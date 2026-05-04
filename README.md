@@ -16,6 +16,42 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Keep the app running after closing VS Code
+
+`npm run dev` is tied to the terminal session, so the app stops when VS Code closes.
+
+To keep the app available on `http://localhost:3000` after closing VS Code, use the background production server instead:
+
+```bash
+npm run app:start
+```
+
+Useful commands:
+
+```bash
+npm run app:status
+npm run app:stop
+```
+
+The first start will build the app automatically if needed, then launch `next start` in the background and write logs to `.runtime/`.
+
+## Auto-sync local production with code changes
+
+If you want your local production server to update automatically every time you edit code, start the sync watcher:
+
+```bash
+npm run app:sync:start
+```
+
+Useful commands:
+
+```bash
+npm run app:sync:status
+npm run app:stop
+```
+
+This mode watches the project files, runs a fresh production build, and restarts `next start` after each change.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

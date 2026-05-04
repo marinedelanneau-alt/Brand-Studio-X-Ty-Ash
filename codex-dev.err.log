@@ -1,0 +1,774 @@
+⨯ ./app/ui/admin-module-editor.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from D:\projet-dev\my-app\app\ui\admin-module-editor.tsx
+    1: Le fichier spécifié est introuvable. (os error 2)
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+⨯ ./app/ui/admin-module-editor.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from D:\projet-dev\my-app\app\ui\admin-module-editor.tsx
+    1: Le fichier spécifié est introuvable. (os error 2)
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+./app/admin/modules/page.tsx
+⚠ Fast Refresh had to perform a full reload when t-dev\\my-app\\node_modules\\next\\dist\\client\\app-dir\\link.js","ids":[]} changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⨯ ./app/ui/admin-module-editor.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from D:\projet-dev\my-app\app\ui\admin-module-editor.tsx
+    1: Le fichier spécifié est introuvable. (os error 2)
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+./app/admin/modules/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+
+Caused by:
+    0: Failed to read source code from D:\projet-dev\my-app\app\ui\admin-module-editor.tsx
+    1: Le fichier spécifié est introuvable. (os error 2)
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error: 
+
+Caused by:
+    0: Failed to read source code from D:\projet-dev\my-app\app\ui\admin-module-editor.tsx
+    1: Le fichier spécifié est introuvable. (os error 2)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'D:\projet-dev\my-app\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'D:\projet-dev\my-app\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⨯ ./app/ui/admin-module-editor.tsx
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:559:82]
+ 557 |           <form action={saveAdminModule} className="space-y-6">
+ 558 |             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
+ 559 |             <input type="hidden" name="submodulesJson" value={submodulesJson} />
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+./app/admin/modules/page.tsx
+⨯ ./app/ui/admin-module-editor.tsx
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:559:82]
+ 557 |           <form action={saveAdminModule} className="space-y-6">
+ 558 |             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
+ 559 |             <input type="hidden" name="submodulesJson" value={submodulesJson} />
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+./app/admin/modules/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:559:82]
+ 557 |           <form action={saveAdminModule} className="space-y-6">
+ 558 |             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
+ 559 |             <input type="hidden" name="submodulesJson" value={submodulesJson} />
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:559:82]
+ 557 |           <form action={saveAdminModule} className="space-y-6">
+ 558 |             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
+ 559 |             <input type="hidden" name="submodulesJson" value={submodulesJson} />
+     `----
+
+
+Caused by:
+    Syntax Error
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⨯ ./app/ui/admin-module-editor.tsx
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:735:30]
+ 733 |                           Ajouter un exercice
+ 734 |                         </button>
+ 735 |                       </div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/ui/admin-module-editor.tsx
+./app/admin/modules/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:735:30]
+ 733 |                           Ajouter un exercice
+ 734 |                         </button>
+ 735 |                       </div>
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:735:30]
+ 733 |                           Ajouter un exercice
+ 734 |                         </button>
+ 735 |                       </div>
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./app/ui/admin-module-editor.tsx
+Error:   x Expected '</', got '<eof>'
+     ,-[D:\projet-dev\my-app\app\ui\admin-module-editor.tsx:735:30]
+ 733 |                           Ajouter un exercice
+ 734 |                         </button>
+ 735 |                       </div>
+     `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `---- 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `---- 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx 
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import {
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/admin-module-editor.tsx
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] Uncaught Error: An unexpected response was received from the server.
+    at ModuleLearningSection (app\ui\module-learning-section.tsx:107:11)
+    at WorkspaceModulePage (app\mon-espace\module\[moduleId]\page.tsx:174:13)
+  105 |         </p>
+  106 |         <div className="mt-5">
+> 107 |           <ModuleAnswerForm
+      |           ^
+  108 |             module={module}
+  109 |             activeSubmoduleId={currentSubmodule?.id}
+  110 |             initialExerciseIndex={exerciseStartIndex}
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+[browser] ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx 
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+⨯ ./lib/training.ts
+Error:   x You're importing a module that depends on "server-only". This API is only available in Server Components in the App Router, but you are using it in the Pages Router.
+  | Learn more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  |
+
+   ,-[D:\projet-dev\my-app\lib\training.ts:1:1]
+ 1 | import "server-only";
+   : ^^^^^^^^^^^^^^^^^^^^^
+ 2 | 
+ 3 | import { createSupabaseServerClient } from "@/lib/supabase/server";
+ 4 | import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+   `----
+
+Import trace for requested module:
+./lib/training.ts
+./app/ui/module-answer-form.tsx
+./app/ui/module-learning-section.tsx
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+^C

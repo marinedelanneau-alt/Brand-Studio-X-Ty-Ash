@@ -1,26 +1,209 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf6ed;
+  --foreground: #6c6056;
+  --background-grid: rgba(184, 171, 152, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--background-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--background-grid) 1px, transparent 1px),
+    radial-gradient(circle at 14% 10%, rgba(243, 198, 35, 0.08), transparent 16%),
+    radial-gradient(circle at 84% 18%, rgba(219, 232, 216, 0.14), transparent 18%),
+    radial-gradient(circle at 72% 84%, rgba(246, 178, 107, 0.08), transparent 18%);
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%, 100% 100%;
+  background-position: top left, top left, top left, top left, top left;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+textarea,
+select {
+  font: inherit;
+}
+
+.font-more-sugar {
+  font-family: var(--font-more-sugar), cursive;
+}
+
+.tiptap-editor p.is-editor-empty:first-child::before {
+  color: #a39488;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap-editor h2,
+.module-content h2 {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.8rem;
+  line-height: 1.05;
+  color: #4b4550;
+}
+
+.tiptap-editor h3,
+.module-content h3 {
+  margin: 1.25rem 0 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #4b4550;
+}
+
+.tiptap-editor p,
+.module-content p,
+.tiptap-editor ul,
+.module-content ul,
+.tiptap-editor ol,
+.module-content ol,
+.tiptap-editor blockquote,
+.module-content blockquote {
+  margin: 0.85rem 0;
+}
+
+.tiptap-editor ul,
+.module-content ul,
+.tiptap-editor ol,
+.module-content ol {
+  padding-left: 1.4rem;
+}
+
+.tiptap-editor ul,
+.module-content ul {
+  list-style: disc;
+}
+
+.tiptap-editor ol,
+.module-content ol {
+  list-style: decimal;
+}
+
+.tiptap-editor a,
+.module-content a {
+  color: #cf7430;
+  text-decoration: underline;
+}
+
+.tiptap-editor blockquote,
+.module-content blockquote {
+  border-left: 3px solid #efd7b8;
+  padding-left: 1rem;
+  color: #7b7068;
+}
+
+.tiptap-editor .ProseMirror {
+  min-height: 10rem;
+}
+
+.tiptap-editor .ProseMirror:focus {
+  outline: none;
+}
+
+::selection {
+  background: rgba(243, 198, 35, 0.38);
+}
+
+.spectrum-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.spectrum-range::-moz-range-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.spectrum-range::-webkit-slider-runnable-track {
+  height: 2.5rem;
+  background: transparent;
+}
+
+.spectrum-range::-moz-range-track {
+  height: 2.5rem;
+  background: transparent;
+}
+
+@keyframes spectrum-confetti {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.55);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-26px) scale(1);
+  }
+}
+
+@keyframes spectrum-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-12px) scale(1.3);
+  }
+}
+
+@keyframes spectrum-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.85);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
 }

@@ -1,0 +1,18 @@
+
+> my-app@0.1.0 dev
+> next dev --webpack --webpack
+
+▲ Next.js 16.2.1 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.92:3000
+- Environments: .env.local
+✓ Ready in 1211ms
+
+○ Compiling /mon-espace ...
+ GET /mon-espace 307 in 5.9s (next.js: 4.9s, application-code: 953ms)
+ GET /mon-espace 200 in 6.4s (next.js: 3.6s, application-code: 2.9s)
+○ Compiling / ...
+ GET / 200 in 5.2s (next.js: 4.7s, application-code: 452ms)
+ GET /mon-espace/module/2 200 in 4.4s (next.js: 3.2s, application-code: 1208ms)
+ GET /mon-espace/module/2 200 in 604ms (next.js: 37ms, application-code: 567ms)
+^C^C

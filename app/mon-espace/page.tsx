@@ -1,0 +1,362 @@
+import Image from "next/image";
+import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
+import DatabaseErrorState from "@/app/ui/database-error-state";
+import ProjectNameForm from "@/app/ui/project-name-form";
+import RevealOnScroll from "@/app/ui/reveal-on-scroll";
+import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
+import LogoutButton from "../ui/logout-button";
+import { getAuthenticatedAccount } from "@/lib/session";
+import { getWorkspaceData } from "@/lib/training";
+import type { WorkspaceModule } from "@/lib/training-types";
+import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import {
+  getTableCellCount,
+  isAnswerableExerciseType,
+  parseStoredTableConfig,
+} from "@/lib/exercise-types";
+
+function isExerciseAnswered(
+  exercise: WorkspaceModule["exercises"][number],
+  answers: WorkspaceModule["answers"],
+) {
+  if (!isAnswerableExerciseType(exercise.type)) {
+    return true;
+  }
+
+  const values = answers[exercise.id] ?? [];
+
+  if (exercise.type === "fill_blank") {
+    const blankCount = (exercise.question.match(/_{3,}/g) ?? []).length;
+    return values.length === blankCount && values.every((value) => value.trim().length > 0);
+  }
+
+  if (exercise.type === "group_open") {
+    return (
+      values.length === exercise.options.length &&
+      values.every((value) => value.trim().length > 0)
+    );
+  }
+
+  if (exercise.type === "table") {
+    const expectedCount = getTableCellCount(parseStoredTableConfig(exercise.options));
+    return values.length === expectedCount && values.every((value) => value.trim().length > 0);
+  }
+
+  return values.some((value) => value.trim().length > 0);
+}
+
+function getResumeHref(modules: WorkspaceModule[]) {
+  const activeModule =
+    modules.find(
+      (module) =>
+        module.progress.isUnlocked &&
+        module.progress.answeredCount > 0 &&
+        !module.progress.isCompleted,
+    ) ??
+    modules.find((module) => module.progress.isUnlocked && !module.progress.isCompleted) ??
+    modules.find((module) => module.progress.isUnlocked) ??
+    modules[0];
+
+  if (!activeModule) {
+    return "/mon-espace";
+  }
+
+  for (let submoduleIndex = 0; submoduleIndex < activeModule.submodules.length; submoduleIndex += 1) {
+    const submodule = activeModule.submodules[submoduleIndex];
+
+    for (let exerciseIndex = 0; exerciseIndex < submodule.exercises.length; exerciseIndex += 1) {
+      const exercise = submodule.exercises[exerciseIndex];
+
+      if (isAnswerableExerciseType(exercise.type) && !isExerciseAnswered(exercise, activeModule.answers)) {
+        return `/mon-espace/module/${activeModule.id}?mode=exercises&submodule=${submoduleIndex}&exercise=${exerciseIndex}`;
+      }
+    }
+  }
+
+  return `/mon-espace/module/${activeModule.id}`;
+}
+
+export default async function MonEspacePage() {
+  let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
+  let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
+  let loadError = "";
+
+  try {
+    account = await getAuthenticatedAccount();
+    workspace = await getWorkspaceData(account.id);
+  } catch (error) {
+    unstable_rethrow(error);
+    loadError = getUserFacingDataErrorMessage(error);
+  }
+
+  if (!account || !workspace) {
+    return (
+      <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-6xl">
+          <DatabaseErrorState
+            title="Votre espace ne peut pas etre charge"
+            message={loadError}
+          />
+        </section>
+      </main>
+    );
+  }
+
+  const hasStartedModules = workspace.modules.some(
+    (module) => module.progress.answeredCount > 0 || module.progress.isCompleted,
+  );
+  const firstModuleHref =
+    workspace.modules.find((module) => module.progress.isUnlocked)?.id
+      ? `/mon-espace/module/${workspace.modules.find((module) => module.progress.isUnlocked)?.id}`
+      : "/mon-espace";
+  const continueHref = getResumeHref(workspace.modules);
+  const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl space-y-6">
+        <div className="border-b border-[#eadfca] pb-8 sm:pb-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-4">
+                {workspace.project?.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={workspace.project.logo_url}
+                    alt={`Logo de ${workspace.project.name}`}
+                    className="h-16 w-16 rounded-[1rem] border border-[#eadfca] bg-white object-contain p-2"
+                  />
+                ) : (
+                  <Image
+                    src="/logo.png"
+                    alt="Brand Studio"
+                    width={154}
+                    height={86}
+                    className="h-auto w-[7.4rem]"
+                    priority
+                  />
+                )}
+                <span className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                  Espace de travail
+                </span>
+              </div>
+              <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
+                <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[#2f2a33] sm:text-[4rem]">
+                  {workspace.project?.name ?? "Mon projet"}
+                </p>
+                <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+                  En route vers ta nouvelle identite de marque
+                </p>
+              </div>
+              <div className="relative mt-12 max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-8">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+                />
+                <div className="relative">
+                  <div>
+                    <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+                      Introduction
+                    </p>
+                  </div>
+                  <div className="space-y-5 pt-5 text-[#6b625a]">
+                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                      Bienvenue dans le Brand Studio
+                    </p>
+                    <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-4 text-[1.05rem] leading-8 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                      Hello, ca y est, c&apos;est le grand moment ! Je te remercie
+                      encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
+                      belle mission de structurer ton identite de marque. Es-tu pret
+                      a entrer dans la peau d&apos;un Directeur Artistique ?
+                    </p>
+                    <div className="space-y-4 text-base leading-8 text-[#6f645b]">
+                      <p>
+                        Ce guide est le document de reference de ton identite,{" "}
+                        <span className="font-semibold italic text-[#5f544a]">
+                          un kit cle en main pour poser les bases d&apos;une marque forte.
+                        </span>
+                      </p>
+                      <p>
+                        Il rassemble les fondations strategiques et visuelles de ta
+                        marque afin de garantir une communication{" "}
+                        <strong className="font-extrabold text-[#4b4550]">
+                          coherente, professionnelle et durable
+                        </strong>
+                        .
+                      </p>
+                      <p className="text-[#6f645b]">
+                        <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
+                        utilise-le comme un repere pour creer, decliner et faire
+                        evoluer ta marque en toute autonomie.
+                      </p>
+                    </div>
+                    {workspace.modules.length > 0 ? (
+                      <div className="pt-4">
+                        <Link
+                          href={ctaHref}
+                          className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)] transition hover:brightness-[1.02]"
+                        >
+                          {hasStartedModules ? "Reprendre" : "Commencer"}
+                        </Link>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2 lg:w-[24rem] lg:grid-cols-1">
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+                />
+                <div className="relative space-y-6">
+                  {workspace.project && workspace.modules.length > 0 ? (
+                    <nav className="border-b border-[#f0e4d3] pb-6">
+                      <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                        Navigation
+                      </p>
+                      <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
+                        Vos modules
+                      </h3>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {workspace.modules.map((module) =>
+                          module.progress.isUnlocked ? (
+                            <Link
+                              key={module.id}
+                              href={`/mon-espace/module/${module.id}`}
+                              className={`rounded-full border px-4 py-2 text-sm font-black uppercase tracking-[0.12em] transition ${
+                                module.progress.isCompleted
+                                  ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
+                                  : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
+                              }`}
+                            >
+                              {module.title}
+                            </Link>
+                          ) : (
+                            <span
+                              key={module.id}
+                              className="cursor-not-allowed rounded-full border border-[#ebe4dc] bg-[#f7f2ec] px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-[#9b8d80]"
+                            >
+                              {module.title}
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    </nav>
+                  ) : null}
+
+                  <div className="border-b border-[#f0e4d3] pb-6">
+                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                      Profil
+                    </p>
+                    <p className="mt-4 text-lg font-semibold text-[#4b4550]">
+                      {account.client_name ?? "Client"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#7b7068]">{account.email}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#7b7068]">
+                      {account.company_name ?? "Entreprise non renseignee"}
+                    </p>
+                    {workspace.project ? (
+                      <WorkspaceLogoForm
+                        currentLogoUrl={workspace.project.logo_url}
+                        projectName={workspace.project.name}
+                      />
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                      Progression
+                    </p>
+                    <p className="mt-4 text-[2.8rem] font-black leading-none text-[#4b4550]">
+                      {workspace.progressPercent}%
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#7b7068]">
+                      {workspace.completedModulesCount} module
+                      {workspace.completedModulesCount > 1 ? "s" : ""} termine
+                      {workspace.completedModulesCount > 1 ? "s" : ""} sur{" "}
+                      {workspace.totalModulesCount}
+                    </p>
+                    <div className="mt-5 h-3 overflow-hidden rounded-full bg-[#f1ece5]">
+                      <div
+                        className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
+                        style={{ width: `${workspace.progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:col-span-2 lg:col-span-1">
+                {account.is_admin ? (
+                  <Link
+                    href="/admin/modules"
+                    className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                  >
+                    Gerer les modules
+                  </Link>
+                ) : null}
+                <LogoutButton />
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-[#eadfca] pt-7">
+            <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[#5d5259] sm:text-[2.9rem] lg:text-[3.35rem]">
+              Votre histoire commence ici, ecrivons-la ensemble !
+            </p>
+          </div>
+        </div>
+
+        {!workspace.project ? (
+          <section className="rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] sm:p-8">
+            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+              <div>
+                <p className="inline-flex rounded-full bg-[#f2eef7] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                  Creation
+                </p>
+                <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[#4b4550] sm:text-[3rem]">
+                  Creez votre unique projet de marque
+                </h2>
+                <p className="mt-4 max-w-xl text-base leading-8 text-[#7b7068]">
+                  Le projet commence simplement avec un nom. Vous pourrez ensuite
+                  suivre les modules, les videos, le contenu et les exercices
+                  dans le bon ordre.
+                </p>
+              </div>
+
+              <div className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffdf7] p-6">
+                <ProjectNameForm />
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {workspace.project ? (
+          <section className="grid gap-6">
+            {workspace.modules.length === 0 ? (
+              <div className="rounded-[1.6rem] border border-[#eadfca] bg-white p-6 text-base leading-8 text-[#7b7068] shadow-[0_18px_46px_rgba(210,189,152,0.1)]">
+                Aucun module n&apos;est encore publie. Un administrateur peut les
+                ajouter depuis l&apos;espace de gestion.
+              </div>
+            ) : workspace.modules.length > 0 ? (
+              <div className="flex items-center justify-center py-6 sm:py-8">
+                <RevealOnScroll>
+                  <Image
+                    src="/logo.png"
+                    alt="Brand Studio"
+                    width={220}
+                    height={124}
+                    className="h-auto w-[10rem] drop-shadow-[0_14px_24px_rgba(92,78,63,0.14)] transition-transform duration-300 hover:-translate-y-1 hover:drop-shadow-[0_20px_34px_rgba(92,78,63,0.18)] sm:w-[12rem]"
+                  />
+                </RevealOnScroll>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
+      </section>
+    </main>
+  );
+}

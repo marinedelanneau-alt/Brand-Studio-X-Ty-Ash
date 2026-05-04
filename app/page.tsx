@@ -1,65 +1,139 @@
+import { cookies } from "next/headers";
 import Image from "next/image";
+import Link from "next/link";
+import AccessLoginForm from "./ui/access-login-form";
+import { findAccountByCode } from "@/lib/access-codes";
 
-export default function Home() {
+const studioNotes = [
+  "Acces immediat a votre espace de formation",
+  "Code personnel simple a reutiliser",
+  "Interface editoriale inspiree de Brand Studio",
+];
+
+export default async function Home() {
+  const cookieStore = await cookies();
+  const accessCode = cookieStore.get("formation-access")?.value;
+  let hasAccess = false;
+
+  if (accessCode) {
+    try {
+      const account = await findAccountByCode(accessCode);
+      hasAccess = Boolean(account && account.is_active !== false);
+    } catch {
+      hasAccess = false;
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+      <section className="relative mx-auto w-full max-w-[84rem] overflow-hidden rounded-[2rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] shadow-[0_16px_44px_rgba(210,189,152,0.09)]">
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,rgba(243,198,35,0),rgba(243,198,35,0.72),rgba(246,178,107,0.42),rgba(243,198,35,0))]" />
+
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="relative overflow-hidden px-7 py-8 sm:px-9 sm:py-9 lg:px-10 lg:py-10">
+            <div className="pointer-events-none absolute left-0 top-12 h-28 w-28 rounded-full bg-[#f3c623]/8 blur-3xl" />
+
+            <div className="relative flex h-full flex-col gap-7">
+              <div className="flex items-center gap-4">
+                <Image
+                  src="/logo.png"
+                  alt="Brand Studio"
+                  width={154}
+                  height={86}
+                  className="h-auto w-[8rem]"
+                  priority
+                />
+                <div className="hidden h-5 w-px bg-[#eadfca] lg:block" />
+                <p className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-5 py-3 text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+                  Espace de travail
+                </p>
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-[11rem_minmax(0,1fr)] lg:items-center">
+                <div className="relative mx-auto min-h-[18rem] w-full max-w-[12rem] sm:min-h-[21rem] sm:max-w-[13rem] lg:mx-0 lg:min-h-[22rem] lg:max-w-[11rem]">
+                  <Image
+                    src="/Icone Accueil - Brand Studio.png"
+                    alt="Illustration Brand Studio"
+                    fill
+                    sizes="(min-width: 1024px) 11rem, (min-width: 640px) 13rem, 12rem"
+                    className="object-contain object-center drop-shadow-[0_12px_18px_rgba(198,168,120,0.08)]"
+                    priority
+                  />
+                </div>
+
+                <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
+                  <h1 className="whitespace-nowrap font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[#4b4550] sm:text-[3.45rem] xl:text-[3.95rem]">
+                    Brand Studio
+                  </h1>
+                  <p className="mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[#7b7068]">
+                    Un espace editorial pour structurer votre parcours, acceder
+                    a vos ressources et avancer avec plus de clarte.
+                  </p>
+
+                  <div className="mt-6 grid gap-3 border-l border-[#eadfca] pl-5">
+                    {studioNotes.map((item) => (
+                      <div
+                        key={item}
+                        className="flex items-start gap-3 text-[0.9rem] leading-6 text-[#7b7068]"
+                      >
+                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#f0cf55]" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] px-7 py-8 sm:px-9 sm:py-9 lg:border-l lg:border-t-0 lg:px-9 lg:py-10">
+            <div className="flex h-full flex-col justify-center gap-8">
+              <div>
+                <div className="flex flex-col items-start gap-5">
+                  <h2 className="font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.92] tracking-[-0.04em] text-[#4b4550] sm:text-[2.7rem]">
+                    Ouvrir votre espace
+                  </h2>
+                  <p className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-5 py-3 text-[0.7rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+                    Espace de travail
+                  </p>
+                </div>
+
+                <p className="mt-5 max-w-[23rem] text-[0.95rem] leading-[1.8] text-[#7b7068]">
+                  Utilisez votre code de connexion pour retrouver votre espace de
+                  travail, vos ressources et votre parcours de formation.
+                </p>
+              </div>
+
+              <div>
+                {hasAccess ? (
+                  <div className="space-y-6 rounded-[1.9rem] border border-[#efe2d1] bg-[#fffdf7] p-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-[#7a7087]">
+                        Session active
+                      </p>
+                      <span className="rounded-full bg-[#fff1c7] px-3 py-1 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+                        active
+                      </span>
+                    </div>
+                    <p className="text-base leading-7 text-[#7b7068]">
+                      Votre acces est deja reconnu. Ouvrez directement votre
+                      espace client.
+                    </p>
+                    <Link
+                      href="/mon-espace"
+                      className="flex h-16 w-full items-center justify-center rounded-[1.2rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5"
+                    >
+                      Ouvrir mon espace
+                    </Link>
+                  </div>
+                ) : (
+                  <AccessLoginForm />
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
