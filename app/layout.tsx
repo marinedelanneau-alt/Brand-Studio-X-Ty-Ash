@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Caveat, Cormorant_Garamond, Manrope, Satisfy } from "next/font/google";
+import { Suspense } from "react";
 import ScrollToTop from "./ui/scroll-to-top";
 import "./globals.css";
 
@@ -49,7 +50,9 @@ export default function RootLayout({
       className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} ${satisfy.variable} ${moreSugar.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ScrollToTop />
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         {children}
       </body>
     </html>
