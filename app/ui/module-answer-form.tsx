@@ -592,6 +592,7 @@ export default function ModuleAnswerForm({
   const previousModuleIdRef = useRef(module.id);
   const allowExplicitSubmitRef = useRef(false);
   const submitModeRef = useRef<"draft" | "complete" | null>(null);
+  const shouldOpenSummaryAfterSaveRef = useRef(false);
 
   const currentSubmodule = useMemo(
     () =>
@@ -678,6 +679,7 @@ export default function ModuleAnswerForm({
       setChecklistDrafts({});
       setAutoSaveState(initialState);
       setAiAssistStates({});
+      shouldOpenSummaryAfterSaveRef.current = false;
       hasMountedRef.current = false;
       return;
     }
@@ -717,6 +719,15 @@ export default function ModuleAnswerForm({
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isPopupOpen]);
+
+  useEffect(() => {
+    if (state.status !== "success" || !shouldOpenSummaryAfterSaveRef.current) {
+      return;
+    }
+
+    shouldOpenSummaryAfterSaveRef.current = false;
+    window.location.assign(getModuleSummaryHref(module.id));
+  }, [module.id, state.status]);
 
   async function handleAiAssist(
     exercise: WorkspaceModule["exercises"][number],
@@ -792,6 +803,7 @@ export default function ModuleAnswerForm({
         const formData = buildSubmissionFormData(module, answers);
 
         if (submitMode === "complete") {
+          shouldOpenSummaryAfterSaveRef.current = true;
           onComplete?.(answers);
         }
 
@@ -2427,4 +2439,3 @@ function ChecklistExerciseBlocks({
     </div>
   );
 }
-
