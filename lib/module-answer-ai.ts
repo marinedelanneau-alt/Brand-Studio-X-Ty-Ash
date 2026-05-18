@@ -11,6 +11,8 @@ import {
 } from "@/lib/exercise-types";
 
 export const MODULE_ANSWER_AI_MODEL = "gpt-4o-mini";
+export const MODULE_ANSWER_EMBEDDING_MODEL = "text-embedding-3-large";
+const RAG_TOP_K = 3;
 
 type AssistanceMode = "suggest" | "improve";
 
@@ -36,6 +38,97 @@ type AssistanceResponse = {
     values: string[];
   }>;
 };
+
+type RagContextItem = {
+  id: string;
+  title: string;
+  content: string;
+  embedding?: number[];
+};
+
+async function getEmbedding(text: string, apiKey: string) {
+  const response = await fetch("https://api.openai.com/v1/embeddings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MODULE_ANSWER_EMBEDDING_MODEL,
+      input: text,
+    }),
+  });
+
+  const payload = await response.json();
+
+  if (!response.ok) {
+    const message = typeof payload?.error?.message === "string" ? payload.error.message : "Erreur lors de la generation des embeddings.";
+    throw new Error(message);
+  }
+
+  if (!payload?.data || !Array.isArray(payload.data) || payload.data.length === 0) {
+    throw new Error("Aucun embedding n'a ete retourne par l'API.");
+  }
+
+  return payload.data[0].embedding as number[];
+}
+
+function cosineSimilarity(left: number[], right: number[]) {
+  const leftLength = Math.sqrt(left.reduce((sum, value) => sum + value * value, 0));
+  const rightLength = Math.sqrt(right.reduce((sum, value) => sum + value * value, 0));
+  if (leftLength === 0 || rightLength === 0) {
+    return 0;
+  }
+
+  const dot = left.reduce((sum, value, index) => sum + value * (right[index] ?? 0), 0);
+  return dot / (leftLength * rightLength);
+}
+
+function buildRagContextItems(input: {
+  module: WorkspaceModule;
+  workspaceModules: WorkspaceModule[];
+  currentAnswers: Record<number, string[]>;
+  currentExerciseId: number;
+}) {
+  const contextItems = buildWorkspaceAnswerContext(input);
+
+  return contextItems.map((item, index) => ({
+    id: `context-${index}`,
+    title: `${item.moduleTitle}${item.submoduleTitle ? ` / ${item.submoduleTitle}` : ""}`,
+    content: `${item.question}\n${item.answer}`,
+  }));
+}
+
+async function selectRelevantRagContext(
+  items: RagContextItem[],
+  queryEmbedding: number[],
+  apiKey: string,
+) {
+  const itemsWithEmbedding = await Promise.all(
+    items.map(async (item) => {
+      const embedding = await getEmbedding(item.content, apiKey);
+      return {
+        ...item,
+        embedding,
+      };
+    }),
+  );
+
+  return itemsWithEmbedding
+    .map((item) => ({
+      ...item,
+      score: item.embedding ? cosineSimilarity(queryEmbedding, item.embedding) : 0,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, RAG_TOP_K)
+    .filter((item) => item.score > 0.01);
+}
+
+function formatRagContext(items: Array<RagContextItem & { score: number }>) {
+  return items
+    .map((item) => `- ${item.title} : ${item.content}`)
+    .join("\n\n");
+}
 
 export function supportsModuleAnswerAi(exercise: ModuleExercise) {
   return (
@@ -354,6 +447,26 @@ export async function generateModuleAnswerAssistance(input: {
   });
   const currentDraft = formatQuestionAnswerForContext(input.exercise, currentRawValues).trim();
 
+  const ragContextItems = buildRagContextItems({
+    module: input.module,
+    workspaceModules: input.workspaceModules,
+    currentAnswers: input.currentAnswers,
+    currentExerciseId: input.exercise.id,
+  });
+
+  const queryText = [
+    `Question: ${input.exercise.question}`,
+    `Mode: ${input.mode}`,
+    `Reponses existantes: ${currentDraft || "Aucune"}`,
+    `Contexte du module: ${input.module.title}`,
+  ].join("\n");
+
+  const queryEmbedding = await getEmbedding(queryText, apiKey);
+  const relevantRagItems = await selectRelevantRagContext(ragContextItems, queryEmbedding, apiKey);
+  const ragContextText = relevantRagItems.length
+    ? formatRagContext(relevantRagItems)
+    : "Aucun contexte additionnel pertinent n'a ete trouve.";
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -404,6 +517,10 @@ export async function generateModuleAnswerAssistance(input: {
           role: "system",
           content:
             "Tu es un directeur artistique senior dans une agence de communication. Tu accompagnes un candidat qui construit sa marque. Reponds toujours en francais. Tes propositions doivent etre credibles, concretes, coherentes avec les reponses deja donnees et utiles pour une plateforme de formation de marque. Tu dois tenir compte explicitement du nom de marque fourni et, s'il existe, du nom d'entreprise du client. Si le contexte est incomplet, formule une hypothese raisonnable plutot qu'un discours vague. En mode improve, preserve l'intention du candidat tout en rendant la formulation plus claire, plus specifique et plus impactante. Ne fournis pas de meta-commentaire dans les champs de reponse.",
+        },
+        {
+          role: "system",
+          content: "Contexte pertinent extrait du projet pour le RAG :\n\n" + ragContextText,
         },
         {
           role: "user",

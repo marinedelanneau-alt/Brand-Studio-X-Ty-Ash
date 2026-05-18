@@ -190,6 +190,17 @@ function computeModuleAnswerMap(
   return Object.fromEntries(scopedEntries);
 }
 
+const ALWAYS_UNLOCK_MODULE_KEYWORDS = [
+  "positionnement",
+  "personnalité",
+  "ton de la marque",
+];
+
+function isAlwaysUnlockedModule(module: BrandModule) {
+  const title = module.title.toLowerCase();
+  return ALWAYS_UNLOCK_MODULE_KEYWORDS.some((keyword) => title.includes(keyword));
+}
+
 function getModuleProgress(
   module: BrandModule,
   exercises: ModuleExercise[],
@@ -308,14 +319,18 @@ function getModuleProgress(
   const isCompleted =
     hasManualCompletion || (exerciseCount > 0 && answeredCount === exerciseCount);
 
+  const isUnlocked = true;
+
+  const completionPercent =
+    exerciseCount === 0 ? 0 : Math.round((answeredCount / exerciseCount) * 100);
+
   return {
     answeredCount,
     exerciseCount,
     isCompleted,
-    isUnlocked: module.position <= unlockedUntilPosition || isCompleted,
-    completionPercent:
-      exerciseCount === 0 ? 0 : Math.round((answeredCount / exerciseCount) * 100),
-  } satisfies ModuleProgress;
+    isUnlocked,
+    completionPercent,
+  };
 }
 
 export async function getProjectByAccountId(accountId: number) {

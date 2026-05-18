@@ -728,7 +728,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
       ) : null}
 
       {exercise.type === "popup_message" ? <PreviewPopupMessage exercise={exercise} /> : null}
-      {exercise.type === "image_upload" ? <PreviewImageUpload exercise={exercise} /> : null}
+      {(exercise.type === "image_upload" || exercise.type === "moodboard") ? <PreviewImageUpload exercise={exercise} /> : null}
       {exercise.type === "brand_persona" ? <PreviewBrandPersona exercise={exercise} /> : null}
       {exercise.type === "spectrum" ? <PreviewSpectrum exercise={exercise} /> : null}
       {exercise.type === "color_palette" ? <PreviewColorPalette exercise={exercise} /> : null}

@@ -65,10 +65,6 @@ export default async function WorkspaceModulePage({
     notFound();
   }
 
-  if (!currentModule.progress.isUnlocked) {
-    redirect("/mon-espace");
-  }
-
   const requestedSubmoduleIndex = Number(resolvedSearchParams?.submodule ?? "0");
   const requestedExerciseIndex = Number(resolvedSearchParams?.exercise ?? "0");
   const initialSubmoduleIndex = Number.isFinite(requestedSubmoduleIndex)
@@ -85,8 +81,9 @@ export default async function WorkspaceModulePage({
           Math.max(selectedSubmodule.exercises.length - 1, 0),
         )
       : 0;
-  const startInExercises = resolvedSearchParams?.mode === "exercises";
+  const startInExercises = resolvedSearchParams?.mode !== "reading";
   const shouldForceSummary = resolvedSearchParams?.summary === "1";
+
   const showSummary = shouldForceSummary;
   const summaryCard = workspace.project
     ? buildModuleSummaryCard({
@@ -144,17 +141,13 @@ export default async function WorkspaceModulePage({
             </div>
           </div>
 
-          {currentModule.progress.isUnlocked && !showSummary ? (
+          {!showSummary ? (
             <ModuleLearningSection
               module={currentModule}
               initialSubmoduleIndex={initialSubmoduleIndex}
               initialExerciseIndex={initialExerciseIndex}
               startInExercises={startInExercises}
             />
-          ) : !showSummary ? (
-            <div className="mt-8 rounded-[1rem] border border-dashed border-[#eadfca] bg-white p-6 text-base leading-8 text-[#7b7068]">
-              Terminez les modules precedents pour debloquer celui-ci.
-            </div>
           ) : null}
 
           {showSummary && summaryCard ? (

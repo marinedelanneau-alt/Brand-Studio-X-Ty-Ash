@@ -45,7 +45,7 @@ async function persistModuleAnswers(input: {
 
     const selectedModule = workspace.modules.find((item) => item.id === moduleId);
 
-    if (!selectedModule || !selectedModule.progress.isUnlocked) {
+    if (!selectedModule) {
       return {
         status: "error",
         message: "Ce module n'est pas encore disponible.",

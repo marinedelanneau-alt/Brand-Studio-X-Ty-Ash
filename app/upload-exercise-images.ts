@@ -62,7 +62,7 @@ export async function uploadExerciseImages(
     const targetModule = workspace.modules.find((item) => item.id === moduleId);
     const exercise = targetModule?.exercises.find((item) => item.id === exerciseId);
 
-    if (!targetModule || !targetModule.progress.isUnlocked || !exercise || exercise.type !== "image_upload") {
+    if (!targetModule || !exercise || (exercise.type !== "image_upload" && exercise.type !== "moodboard")) {
       return {
         status: "error",
         message: "Cet exercice n'est pas disponible.",

@@ -36,6 +36,12 @@ import {
   type ColorPaletteConfig,
 } from "@/lib/color-palette";
 import {
+  getDefaultMoodboardConfig,
+  getSerializedMoodboardOptions,
+  parseStoredMoodboardConfig,
+  type MoodboardConfig,
+} from "@/lib/exercise-types";
+import {
   getDefaultSmartFeedbackConfig,
   type SmartFeedbackConfig,
 } from "@/lib/smart-feedback";
@@ -43,6 +49,7 @@ import { groupExercisesByGroupId } from "@/lib/exercise-groups";
 import BrandPersonaAdminEditor from "./brand-persona-admin-editor";
 import ColorPaletteAdminEditor from "./color-palette-admin-editor";
 import ExercisePreview from "./exercise-preview";
+import MoodboardAdminEditor from "./moodboard-admin-editor";
 import RichTextEditor from "./rich-text-editor";
 import SmartFeedbackAdminEditor from "./smart-feedback-admin-editor";
 import SpectrumAdminEditor from "./spectrum-admin-editor";
@@ -63,6 +70,7 @@ type EditorQuestion = {
   brandPersonaConfig: BrandPersonaConfig;
   spectrumConfig: SpectrumConfig;
   colorPaletteConfig: ColorPaletteConfig;
+  moodboardConfig: MoodboardConfig;
   smartFeedbackConfig: SmartFeedbackConfig;
 };
 
@@ -133,7 +141,9 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
         ? "Ou se situe ta marque entre sobriete et expression ?"
         : type === "color_palette"
           ? "Construis la palette de couleurs de ta marque"
-        : "",
+          : type === "moodboard"
+            ? "Creer un moodboard d'inspiration pour ta marque"
+            : "",
     optionsText: getExerciseDefaultOptionsText(type),
     tableRows: tableConfig.rows,
     tableColumns: tableConfig.columns,
@@ -143,6 +153,7 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
     brandPersonaConfig: getDefaultBrandPersonaConfig(),
     spectrumConfig,
     colorPaletteConfig,
+    moodboardConfig: getDefaultMoodboardConfig(),
     smartFeedbackConfig: getDefaultSmartFeedbackConfig(),
   };
 }
@@ -179,7 +190,9 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     type: exercise.type,
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
-    question: getEditorExerciseQuestion(exercise.type, exercise.question),
+    question:
+      getEditorExerciseQuestion(exercise.type, exercise.question) ||
+      (exercise.type === "moodboard" ? "Creer un moodboard d'inspiration pour ta marque" : ""),
     optionsText: getEditorOptionsText(exercise.type, exercise.options),
     tableRows: tableConfig.rows,
     tableColumns: tableConfig.columns,
@@ -189,6 +202,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     brandPersonaConfig: parseStoredBrandPersonaConfig(exercise.options),
     spectrumConfig: parseStoredSpectrumConfig(exercise.options),
     colorPaletteConfig: parseStoredColorPaletteConfig(exercise.options),
+    moodboardConfig: parseStoredMoodboardConfig(exercise.options),
     smartFeedbackConfig: exercise.feedback_config ?? getDefaultSmartFeedbackConfig(),
   };
 }
@@ -320,6 +334,8 @@ function serializeQuestion(question: EditorQuestion) {
         ]
       : question.type === "image_upload"
         ? [`__image_upload_max__:${Math.max(1, question.imageUploadMax)}`]
+      : question.type === "moodboard"
+        ? getSerializedMoodboardOptions(question.moodboardConfig)
       : question.type === "brand_persona"
         ? getSerializedBrandPersonaOptions(question.brandPersonaConfig)
       : question.type === "spectrum"
@@ -994,6 +1010,15 @@ function QuestionCard({
                 Exemple : 6 pour un mini moodboard, 12 pour un tableau plus riche.
               </p>
             </div>
+          ) : null}
+
+          {question.type === "moodboard" ? (
+            <MoodboardAdminEditor
+              value={question.moodboardConfig}
+              onChange={(nextMoodboardConfig) =>
+                onChange((current) => ({ ...current, moodboardConfig: nextMoodboardConfig }))
+              }
+            />
           ) : null}
         </div>
         ) : null}

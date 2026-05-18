@@ -58,6 +58,153 @@ export type MoodboardGenerationInput = {
   maxImages?: number;
 };
 
+export type MoodboardSlotType = "image" | "text" | "color";
+
+export type MoodboardTemplateSlot = {
+  id: string;
+  type: MoodboardSlotType;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  defaultText?: string;
+  label?: string;
+  usage?: string;
+};
+
+export type MoodboardTemplate = {
+  id: string;
+  name: string;
+  preview_image: string;
+  layoutType: "editorial" | "minimal" | "collage" | "grid";
+  background: {
+    type: "color";
+    value: string;
+  };
+  slots: MoodboardTemplateSlot[];
+};
+
+export const MOODBOARD_TEMPLATES: MoodboardTemplate[] = [
+  {
+    id: "editorial_collage_01",
+    name: "Collage éditorial",
+    preview_image: "",
+    layoutType: "collage",
+    background: { type: "color", value: "#EFE8D0" },
+    slots: [
+      { id: "image_1", type: "image", x: 6, y: 8, width: 34, height: 34, rotation: -4 },
+      { id: "image_2", type: "image", x: 42, y: 8, width: 32, height: 26, rotation: 3 },
+      { id: "text_1", type: "text", x: 76, y: 38, width: 18, height: 12, rotation: 0, defaultText: "Ton univers en quelques mots" },
+      { id: "color_1", type: "color", x: 8, y: 72, width: 12, height: 10, rotation: 0, label: "Accent", usage: "Ton principal" },
+    ],
+  },
+  {
+    id: "minimalist_moodboard_01",
+    name: "Moodboard minimaliste",
+    preview_image: "",
+    layoutType: "minimal",
+    background: { type: "color", value: "#F6EFE4" },
+    slots: [
+      { id: "image_1", type: "image", x: 6, y: 8, width: 44, height: 24, rotation: 0 },
+      { id: "image_2", type: "image", x: 52, y: 8, width: 44, height: 24, rotation: 0 },
+      { id: "text_1", type: "text", x: 6, y: 36, width: 42, height: 16, rotation: 0, defaultText: "Clair, doux, structuré" },
+      { id: "color_1", type: "color", x: 52, y: 36, width: 20, height: 18, rotation: 0, label: "Palette", usage: "Tons clés" },
+      { id: "image_3", type: "image", x: 74, y: 36, width: 22, height: 24, rotation: 0 },
+    ],
+  },
+  {
+    id: "grid_moodboard_01",
+    name: "Moodboard grille propre",
+    preview_image: "",
+    layoutType: "grid",
+    background: { type: "color", value: "#F8F1E7" },
+    slots: [
+      { id: "image_1", type: "image", x: 6, y: 6, width: 29, height: 24, rotation: 0 },
+      { id: "image_2", type: "image", x: 36, y: 6, width: 28, height: 24, rotation: 0 },
+      { id: "image_3", type: "image", x: 67, y: 6, width: 29, height: 24, rotation: 0 },
+      { id: "text_1", type: "text", x: 6, y: 36, width: 29, height: 14, rotation: 0, defaultText: "Ambiance graphique" },
+      { id: "color_1", type: "color", x: 36, y: 36, width: 28, height: 14, rotation: 0, label: "Accent", usage: "Couleur phare" },
+      { id: "image_4", type: "image", x: 67, y: 36, width: 29, height: 14, rotation: 0 },
+      { id: "text_2", type: "text", x: 6, y: 56, width: 29, height: 14, rotation: 0, defaultText: "Organisé et élégant" },
+      { id: "image_5", type: "image", x: 36, y: 56, width: 28, height: 18, rotation: 0 },
+      { id: "color_2", type: "color", x: 67, y: 56, width: 29, height: 18, rotation: 0, label: "Base", usage: "Fond" },
+    ],
+  },
+];
+
+export function getMoodboardTemplate(templateId: string) {
+  return (
+    MOODBOARD_TEMPLATES.find((template) => template.id === templateId) ??
+    MOODBOARD_TEMPLATES[0]
+  );
+}
+
+export function createMoodboardFromTemplate(
+  template: MoodboardTemplate,
+  signals: { palette: string[]; keywords: string[]; persona: string },
+): MoodboardAnswer {
+  const blocks: MoodboardBlock[] = template.slots.map((slot, index) => {
+    if (slot.type === "image") {
+      const keyword = signals.keywords[index % Math.max(signals.keywords.length, 1)] || "univers";
+      const imageBlock = createGeneratedImageBlock({
+        keyword,
+        persona: signals.persona,
+        palette: signals.palette,
+        variant: index,
+      });
+
+      return {
+        ...imageBlock,
+        x: slot.x,
+        y: slot.y,
+        w: slot.width,
+        h: slot.height,
+        rotation: slot.rotation,
+        zIndex: index + 1,
+      };
+    }
+
+    if (slot.type === "color") {
+      return {
+        id: `mood-color-${crypto.randomUUID()}`,
+        type: "color",
+        color: ensureHexColor(signals.palette[index % signals.palette.length] ?? template.background.value),
+        label: slot.label ?? "Couleur",
+        usage: slot.usage ?? "Accent",
+        x: slot.x,
+        y: slot.y,
+        w: slot.width,
+        h: slot.height,
+        rotation: slot.rotation,
+        zIndex: index + 1,
+      };
+    }
+
+    return {
+      id: `mood-text-${crypto.randomUUID()}`,
+      type: "text",
+      text: slot.defaultText ?? signals.keywords[index % Math.max(signals.keywords.length, 1)] ?? "Ton univers",
+      author: signals.persona || "Brand Studio",
+      x: slot.x,
+      y: slot.y,
+      w: slot.width,
+      h: slot.height,
+      rotation: slot.rotation,
+      zIndex: index + 1,
+    };
+  });
+
+  return {
+    type: "moodboard",
+    version: 1,
+    layoutStyle: template.layoutType,
+    ambiance: "",
+    feedback: "",
+    blocks,
+  };
+}
+
 const MOODBOARD_PREFIX = "__moodboard__:";
 const DEFAULT_STYLE: MoodboardLayoutStyle = "editorial";
 

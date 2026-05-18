@@ -54,7 +54,7 @@ export async function requestModuleAnswerAssistance(input: {
 
     const selectedModule = workspace.modules.find((item) => item.id === input.moduleId);
 
-    if (!selectedModule || !selectedModule.progress.isUnlocked) {
+    if (!selectedModule) {
       return {
         status: "error",
         message: "Ce module n'est pas accessible.",

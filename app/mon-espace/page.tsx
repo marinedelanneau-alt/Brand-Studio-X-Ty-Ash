@@ -50,12 +50,10 @@ function getResumeHref(modules: WorkspaceModule[]) {
   const activeModule =
     modules.find(
       (module) =>
-        module.progress.isUnlocked &&
         module.progress.answeredCount > 0 &&
         !module.progress.isCompleted,
     ) ??
-    modules.find((module) => module.progress.isUnlocked && !module.progress.isCompleted) ??
-    modules.find((module) => module.progress.isUnlocked) ??
+    modules.find((module) => !module.progress.isCompleted) ??
     modules[0];
 
   if (!activeModule) {
@@ -107,8 +105,8 @@ export default async function MonEspacePage() {
     (module) => module.progress.answeredCount > 0 || module.progress.isCompleted,
   );
   const firstModuleHref =
-    workspace.modules.find((module) => module.progress.isUnlocked)?.id
-      ? `/mon-espace/module/${workspace.modules.find((module) => module.progress.isUnlocked)?.id}`
+    workspace.modules[0]?.id
+      ? `/mon-espace/module/${workspace.modules[0].id}`
       : "/mon-espace";
   const continueHref = getResumeHref(workspace.modules);
   const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
@@ -222,28 +220,19 @@ export default async function MonEspacePage() {
                         Vos modules
                       </h3>
                       <div className="mt-4 flex flex-wrap gap-3">
-                        {workspace.modules.map((module) =>
-                          module.progress.isUnlocked ? (
-                            <Link
-                              key={module.id}
-                              href={`/mon-espace/module/${module.id}`}
-                              className={`rounded-full border px-4 py-2 text-sm font-black uppercase tracking-[0.12em] transition ${
-                                module.progress.isCompleted
-                                  ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
-                                  : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
-                              }`}
-                            >
-                              {module.title}
-                            </Link>
-                          ) : (
-                            <span
-                              key={module.id}
-                              className="cursor-not-allowed rounded-full border border-[#ebe4dc] bg-[#f7f2ec] px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-[#9b8d80]"
-                            >
-                              {module.title}
-                            </span>
-                          ),
-                        )}
+                        {workspace.modules.map((module) => (
+                          <Link
+                            key={module.id}
+                            href={`/mon-espace/module/${module.id}`}
+                            className={`rounded-full border px-4 py-2 text-sm font-black uppercase tracking-[0.12em] transition ${
+                              module.progress.isCompleted
+                                ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
+                                : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
+                            }`}
+                          >
+                            {module.title}
+                          </Link>
+                        ))}
                       </div>
                     </nav>
                   ) : null}

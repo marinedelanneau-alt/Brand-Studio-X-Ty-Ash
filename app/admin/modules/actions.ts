@@ -61,6 +61,7 @@ function parseQuestion(rawQuestion: unknown) {
       type !== "multiple" &&
       type !== "popup_message" &&
       type !== "image_upload" &&
+      type !== "moodboard" &&
       type !== "checklist" &&
       type !== "table" &&
       type !== "boolean" &&

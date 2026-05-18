@@ -173,7 +173,7 @@ function normalizeSubmissionValues(
 ) {
   const normalizedValues = normalizeTextEntryValues(exercise, values);
 
-  if (exercise.type !== "image_upload") {
+  if (exercise.type !== "image_upload" && exercise.type !== "moodboard") {
     return normalizedValues;
   }
 
@@ -402,7 +402,7 @@ function isExerciseAnswered(
     );
   }
 
-  if (exercise.type === "image_upload") {
+  if (exercise.type === "image_upload" || exercise.type === "moodboard") {
     return isMoodboardComplete(parseStoredMoodboardAnswer(normalizedValues));
   }
 
@@ -1631,7 +1631,7 @@ export default function ModuleAnswerForm({
               )
             ) : null}
 
-            {currentExercise.type === "image_upload" ? (
+            {(currentExercise.type === "image_upload" || currentExercise.type === "moodboard") ? (
               <MoodboardExercise
                 module={module}
                 exercise={currentExercise}

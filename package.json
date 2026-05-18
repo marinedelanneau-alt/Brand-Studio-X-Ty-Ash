@@ -11,7 +11,8 @@
     "app:stop": "powershell -ExecutionPolicy Bypass -File ./scripts/stop-app.ps1",
     "app:status": "powershell -ExecutionPolicy Bypass -File ./scripts/status-app.ps1",
     "app:sync:start": "powershell -ExecutionPolicy Bypass -File ./scripts/start-app.ps1",
-    "app:sync:status": "powershell -ExecutionPolicy Bypass -File ./scripts/status-app.ps1"
+    "app:sync:status": "powershell -ExecutionPolicy Bypass -File ./scripts/status-app.ps1",
+    "auto:push-deploy": "powershell -ExecutionPolicy Bypass -File ./scripts/auto-push-deploy.ps1"
   },
   "dependencies": {
     "@getbrevo/brevo": "^5.0.3",

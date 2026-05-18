@@ -31,7 +31,8 @@ export type ExerciseType =
   | "group_open"
   | "brand_persona"
   | "spectrum"
-  | "color_palette";
+  | "color_palette"
+  | "moodboard";
 
 const GROUP_OPEN_PREFIX = "__group_open__:";
 const GROUP_OPEN_LAYOUT_PREFIX = "__group_open_layout__:";
@@ -74,13 +75,69 @@ export const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
   brand_persona: "Persona de marque",
   spectrum: "Curseur spectrum",
   color_palette: "Palette de couleurs",
+  moodboard: "Moodboard",
 };
+
+const MOODBOARD_CONFIG_PREFIX = "__moodboard_config__:";
+export type MoodboardConfig = {
+  templateId: string;
+  maxImages: number;
+  maxTextBlocks: number;
+  allowImageUpload: boolean;
+  allowImageReplace: boolean;
+  allowImageMove: boolean;
+  allowTextEdit: boolean;
+  allowColorEdit: boolean;
+  allowExportPng: boolean;
+  allowExportPdf: boolean;
+};
+
+const DEFAULT_MOODBOARD_CONFIG: MoodboardConfig = {
+  templateId: "editorial_collage_01",
+  maxImages: 6,
+  maxTextBlocks: 3,
+  allowImageUpload: true,
+  allowImageReplace: true,
+  allowImageMove: true,
+  allowTextEdit: true,
+  allowColorEdit: true,
+  allowExportPng: true,
+  allowExportPdf: true,
+};
+
+export function getDefaultMoodboardConfig() {
+  return { ...DEFAULT_MOODBOARD_CONFIG };
+}
+
+export function getSerializedMoodboardOptions(config: MoodboardConfig) {
+  return [`${MOODBOARD_CONFIG_PREFIX}${JSON.stringify(config)}`];
+}
+
+export function parseStoredMoodboardConfig(rawOptions: string[]) {
+  const configOption = rawOptions.find((option) => option.startsWith(MOODBOARD_CONFIG_PREFIX));
+
+  if (!configOption) {
+    return getDefaultMoodboardConfig();
+  }
+
+  try {
+    const parsed = JSON.parse(configOption.slice(MOODBOARD_CONFIG_PREFIX.length)) as Partial<MoodboardConfig>;
+
+    return {
+      ...DEFAULT_MOODBOARD_CONFIG,
+      ...parsed,
+    } satisfies MoodboardConfig;
+  } catch {
+    return getDefaultMoodboardConfig();
+  }
+}
 
 export function exerciseNeedsOptions(type: ExerciseType) {
   return (
     type !== "static_text" &&
     type !== "popup_message" &&
     type !== "image_upload" &&
+    type !== "moodboard" &&
     type !== "open" &&
     type !== "checklist" &&
     type !== "table" &&
@@ -540,7 +597,7 @@ export function parseChecklistEntries(values: string[]) {
 }
 
 export function getEditorOptionsText(type: ExerciseType, rawOptions: string[]) {
-  if (type === "table" || type === "image_upload") {
+  if (type === "table" || type === "image_upload" || type === "moodboard") {
     return "";
   }
 

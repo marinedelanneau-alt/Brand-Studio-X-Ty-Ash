@@ -17,9 +17,11 @@ import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
 import {
   analyzeMoodboard,
   autoArrange,
+  createMoodboardFromTemplate,
   createSuggestedMoodboardImages,
   generateMoodboard,
   getMoodboardImageCount,
+  getMoodboardTemplate,
   parseStoredMoodboardAnswer,
   serializeMoodboardAnswer,
   type MoodboardAnswer,
@@ -27,7 +29,13 @@ import {
   type MoodboardLayoutStyle,
 } from "@/lib/moodboard";
 import type { WorkspaceModule } from "@/lib/training-types";
-import { parseIndexedAnswerItems, parseStoredImageUploadConfig } from "@/lib/exercise-types";
+import {
+  getDefaultMoodboardConfig,
+  parseIndexedAnswerItems,
+  parseStoredImageUploadConfig,
+  parseStoredMoodboardConfig,
+  type MoodboardConfig,
+} from "@/lib/exercise-types";
 
 type ExerciseLike = WorkspaceModule["exercises"][number];
 
@@ -443,20 +451,42 @@ export default function MoodboardExercise({
   allAnswers: Record<number, string[]>;
   onChange: (nextValues: string[]) => void;
 }) {
-  const config = useMemo(() => parseStoredImageUploadConfig(exercise.options), [exercise.options]);
-  const incomingBoard = useMemo(
-    () => parseStoredMoodboardAnswer(answers, config.maxImages),
-    [answers, config.maxImages],
+  const config = useMemo<MoodboardConfig>(() => {
+    if (exercise.type === "moodboard") {
+      return parseStoredMoodboardConfig(exercise.options);
+    }
+
+    return {
+      ...getDefaultMoodboardConfig(),
+      maxImages: parseStoredImageUploadConfig(exercise.options).maxImages,
+    };
+  }, [exercise.options, exercise.type]);
+
+  const signals = useMemo(
+    () => collectMoodboardSignals(module, allAnswers, exercise.id),
+    [allAnswers, exercise.id, module],
   );
+  const incomingBoard = useMemo(() => {
+    const storedBoard = parseStoredMoodboardAnswer(answers, config.maxImages);
+
+    if (storedBoard.blocks.length > 0) {
+      return storedBoard;
+    }
+
+    if (exercise.type === "moodboard") {
+      return createMoodboardFromTemplate(
+        getMoodboardTemplate(config.templateId),
+        signals,
+      );
+    }
+
+    return storedBoard;
+  }, [answers, config.maxImages, config.templateId, exercise.type, signals]);
   const [board, setBoard] = useState<MoodboardAnswer>(incomingBoard);
   const [uploadState, setUploadState] = useState<UploadState>(initialUploadState);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const signals = useMemo(
-    () => collectMoodboardSignals(module, allAnswers, exercise.id),
-    [allAnswers, exercise.id, module],
-  );
   const suggestions = useMemo(
     () =>
       createSuggestedMoodboardImages(
