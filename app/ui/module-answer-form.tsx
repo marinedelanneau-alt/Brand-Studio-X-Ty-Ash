@@ -167,6 +167,29 @@ function normalizeTextEntryValues(
   return values.map((value) => normalizeTextEntryValue(exercise, value));
 }
 
+function normalizePlaceholderText(value: string) {
+  return value.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function getAnswerPlaceholder(
+  exercise: WorkspaceModule["exercises"][number],
+  displayedQuestion?: string,
+  fallback = "Votre reponse",
+) {
+  const placeholder = exercise.answer_placeholder.trim();
+
+  if (!placeholder) {
+    return fallback;
+  }
+
+  const normalizedPlaceholder = normalizePlaceholderText(placeholder);
+  const duplicateSources = [displayedQuestion, exercise.question]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .map(normalizePlaceholderText);
+
+  return duplicateSources.includes(normalizedPlaceholder) ? fallback : placeholder;
+}
+
 function normalizeSubmissionValues(
   exercise: WorkspaceModule["exercises"][number],
   values: string[],
@@ -1055,7 +1078,7 @@ export default function ModuleAnswerForm({
                           }))
                         }
                         className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                        placeholder={currentExercise.answer_placeholder || undefined}
+                        placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                       />
                       <SmartFeedback
                         value={normalizeTextEntryValue(
@@ -1087,7 +1110,7 @@ export default function ModuleAnswerForm({
                         }))
                       }
                       className="mt-4 min-h-32 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                      placeholder={currentExercise.answer_placeholder || undefined}
+                      placeholder={getAnswerPlaceholder(currentExercise)}
                     />
                     <SmartFeedback
                       value={normalizeTextEntryValue(
@@ -1156,9 +1179,7 @@ export default function ModuleAnswerForm({
                           }))
                         }
                         className="mt-3 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                        placeholder={
-                          currentExercise.answer_placeholder || "Votre reponse"
-                        }
+                        placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                         style={{
                           width: getAdaptiveInlineInputWidth(
                             normalizeTextEntryValue(
@@ -1169,7 +1190,7 @@ export default function ModuleAnswerForm({
                                 questionIndex,
                               )[0] ?? "",
                             ),
-                            currentExercise.answer_placeholder || "Votre reponse",
+                            getAnswerPlaceholder(currentExercise, prompt),
                           ),
                         }}
                       />
@@ -1217,16 +1238,20 @@ export default function ModuleAnswerForm({
                           }))
                         }
                         className="min-w-32 max-w-full flex-none rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                        placeholder={
-                          currentExercise.answer_placeholder || "Votre reponse"
-                        }
+                        placeholder={getAnswerPlaceholder(
+                          currentExercise,
+                          getPromptOpenLabel(currentExercise.question),
+                        )}
                         style={{
                           width: getAdaptiveInlineInputWidth(
                             normalizeTextEntryValue(
                               currentExercise,
                               answers[currentExercise.id]?.[0] ?? "",
                             ),
-                            currentExercise.answer_placeholder || "Votre reponse",
+                            getAnswerPlaceholder(
+                              currentExercise,
+                              getPromptOpenLabel(currentExercise.question),
+                            ),
                           ),
                         }}
                       />
@@ -1731,7 +1756,7 @@ export default function ModuleAnswerForm({
                                   })
                                 }
                                 className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                                placeholder={currentExercise.answer_placeholder || undefined}
+                                placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                                 style={{
                                   width: getAdaptiveInlineInputWidth(
                                     normalizeTextEntryValue(
@@ -1742,7 +1767,7 @@ export default function ModuleAnswerForm({
                                         questionIndex,
                                       )[index] ?? "",
                                     ),
-                                    currentExercise.answer_placeholder || undefined,
+                                    getAnswerPlaceholder(currentExercise, prompt),
                                   ),
                                 }}
                               />
@@ -1797,14 +1822,14 @@ export default function ModuleAnswerForm({
                                 })
                               }
                               className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                              placeholder={currentExercise.answer_placeholder || undefined}
+                              placeholder={getAnswerPlaceholder(currentExercise)}
                               style={{
                                 width: getAdaptiveInlineInputWidth(
                                   normalizeTextEntryValue(
                                     currentExercise,
                                     answers[currentExercise.id]?.[index] ?? "",
                                   ),
-                                  currentExercise.answer_placeholder || undefined,
+                                  getAnswerPlaceholder(currentExercise),
                                 ),
                               }}
                             />
@@ -1946,10 +1971,9 @@ export default function ModuleAnswerForm({
                                                     })
                                                   }
                                                   className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                                                  placeholder={
-                                                    currentExercise.answer_placeholder ||
-                                                    undefined
-                                                  }
+                                                  placeholder={getAnswerPlaceholder(
+                                                    currentExercise,
+                                                  )}
                                                 />
                                               </td>
                                             );
@@ -2136,7 +2160,7 @@ function MultiQuestionOpenExerciseGroup({
             value={normalizeTextEntryValue(question, answers[question.id]?.[0] ?? "")}
             onChange={(event) => onChange(question.id, [event.target.value])}
             className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-            placeholder={question.answer_placeholder || undefined}
+            placeholder={getAnswerPlaceholder(question)}
           />
           <SmartFeedback
             value={normalizeTextEntryValue(question, answers[question.id]?.[0] ?? "")}
@@ -2336,7 +2360,11 @@ function ChecklistExerciseBlocks({
                   setDrafts((current) => ({ ...current, [draftKey]: "" }));
                 }}
                 className="h-12 flex-1 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                placeholder={exercise.answer_placeholder || "Ajouter un mot ou une idee"}
+                placeholder={getAnswerPlaceholder(
+                  exercise,
+                  prompt,
+                  "Ajouter un mot ou une idee",
+                )}
               />
               <button
                 type="button"
