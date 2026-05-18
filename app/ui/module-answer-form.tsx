@@ -76,6 +76,8 @@ const initialAiAssistState: AiAssistState = {
   message: "",
 };
 
+const IMAGE_UPLOAD_TIMEOUT_MS = 45000;
+
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
   return (
     exercise.type === "open" ||
@@ -2230,6 +2232,24 @@ function ImageUploadExercise({
   const [isUploading, setIsUploading] = useState(false);
   const remainingSlots = Math.max(config.maxImages - imageUrls.length, 0);
 
+  useEffect(() => {
+    setIsUploading(false);
+    setMessage("");
+  }, [exercise.id]);
+
+  useEffect(() => {
+    if (!isUploading) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setIsUploading(false);
+      setMessage("L'upload prend trop de temps. Reessayez avec moins d'images ou des fichiers plus legers.");
+    }, IMAGE_UPLOAD_TIMEOUT_MS + 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isUploading]);
+
   async function handleUpload(files: FileList | null) {
     const selectedFiles = Array.from(files ?? []);
 
@@ -2246,15 +2266,33 @@ function ImageUploadExercise({
     setIsUploading(true);
     setMessage("");
 
-    const result = await uploadExerciseImages(formData);
-    setIsUploading(false);
+    try {
+      const result = await Promise.race([
+        uploadExerciseImages(formData),
+        new Promise<Awaited<ReturnType<typeof uploadExerciseImages>>>((resolve) => {
+          window.setTimeout(
+            () =>
+              resolve({
+                status: "error",
+                message:
+                  "L'upload prend trop de temps. Reessayez avec moins d'images ou des fichiers plus legers.",
+              }),
+            IMAGE_UPLOAD_TIMEOUT_MS,
+          );
+        }),
+      ]);
 
-    if (result.status === "error") {
-      setMessage(result.message);
-      return;
+      if (result.status === "error") {
+        setMessage(result.message);
+        return;
+      }
+
+      onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
+    } catch {
+      setMessage("L'upload a echoue. Reessayez avec une autre image.");
+    } finally {
+      setIsUploading(false);
     }
-
-    onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
   }
 
   return (

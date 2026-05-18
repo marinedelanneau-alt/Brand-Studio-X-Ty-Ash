@@ -20,6 +20,17 @@ type UploadExerciseImagesResult =
       message: string;
     };
 
+function isImageUploadValue(value: string) {
+  const trimmedValue = value.trim();
+
+  return (
+    trimmedValue.startsWith("http://") ||
+    trimmedValue.startsWith("https://") ||
+    trimmedValue.startsWith("/") ||
+    trimmedValue.startsWith("data:image/")
+  );
+}
+
 export async function uploadExerciseImages(
   formData: FormData,
 ): Promise<UploadExerciseImagesResult> {
@@ -76,7 +87,10 @@ export async function uploadExerciseImages(
       exercise.type === "moodboard"
         ? parseStoredMoodboardConfig(exercise.options)
         : parseStoredImageUploadConfig(exercise.options);
-    const persistedCount = targetModule.answers[exercise.id]?.length ?? 0;
+    const persistedCount =
+      exercise.type === "image_upload"
+        ? (targetModule.answers[exercise.id] ?? []).filter(isImageUploadValue).length
+        : targetModule.answers[exercise.id]?.length ?? 0;
     const remainingSlots = Math.max(
       config.maxImages - Math.max(currentCount, persistedCount),
       0,
