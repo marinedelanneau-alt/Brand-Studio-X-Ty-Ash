@@ -323,13 +323,13 @@ function PreviewImageUpload({ exercise }: { exercise: PreviewExercise }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
-              Moodboard intelligent
+              Tableau d&apos;inspiration
             </p>
             <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
-              Generation, collage et export
+              Upload d&apos;images simple
             </h3>
             <p className="mt-3 text-sm leading-7 text-[#6f645b]">
-              Le rendu utilisateur combine images, mots-clés, couleurs et citations dans une composition editoriale.
+              L&apos;utilisateur ajoute seulement les images demandees dans la question.
             </p>
           </div>
           <div className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
@@ -728,7 +728,8 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
       ) : null}
 
       {exercise.type === "popup_message" ? <PreviewPopupMessage exercise={exercise} /> : null}
-      {(exercise.type === "image_upload" || exercise.type === "moodboard") ? <PreviewImageUpload exercise={exercise} /> : null}
+      {exercise.type === "image_upload" ? <PreviewImageUpload exercise={exercise} /> : null}
+      {exercise.type === "moodboard" ? <PreviewImageUpload exercise={exercise} /> : null}
       {exercise.type === "brand_persona" ? <PreviewBrandPersona exercise={exercise} /> : null}
       {exercise.type === "spectrum" ? <PreviewSpectrum exercise={exercise} /> : null}
       {exercise.type === "color_palette" ? <PreviewColorPalette exercise={exercise} /> : null}

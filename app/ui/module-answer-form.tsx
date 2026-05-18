@@ -13,6 +13,7 @@ import {
 import type { Dispatch, SetStateAction } from "react";
 import { requestModuleAnswerAssistance } from "../generate-module-answer-assistance";
 import { saveModuleAnswers, saveModuleDraft } from "../save-module-answers";
+import { uploadExerciseImages } from "../upload-exercise-images";
 import BrandPersonaExercise from "./brand-persona-exercise";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
@@ -40,6 +41,7 @@ import {
   getTableCellCount,
   parseIndexedAnswerItems,
   parseStoredExerciseQuestionConfig,
+  parseStoredImageUploadConfig,
   parseStoredTableConfig,
   parseChecklistEntries,
   getPromptOpenLabel,
@@ -196,7 +198,7 @@ function normalizeSubmissionValues(
 ) {
   const normalizedValues = normalizeTextEntryValues(exercise, values);
 
-  if (exercise.type !== "image_upload" && exercise.type !== "moodboard") {
+  if (exercise.type !== "moodboard") {
     return normalizedValues;
   }
 
@@ -1668,7 +1670,21 @@ export default function ModuleAnswerForm({
               )
             ) : null}
 
-            {(currentExercise.type === "image_upload" || currentExercise.type === "moodboard") ? (
+            {currentExercise.type === "image_upload" ? (
+              <ImageUploadExercise
+                module={module}
+                exercise={currentExercise}
+                answers={answers[currentExercise.id] ?? []}
+                onChange={(nextValues) =>
+                  setAnswers((current) => ({
+                    ...current,
+                    [currentExercise.id]: nextValues,
+                  }))
+                }
+              />
+            ) : null}
+
+            {currentExercise.type === "moodboard" ? (
               <MoodboardExercise
                 module={module}
                 exercise={currentExercise}
@@ -2170,6 +2186,129 @@ function MultiQuestionOpenExerciseGroup({
           />
         </label>
       ))}
+    </div>
+  );
+}
+
+function ImageUploadExercise({
+  module,
+  exercise,
+  answers,
+  onChange,
+}: {
+  module: WorkspaceModule;
+  exercise: ModuleExercise;
+  answers: string[];
+  onChange: (nextValues: string[]) => void;
+}) {
+  const config = parseStoredImageUploadConfig(exercise.options);
+  const parsedMoodboard = parseStoredMoodboardAnswer(answers, config.maxImages);
+  const imageUrls = answers.some((value) => value.startsWith("__moodboard__:"))
+    ? parsedMoodboard.blocks
+        .flatMap((block) =>
+          block.type === "image" && block.imageUrl ? [block.imageUrl] : [],
+        )
+        .slice(0, config.maxImages)
+    : answers.filter(Boolean).slice(0, config.maxImages);
+  const [message, setMessage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const remainingSlots = Math.max(config.maxImages - imageUrls.length, 0);
+
+  async function handleUpload(files: FileList | null) {
+    const selectedFiles = Array.from(files ?? []);
+
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("moduleId", String(module.id));
+    formData.set("exerciseId", String(exercise.id));
+    formData.set("currentCount", String(imageUrls.length));
+    selectedFiles.forEach((file) => formData.append("images", file));
+
+    setIsUploading(true);
+    setMessage("");
+
+    const result = await uploadExerciseImages(formData);
+    setIsUploading(false);
+
+    if (result.status === "error") {
+      setMessage(result.message);
+      return;
+    }
+
+    onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
+  }
+
+  return (
+    <div className="mt-4 space-y-4 rounded-[1.4rem] border border-[#eadfca] bg-white px-5 py-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+            Tableau d&apos;inspiration
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[#6f645b]">
+            Ajoute simplement les images demandees dans la question.
+          </p>
+        </div>
+        <p className="rounded-full border border-[#eadfca] bg-[#fff8f1] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#7a7087]">
+          {imageUrls.length}/{config.maxImages} images
+        </p>
+      </div>
+
+      <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-[1rem] border border-dashed border-[#d9c4aa] bg-[#fffdf8] px-4 py-5 text-center transition hover:border-[#cf7430]">
+        <span className="text-sm font-black uppercase tracking-[0.16em] text-[#6b625a]">
+          {isUploading ? "Upload en cours..." : "Ajouter des images"}
+        </span>
+        <span className="mt-2 text-sm leading-6 text-[#8a8077]">
+          {remainingSlots > 0
+            ? `${remainingSlots} image${remainingSlots > 1 ? "s" : ""} restante${remainingSlots > 1 ? "s" : ""}`
+            : "Limite atteinte"}
+        </span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          disabled={isUploading || remainingSlots <= 0}
+          onChange={(event) => {
+            void handleUpload(event.target.files);
+            event.target.value = "";
+          }}
+          className="sr-only"
+        />
+      </label>
+
+      {message ? (
+        <p className="rounded-[1rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#9d4e40]">
+          {message}
+        </p>
+      ) : null}
+
+      {imageUrls.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {imageUrls.map((imageUrl, index) => (
+            <div
+              key={`${imageUrl}-${index}`}
+              className="group relative aspect-square overflow-hidden rounded-[1rem] border border-[#eadfca] bg-[#fff8f1]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={`Inspiration ${index + 1}`}
+                className="h-full w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => onChange(imageUrls.filter((_, itemIndex) => itemIndex !== index))}
+                className="absolute right-2 top-2 rounded-full bg-white/95 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#b45247] opacity-0 shadow-[0_8px_18px_rgba(47,36,24,0.14)] transition group-hover:opacity-100"
+              >
+                Retirer
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -5,7 +5,10 @@ import {
   getWorkspaceData,
   uploadProjectExerciseImage,
 } from "@/lib/training";
-import { parseStoredImageUploadConfig } from "@/lib/exercise-types";
+import {
+  parseStoredImageUploadConfig,
+  parseStoredMoodboardConfig,
+} from "@/lib/exercise-types";
 
 type UploadExerciseImagesResult =
   | {
@@ -69,7 +72,10 @@ export async function uploadExerciseImages(
       };
     }
 
-    const config = parseStoredImageUploadConfig(exercise.options);
+    const config =
+      exercise.type === "moodboard"
+        ? parseStoredMoodboardConfig(exercise.options)
+        : parseStoredImageUploadConfig(exercise.options);
     const persistedCount = targetModule.answers[exercise.id]?.length ?? 0;
     const remainingSlots = Math.max(
       config.maxImages - Math.max(currentCount, persistedCount),

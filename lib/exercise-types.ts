@@ -181,6 +181,10 @@ export function normalizeExerciseOptions(type: ExerciseType, rawOptions: string[
     return getSerializedImageUploadOptions(getDefaultImageUploadConfig());
   }
 
+  if (type === "moodboard") {
+    return getSerializedMoodboardOptions(getDefaultMoodboardConfig());
+  }
+
   if (type === "fill_blank") {
     return [] as string[];
   }
@@ -234,6 +238,10 @@ export function getPersistedExerciseType(type: ExerciseType) {
   }
 
   if (type === "image_upload") {
+    return "multiple";
+  }
+
+  if (type === "moodboard") {
     return "multiple";
   }
 
@@ -317,6 +325,10 @@ export function resolveExerciseType(
     return "image_upload";
   }
 
+  if (type === "multiple" && hasMoodboardConfigOptions(options)) {
+    return "moodboard";
+  }
+
   if (type === "multiple" && isBrandPersonaOptions(options)) {
     return "brand_persona";
   }
@@ -379,6 +391,10 @@ export function resolveStoredExerciseOptions(type: ExerciseType, rawOptions: str
 
   if (type === "image_upload") {
     return sanitizedOptions.filter((option) => option.startsWith(IMAGE_UPLOAD_MAX_PREFIX));
+  }
+
+  if (type === "moodboard") {
+    return sanitizedOptions.filter((option) => option.startsWith(MOODBOARD_CONFIG_PREFIX));
   }
 
   if (type === "brand_persona") {
@@ -917,6 +933,10 @@ function hasTableConfigOptions(options: string[]) {
 
 function hasImageUploadConfigOptions(options: string[]) {
   return options.some((option) => option.startsWith(IMAGE_UPLOAD_MAX_PREFIX));
+}
+
+function hasMoodboardConfigOptions(options: string[]) {
+  return options.some((option) => option.startsWith(MOODBOARD_CONFIG_PREFIX));
 }
 
 function getPositiveIntegerFromOption(

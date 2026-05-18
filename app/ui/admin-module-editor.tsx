@@ -236,6 +236,7 @@ function getQuestionLabel(type: ExerciseType) {
   if (type === "static_text") return "Texte a afficher";
   if (type === "popup_message") return "Message ou citation";
   if (type === "image_upload") return "Question ou intention";
+  if (type === "moodboard") return "Question moodboard";
   if (type === "prompt_open") return "Libelle";
   if (type === "brand_persona") return "Titre de l'exercice";
   if (type === "spectrum") return "Question du spectrum";
@@ -249,6 +250,7 @@ function getQuestionHint(type: ExerciseType) {
   if (type === "static_text") return "Ce bloc affiche simplement du texte entre deux questions.";
   if (type === "popup_message") return "Ce bloc ouvre une pop-up inspirante avec un message motivant ou une citation que l'utilisateur peut fermer.";
   if (type === "image_upload") return "L'utilisateur pourra importer plusieurs images pour composer un tableau d'inspiration.";
+  if (type === "moodboard") return "L'utilisateur verra un moodboard intelligent uniquement si ce type est choisi ici.";
   if (type === "boolean") return "Les choix Oui et Non sont ajoutes automatiquement.";
   if (type === "checklist") return "L'utilisateur pourra ajouter autant d'elements qu'il souhaite.";
   if (type === "brand_persona") return "Configure ici les sections et questions du persona de marque, avec leur ordre, leur type et leurs exemples.";
@@ -270,13 +272,14 @@ function supportsExplanationField(type: ExerciseType) {
 }
 
 function supportsPlaceholderField(type: ExerciseType) {
-  return !isPassiveContentType(type) && type !== "image_upload" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
+  return !isPassiveContentType(type) && type !== "image_upload" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
 }
 
 function supportsSmartFeedbackField(type: ExerciseType) {
   return (
     !isPassiveContentType(type) &&
     type !== "image_upload" &&
+    type !== "moodboard" &&
     type !== "brand_persona" &&
     type !== "spectrum" &&
     type !== "color_palette"

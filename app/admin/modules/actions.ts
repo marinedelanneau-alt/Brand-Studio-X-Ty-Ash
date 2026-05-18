@@ -91,8 +91,9 @@ function parseQuestion(rawQuestion: unknown) {
       if (
         type !== "static_text" &&
         type !== "popup_message" &&
-        type !== "image_upload" &&
-        type !== "fill_blank" &&
+          type !== "image_upload" &&
+          type !== "moodboard" &&
+          type !== "fill_blank" &&
         type !== "checklist" &&
         type !== "table" &&
         type !== "prompt_open" &&
