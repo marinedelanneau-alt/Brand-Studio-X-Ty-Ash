@@ -198,6 +198,10 @@ function normalizeSubmissionValues(
 ) {
   const normalizedValues = normalizeTextEntryValues(exercise, values);
 
+  if (exercise.type === "image_upload") {
+    return getImageUploadValues(normalizedValues);
+  }
+
   if (exercise.type !== "moodboard") {
     return normalizedValues;
   }
@@ -207,6 +211,21 @@ function normalizeSubmissionValues(
   }
 
   return [serializeMoodboardAnswer(parseStoredMoodboardAnswer(normalizedValues))];
+}
+
+function isImageUploadValue(value: string) {
+  const trimmedValue = value.trim();
+
+  return (
+    trimmedValue.startsWith("http://") ||
+    trimmedValue.startsWith("https://") ||
+    trimmedValue.startsWith("/") ||
+    trimmedValue.startsWith("data:image/")
+  );
+}
+
+function getImageUploadValues(values: string[]) {
+  return values.map((value) => value.trim()).filter(isImageUploadValue);
 }
 
 function getAdaptiveInlineInputWidth(value: string, placeholder?: string) {
@@ -303,18 +322,22 @@ function createInitialAnswers(module: WorkspaceModule) {
       module.answers[exercise.id] ?? [],
     );
     const tableConfig = parseStoredTableConfig(exercise.options);
+    const normalizedSavedAnswers =
+      exercise.type === "image_upload"
+        ? getImageUploadValues(savedAnswers)
+        : savedAnswers;
 
     accumulator[exercise.id] =
-      exercise.type === "fill_blank" && savedAnswers.length === 0
+      exercise.type === "fill_blank" && normalizedSavedAnswers.length === 0
         ? Array.from({ length: getFillBlankCount(exercise.question) }, () => "")
-        : exercise.type === "group_open" && savedAnswers.length === 0
+        : exercise.type === "group_open" && normalizedSavedAnswers.length === 0
           ? Array.from({ length: exercise.options.length }, () => "")
           : exercise.type === "table"
             ? Array.from(
                 { length: getTableCellCount(tableConfig) },
-                (_, index) => savedAnswers[index] ?? "",
+                (_, index) => normalizedSavedAnswers[index] ?? "",
               )
-            : savedAnswers;
+            : normalizedSavedAnswers;
 
     return accumulator;
   }, {});
@@ -2202,14 +2225,7 @@ function ImageUploadExercise({
   onChange: (nextValues: string[]) => void;
 }) {
   const config = parseStoredImageUploadConfig(exercise.options);
-  const parsedMoodboard = parseStoredMoodboardAnswer(answers, config.maxImages);
-  const imageUrls = answers.some((value) => value.startsWith("__moodboard__:"))
-    ? parsedMoodboard.blocks
-        .flatMap((block) =>
-          block.type === "image" && block.imageUrl ? [block.imageUrl] : [],
-        )
-        .slice(0, config.maxImages)
-    : answers.filter(Boolean).slice(0, config.maxImages);
+  const imageUrls = getImageUploadValues(answers).slice(0, config.maxImages);
   const [message, setMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const remainingSlots = Math.max(config.maxImages - imageUrls.length, 0);
