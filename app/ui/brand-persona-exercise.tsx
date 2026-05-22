@@ -240,11 +240,6 @@ export default function BrandPersonaExercise({
                           ) : null}
                         </div>
 
-                        {question.example ? (
-                          <span className="rounded-full bg-[#fff6e3] px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#cf7430]">
-                            Ex. {question.example}
-                          </span>
-                        ) : null}
                       </div>
 
                       {question.fieldType === "text" ? (
