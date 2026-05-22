@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
+import type { CSSProperties } from "react";
 import type {
   GeneratedBrandGuide,
   GuideColor,
@@ -23,6 +24,16 @@ export default function BrandGuideLayout({
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const guideText = useMemo(() => buildCopyText(guide), [guide]);
+  const theme = useMemo(() => getGuideTheme(guide), [guide]);
+  const themeStyle = {
+    "--guide-bg": theme.background,
+    "--guide-surface": theme.surface,
+    "--guide-card": theme.card,
+    "--guide-border": theme.border,
+    "--guide-accent": theme.accent,
+    "--guide-accent-soft": theme.accentSoft,
+    "--guide-text": theme.text,
+  } as CSSProperties;
 
   function saveSnapshot() {
     startTransition(async () => {
@@ -37,9 +48,12 @@ export default function BrandGuideLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#fbf6ed] px-4 py-6 text-[#4b4550] sm:px-6 lg:px-8 print:bg-white print:px-0 print:py-0">
+    <div
+      className="min-h-screen bg-[var(--guide-bg)] px-4 py-6 text-[var(--guide-text)] sm:px-6 lg:px-8 print:bg-white print:px-0 print:py-0"
+      style={themeStyle}
+    >
       <div className="mx-auto max-w-6xl">
-        <header className="mb-6 flex flex-col gap-4 border-b border-[#eadfca] pb-5 print:hidden lg:flex-row lg:items-center lg:justify-between">
+        <header className="mb-6 flex flex-col gap-4 border-b border-[var(--guide-border)] pb-5 print:hidden lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-3">
             <Link
               href="/mon-espace"
@@ -184,10 +198,10 @@ function CompletionBanner({
   message: string;
 }) {
   return (
-    <section className="mb-6 rounded-[1.4rem] border border-[#eadfca] bg-white/90 p-5 shadow-[0_14px_36px_rgba(126,102,78,0.07)] print:hidden">
+    <section className="mb-6 rounded-[1.4rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] p-5 shadow-[0_14px_36px_rgba(126,102,78,0.07)] print:hidden">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--guide-accent)]">
             Etat du guide
           </p>
           <p className="mt-2 text-lg font-semibold text-[#4b4550]">{warning}</p>
@@ -225,16 +239,17 @@ function CompletionBanner({
 
 export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
   const colors = [...guide.visualUniverse.palette.primary, ...guide.visualUniverse.palette.secondary].slice(0, 5);
+  const moodboardItems = guide.visualUniverse.moodboard.filter((item) => item.type === "image").slice(0, 2);
 
   return (
-    <section className="overflow-hidden rounded-[1.6rem] border border-[#eadfca] bg-[#fffdf9] shadow-[0_24px_60px_rgba(126,102,78,0.09)] print:rounded-none print:shadow-none">
+    <section className="overflow-hidden rounded-[1.6rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] shadow-[0_24px_60px_rgba(126,102,78,0.09)] print:rounded-none print:shadow-none">
       <div className="grid min-h-[32rem] gap-8 p-8 sm:p-12 lg:grid-cols-[1.1fr_0.9fr] lg:p-14">
         <div className="flex flex-col justify-between">
           <div>
-            <p className="text-[0.78rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+            <p className="text-[0.78rem] font-black uppercase tracking-[0.24em] text-[var(--guide-accent)]">
               Brand Studio
             </p>
-            <h1 className="mt-7 font-[family:var(--font-cormorant)] text-[3rem] leading-[0.92] text-[#332d35] sm:text-[4.5rem]">
+            <h1 className="mt-7 font-[family:var(--font-cormorant)] text-[3rem] leading-[0.92] text-[var(--guide-text)] sm:text-[4.5rem]">
               {guide.cover.title}
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-8 text-[#6f645b]">
@@ -249,6 +264,14 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
           </div>
         </div>
         <div className="grid min-h-[22rem] grid-cols-2 gap-3">
+          {moodboardItems.map((item) =>
+            item.imageUrl ? (
+              <div key={item.id} className="overflow-hidden rounded-[1rem] border border-white/70 bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.imageUrl} alt={item.label} className="h-full min-h-44 w-full object-cover" />
+              </div>
+            ) : null,
+          )}
           {colors.length > 0 ? (
             colors.map((color) => (
               <div
@@ -261,8 +284,8 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
               </div>
             ))
           ) : (
-            <div className="col-span-2 flex items-center justify-center rounded-[1rem] border border-dashed border-[#eadfca] bg-[#fff8f1] p-6 text-center text-sm font-semibold text-[#7b7068]">
-              Apercu palette a completer dans le module Palette de couleurs.
+            <div className="col-span-2 flex items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-white p-6 text-center text-sm font-semibold text-[#7b7068]">
+              Apercu neutre. Palette a completer dans le module Palette de couleurs.
             </div>
           )}
         </div>
@@ -281,11 +304,11 @@ export function GuideSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffdf9] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.08)] sm:p-8 print:break-inside-avoid print:shadow-none">
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+    <section className="rounded-[1.4rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.08)] sm:p-8 print:break-inside-avoid print:shadow-none">
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--guide-accent)]">
         {kicker}
       </p>
-      <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.5rem] leading-[0.98] text-[#3f3945]">
+      <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.5rem] leading-[0.98] text-[var(--guide-text)]">
         {title}
       </h2>
       <div className="mt-6">{children}</div>
@@ -303,7 +326,7 @@ export function GuideCard({
   wide?: boolean;
 }) {
   return (
-    <article className={`${wide ? "mt-4" : ""} rounded-[0.75rem] border border-[#eadfca] bg-white px-5 py-5`}>
+    <article className={`${wide ? "mt-4" : ""} rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)] px-5 py-5`}>
       <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
         {label}
       </p>
@@ -330,7 +353,7 @@ export function GuideColorPalette({
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {colors.map((color) => (
-        <article key={color.id} className="overflow-hidden rounded-[0.75rem] border border-[#eadfca] bg-white">
+        <article key={color.id} className="overflow-hidden rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)]">
           <div className="h-24" style={{ background: color.css }} />
           <div className="p-4">
             <p className="text-sm font-black text-[#4b4550]">{color.name}</p>
@@ -353,7 +376,7 @@ export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item) => (
-        <article key={item.id} className="min-h-40 overflow-hidden rounded-[0.75rem] border border-[#eadfca] bg-white">
+        <article key={item.id} className="min-h-40 overflow-hidden rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)]">
           {item.type === "image" && item.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={item.imageUrl} alt={item.label} className="h-36 w-full object-cover" />
@@ -384,7 +407,7 @@ export function GuideChecklist({ title, items }: { title: string; items: string[
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
           <li key={item} className="flex gap-3 text-sm leading-6 text-[#5f544a]">
-            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#cf7430]" />
+            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--guide-accent)]" />
             <span>{item}</span>
           </li>
         ))}
@@ -401,8 +424,8 @@ export function GuideSummary({
   compact?: boolean;
 }) {
   return (
-    <section className={`${compact ? "" : "min-h-[70vh]"} rounded-[1.4rem] border border-[#eadfca] bg-white p-6 shadow-[0_18px_46px_rgba(210,189,152,0.08)] sm:p-8 print:shadow-none`}>
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+    <section className={`${compact ? "" : "min-h-[70vh]"} rounded-[1.4rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.08)] sm:p-8 print:shadow-none`}>
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--guide-accent)]">
         Synthese express
       </p>
       <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.98] text-[#3f3945]">
@@ -467,6 +490,80 @@ function formatDate(value: string) {
     month: "long",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function getGuideTheme(guide: GeneratedBrandGuide) {
+  const colors = [
+    ...guide.visualUniverse.palette.primary,
+    ...guide.visualUniverse.palette.secondary,
+  ];
+  const solidHex = colors.map((color) => color.hex).find((hex) => hex.startsWith("#"));
+
+  if (!solidHex) {
+    return {
+      background: "#FFFFFF",
+      surface: "#FFFFFF",
+      card: "#FFFFFF",
+      border: "#E7E2DA",
+      accent: "#4B4550",
+      accentSoft: "#F6F4F0",
+      text: "#2F2A33",
+    };
+  }
+
+  const accent = normalizeHex(solidHex) ?? "#4B4550";
+  const readableText = getReadableTextColor(accent);
+
+  return {
+    background: mixHex(accent, "#FFFFFF", 0.91),
+    surface: mixHex(accent, "#FFFFFF", 0.97),
+    card: "#FFFFFF",
+    border: mixHex(accent, "#FFFFFF", 0.72),
+    accent,
+    accentSoft: mixHex(accent, "#FFFFFF", 0.88),
+    text: readableText === "#FFFFFF" ? "#2F2A33" : readableText,
+  };
+}
+
+function normalizeHex(value: string) {
+  const match = value.trim().match(/^#?([0-9a-fA-F]{6})$/);
+  return match ? `#${match[1].toUpperCase()}` : null;
+}
+
+function hexToRgb(value: string) {
+  const normalized = normalizeHex(value);
+  if (!normalized) return null;
+  return {
+    red: Number.parseInt(normalized.slice(1, 3), 16),
+    green: Number.parseInt(normalized.slice(3, 5), 16),
+    blue: Number.parseInt(normalized.slice(5, 7), 16),
+  };
+}
+
+function rgbToHex(red: number, green: number, blue: number) {
+  return `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
+function mixHex(base: string, target: string, targetRatio: number) {
+  const baseRgb = hexToRgb(base);
+  const targetRgb = hexToRgb(target);
+  if (!baseRgb || !targetRgb) return target;
+
+  return rgbToHex(
+    baseRgb.red * (1 - targetRatio) + targetRgb.red * targetRatio,
+    baseRgb.green * (1 - targetRatio) + targetRgb.green * targetRatio,
+    baseRgb.blue * (1 - targetRatio) + targetRgb.blue * targetRatio,
+  );
+}
+
+function getReadableTextColor(hex: string) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return "#2F2A33";
+  const luminance = (0.299 * rgb.red + 0.587 * rgb.green + 0.114 * rgb.blue) / 255;
+  return luminance > 0.55 ? "#2F2A33" : "#FFFFFF";
 }
 
 function tabClass(active: boolean) {

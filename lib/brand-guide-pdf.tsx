@@ -144,19 +144,90 @@ function solidColor(color: GuideColor) {
   return "#EAD9C8";
 }
 
+function getPdfTheme(guide: GeneratedBrandGuide) {
+  const colors = [
+    ...guide.visualUniverse.palette.primary,
+    ...guide.visualUniverse.palette.secondary,
+  ];
+  const solidHex = colors.map((color) => color.hex).find((hex) => hex.startsWith("#"));
+
+  if (!solidHex) {
+    return {
+      background: "#FFFFFF",
+      surface: "#FFFFFF",
+      card: "#FFFFFF",
+      border: "#E7E2DA",
+      accent: "#4B4550",
+      text: "#2F2A33",
+    };
+  }
+
+  const accent = normalizeHex(solidHex) ?? "#4B4550";
+
+  return {
+    background: mixHex(accent, "#FFFFFF", 0.91),
+    surface: mixHex(accent, "#FFFFFF", 0.97),
+    card: "#FFFFFF",
+    border: mixHex(accent, "#FFFFFF", 0.72),
+    accent,
+    text: "#2F2A33",
+  };
+}
+
+function normalizeHex(value: string) {
+  const match = value.trim().match(/^#?([0-9a-fA-F]{6})$/);
+  return match ? `#${match[1].toUpperCase()}` : null;
+}
+
+function hexToRgb(value: string) {
+  const normalized = normalizeHex(value);
+  if (!normalized) return null;
+  return {
+    red: Number.parseInt(normalized.slice(1, 3), 16),
+    green: Number.parseInt(normalized.slice(3, 5), 16),
+    blue: Number.parseInt(normalized.slice(5, 7), 16),
+  };
+}
+
+function rgbToHex(red: number, green: number, blue: number) {
+  return `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
+function mixHex(base: string, target: string, targetRatio: number) {
+  const baseRgb = hexToRgb(base);
+  const targetRgb = hexToRgb(target);
+  if (!baseRgb || !targetRgb) return target;
+
+  return rgbToHex(
+    baseRgb.red * (1 - targetRatio) + targetRgb.red * targetRatio,
+    baseRgb.green * (1 - targetRatio) + targetRgb.green * targetRatio,
+    baseRgb.blue * (1 - targetRatio) + targetRgb.blue * targetRatio,
+  );
+}
+
 function Card({
   label,
   value,
+  theme,
   wide = false,
 }: {
   label: string;
   value: string;
+  theme: ReturnType<typeof getPdfTheme>;
   wide?: boolean;
 }) {
   return (
-    <View style={wide ? styles.cardWide : styles.card}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.text}>{value}</Text>
+    <View
+      style={[
+        wide ? styles.cardWide : styles.card,
+        { backgroundColor: theme.card, borderColor: theme.border },
+      ]}
+    >
+      <Text style={[styles.label, { color: theme.accent }]}>{label}</Text>
+      <Text style={[styles.text, { color: theme.text }]}>{value}</Text>
     </View>
   );
 }
@@ -164,27 +235,43 @@ function Card({
 function Section({
   eyebrow,
   title,
+  theme,
   children,
 }: {
   eyebrow: string;
   title: string;
+  theme: ReturnType<typeof getPdfTheme>;
   children: React.ReactNode;
 }) {
   return (
-    <View style={styles.section} wrap={false}>
-      <Text style={styles.eyebrow}>{eyebrow}</Text>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <View
+      style={[
+        styles.section,
+        { backgroundColor: theme.surface, borderColor: theme.border },
+      ]}
+      wrap={false}
+    >
+      <Text style={[styles.eyebrow, { color: theme.accent }]}>{eyebrow}</Text>
+      <Text style={[styles.sectionTitle, { color: theme.text }]}>{title}</Text>
       {children}
     </View>
   );
 }
 
-function Checklist({ title, items }: { title: string; items: string[] }) {
+function Checklist({
+  title,
+  items,
+  theme,
+}: {
+  title: string;
+  items: string[];
+  theme: ReturnType<typeof getPdfTheme>;
+}) {
   return (
-    <View style={styles.card}>
-      <Text style={styles.label}>{title}</Text>
+    <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <Text style={[styles.label, { color: theme.accent }]}>{title}</Text>
       {items.map((item) => (
-        <Text key={item} style={styles.checklistItem}>
+        <Text key={item} style={[styles.checklistItem, { color: theme.text }]}>
           - {item}
         </Text>
       ))}
@@ -192,13 +279,20 @@ function Checklist({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function Palette({ colors }: { colors: GuideColor[] }) {
+function Palette({
+  colors,
+  theme,
+}: {
+  colors: GuideColor[];
+  theme: ReturnType<typeof getPdfTheme>;
+}) {
   if (colors.length === 0) {
     return (
       <Card
         wide
+        theme={theme}
         label="Palette"
-        value="Palette ou intention visuelle a completer dans le module Palette de couleurs."
+        value="Apercu neutre. Palette ou intention visuelle a completer dans le module Palette de couleurs."
       />
     );
   }
@@ -206,7 +300,7 @@ function Palette({ colors }: { colors: GuideColor[] }) {
   return (
     <View style={styles.colorRow}>
       {colors.map((color) => (
-        <View key={color.id} style={styles.colorCard}>
+        <View key={color.id} style={[styles.colorCard, { borderColor: theme.border }]}>
           <View style={[styles.swatch, { backgroundColor: solidColor(color) }]} />
           <View style={styles.swatchBody}>
             <Text style={styles.label}>{color.name}</Text>
@@ -224,6 +318,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
     ...guide.visualUniverse.palette.primary,
     ...guide.visualUniverse.palette.secondary,
   ];
+  const theme = getPdfTheme(guide);
 
   return (
     <Document
@@ -231,99 +326,103 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
       author="Brand Studio"
       subject="Guide de marque genere automatiquement"
     >
-      <Page size="A4" orientation="landscape" style={[styles.page, styles.cover]}>
+      <Page
+        size="A4"
+        orientation="landscape"
+        style={[styles.page, styles.cover, { backgroundColor: theme.background, color: theme.text }]}
+      >
         <View>
-          <Text style={styles.eyebrow}>Brand Studio</Text>
-          <Text style={styles.title}>{guide.cover.title}</Text>
-          <Text style={styles.subtitle}>{guide.cover.subtitle}</Text>
+          <Text style={[styles.eyebrow, { color: theme.accent }]}>Brand Studio</Text>
+          <Text style={[styles.title, { color: theme.text }]}>{guide.cover.title}</Text>
+          <Text style={[styles.subtitle, { color: theme.text }]}>{guide.cover.subtitle}</Text>
         </View>
         <View>
-          <Palette colors={colors.slice(0, 6)} />
-          <Text style={styles.subtitle}>{guide.cover.introLine}</Text>
-          <Text style={styles.date}>Genere le {formatDate(guide.generatedAt)}</Text>
+          <Palette colors={colors.slice(0, 6)} theme={theme} />
+          <Text style={[styles.subtitle, { color: theme.text }]}>{guide.cover.introLine}</Text>
+          <Text style={[styles.date, { color: theme.accent }]}>Genere le {formatDate(guide.generatedAt)}</Text>
         </View>
       </Page>
 
-      <Page size="A4" orientation="landscape" style={styles.page}>
-        <Section eyebrow="Introduction" title="Comment utiliser ce guide">
-          <Text style={styles.introText}>{guide.introduction}</Text>
+      <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
+        <Section eyebrow="Introduction" title="Comment utiliser ce guide" theme={theme}>
+          <Text style={[styles.introText, { color: theme.text }]}>{guide.introduction}</Text>
         </Section>
-        <Section eyebrow="01" title="ADN de marque">
+        <Section eyebrow="01" title="ADN de marque" theme={theme}>
           <View style={styles.grid}>
-            <Card label="Activite" value={guide.dna.activity} />
-            <Card label="Raison d'etre" value={guide.dna.essence} />
-            <Card label="Mission" value={guide.dna.mission} />
-            <Card label="Vision" value={guide.dna.vision} />
-            <Card label="Promesse" value={guide.dna.promise} />
-            <Card label="Valeurs" value={guide.dna.values.join(", ")} />
+            <Card label="Activite" value={guide.dna.activity} theme={theme} />
+            <Card label="Raison d'etre" value={guide.dna.essence} theme={theme} />
+            <Card label="Mission" value={guide.dna.mission} theme={theme} />
+            <Card label="Vision" value={guide.dna.vision} theme={theme} />
+            <Card label="Promesse" value={guide.dna.promise} theme={theme} />
+            <Card label="Valeurs" value={guide.dna.values.join(", ")} theme={theme} />
           </View>
         </Section>
-        <Section eyebrow="02" title="Positionnement">
+        <Section eyebrow="02" title="Positionnement" theme={theme}>
           <View style={styles.grid}>
-            <Card label="Cible principale" value={guide.positioning.target} />
-            <Card label="Contexte client" value={guide.positioning.context} />
-            <Card label="Probleme resolu" value={guide.positioning.problem} />
-            <Card label="Differenciation" value={guide.positioning.differentiation} />
-            <Card label="Positionnement final" value={guide.positioning.finalPositioning} />
-            <Card label="Pitch" value={guide.positioning.pitch} />
-          </View>
-        </Section>
-      </Page>
-
-      <Page size="A4" orientation="landscape" style={styles.page}>
-        <Section eyebrow="03" title="Personnalite de marque">
-          <View style={styles.grid}>
-            <Card label="Persona incarne" value={guide.personality.persona} />
-            <Card label="Traits dominants" value={guide.personality.traits.join(", ")} />
-            <Card label="Posture relationnelle" value={guide.personality.relationship} />
-            <Card label="Ton de voix" value={guide.personality.tone} />
-            <Card label="Vocabulaire a privilegier" value={guide.personality.wordsToUse.join(", ")} />
-            <Card label="Vocabulaire a eviter" value={guide.personality.wordsToAvoid.join(", ")} />
-          </View>
-        </Section>
-        <Section eyebrow="04" title="Baseline">
-          <View style={styles.grid}>
-            <Card label="Baseline finale" value={guide.baselineSection.final} />
-            <Checklist title="Usages recommandes" items={guide.baselineSection.recommendedUses} />
-          </View>
-        </Section>
-        <Section eyebrow="05" title="Univers visuel">
-          <Palette colors={colors} />
-          <View style={styles.grid}>
-            <Card label="Ambiance generale" value={guide.visualUniverse.ambiance} />
-            <Card label="Elements graphiques" value={guide.visualUniverse.graphicElements} />
+            <Card label="Cible principale" value={guide.positioning.target} theme={theme} />
+            <Card label="Contexte client" value={guide.positioning.context} theme={theme} />
+            <Card label="Probleme resolu" value={guide.positioning.problem} theme={theme} />
+            <Card label="Differenciation" value={guide.positioning.differentiation} theme={theme} />
+            <Card label="Positionnement final" value={guide.positioning.finalPositioning} theme={theme} />
+            <Card label="Pitch" value={guide.positioning.pitch} theme={theme} />
           </View>
         </Section>
       </Page>
 
-      <Page size="A4" orientation="landscape" style={styles.page}>
-        <Section eyebrow="06" title="Regles d'application">
+      <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
+        <Section eyebrow="03" title="Personnalite de marque" theme={theme}>
           <View style={styles.grid}>
-            <Checklist title="Reseaux sociaux" items={guide.applicationRules.social} />
-            <Checklist title="Site web" items={guide.applicationRules.website} />
-            <Checklist title="Presentations" items={guide.applicationRules.presentations} />
-            <Checklist title="Documents commerciaux" items={guide.applicationRules.salesDocs} />
+            <Card label="Persona incarne" value={guide.personality.persona} theme={theme} />
+            <Card label="Traits dominants" value={guide.personality.traits.join(", ")} theme={theme} />
+            <Card label="Posture relationnelle" value={guide.personality.relationship} theme={theme} />
+            <Card label="Ton de voix" value={guide.personality.tone} theme={theme} />
+            <Card label="Vocabulaire a privilegier" value={guide.personality.wordsToUse.join(", ")} theme={theme} />
+            <Card label="Vocabulaire a eviter" value={guide.personality.wordsToAvoid.join(", ")} theme={theme} />
           </View>
         </Section>
-        <Section eyebrow="07" title="Checklists">
+        <Section eyebrow="04" title="Baseline" theme={theme}>
           <View style={styles.grid}>
-            <Checklist title="Avant publication d'un visuel" items={guide.checklists.visual} />
-            <Checklist title="Avant redaction d'un contenu" items={guide.checklists.editorial} />
-            <Checklist title="Avant creation d'un support" items={guide.checklists.support} />
-            <Checklist title="Avant evolution de la marque" items={guide.checklists.evolution} />
+            <Card label="Baseline finale" value={guide.baselineSection.final} theme={theme} />
+            <Checklist title="Usages recommandes" items={guide.baselineSection.recommendedUses} theme={theme} />
+          </View>
+        </Section>
+        <Section eyebrow="05" title="Univers visuel" theme={theme}>
+          <Palette colors={colors} theme={theme} />
+          <View style={styles.grid}>
+            <Card label="Ambiance generale" value={guide.visualUniverse.ambiance} theme={theme} />
+            <Card label="Elements graphiques" value={guide.visualUniverse.graphicElements} theme={theme} />
           </View>
         </Section>
       </Page>
 
-      <Page size="A4" orientation="landscape" style={[styles.page, styles.summaryPage]}>
-        <Section eyebrow="Synthese express" title={`${guide.brandName} en une page`}>
+      <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
+        <Section eyebrow="06" title="Regles d'application" theme={theme}>
           <View style={styles.grid}>
-            <Card label="Mission en 1 phrase" value={guide.expressSummary.mission} />
-            <Card label="Positionnement en 1 phrase" value={guide.expressSummary.positioning} />
-            <Card label="Ton en 3 mots" value={guide.expressSummary.tone.join(", ")} />
-            <Card label="Palette principale" value={guide.expressSummary.palette.join(", ")} />
-            <Card label="Promesse" value={guide.expressSummary.promise} />
-            <Card label="Baseline" value={guide.expressSummary.baseline} />
+            <Checklist title="Reseaux sociaux" items={guide.applicationRules.social} theme={theme} />
+            <Checklist title="Site web" items={guide.applicationRules.website} theme={theme} />
+            <Checklist title="Presentations" items={guide.applicationRules.presentations} theme={theme} />
+            <Checklist title="Documents commerciaux" items={guide.applicationRules.salesDocs} theme={theme} />
+          </View>
+        </Section>
+        <Section eyebrow="07" title="Checklists" theme={theme}>
+          <View style={styles.grid}>
+            <Checklist title="Avant publication d'un visuel" items={guide.checklists.visual} theme={theme} />
+            <Checklist title="Avant redaction d'un contenu" items={guide.checklists.editorial} theme={theme} />
+            <Checklist title="Avant creation d'un support" items={guide.checklists.support} theme={theme} />
+            <Checklist title="Avant evolution de la marque" items={guide.checklists.evolution} theme={theme} />
+          </View>
+        </Section>
+      </Page>
+
+      <Page size="A4" orientation="landscape" style={[styles.page, styles.summaryPage, { backgroundColor: theme.background, color: theme.text }]}>
+        <Section eyebrow="Synthese express" title={`${guide.brandName} en une page`} theme={theme}>
+          <View style={styles.grid}>
+            <Card label="Mission en 1 phrase" value={guide.expressSummary.mission} theme={theme} />
+            <Card label="Positionnement en 1 phrase" value={guide.expressSummary.positioning} theme={theme} />
+            <Card label="Ton en 3 mots" value={guide.expressSummary.tone.join(", ")} theme={theme} />
+            <Card label="Palette principale" value={guide.expressSummary.palette.join(", ")} theme={theme} />
+            <Card label="Promesse" value={guide.expressSummary.promise} theme={theme} />
+            <Card label="Baseline" value={guide.expressSummary.baseline} theme={theme} />
           </View>
         </Section>
       </Page>
