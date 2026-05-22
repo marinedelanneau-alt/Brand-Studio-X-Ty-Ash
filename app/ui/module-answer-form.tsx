@@ -77,6 +77,8 @@ const initialAiAssistState: AiAssistState = {
 };
 
 const IMAGE_UPLOAD_TIMEOUT_MS = 45000;
+const IMAGE_UPLOAD_MAX_CLIENT_SIZE = 900 * 1024;
+const IMAGE_UPLOAD_MAX_DIMENSION = 1600;
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
   return (
@@ -267,6 +269,61 @@ function isImageUploadValue(value: string) {
 
 function getImageUploadValues(values: string[]) {
   return values.map((value) => value.trim()).filter(isImageUploadValue);
+}
+
+async function optimizeImageForUpload(file: File) {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+    return file;
+  }
+
+  if (file.size <= IMAGE_UPLOAD_MAX_CLIENT_SIZE) {
+    return file;
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("Image illisible."));
+      element.src = imageUrl;
+    });
+    const scale = Math.min(
+      IMAGE_UPLOAD_MAX_DIMENSION / Math.max(image.width, image.height),
+      1,
+    );
+    const width = Math.max(Math.round(image.width * scale), 1);
+    const height = Math.max(Math.round(image.height * scale), 1);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return file;
+    }
+
+    context.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.82),
+    );
+
+    if (!blob || blob.size >= file.size) {
+      return file;
+    }
+
+    return new File(
+      [blob],
+      `${file.name.replace(/\.[^.]+$/, "") || "image"}.jpg`,
+      {
+        type: "image/jpeg",
+        lastModified: Date.now(),
+      },
+    );
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
 }
 
 function getAdaptiveInlineInputWidth(value: string, placeholder?: string) {
@@ -491,7 +548,11 @@ function isExerciseAnswered(
     );
   }
 
-  if (exercise.type === "image_upload" || exercise.type === "moodboard") {
+  if (exercise.type === "image_upload") {
+    return getImageUploadValues(normalizedValues).length > 0;
+  }
+
+  if (exercise.type === "moodboard") {
     return isMoodboardComplete(parseStoredMoodboardAnswer(normalizedValues));
   }
 
@@ -2296,16 +2357,20 @@ function ImageUploadExercise({
       return;
     }
 
-    const formData = new FormData();
-    formData.set("moduleId", String(module.id));
-    formData.set("exerciseId", String(exercise.id));
-    formData.set("currentCount", String(imageUrls.length));
-    selectedFiles.forEach((file) => formData.append("images", file));
-
     setIsUploading(true);
-    setMessage("");
+    setMessage("Preparation des images...");
 
     try {
+      const optimizedFiles = await Promise.all(
+        selectedFiles.map((file) => optimizeImageForUpload(file)),
+      );
+      const formData = new FormData();
+      formData.set("moduleId", String(module.id));
+      formData.set("exerciseId", String(exercise.id));
+      formData.set("currentCount", String(imageUrls.length));
+      optimizedFiles.forEach((file) => formData.append("images", file));
+      setMessage("Upload en cours...");
+
       const result = await Promise.race([
         uploadExerciseImages(formData),
         new Promise<Awaited<ReturnType<typeof uploadExerciseImages>>>((resolve) => {
@@ -2327,8 +2392,8 @@ function ImageUploadExercise({
       }
 
       onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
-    } catch {
-      setMessage("L'upload a echoue. Reessayez avec une autre image.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "L'upload a echoue. Reessayez avec une autre image.");
     } finally {
       setIsUploading(false);
     }

@@ -20,6 +20,9 @@ type UploadExerciseImagesResult =
       message: string;
     };
 
+const MAX_IMAGE_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_DATA_URL_SIZE = 1.4 * 1024 * 1024;
+
 function isImageUploadValue(value: string) {
   const trimmedValue = value.trim();
 
@@ -29,6 +32,17 @@ function isImageUploadValue(value: string) {
     trimmedValue.startsWith("/") ||
     trimmedValue.startsWith("data:image/")
   );
+}
+
+async function fileToDataUrl(file: File) {
+  if (file.size > MAX_DATA_URL_SIZE) {
+    throw new Error(
+      "L'image reste trop lourde apres optimisation. Essayez une image plus legere.",
+    );
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  return `data:${file.type || "image/jpeg"};base64,${buffer.toString("base64")}`;
 }
 
 export async function uploadExerciseImages(
@@ -61,6 +75,14 @@ export async function uploadExerciseImages(
       return {
         status: "error",
         message: "Tous les fichiers doivent etre des images.",
+      };
+    }
+
+    if (files.some((file) => file.size > MAX_IMAGE_FILE_SIZE)) {
+      return {
+        status: "error",
+        message:
+          "Une image est encore trop lourde. Essayez une image plus legere ou une capture reduite.",
       };
     }
 
@@ -111,13 +133,17 @@ export async function uploadExerciseImages(
     }
 
     const urls = await Promise.all(
-      files.map((file) =>
-        uploadProjectExerciseImage({
-          projectId: workspace.project!.id,
-          exerciseId,
-          file,
-        }),
-      ),
+      files.map(async (file) => {
+        try {
+          return await uploadProjectExerciseImage({
+            projectId: workspace.project!.id,
+            exerciseId,
+            file,
+          });
+        } catch {
+          return fileToDataUrl(file);
+        }
+      }),
     );
 
     return {
