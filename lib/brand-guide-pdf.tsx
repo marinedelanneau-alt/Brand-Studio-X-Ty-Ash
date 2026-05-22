@@ -231,7 +231,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
       author="Brand Studio"
       subject="Guide de marque genere automatiquement"
     >
-      <Page size="A4" style={[styles.page, styles.cover]}>
+      <Page size="A4" orientation="landscape" style={[styles.page, styles.cover]}>
         <View>
           <Text style={styles.eyebrow}>Brand Studio</Text>
           <Text style={styles.title}>{guide.cover.title}</Text>
@@ -244,7 +244,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         </View>
       </Page>
 
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" orientation="landscape" style={styles.page}>
         <Section eyebrow="Introduction" title="Comment utiliser ce guide">
           <Text style={styles.introText}>{guide.introduction}</Text>
         </Section>
@@ -270,7 +270,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         </Section>
       </Page>
 
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" orientation="landscape" style={styles.page}>
         <Section eyebrow="03" title="Personnalite de marque">
           <View style={styles.grid}>
             <Card label="Persona incarne" value={guide.personality.persona} />
@@ -296,7 +296,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         </Section>
       </Page>
 
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" orientation="landscape" style={styles.page}>
         <Section eyebrow="06" title="Regles d'application">
           <View style={styles.grid}>
             <Checklist title="Reseaux sociaux" items={guide.applicationRules.social} />
@@ -315,7 +315,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         </Section>
       </Page>
 
-      <Page size="A4" style={[styles.page, styles.summaryPage]}>
+      <Page size="A4" orientation="landscape" style={[styles.page, styles.summaryPage]}>
         <Section eyebrow="Synthese express" title={`${guide.brandName} en une page`}>
           <View style={styles.grid}>
             <Card label="Mission en 1 phrase" value={guide.expressSummary.mission} />
