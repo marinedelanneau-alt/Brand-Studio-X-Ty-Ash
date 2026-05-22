@@ -130,6 +130,18 @@ create table if not exists public.project_module_states (
   unique (project_id, module_id)
 );
 
+create table if not exists public.brand_exports (
+  id bigint generated always as identity primary key,
+  project_id bigint not null references public.brand_projects(id) on delete cascade,
+  export_type text not null default 'brand_guide',
+  file_url text,
+  generated_at timestamptz not null default now(),
+  guide_snapshot jsonb not null default '{}'::jsonb
+);
+
+create index if not exists brand_exports_project_type_generated_idx
+  on public.brand_exports (project_id, export_type, generated_at desc);
+
 alter table public.client_access_codes enable row level security;
 alter table public.brand_projects enable row level security;
 alter table public.brand_modules enable row level security;
@@ -137,3 +149,4 @@ alter table public.brand_submodules enable row level security;
 alter table public.module_exercises enable row level security;
 alter table public.project_exercise_answers enable row level security;
 alter table public.project_module_states enable row level security;
+alter table public.brand_exports enable row level security;

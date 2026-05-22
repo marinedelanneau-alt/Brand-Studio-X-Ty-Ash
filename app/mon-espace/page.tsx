@@ -7,6 +7,10 @@ import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
 import LogoutButton from "../ui/logout-button";
 import { getAuthenticatedAccount } from "@/lib/session";
+import {
+  generateGuideFromAnswers,
+  getLatestBrandGuideExport,
+} from "@/lib/brand-guide";
 import { getWorkspaceData } from "@/lib/training";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
@@ -78,11 +82,15 @@ function getResumeHref(modules: WorkspaceModule[]) {
 export default async function MonEspacePage() {
   let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
+  let latestGuideExport: Awaited<ReturnType<typeof getLatestBrandGuideExport>> | null = null;
   let loadError = "";
 
   try {
     account = await getAuthenticatedAccount();
     workspace = await getWorkspaceData(account.id);
+    if (workspace.project) {
+      latestGuideExport = await getLatestBrandGuideExport(workspace.project.id);
+    }
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
@@ -110,6 +118,22 @@ export default async function MonEspacePage() {
       : "/mon-espace";
   const continueHref = getResumeHref(workspace.modules);
   const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
+  const guide = workspace.project
+    ? generateGuideFromAnswers({
+        project: workspace.project,
+        modules: workspace.modules,
+      })
+    : null;
+  const hasGuideData = guide?.completion.hasAnyData ?? false;
+  const missingGuideItems =
+    guide?.completion.items.filter((item) => item.status === "missing").length ?? 0;
+  const guideStatus = !hasGuideData
+    ? "Non genere"
+    : latestGuideExport
+      ? "Pret"
+      : missingGuideItems > 0
+        ? "En cours"
+        : "Pret a generer";
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
@@ -256,7 +280,7 @@ export default async function MonEspacePage() {
                     ) : null}
                   </div>
 
-                  <div>
+                  <div className="border-b border-[#f0e4d3] pb-6">
                     <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                       Progression
                     </p>
@@ -276,6 +300,52 @@ export default async function MonEspacePage() {
                       />
                     </div>
                   </div>
+
+                  {workspace.project ? (
+                    <div>
+                      <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                        Ton Guide de Marque
+                      </p>
+                      <p className="mt-4 text-2xl font-black leading-none text-[#4b4550]">
+                        {guideStatus}
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-[#7b7068]">
+                        {latestGuideExport
+                          ? `Derniere generation : ${new Intl.DateTimeFormat("fr-FR", {
+                              day: "2-digit",
+                              month: "long",
+                              year: "numeric",
+                            }).format(new Date(latestGuideExport.generated_at))}`
+                          : "Genere un guide structure a partir de tes reponses existantes."}
+                      </p>
+                      {missingGuideItems > 0 ? (
+                        <p className="mt-2 text-sm font-semibold text-[#cf7430]">
+                          {missingGuideItems} element
+                          {missingGuideItems > 1 ? "s" : ""} a completer.
+                        </p>
+                      ) : null}
+                      <div className="mt-5 flex flex-wrap gap-3">
+                        <Link
+                          href="/brand-guide"
+                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-white"
+                        >
+                          Generer
+                        </Link>
+                        <Link
+                          href="/brand-guide"
+                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                        >
+                          Voir
+                        </Link>
+                        <Link
+                          href="/brand-guide"
+                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                        >
+                          Regenerer
+                        </Link>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
 

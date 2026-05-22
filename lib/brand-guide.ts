@@ -1,0 +1,644 @@
+import "server-only";
+
+import { parseStoredBrandPersonaConfig, getBrandPersonaFields } from "@/lib/brand-persona";
+import {
+  getPaletteColorCss,
+  parseStoredColorPaletteAnswer,
+  type PaletteColor,
+} from "@/lib/color-palette";
+import {
+  getPromptOpenLabel,
+  parseChecklistEntries,
+  parseIndexedAnswerItems,
+  parseStoredTableConfig,
+} from "@/lib/exercise-types";
+import { parseStoredMoodboardAnswer, type MoodboardAnswer } from "@/lib/moodboard";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { BrandProject, ModuleExercise, WorkspaceModule } from "@/lib/training-types";
+
+type AnswerSource = {
+  module: WorkspaceModule;
+  exercise: ModuleExercise;
+  label: string;
+  values: string[];
+  text: string;
+};
+
+export type GuideColor = {
+  id: string;
+  name: string;
+  usage: string;
+  css: string;
+  hex: string;
+  role: "primary" | "secondary";
+};
+
+export type GuideMoodboardItem = {
+  id: string;
+  type: "image" | "color" | "text" | "keyword";
+  imageUrl?: string;
+  color?: string;
+  label: string;
+  description: string;
+};
+
+export type GuideCompletionItem = {
+  key: string;
+  label: string;
+  status: "ok" | "missing" | "optional";
+  moduleHref?: string;
+};
+
+export type GeneratedBrandGuide = {
+  brandName: string;
+  baseline: string;
+  generatedAt: string;
+  completion: {
+    hasAnyData: boolean;
+    warning: string;
+    items: GuideCompletionItem[];
+  };
+  cover: {
+    title: string;
+    subtitle: string;
+    introLine: string;
+  };
+  introduction: string;
+  dna: {
+    activity: string;
+    essence: string;
+    mission: string;
+    vision: string;
+    values: string[];
+    promise: string;
+  };
+  positioning: {
+    target: string;
+    context: string;
+    problem: string;
+    differentiation: string;
+    competitors: string;
+    finalPositioning: string;
+    pitch: string;
+  };
+  personality: {
+    persona: string;
+    traits: string[];
+    relationship: string;
+    tone: string;
+    wordsToUse: string[];
+    wordsToAvoid: string[];
+  };
+  baselineSection: {
+    final: string;
+    variants: string[];
+    recommendedUses: string[];
+  };
+  visualUniverse: {
+    palette: {
+      primary: GuideColor[];
+      secondary: GuideColor[];
+    };
+    ambiance: string;
+    graphicElements: string;
+    prioritySupports: string[];
+    moodboard: GuideMoodboardItem[];
+  };
+  applicationRules: {
+    social: string[];
+    website: string[];
+    presentations: string[];
+    salesDocs: string[];
+    prioritySupports: string[];
+  };
+  checklists: {
+    visual: string[];
+    editorial: string[];
+    support: string[];
+    evolution: string[];
+  };
+  expressSummary: {
+    mission: string;
+    positioning: string;
+    tone: string[];
+    palette: string[];
+    promise: string;
+    baseline: string;
+  };
+};
+
+export type BrandExportRecord = {
+  id: number;
+  project_id: number;
+  export_type: "brand_guide";
+  file_url: string | null;
+  generated_at: string;
+  guide_snapshot: GeneratedBrandGuide;
+};
+
+const MISSING = {
+  activity: "Activite a completer dans le module Vision & marque.",
+  essence: "ADN de marque a completer dans le module Vision & marque.",
+  mission: "Mission a completer dans le module Vision & marque.",
+  vision: "Vision a completer dans le module Vision & marque.",
+  values: "Valeurs a completer dans le module Vision & marque.",
+  promise: "Promesse a completer dans le module Vision & marque.",
+  positioning: "Positionnement a completer dans le module Positionnement.",
+  tone: "Ton de marque a completer dans le module Personnalite & ton.",
+  palette: "Palette ou intention visuelle a completer dans le module Palette de couleurs.",
+};
+
+function compactText(value: string | null | undefined) {
+  return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function normalizeForSearch(value: string) {
+  return compactText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function splitList(value: string) {
+  return compactText(value)
+    .split(/\s*(?:,|;|\||\n| - )\s*/g)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function sentence(value: string, fallback: string) {
+  const text = compactText(value);
+  if (!text) return fallback;
+  return text.endsWith(".") || text.endsWith("!") || text.endsWith("?") ? text : `${text}.`;
+}
+
+function hasRealValue(value: string) {
+  return compactText(value).length > 0 && !normalizeForSearch(value).includes("a completer");
+}
+
+function getExerciseLabel(exercise: ModuleExercise) {
+  if (exercise.type === "prompt_open") {
+    return getPromptOpenLabel(exercise.question);
+  }
+
+  return exercise.question;
+}
+
+function summarizeTable(exercise: ModuleExercise, values: string[]) {
+  const tableConfig = parseStoredTableConfig(exercise.options);
+  return Array.from({ length: tableConfig.rows }, (_, rowIndex) => {
+    const rowValues = Array.from({ length: tableConfig.columns }, (_, columnIndex) => {
+      const value = compactText(values[rowIndex * tableConfig.columns + columnIndex]);
+      if (!value) return "";
+      const columnLabel = tableConfig.columnLabels[columnIndex] || `Colonne ${columnIndex + 1}`;
+      return `${columnLabel}: ${value}`;
+    }).filter(Boolean);
+
+    if (rowValues.length === 0) return "";
+    const rowLabel = tableConfig.rowLabels[rowIndex] || `Ligne ${rowIndex + 1}`;
+    return `${rowLabel} - ${rowValues.join(", ")}`;
+  }).filter(Boolean);
+}
+
+function buildAnswerText(exercise: ModuleExercise, values: string[]) {
+  if (values.length === 0) return "";
+
+  if (exercise.type === "brand_persona") {
+    const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(exercise.options));
+    const indexedAnswers = parseIndexedAnswerItems(values);
+    return fields
+      .map((field, fieldIndex) => {
+        const fieldValues = indexedAnswers
+          .filter((item) => item.questionIndex === fieldIndex)
+          .sort((left, right) => left.valueIndex - right.valueIndex)
+          .map((item) => compactText(item.value))
+          .filter(Boolean);
+        return fieldValues.length > 0 ? `${field.label}: ${fieldValues.join(", ")}` : "";
+      })
+      .filter(Boolean)
+      .join(" | ");
+  }
+
+  if (exercise.type === "checklist") {
+    const entries = parseChecklistEntries(values);
+    const checked = entries.filter((entry) => entry.checked).map((entry) => entry.label);
+    return (checked.length > 0 ? checked : entries.map((entry) => entry.label)).join(", ");
+  }
+
+  if (exercise.type === "table") {
+    return summarizeTable(exercise, values).join(" | ");
+  }
+
+  const indexedAnswers = parseIndexedAnswerItems(values);
+  if (indexedAnswers.length > 0) {
+    return indexedAnswers
+      .sort((left, right) =>
+        left.questionIndex === right.questionIndex
+          ? left.valueIndex - right.valueIndex
+          : left.questionIndex - right.questionIndex,
+      )
+      .map((item) => item.value)
+      .map(compactText)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return values.map(compactText).filter(Boolean).join(", ");
+}
+
+function collectSources(modules: WorkspaceModule[]) {
+  return modules.flatMap((module) =>
+    module.exercises.flatMap((exercise) => {
+      const values = module.answers[exercise.id] ?? [];
+      const text = buildAnswerText(exercise, values);
+      return text
+        ? [{
+            module,
+            exercise,
+            label: getExerciseLabel(exercise),
+            values,
+            text,
+          } satisfies AnswerSource]
+        : [];
+    }),
+  );
+}
+
+function findSource(sources: AnswerSource[], keywordGroups: string[][]) {
+  return sources.find((source) => {
+    const haystack = normalizeForSearch(
+      `${source.module.title} ${source.label} ${source.text}`,
+    );
+    return keywordGroups.some((group) =>
+      group.every((keyword) => haystack.includes(normalizeForSearch(keyword))),
+    );
+  });
+}
+
+function findText(sources: AnswerSource[], keywordGroups: string[][], fallback: string) {
+  return findSource(sources, keywordGroups)?.text || fallback;
+}
+
+function moduleHref(source: AnswerSource | undefined) {
+  return source ? `/mon-espace/module/${source.module.id}?mode=exercises` : undefined;
+}
+
+function collectPersonaValue(
+  sources: AnswerSource[],
+  fieldKeywords: string[],
+  fallback = "",
+) {
+  const source = sources.find((item) => item.exercise.type === "brand_persona");
+  if (!source) return fallback;
+  const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(source.exercise.options));
+  const indexedAnswers = parseIndexedAnswerItems(source.values);
+  const fieldIndex = fields.findIndex((field) => {
+    const label = normalizeForSearch(`${field.id} ${field.label}`);
+    return fieldKeywords.some((keyword) => label.includes(normalizeForSearch(keyword)));
+  });
+  if (fieldIndex < 0) return fallback;
+
+  return indexedAnswers
+    .filter((item) => item.questionIndex === fieldIndex)
+    .sort((left, right) => left.valueIndex - right.valueIndex)
+    .map((item) => compactText(item.value))
+    .filter(Boolean)
+    .join(", ") || fallback;
+}
+
+function collectColors(sources: AnswerSource[]) {
+  const source = sources.find((item) => item.exercise.type === "color_palette");
+  const parsed = source
+    ? parseStoredColorPaletteAnswer(source.values)
+    : null;
+
+  function mapColor(color: PaletteColor, role: "primary" | "secondary"): GuideColor {
+    return {
+      id: color.id,
+      name: color.name || (role === "primary" ? "Couleur principale" : "Couleur secondaire"),
+      usage: color.usage || "Usage a preciser dans la palette.",
+      css: getPaletteColorCss(color),
+      hex: color.mode === "gradient" ? `${color.from} -> ${color.to}` : color.hex,
+      role,
+    };
+  }
+
+  return {
+    primary: (parsed?.primaryColors ?? []).map((color) => mapColor(color, "primary")),
+    secondary: (parsed?.secondaryColors ?? []).map((color) => mapColor(color, "secondary")),
+  };
+}
+
+function collectMoodboard(sources: AnswerSource[]) {
+  const source = sources.find((item) => item.exercise.type === "moodboard");
+  const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
+
+  return {
+    ambiance: answer?.ambiance || answer?.feedback || "",
+    items: (answer?.blocks ?? []).slice(0, 8).map((block) => {
+      if (block.type === "image") {
+        return {
+          id: block.id,
+          type: "image" as const,
+          imageUrl: block.imageUrl,
+          label: block.caption || "Inspiration",
+          description: "Reference visuelle du moodboard.",
+        };
+      }
+
+      if (block.type === "color") {
+        return {
+          id: block.id,
+          type: "color" as const,
+          color: block.color,
+          label: block.label || "Couleur",
+          description: block.usage || "Role visuel a preciser.",
+        };
+      }
+
+      if (block.type === "text") {
+        return {
+          id: block.id,
+          type: "text" as const,
+          label: block.text || "Note d'ambiance",
+          description: block.author || "Moodboard",
+        };
+      }
+
+      return {
+        id: block.id,
+        type: "keyword" as const,
+        label: block.keyword || "Mot-cle",
+        description: "Mot d'ambiance.",
+      };
+    }),
+  };
+}
+
+function listFromText(text: string, fallback: string[]) {
+  const items = splitList(text).slice(0, 8);
+  return items.length > 0 ? items : fallback;
+}
+
+function buildPitch(brandName: string, target: string, problem: string, promise: string) {
+  if (!hasRealValue(target) || !hasRealValue(problem) || !hasRealValue(promise)) {
+    return "Pitch a finaliser lorsque la cible, le probleme resolu et la promesse seront completes.";
+  }
+
+  return `${brandName} aide ${target} a depasser ${problem} grace a une promesse claire : ${promise}`;
+}
+
+export function generateGuideFromAnswers(input: {
+  project: BrandProject;
+  modules: WorkspaceModule[];
+}) {
+  return generateBrandGuide(input);
+}
+
+export function generateBrandGuide(input: {
+  project: BrandProject;
+  modules: WorkspaceModule[];
+}): GeneratedBrandGuide {
+  const sources = collectSources(input.modules);
+  const brandName = compactText(input.project.name) || "Ma marque";
+  const colors = collectColors(sources);
+  const moodboard = collectMoodboard(sources);
+
+  const missionSource = findSource(sources, [["mission"]]);
+  const positioningSource = findSource(sources, [["positionnement"], ["positioning"]]);
+  const promiseSource = findSource(sources, [["promesse"], ["promise"]]);
+  const toneSource = findSource(sources, [["ton"], ["voix"]]);
+  const paletteSource = sources.find((item) => item.exercise.type === "color_palette");
+
+  const activity = findText(sources, [["activite"], ["metier"], ["description", "marque"]], MISSING.activity);
+  const essence = findText(sources, [["adn"], ["raison", "etre"], ["essence"]], MISSING.essence);
+  const mission = findText(sources, [["mission"]], MISSING.mission);
+  const vision = findText(sources, [["vision"]], MISSING.vision);
+  const promise = findText(sources, [["promesse"], ["promise"]], MISSING.promise);
+  const target = findText(sources, [["cible"], ["audience"], ["client", "ideal"]], "Cible principale a completer dans le module Positionnement.");
+  const problem = findText(sources, [["probleme"], ["frustration"], ["douleur"]], "Probleme client a completer dans le module Positionnement.");
+  const differentiation = findText(sources, [["differenciation"], ["different"], ["singulier"]], "Differenciation a completer dans le module Positionnement.");
+  const competitors = findText(sources, [["concurrent"]], "Concurrents a renseigner si utile.");
+  const finalPositioning = findText(sources, [["positionnement", "final"], ["positionnement"]], MISSING.positioning);
+  const baseline = findText(sources, [["baseline"], ["slogan"], ["signature"]], "Baseline a completer dans le module Baseline.");
+  const traitsText =
+    collectPersonaValue(sources, ["dominant_traits", "traits dominants"]) ||
+    findText(sources, [["trait"], ["personnalite"]], "");
+  const tone =
+    collectPersonaValue(sources, ["tone_of_voice", "ton de voix"]) ||
+    findText(sources, [["ton"], ["voix"]], MISSING.tone);
+  const persona =
+    collectPersonaValue(sources, ["final_summary_sentence", "phrase", "resume"]) ||
+    collectPersonaValue(sources, ["persona_first_name", "prenom"]) ||
+    findText(sources, [["persona"]], "Persona de marque a completer dans le module Persona.");
+  const relationship =
+    collectPersonaValue(sources, ["communication_style", "style de communication"]) ||
+    collectPersonaValue(sources, ["welcome_style", "accueille"]) ||
+    "Posture relationnelle a completer dans le module Personnalite & ton.";
+  const visualAmbiance =
+    moodboard.ambiance ||
+    collectPersonaValue(sources, ["visual_mood", "ambiance visuelle"]) ||
+    findText(sources, [["ambiance"], ["univers", "visuel"]], "Ambiance visuelle a completer dans le module Moodboard.");
+  const supports = listFromText(
+    findText(sources, [["support"], ["application"], ["reseaux"], ["site web"]], ""),
+    ["Reseaux sociaux", "Site web", "Presentations", "Documents commerciaux"],
+  );
+
+  const primaryColorNames = colors.primary.map((color) => color.name);
+  const toneWords = listFromText(traitsText || tone, ["Clair", "Coherent", "Professionnel"]).slice(0, 3);
+  const values = listFromText(
+    findText(sources, [["valeur"]], ""),
+    [MISSING.values],
+  );
+  const wordsToUse = listFromText(
+    findText(sources, [["mots", "utiliser"], ["vocabulaire", "privilegier"]], ""),
+    ["Mots alignes avec le ton de marque a completer."],
+  );
+  const wordsToAvoid = listFromText(
+    findText(sources, [["mots", "eviter"], ["vocabulaire", "eviter"]], ""),
+    ["Mots a eviter a completer."],
+  );
+
+  const completionItems: GuideCompletionItem[] = [
+    { key: "brandName", label: "Nom de marque", status: hasRealValue(brandName) ? "ok" : "missing" },
+    { key: "mission", label: "Mission", status: hasRealValue(mission) ? "ok" : "missing", moduleHref: moduleHref(missionSource) },
+    { key: "positioning", label: "Positionnement", status: hasRealValue(finalPositioning) ? "ok" : "missing", moduleHref: moduleHref(positioningSource) },
+    { key: "promise", label: "Promesse", status: hasRealValue(promise) ? "ok" : "missing", moduleHref: moduleHref(promiseSource) },
+    { key: "tone", label: "Ton", status: hasRealValue(tone) ? "ok" : "missing", moduleHref: moduleHref(toneSource) },
+    {
+      key: "palette",
+      label: "Palette",
+      status: colors.primary.length > 0 || hasRealValue(visualAmbiance) ? "ok" : "missing",
+      moduleHref: moduleHref(paletteSource),
+    },
+    {
+      key: "moodboard",
+      label: "Moodboard",
+      status: moodboard.items.length > 0 ? "ok" : "optional",
+    },
+  ];
+  const missingRequiredCount = completionItems.filter((item) => item.status === "missing").length;
+
+  return {
+    brandName,
+    baseline,
+    generatedAt: new Date().toISOString(),
+    completion: {
+      hasAnyData: sources.length > 0,
+      warning:
+        sources.length === 0
+          ? "Aucune reponse n'est encore disponible pour generer le guide."
+          : missingRequiredCount > 0
+            ? "Ton guide peut etre genere, mais certaines sections seront incompletes."
+            : "Ton Guide de Marque est pret.",
+      items: completionItems,
+    },
+    cover: {
+      title: `Guide de Marque - ${brandName}`,
+      subtitle: baseline,
+      introLine: `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.`,
+    },
+    introduction: `Ce guide rassemble les fondations strategiques, verbales et visuelles de ${brandName}. Il sert de reference pour creer des contenus, guider les visuels et garder une communication coherente dans le temps.`,
+    dna: {
+      activity,
+      essence,
+      mission,
+      vision,
+      values,
+      promise,
+    },
+    positioning: {
+      target,
+      context: findText(sources, [["contexte"], ["situation", "client"]], "Contexte client a preciser dans le module Positionnement."),
+      problem,
+      differentiation,
+      competitors,
+      finalPositioning,
+      pitch: buildPitch(brandName, target, problem, promise),
+    },
+    personality: {
+      persona,
+      traits: toneWords,
+      relationship,
+      tone,
+      wordsToUse,
+      wordsToAvoid,
+    },
+    baselineSection: {
+      final: baseline,
+      variants: listFromText(findText(sources, [["variante"], ["baseline"]], ""), []).filter((item) => item !== baseline),
+      recommendedUses: [
+        "Couverture de presentation et documents commerciaux.",
+        "Bio de reseaux sociaux lorsque l'espace le permet.",
+        "Introduction courte sur le site ou les supports de vente.",
+      ],
+    },
+    visualUniverse: {
+      palette: colors,
+      ambiance: visualAmbiance,
+      graphicElements: findText(sources, [["element", "graphique"], ["codes", "visuels"]], "Elements graphiques a preciser dans le module Univers visuel."),
+      prioritySupports: supports,
+      moodboard: moodboard.items,
+    },
+    applicationRules: {
+      social: [
+        "Utiliser le ton defini avant de publier un contenu.",
+        "Conserver une presence visuelle reguliere avec les couleurs principales.",
+        "Faire ressortir une idee forte par publication.",
+      ],
+      website: [
+        "Faire apparaitre clairement la promesse des les premiers ecrans.",
+        "Garder la palette principale pour les zones de decision et de repere.",
+        "Utiliser la baseline comme signature, pas comme texte explicatif principal.",
+      ],
+      presentations: [
+        "Ouvrir avec le positionnement et la promesse.",
+        "Limiter chaque page a une idee directrice.",
+        "Reprendre les couleurs et les mots-clefs de la marque.",
+      ],
+      salesDocs: [
+        "Mettre en avant le probleme resolu et la difference de la marque.",
+        "Utiliser un vocabulaire clair, concret et coherent avec le ton.",
+        "Terminer par une action simple a comprendre.",
+      ],
+      prioritySupports: supports,
+    },
+    checklists: {
+      visual: [
+        "La palette principale est-elle respectee ?",
+        "Le niveau de contraste rend-il le texte lisible ?",
+        "L'ambiance correspond-elle au moodboard ?",
+        "Le visuel reste-t-il coherent avec la promesse ?",
+      ],
+      editorial: [
+        "Le message parle-t-il clairement a la cible ?",
+        "Le ton correspond-il aux traits de marque ?",
+        "Les mots a privilegier sont-ils presents ?",
+        "Les mots a eviter ont-ils ete retires ?",
+      ],
+      support: [
+        "Le support a-t-il un objectif unique ?",
+        "La baseline et la promesse sont-elles utilisees au bon endroit ?",
+        "La hierarchie visuelle facilite-t-elle la lecture ?",
+      ],
+      evolution: [
+        "La modification renforce-t-elle l'ADN de marque ?",
+        "Le positionnement reste-t-il reconnaissable ?",
+        "Les nouveaux choix peuvent-ils etre reutilises sur plusieurs supports ?",
+      ],
+    },
+    expressSummary: {
+      mission: sentence(mission, MISSING.mission),
+      positioning: sentence(finalPositioning, MISSING.positioning),
+      tone: toneWords,
+      palette: primaryColorNames.length > 0 ? primaryColorNames : [MISSING.palette],
+      promise: sentence(promise, MISSING.promise),
+      baseline,
+    },
+  };
+}
+
+export async function enhanceGuideWithAI(guide: GeneratedBrandGuide) {
+  return guide;
+}
+
+export async function getLatestBrandGuideExport(projectId: number) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("brand_exports")
+    .select("*")
+    .eq("project_id", projectId)
+    .eq("export_type", "brand_guide")
+    .order("generated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<BrandExportRecord>();
+
+  if (error) {
+    const message = error.message.toLowerCase();
+    if (message.includes("could not find the table") || message.includes("schema cache")) {
+      return null;
+    }
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function saveBrandGuideSnapshot(input: {
+  projectId: number;
+  guide: GeneratedBrandGuide;
+}) {
+  const supabase = createSupabaseServerClient();
+  const now = new Date().toISOString();
+  const { error } = await supabase.from("brand_exports").insert({
+    project_id: input.projectId,
+    export_type: "brand_guide",
+    file_url: null,
+    generated_at: now,
+    guide_snapshot: input.guide,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

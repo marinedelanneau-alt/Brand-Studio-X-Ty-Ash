@@ -175,6 +175,45 @@ function normalizePlaceholderText(value: string) {
   return value.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+function normalizeDisplayText(value: string | null | undefined) {
+  return String(value ?? "")
+    .replace(/[’`]/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function isDuplicateDisplayText(
+  value: string | null | undefined,
+  candidates: Array<string | null | undefined>,
+) {
+  const normalizedValue = normalizeDisplayText(value);
+
+  if (!normalizedValue) {
+    return false;
+  }
+
+  return candidates.some(
+    (candidate) => normalizeDisplayText(candidate) === normalizedValue,
+  );
+}
+
+function shouldShowExerciseExplanation(
+  exercise: WorkspaceModule["exercises"][number],
+  displayedTexts: Array<string | null | undefined> = [],
+) {
+  return (
+    exercise.explanation.trim().length > 0 &&
+    !isDuplicateDisplayText(exercise.explanation, [
+      exercise.question,
+      getPromptOpenLabel(exercise.question),
+      ...displayedTexts,
+    ])
+  );
+}
+
 function getAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   displayedQuestion?: string,
@@ -914,7 +953,7 @@ export default function ModuleAnswerForm({
 
         {currentExercise ? (
           <>
-            {currentExercise.explanation &&
+            {shouldShowExerciseExplanation(currentExercise, currentQuestionPrompts) &&
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "brand_persona" &&
             currentExercise.type !== "color_palette" ? (
@@ -985,7 +1024,7 @@ export default function ModuleAnswerForm({
                     __html: getStaticTextHtml(currentExercise.question),
                   }}
                 />
-                {currentExercise.explanation ? (
+                {shouldShowExerciseExplanation(currentExercise) ? (
                   <div className="relative mt-4 rounded-[1.1rem] border border-[#f0dfc6] bg-white/95 px-4 py-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
                     {currentExercise.explanation}
                   </div>
@@ -2179,7 +2218,7 @@ function MultiQuestionOpenExerciseGroup({
           key={question.id}
           className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
         >
-          {question.explanation ? (
+          {shouldShowExerciseExplanation(question) ? (
             <span className="mb-3 block rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
               {question.explanation}
             </span>

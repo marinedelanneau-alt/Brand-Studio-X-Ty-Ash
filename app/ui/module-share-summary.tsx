@@ -89,6 +89,14 @@ export default function ModuleShareSummary({
                 {nextLabel ?? "Passer au module suivant"}
               </Link>
             ) : null}
+            {!nextHref ? (
+              <Link
+                href="/brand-guide"
+                className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#efd7b8] bg-[#fff6e3] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430]"
+              >
+                Generer mon Guide de Marque
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>

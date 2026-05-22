@@ -125,6 +125,12 @@ export default async function Home() {
                     >
                       Ouvrir mon espace
                     </Link>
+                    <Link
+                      href="/brand-guide"
+                      className="flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#efd7b8] bg-[#fff6e3] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430] transition duration-200 hover:-translate-y-0.5"
+                    >
+                      Generer mon Guide de Marque
+                    </Link>
                   </div>
                 ) : (
                   <AccessLoginForm />
