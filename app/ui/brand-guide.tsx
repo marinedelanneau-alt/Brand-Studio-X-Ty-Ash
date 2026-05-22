@@ -36,11 +36,6 @@ export default function BrandGuideLayout({
     setMessage("Le contenu du guide est copie.");
   }
 
-  function exportPlaceholder() {
-    saveSnapshot();
-    setMessage("Export PDF prepare. Le snapshot est sauvegarde et l'integration PDF pourra s'appuyer sur cette version figee.");
-  }
-
   return (
     <div className="min-h-screen bg-[#fbf6ed] px-4 py-6 text-[#4b4550] sm:px-6 lg:px-8 print:bg-white print:px-0 print:py-0">
       <div className="mx-auto max-w-6xl">
@@ -71,9 +66,9 @@ export default function BrandGuideLayout({
             <button type="button" onClick={copyGuide} className={secondaryButtonClass}>
               Copier le contenu
             </button>
-            <button type="button" onClick={exportPlaceholder} className={primaryButtonClass}>
+            <Link href="/brand-guide/download" className={primaryButtonClass}>
               Exporter mon Guide de Marque
-            </button>
+            </Link>
           </div>
         </header>
 
