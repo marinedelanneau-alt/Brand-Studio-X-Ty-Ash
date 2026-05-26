@@ -51,16 +51,9 @@ export default function PricingPage() {
             Offre
           </p>
           <h2 className="mt-4 text-2xl font-black text-[#4b4550]">Brand Studio</h2>
-          <p className="mt-3 text-sm leading-7 text-[#7b7068]">
-            Prix configure dans Stripe via <span className="font-semibold">STRIPE_PRICE_ID</span>.
-          </p>
           <div className="mt-6">
             <CheckoutButton />
           </div>
-          <p className="mt-4 text-xs leading-6 text-[#8a8078]">
-            Apres validation du webhook Stripe, un code d&apos;activation est
-            envoye par e-mail pour creer votre compte.
-          </p>
           <Link
             href="/"
             className="mt-5 inline-flex text-sm font-bold text-[#cf7430] underline-offset-4 hover:underline"
