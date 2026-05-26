@@ -1,47 +1,37 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { findAccountByEmail, insertAccount } from "@/lib/access-codes";
 import {
-  findAccountByEmail,
-  insertAccount,
-  isCodeAvailable,
-} from "@/lib/access-codes";
-import { sendAccessCodeEmail } from "@/lib/mailer";
+  consumeActivationCode,
+  findUsableActivationCode,
+} from "@/lib/activation-codes";
+import {
+  createSupabaseAuthServerClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
+import { upsertSubscription } from "@/lib/subscriptions";
 
 type RegisterState = {
   status: "idle" | "error";
   message: string;
 };
 
-function generateAccessCode() {
-  return `BRAND-${randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-}
-
-async function generateUniqueAccessCode() {
-  let generatedCode = generateAccessCode();
-
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const available = await isCodeAvailable(generatedCode);
-    if (available) {
-      return generatedCode;
-    }
-
-    generatedCode = generateAccessCode();
-  }
-
-  return generatedCode;
-}
-
 export async function registerAccount(
   _prevState: RegisterState,
   formData: FormData,
 ): Promise<RegisterState> {
+  const activationCode =
+    typeof formData.get("activationCode") === "string"
+      ? String(formData.get("activationCode")).trim().toUpperCase().replace(/\s+/g, "")
+      : "";
   const email =
     typeof formData.get("email") === "string"
       ? String(formData.get("email")).trim().toLowerCase()
       : "";
+  const password =
+    typeof formData.get("password") === "string" ? String(formData.get("password")) : "";
   const clientName =
     typeof formData.get("clientName") === "string"
       ? String(formData.get("clientName")).trim()
@@ -51,60 +41,113 @@ export async function registerAccount(
       ? String(formData.get("companyName")).trim()
       : "";
 
-  if (!email || !clientName || !companyName) {
+  if (!activationCode || !email || !password || !clientName || !companyName) {
     return {
       status: "error",
-      message: "Merci de remplir l'email, le nom et l'entreprise.",
+      message: "Merci de remplir le code, l'e-mail, le mot de passe, le nom et l'entreprise.",
     };
   }
 
   if (!email.includes("@")) {
     return {
       status: "error",
-      message: "Merci de saisir un email valide.",
+      message: "Merci de saisir un e-mail valide.",
     };
   }
 
-  let generatedCode = "";
-  let emailStatus = "sent";
-  let emailWarning = "";
+  if (password.length < 8) {
+    return {
+      status: "error",
+      message: "Le mot de passe doit contenir au moins 8 caracteres.",
+    };
+  }
 
   try {
-    const existingUser = await findAccountByEmail(email);
+    const activation = await findUsableActivationCode({
+      code: activationCode,
+      email,
+    });
 
-    if (!existingUser) {
-      generatedCode = await generateUniqueAccessCode();
-      await insertAccount({
-        code: generatedCode,
-        email,
-        clientName,
-        companyName,
-      });
-    } else {
-      generatedCode = existingUser.code;
+    if (!activation) {
+      return {
+        status: "error",
+        message: "Code d'activation invalide, expire ou deja utilise.",
+      };
     }
 
-    try {
-      await sendAccessCodeEmail({
+    const existingAccount = await findAccountByEmail(email);
+
+    if (existingAccount?.auth_user_id) {
+      return {
+        status: "error",
+        message: "Un compte existe deja avec cet e-mail. Connectez-vous directement.",
+      };
+    }
+
+    const adminSupabase = createSupabaseServerClient();
+    const { data: authData, error: authError } =
+      await adminSupabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          client_name: clientName,
+          company_name: companyName,
+        },
+      });
+
+    if (authError || !authData.user) {
+      return {
+        status: "error",
+        message: authError?.message ?? "Le compte n'a pas pu etre cree.",
+      };
+    }
+
+    if (!existingAccount) {
+      await insertAccount({
+        code: null,
+        authUserId: authData.user.id,
         email,
         clientName,
         companyName,
-        accessCode: generatedCode,
       });
-    } catch {
-      emailStatus = "warning";
-      emailWarning =
-        "Le compte a bien ete cree, mais l'e-mail n'a pas pu etre envoye. Utilisez le code affiche ci-dessous.";
+    }
+
+    const account = await findAccountByEmail(email);
+
+    if (!account) {
+      return {
+        status: "error",
+        message: "Le compte client n'a pas pu etre retrouve apres creation.",
+      };
+    }
+
+    await upsertSubscription({
+      userId: account.id,
+      stripeCustomerId: activation.stripe_customer_id,
+      stripeSubscriptionId: activation.stripe_subscription_id,
+      stripeCheckoutSessionId: activation.stripe_checkout_session_id,
+      priceId: activation.price_id,
+      status: "paid",
+      accessGranted: true,
+    });
+
+    await consumeActivationCode(activation.id);
+
+    const authSupabase = await createSupabaseAuthServerClient();
+    const { error: signInError } = await authSupabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      return {
+        status: "error",
+        message: "Compte cree. Connectez-vous avec votre e-mail et votre mot de passe.",
+      };
     }
 
     const cookieStore = await cookies();
-    cookieStore.set("registration-access-code", generatedCode, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 10,
-    });
     cookieStore.set("registration-client-name", clientName, {
       httpOnly: true,
       sameSite: "lax",
@@ -112,32 +155,11 @@ export async function registerAccount(
       path: "/",
       maxAge: 60 * 10,
     });
-    cookieStore.set("registration-email-status", emailStatus, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 10,
-    });
-    cookieStore.set("registration-email-warning", emailWarning, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 10,
-    });
-    cookieStore.set("formation-access", generatedCode, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
   } catch {
     return {
       status: "error",
       message:
-        "Configuration Supabase incomplete. Ajoutez vos variables d'environnement pour activer l'inscription.",
+        "L'activation du compte a echoue. Verifiez votre code ou contactez le support.",
     };
   }
 

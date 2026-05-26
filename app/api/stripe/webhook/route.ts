@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { createActivationCode } from "@/lib/activation-codes";
+import { sendActivationCodeEmail } from "@/lib/mailer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
@@ -52,11 +54,6 @@ async function findUserIdByStripeIds(input: {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const userId = Number(session.metadata?.user_id);
-
-  if (!Number.isFinite(userId)) {
-    throw new Error("Missing checkout user_id metadata");
-  }
-
   const subscriptionId = objectId(
     session.subscription as string | { id: string } | null | undefined,
   );
@@ -65,6 +62,30 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   );
   const isSubscription = session.mode === "subscription";
   const status = isSubscription ? "active" : "paid";
+
+  if (!Number.isFinite(userId) || userId <= 0) {
+    const email = session.customer_details?.email ?? session.customer_email;
+
+    if (!email) {
+      throw new Error("Missing checkout customer email");
+    }
+
+    const activation = await createActivationCode({
+      email,
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId,
+      stripeCheckoutSessionId: session.id,
+      priceId: process.env.STRIPE_PRICE_ID ?? null,
+    });
+
+    await sendActivationCodeEmail({
+      email,
+      clientName: email,
+      accessCode: activation.code,
+    });
+
+    return;
+  }
 
   await upsertSubscription({
     userId,

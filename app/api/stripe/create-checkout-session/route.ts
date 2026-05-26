@@ -9,10 +9,6 @@ export async function POST() {
   try {
     const account = await getCurrentAccount();
 
-    if (!account) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const priceId = process.env.STRIPE_PRICE_ID;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -25,9 +21,9 @@ export async function POST() {
 
     const stripe = getStripe();
     const mode = getStripeCheckoutMode();
-    let customerId = await findStripeCustomerId(account.id);
+    let customerId = account ? await findStripeCustomerId(account.id) : null;
 
-    if (!customerId) {
+    if (account && !customerId) {
       const customer = await stripe.customers.create({
         email: account.email,
         name: account.client_name ?? account.company_name ?? undefined,
@@ -49,19 +45,20 @@ export async function POST() {
 
     const session = await stripe.checkout.sessions.create({
       mode,
-      customer: customerId,
+      customer: customerId ?? undefined,
+      customer_creation: !account && mode === "payment" ? "always" : undefined,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${siteUrl}/dashboard?payment=success`,
+      success_url: `${siteUrl}/?payment=success`,
       cancel_url: `${siteUrl}/pricing?payment=cancelled`,
       metadata: {
-        user_id: String(account.id),
+        user_id: account ? String(account.id) : "",
         product: "brand_studio",
       },
       payment_intent_data:
         mode === "payment"
           ? {
               metadata: {
-                user_id: String(account.id),
+                user_id: account ? String(account.id) : "",
                 product: "brand_studio",
               },
             }
@@ -70,7 +67,7 @@ export async function POST() {
         mode === "subscription"
           ? {
               metadata: {
-                user_id: String(account.id),
+                user_id: account ? String(account.id) : "",
                 product: "brand_studio",
               },
             }

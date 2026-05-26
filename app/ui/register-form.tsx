@@ -27,6 +27,24 @@ export default function RegisterForm() {
       <div className="grid gap-5">
         <div className="space-y-2">
           <label
+            htmlFor="activationCode"
+            className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          >
+            Code d&apos;activation
+          </label>
+          <input
+            id="activationCode"
+            name="activationCode"
+            type="text"
+            required
+            autoComplete="one-time-code"
+            placeholder="BRAND-2026ABCD"
+            className={`${inputClassName} uppercase tracking-[0.12em]`}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
             htmlFor="email"
             className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
           >
@@ -39,6 +57,25 @@ export default function RegisterForm() {
             required
             autoComplete="email"
             placeholder="hello@brandstudio.fr"
+            className={inputClassName}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          >
+            Mot de passe
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            placeholder="8 caracteres minimum"
             className={inputClassName}
           />
         </div>
@@ -85,8 +122,8 @@ export default function RegisterForm() {
           Ce que vous obtenez
         </p>
         <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Votre compte est cree immediatement et un code d&apos;acces personnel
-          vous est attribue pour la connexion.
+          Le code recu apres paiement sert uniquement a activer votre compte.
+          Ensuite, la connexion se fait avec votre e-mail et votre mot de passe.
         </p>
       </div>
 
@@ -95,7 +132,7 @@ export default function RegisterForm() {
         disabled={pending}
         className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
-        {pending ? "Creation du compte..." : "Creer son compte"}
+        {pending ? "Activation du compte..." : "Creer mon compte"}
       </button>
 
       <div className="min-h-7">

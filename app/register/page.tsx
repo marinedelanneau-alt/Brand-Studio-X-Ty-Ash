@@ -3,9 +3,9 @@ import Link from "next/link";
 import RegisterForm from "../ui/register-form";
 
 const values = [
-  "Creation rapide du compte client",
-  "Code d'acces personnel genere automatiquement",
-  "Parcours editorial en phase avec Brand Studio",
+  "Code d'activation recu apres paiement",
+  "Creation du compte avec mot de passe",
+  "Connexion ensuite par e-mail et mot de passe",
 ];
 
 export default function RegisterPage() {
@@ -97,14 +97,14 @@ export default function RegisterPage() {
                     Activation
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Code envoye apres creation
+                    Code envoye apres paiement
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
-                Renseignez vos informations pour recevoir votre code personnel
-                et demarrer votre parcours de formation.
+                Renseignez le code recu par e-mail, puis choisissez votre mot de
+                passe pour activer votre acces.
               </p>
 
               <div className="mt-7">

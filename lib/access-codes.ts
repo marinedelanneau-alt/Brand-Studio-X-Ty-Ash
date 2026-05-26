@@ -4,7 +4,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type AccessCodeRecord = {
   id: number;
-  code: string;
+  code: string | null;
+  auth_user_id: string | null;
   email: string;
   client_name: string | null;
   company_name: string | null;
@@ -56,8 +57,26 @@ export async function findAccountByEmail(email: string) {
   return data;
 }
 
+export async function findAccountByAuthUserId(authUserId: string) {
+  const { tableName } = getTableConfig();
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("*")
+    .eq("auth_user_id", authUserId)
+    .maybeSingle<AccessCodeRecord>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function insertAccount(input: {
-  code: string;
+  code?: string | null;
+  authUserId?: string | null;
   email: string;
   clientName: string;
   companyName: string;
@@ -66,12 +85,33 @@ export async function insertAccount(input: {
   const supabase = createSupabaseServerClient();
 
   const { error } = await supabase.from(tableName).insert({
-    [codeColumn]: input.code,
+    [codeColumn]: input.code ?? null,
+    auth_user_id: input.authUserId ?? null,
     email: input.email,
     [labelColumn]: input.clientName,
     company_name: input.companyName,
     [activeColumn]: true,
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function attachAuthUserToAccount(input: {
+  accountId: number;
+  authUserId: string;
+}) {
+  const { tableName, codeColumn } = getTableConfig();
+  const supabase = createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from(tableName)
+    .update({
+      auth_user_id: input.authUserId,
+      [codeColumn]: null,
+    })
+    .eq("id", input.accountId);
 
   if (error) {
     throw new Error(error.message);

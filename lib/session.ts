@@ -2,9 +2,30 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { findAccountByCode } from "@/lib/access-codes";
+import { findAccountByAuthUserId, findAccountByCode } from "@/lib/access-codes";
+import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
 
 export async function getCurrentAccount() {
+  let userId: string | null = null;
+
+  try {
+    const authSupabase = await createSupabaseAuthServerClient();
+    const {
+      data: { user },
+    } = await authSupabase.auth.getUser();
+    userId = user?.id ?? null;
+  } catch {
+    userId = null;
+  }
+
+  if (userId) {
+    const account = await findAccountByAuthUserId(userId);
+
+    if (account && account.is_active !== false) {
+      return account;
+    }
+  }
+
   const cookieStore = await cookies();
   const accessCode = cookieStore.get("formation-access")?.value;
 

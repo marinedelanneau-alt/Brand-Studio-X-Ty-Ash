@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import AccessLoginForm from "./ui/access-login-form";
-import { findAccountByCode } from "@/lib/access-codes";
+import { getCurrentAccount } from "@/lib/session";
 
 const studioNotes = [
   "Acces immediat a votre espace de formation",
@@ -11,18 +10,8 @@ const studioNotes = [
 ];
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const accessCode = cookieStore.get("formation-access")?.value;
-  let hasAccess = false;
-
-  if (accessCode) {
-    try {
-      const account = await findAccountByCode(accessCode);
-      hasAccess = Boolean(account && account.is_active !== false);
-    } catch {
-      hasAccess = false;
-    }
-  }
+  const account = await getCurrentAccount();
+  const hasAccess = Boolean(account);
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -99,8 +88,8 @@ export default async function Home() {
                 </div>
 
                 <p className="mt-5 max-w-[23rem] text-[0.95rem] leading-[1.8] text-[#7b7068]">
-                  Utilisez votre code de connexion pour retrouver votre espace de
-                  travail, vos ressources et votre parcours de formation.
+                  Connectez-vous avec votre e-mail et votre mot de passe pour
+                  retrouver votre espace de travail.
                 </p>
               </div>
 

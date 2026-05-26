@@ -1,18 +1,10 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function RegisterSuccessPage() {
   const cookieStore = await cookies();
-  const generatedCode = cookieStore.get("registration-access-code")?.value;
   const clientName = cookieStore.get("registration-client-name")?.value;
-  const emailStatus = cookieStore.get("registration-email-status")?.value;
-  const emailWarning = cookieStore.get("registration-email-warning")?.value;
-
-  if (!generatedCode) {
-    redirect("/register");
-  }
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -41,16 +33,17 @@ export default async function RegisterSuccessPage() {
                 {clientName ?? "dans Brand Studio"}
               </h1>
               <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[#82766b]">
-                Votre compte est pret. Votre code personnel a ete prepare pour
-                vous permettre d&apos;entrer dans votre espace client.
+                Votre compte est pret. Votre code d&apos;activation a ete consomme
+                et votre acces se fait maintenant avec votre e-mail et votre mot
+                de passe.
               </p>
 
               <div className="mt-8 rounded-[1.8rem] bg-[#fffaf1] p-5">
                 <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
-                  Votre code
+                  Connexion
                 </p>
-                <p className="mt-5 text-3xl font-black tracking-[0.16em] text-[#514b57] sm:text-4xl">
-                  {generatedCode}
+                <p className="mt-5 text-2xl font-black text-[#514b57] sm:text-3xl">
+                  E-mail + mot de passe
                 </p>
               </div>
             </div>
@@ -82,32 +75,18 @@ export default async function RegisterSuccessPage() {
                 connexions a l&apos;espace client.
               </p>
 
-              <div className="mt-6 space-y-3">
-                {emailStatus === "sent" ? (
-                  <p className="rounded-[1.2rem] border border-[#f0df98] bg-[#fff8d9] px-4 py-3 text-sm font-medium leading-6 text-[#b98744]">
-                    Un e-mail contenant votre code vient d&apos;etre envoye.
-                  </p>
-                ) : null}
-
-                {emailWarning ? (
-                  <p className="rounded-[1.2rem] border border-[#efd6c8] bg-[#fff1ea] px-4 py-3 text-sm font-medium leading-6 text-[#c16a5c]">
-                    {emailWarning}
-                  </p>
-                ) : null}
-              </div>
-
               <div className="mt-8 flex flex-col gap-4">
                 <Link
-                  href="/pricing"
+                  href="/mon-espace"
                   className="flex h-15 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Passer au paiement
+                  Ouvrir ma formation
                 </Link>
                 <Link
-                  href="/recover-code"
+                  href="/"
                   className="flex h-15 w-full items-center justify-center rounded-[1.15rem] border border-[#eadfca] bg-white px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Recuperer le code
+                  Retour a la connexion
                 </Link>
               </div>
             </div>

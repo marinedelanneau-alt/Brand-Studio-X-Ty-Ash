@@ -10,7 +10,13 @@ create table if not exists public.client_access_codes (
 );
 
 alter table public.client_access_codes
+  add column if not exists auth_user_id uuid unique;
+
+alter table public.client_access_codes
   add column if not exists email text;
+
+alter table public.client_access_codes
+  alter column code drop not null;
 
 alter table public.client_access_codes
   add column if not exists client_name text;
@@ -199,6 +205,60 @@ create index if not exists subscriptions_stripe_customer_id_idx
 create index if not exists subscriptions_stripe_subscription_id_idx
   on public.subscriptions (stripe_subscription_id);
 
+create table if not exists public.purchase_activation_codes (
+  id bigint generated always as identity primary key,
+  code text not null unique,
+  email text not null,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_checkout_session_id text,
+  price_id text,
+  status text not null default 'paid',
+  consumed_at timestamptz,
+  expires_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.purchase_activation_codes
+  add column if not exists code text;
+
+alter table public.purchase_activation_codes
+  add column if not exists email text;
+
+alter table public.purchase_activation_codes
+  add column if not exists stripe_customer_id text;
+
+alter table public.purchase_activation_codes
+  add column if not exists stripe_subscription_id text;
+
+alter table public.purchase_activation_codes
+  add column if not exists stripe_checkout_session_id text;
+
+alter table public.purchase_activation_codes
+  add column if not exists price_id text;
+
+alter table public.purchase_activation_codes
+  add column if not exists status text not null default 'paid';
+
+alter table public.purchase_activation_codes
+  add column if not exists consumed_at timestamptz;
+
+alter table public.purchase_activation_codes
+  add column if not exists expires_at timestamptz;
+
+alter table public.purchase_activation_codes
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.purchase_activation_codes
+  add column if not exists updated_at timestamptz not null default now();
+
+create index if not exists purchase_activation_codes_email_idx
+  on public.purchase_activation_codes (email);
+
+create index if not exists purchase_activation_codes_checkout_session_idx
+  on public.purchase_activation_codes (stripe_checkout_session_id);
+
 alter table public.client_access_codes enable row level security;
 alter table public.brand_projects enable row level security;
 alter table public.brand_modules enable row level security;
@@ -208,3 +268,4 @@ alter table public.project_exercise_answers enable row level security;
 alter table public.project_module_states enable row level security;
 alter table public.brand_exports enable row level security;
 alter table public.subscriptions enable row level security;
+alter table public.purchase_activation_codes enable row level security;

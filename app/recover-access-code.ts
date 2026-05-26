@@ -52,6 +52,14 @@ export async function recoverAccessCode(
   }
 
   try {
+    if (!account.code) {
+      return {
+        status: "success",
+        message:
+          "Si un compte existe avec cet e-mail, utilisez la connexion par mot de passe.",
+      };
+    }
+
     await sendAccessCodeEmail({
       email: account.email,
       clientName: account.client_name ?? "client",
