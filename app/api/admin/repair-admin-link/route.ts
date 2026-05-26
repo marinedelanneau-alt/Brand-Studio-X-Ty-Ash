@@ -44,6 +44,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Client account not found" }, { status: 404 });
   }
 
+  const { error: clearError } = await supabase
+    .from("client_access_codes")
+    .update({ auth_user_id: null })
+    .eq("auth_user_id", user.id)
+    .neq("id", account.id);
+
+  if (clearError) {
+    return NextResponse.json({ error: clearError.message }, { status: 500 });
+  }
+
   const { error: updateError } = await supabase
     .from("client_access_codes")
     .update({
