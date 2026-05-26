@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, redirect, unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import ModuleLearningSection from "@/app/ui/module-learning-section";
 import ModulePreviewTrigger from "@/app/ui/module-preview-trigger";
 import ModuleShareSummary from "@/app/ui/module-share-summary";
 import { buildModuleSummaryCard } from "@/lib/module-summary";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 
@@ -29,8 +30,12 @@ export default async function WorkspaceModulePage({
 
   try {
     account = await getAuthenticatedAccount();
+    if (!(await hasActiveAccess(account.id))) {
+      redirect("/pricing");
+    }
     workspace = await getWorkspaceData(account.id);
   } catch (error) {
+    unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
   }
 

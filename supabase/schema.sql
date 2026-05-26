@@ -142,6 +142,63 @@ create table if not exists public.brand_exports (
 create index if not exists brand_exports_project_type_generated_idx
   on public.brand_exports (project_id, export_type, generated_at desc);
 
+create table if not exists public.subscriptions (
+  id bigint generated always as identity primary key,
+  user_id bigint not null references public.client_access_codes(id) on delete cascade,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_checkout_session_id text,
+  price_id text,
+  plan text not null default 'brand_studio',
+  status text not null default 'pending',
+  access_granted boolean not null default false,
+  current_period_end timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.subscriptions
+  add column if not exists user_id bigint references public.client_access_codes(id) on delete cascade;
+
+alter table public.subscriptions
+  add column if not exists stripe_customer_id text;
+
+alter table public.subscriptions
+  add column if not exists stripe_subscription_id text;
+
+alter table public.subscriptions
+  add column if not exists stripe_checkout_session_id text;
+
+alter table public.subscriptions
+  add column if not exists price_id text;
+
+alter table public.subscriptions
+  add column if not exists plan text not null default 'brand_studio';
+
+alter table public.subscriptions
+  add column if not exists status text not null default 'pending';
+
+alter table public.subscriptions
+  add column if not exists access_granted boolean not null default false;
+
+alter table public.subscriptions
+  add column if not exists current_period_end timestamptz;
+
+alter table public.subscriptions
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.subscriptions
+  add column if not exists updated_at timestamptz not null default now();
+
+create index if not exists subscriptions_user_id_idx
+  on public.subscriptions (user_id);
+
+create index if not exists subscriptions_stripe_customer_id_idx
+  on public.subscriptions (stripe_customer_id);
+
+create index if not exists subscriptions_stripe_subscription_id_idx
+  on public.subscriptions (stripe_subscription_id);
+
 alter table public.client_access_codes enable row level security;
 alter table public.brand_projects enable row level security;
 alter table public.brand_modules enable row level security;
@@ -150,3 +207,4 @@ alter table public.module_exercises enable row level security;
 alter table public.project_exercise_answers enable row level security;
 alter table public.project_module_states enable row level security;
 alter table public.brand_exports enable row level security;
+alter table public.subscriptions enable row level security;

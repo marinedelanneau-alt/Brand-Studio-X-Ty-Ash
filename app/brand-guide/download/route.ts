@@ -6,6 +6,7 @@ import {
 } from "@/lib/brand-guide";
 import { renderBrandGuidePdf } from "@/lib/brand-guide-pdf";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 
 export const runtime = "nodejs";
@@ -23,6 +24,11 @@ function slugify(value: string) {
 export async function GET() {
   try {
     const account = await getAuthenticatedAccount();
+    if (!(await hasActiveAccess(account.id))) {
+      return NextResponse.redirect(
+        new URL("/pricing", process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+      );
+    }
     const workspace = await getWorkspaceData(account.id);
 
     if (!workspace.project) {

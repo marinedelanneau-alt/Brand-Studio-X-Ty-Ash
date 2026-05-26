@@ -1,4 +1,4 @@
-import { unstable_rethrow } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import BrandGuideLayout from "@/app/ui/brand-guide";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import {
@@ -7,6 +7,7 @@ import {
 } from "@/lib/brand-guide";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 
 export default async function BrandGuidePage() {
@@ -16,6 +17,9 @@ export default async function BrandGuidePage() {
 
   try {
     const account = await getAuthenticatedAccount();
+    if (!(await hasActiveAccess(account.id))) {
+      redirect("/pricing");
+    }
     workspace = await getWorkspaceData(account.id);
 
     if (workspace.project) {

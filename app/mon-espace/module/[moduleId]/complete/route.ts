@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
 import { updateCompletedModuleCookie } from "@/lib/module-completion-fallback";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { hasActiveAccess } from "@/lib/subscriptions";
 import { getProjectByAccountId, setProjectModuleCompletion } from "@/lib/training";
 
 async function markModuleAsCompleted(moduleId: number) {
   const account = await getAuthenticatedAccount();
+  if (!(await hasActiveAccess(account.id))) {
+    return false;
+  }
   const project = await getProjectByAccountId(account.id);
 
   if (!project) {

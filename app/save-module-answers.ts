@@ -7,6 +7,7 @@ import {
   parseIndexedAnswerItems,
 } from "@/lib/exercise-types";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { hasActiveAccess } from "@/lib/subscriptions";
 import {
   getWorkspaceData,
   replaceModuleAnswers,
@@ -148,6 +149,12 @@ export async function saveModuleAnswers(
 ): Promise<ModuleState> {
   try {
     const account = await getAuthenticatedAccount();
+    if (!(await hasActiveAccess(account.id))) {
+      return {
+        status: "error",
+        message: "Debloquez Brand Studio pour enregistrer vos reponses.",
+      };
+    }
 
     return persistModuleAnswers({
       accountId: account.id,
@@ -165,6 +172,12 @@ export async function saveModuleAnswers(
 export async function saveModuleDraft(formData: FormData): Promise<ModuleState> {
   try {
     const account = await getAuthenticatedAccount();
+    if (!(await hasActiveAccess(account.id))) {
+      return {
+        status: "error",
+        message: "Debloquez Brand Studio pour enregistrer vos reponses.",
+      };
+    }
 
     return persistModuleAnswers({
       accountId: account.id,

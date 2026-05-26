@@ -2,11 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
+import BillingPortalButton from "@/app/ui/billing-portal-button";
 import ProjectNameForm from "@/app/ui/project-name-form";
 import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
 import LogoutButton from "../ui/logout-button";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
 import {
   generateGuideFromAnswers,
   getLatestBrandGuideExport,
@@ -79,24 +81,110 @@ function getResumeHref(modules: WorkspaceModule[]) {
   return `/mon-espace/module/${activeModule.id}`;
 }
 
+function getAccessLabel(status: string) {
+  if (["active", "paid", "trialing"].includes(status)) {
+    return "Acces actif";
+  }
+
+  if (["past_due", "unpaid", "canceled", "incomplete_expired"].includes(status)) {
+    return "Abonnement expire";
+  }
+
+  return "Paiement en attente";
+}
+
 export default async function MonEspacePage() {
   let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
   let latestGuideExport: Awaited<ReturnType<typeof getLatestBrandGuideExport>> | null = null;
+  let accessStatus: Awaited<ReturnType<typeof getSubscriptionAccessStatus>> | null = null;
   let loadError = "";
 
   try {
     account = await getAuthenticatedAccount();
-    workspace = await getWorkspaceData(account.id);
-    if (workspace.project) {
-      latestGuideExport = await getLatestBrandGuideExport(workspace.project.id);
+    accessStatus = await getSubscriptionAccessStatus(account.id);
+
+    if (!accessStatus.accessGranted) {
+      workspace = null;
+    } else {
+      workspace = await getWorkspaceData(account.id);
+      if (workspace.project) {
+        latestGuideExport = await getLatestBrandGuideExport(workspace.project.id);
+      }
     }
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
   }
 
-  if (!account || !workspace) {
+  if (!account) {
+    return (
+      <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-6xl">
+          <DatabaseErrorState
+            title="Votre espace ne peut pas etre charge"
+            message={loadError}
+          />
+        </section>
+      </main>
+    );
+  }
+
+  if (!accessStatus?.accessGranted) {
+    const accessLabel = getAccessLabel(accessStatus?.status ?? "none");
+
+    return (
+      <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-5xl space-y-6">
+          <div className="border-b border-[#eadfca] pb-8">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-2xl">
+                <Image
+                  src="/logo.png"
+                  alt="Brand Studio"
+                  width={154}
+                  height={86}
+                  className="h-auto w-[8rem]"
+                  priority
+                />
+                <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[#4b4550] sm:text-[4.1rem]">
+                  Votre acces Brand Studio
+                </h1>
+                <p className="mt-6 text-lg leading-8 text-[#6f645b]">
+                  Votre paiement doit etre confirme par Stripe avant de debloquer
+                  les modules de formation.
+                </p>
+              </div>
+
+              <aside className="rounded-[1.6rem] border border-[#eadfca] bg-white p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] lg:w-[24rem]">
+                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                  Statut
+                </p>
+                <p className="mt-4 text-2xl font-black text-[#4b4550]">{accessLabel}</p>
+                <p className="mt-3 text-sm leading-7 text-[#7b7068]">
+                  {accessStatus?.status === "none"
+                    ? "Debloquez Brand Studio pour acceder aux modules."
+                    : "Si vous venez de payer, l'acces apparaitra des que le webhook Stripe aura confirme le paiement."}
+                </p>
+                <div className="mt-6 space-y-3">
+                  <Link
+                    href="/pricing"
+                    className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+                  >
+                    Debloquer Brand Studio
+                  </Link>
+                  {accessStatus?.stripeCustomerId ? <BillingPortalButton /> : null}
+                  <LogoutButton />
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!workspace) {
     return (
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
@@ -277,6 +365,23 @@ export default async function MonEspacePage() {
                         currentLogoUrl={workspace.project.logo_url}
                         projectName={workspace.project.name}
                       />
+                    ) : null}
+                  </div>
+
+                  <div className="border-b border-[#f0e4d3] pb-6">
+                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                      Acces
+                    </p>
+                    <p className="mt-4 text-2xl font-black leading-none text-[#4b4550]">
+                      Acces actif
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-[#7b7068]">
+                      Vos modules Brand Studio sont debloques.
+                    </p>
+                    {accessStatus?.stripeCustomerId ? (
+                      <div className="mt-5">
+                        <BillingPortalButton />
+                      </div>
                     ) : null}
                   </div>
 
