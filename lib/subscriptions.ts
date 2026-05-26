@@ -60,6 +60,21 @@ export async function getSubscriptionAccessStatus(
 }
 
 export async function hasActiveAccess(userId: number) {
+  const supabase = createSupabaseServerClient();
+  const { data: account, error: accountError } = await supabase
+    .from("client_access_codes")
+    .select("is_admin,is_active")
+    .eq("id", userId)
+    .maybeSingle<{ is_admin: boolean; is_active: boolean }>();
+
+  if (accountError) {
+    throw new Error(accountError.message);
+  }
+
+  if (account?.is_admin && account.is_active !== false) {
+    return true;
+  }
+
   const status = await getSubscriptionAccessStatus(userId);
   return status.accessGranted && ["active", "paid", "trialing"].includes(status.status);
 }

@@ -102,7 +102,15 @@ export default async function MonEspacePage() {
 
   try {
     account = await getAuthenticatedAccount();
-    accessStatus = await getSubscriptionAccessStatus(account.id);
+    accessStatus = account.is_admin
+      ? {
+          status: "active",
+          accessGranted: true,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          currentPeriodEnd: null,
+        }
+      : await getSubscriptionAccessStatus(account.id);
 
     if (!accessStatus.accessGranted) {
       workspace = null;
