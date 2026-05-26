@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import CheckoutButton from "@/app/ui/checkout-button";
+import { getCurrentAccount } from "@/lib/session";
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const account = await getCurrentAccount();
+
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <section className="mx-auto grid max-w-5xl gap-8 border-t border-[#eadfca] pt-8 lg:grid-cols-[1fr_24rem] lg:items-start">
@@ -55,10 +58,21 @@ export default function PricingPage() {
             Prix configure dans Stripe via <span className="font-semibold">STRIPE_PRICE_ID</span>.
           </p>
           <div className="mt-6">
-            <CheckoutButton />
+            {account ? (
+              <CheckoutButton />
+            ) : (
+              <Link
+                href="/register"
+                className="flex h-14 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5"
+              >
+                Creer mon compte
+              </Link>
+            )}
           </div>
           <p className="mt-4 text-xs leading-6 text-[#8a8078]">
-            L&apos;acces est debloque uniquement apres validation du webhook Stripe.
+            {account
+              ? "L'acces est debloque uniquement apres validation du webhook Stripe."
+              : "Creez votre compte avant paiement pour associer l'acces a votre espace."}
           </p>
           <Link
             href="/"

@@ -89,7 +89,7 @@ export default function AccessLoginForm() {
           editorial, professionnel et inspire du studio Brand Studio.
         </p>
         <Link
-          href="/register"
+          href="/pricing"
           className="mt-5 flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#eadfca] bg-white px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
         >
           Souscrire a la formation

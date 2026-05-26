@@ -126,6 +126,13 @@ export async function registerAccount(
       path: "/",
       maxAge: 60 * 10,
     });
+    cookieStore.set("formation-access", generatedCode, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
   } catch {
     return {
       status: "error",

@@ -98,10 +98,10 @@ export default async function RegisterSuccessPage() {
 
               <div className="mt-8 flex flex-col gap-4">
                 <Link
-                  href="/"
+                  href="/pricing"
                   className="flex h-15 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Aller au login
+                  Passer au paiement
                 </Link>
                 <Link
                   href="/recover-code"
