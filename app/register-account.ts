@@ -2,7 +2,12 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { findAccountByEmail, insertAccount } from "@/lib/access-codes";
+import {
+  attachAuthUserToAccount,
+  findAccountByCode,
+  findAccountByEmail,
+  insertAccount,
+} from "@/lib/access-codes";
 import {
   consumeActivationCode,
   findUsableActivationCode,
@@ -67,11 +72,19 @@ export async function registerAccount(
       code: activationCode,
       email,
     });
+    const legacyAccount = activation ? null : await findAccountByCode(activationCode);
 
-    if (!activation) {
+    if (!activation && !legacyAccount) {
       return {
         status: "error",
         message: "Code d'activation invalide, expire ou deja utilise.",
+      };
+    }
+
+    if (legacyAccount && legacyAccount.email.toLowerCase() !== email) {
+      return {
+        status: "error",
+        message: "Ce code n'est pas associe a cet e-mail.",
       };
     }
 
@@ -103,7 +116,12 @@ export async function registerAccount(
       };
     }
 
-    if (!existingAccount) {
+    if (legacyAccount) {
+      await attachAuthUserToAccount({
+        accountId: legacyAccount.id,
+        authUserId: authData.user.id,
+      });
+    } else if (!existingAccount) {
       await insertAccount({
         code: null,
         authUserId: authData.user.id,
@@ -122,17 +140,19 @@ export async function registerAccount(
       };
     }
 
-    await upsertSubscription({
-      userId: account.id,
-      stripeCustomerId: activation.stripe_customer_id,
-      stripeSubscriptionId: activation.stripe_subscription_id,
-      stripeCheckoutSessionId: activation.stripe_checkout_session_id,
-      priceId: activation.price_id,
-      status: "paid",
-      accessGranted: true,
-    });
+    if (activation) {
+      await upsertSubscription({
+        userId: account.id,
+        stripeCustomerId: activation.stripe_customer_id,
+        stripeSubscriptionId: activation.stripe_subscription_id,
+        stripeCheckoutSessionId: activation.stripe_checkout_session_id,
+        priceId: activation.price_id,
+        status: "paid",
+        accessGranted: true,
+      });
 
-    await consumeActivationCode(activation.id);
+      await consumeActivationCode(activation.id);
+    }
 
     const authSupabase = await createSupabaseAuthServerClient();
     const { error: signInError } = await authSupabase.auth.signInWithPassword({
