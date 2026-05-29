@@ -361,9 +361,6 @@ export default async function MonEspacePage() {
                   ) : null}
 
                   <div className="border-b border-[#f0e4d3] pb-6">
-                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
-                      Profil
-                    </p>
                     <CompanyNameForm currentCompanyName={account.company_name} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
