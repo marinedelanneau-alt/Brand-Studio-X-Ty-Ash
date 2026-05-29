@@ -147,13 +147,20 @@ function normalizeTextEntryValue(
   exercise: WorkspaceModule["exercises"][number],
   value: string,
 ) {
-  const placeholder = exercise.answer_placeholder.trim();
+  const trimmedValue = value.trim();
 
-  if (!placeholder) {
-    return value;
+  if (!trimmedValue) {
+    return "";
   }
 
-  return value.trim() === placeholder ? "" : value;
+  return isDuplicateDisplayText(trimmedValue, [
+    exercise.answer_placeholder,
+    exercise.explanation,
+    exercise.question,
+    getPromptOpenLabel(exercise.question),
+  ])
+    ? ""
+    : value;
 }
 
 function normalizeTextEntryValues(
