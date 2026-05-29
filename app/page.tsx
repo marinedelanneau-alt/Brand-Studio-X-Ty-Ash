@@ -12,6 +12,7 @@ const studioNotes = [
 export default async function Home() {
   const account = await getCurrentAccount();
   const hasAccess = Boolean(account);
+  const homeTitle = account?.company_name?.trim() || "Brand Studio";
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -51,8 +52,8 @@ export default async function Home() {
                 </div>
 
                 <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
-                  <h1 className="whitespace-nowrap font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[#4b4550] sm:text-[3.45rem] xl:text-[3.95rem]">
-                    Brand Studio
+                  <h1 className="max-w-full break-words font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[#4b4550] sm:text-[3.45rem] xl:text-[3.95rem]">
+                    {homeTitle}
                   </h1>
                   <p className="mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[#7b7068]">
                     Un espace editorial pour structurer votre parcours, acceder

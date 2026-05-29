@@ -50,6 +50,7 @@ export async function updateCompanyName(
   }
 
   revalidatePath("/mon-espace");
+  revalidatePath("/");
   revalidatePath("/brand-guide");
 
   return {
