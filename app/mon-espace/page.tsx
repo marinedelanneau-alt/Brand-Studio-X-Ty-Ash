@@ -3,6 +3,7 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import BillingPortalButton from "@/app/ui/billing-portal-button";
+import CompanyNameForm from "@/app/ui/company-name-form";
 import ProjectNameForm from "@/app/ui/project-name-form";
 import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
@@ -368,6 +369,7 @@ export default async function MonEspacePage() {
                     <p className="mt-1 text-sm leading-6 text-[#7b7068]">
                       {account.company_name ?? "Entreprise non renseignee"}
                     </p>
+                    <CompanyNameForm currentCompanyName={account.company_name} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
                         currentLogoUrl={workspace.project.logo_url}

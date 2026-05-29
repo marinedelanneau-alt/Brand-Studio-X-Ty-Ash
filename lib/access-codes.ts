@@ -118,6 +118,25 @@ export async function attachAuthUserToAccount(input: {
   }
 }
 
+export async function updateAccountCompanyName(input: {
+  accountId: number;
+  companyName: string;
+}) {
+  const { tableName } = getTableConfig();
+  const supabase = createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from(tableName)
+    .update({
+      company_name: input.companyName,
+    })
+    .eq("id", input.accountId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function isCodeAvailable(accessCode: string) {
   const account = await findAccountByCode(accessCode);
   return !account;
