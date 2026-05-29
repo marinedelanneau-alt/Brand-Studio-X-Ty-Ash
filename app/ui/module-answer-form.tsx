@@ -228,7 +228,7 @@ function getAnswerPlaceholder(
   }
 
   const normalizedPlaceholder = normalizePlaceholderText(placeholder);
-  const duplicateSources = [displayedQuestion, exercise.question]
+  const duplicateSources = [displayedQuestion, exercise.question, exercise.explanation]
     .filter((value): value is string => Boolean(value?.trim()))
     .map(normalizePlaceholderText);
 
