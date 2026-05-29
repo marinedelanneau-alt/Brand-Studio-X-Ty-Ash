@@ -380,23 +380,6 @@ export default async function MonEspacePage() {
 
                   <div className="border-b border-[#f0e4d3] pb-6">
                     <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
-                      Acces
-                    </p>
-                    <p className="mt-4 text-2xl font-black leading-none text-[#4b4550]">
-                      Acces actif
-                    </p>
-                    <p className="mt-3 text-sm leading-6 text-[#7b7068]">
-                      Vos modules Brand Studio sont debloques.
-                    </p>
-                    {accessStatus?.stripeCustomerId ? (
-                      <div className="mt-5">
-                        <BillingPortalButton />
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="border-b border-[#f0e4d3] pb-6">
-                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                       Progression
                     </p>
                     <p className="mt-4 text-[2.8rem] font-black leading-none text-[#4b4550]">
