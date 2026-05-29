@@ -364,13 +364,6 @@ export default async function MonEspacePage() {
                     <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                       Profil
                     </p>
-                    <p className="mt-4 text-lg font-semibold text-[#4b4550]">
-                      {account.client_name ?? "Client"}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#7b7068]">{account.email}</p>
-                    <p className="mt-1 text-sm leading-6 text-[#7b7068]">
-                      {account.company_name ?? "Entreprise non renseignee"}
-                    </p>
                     <CompanyNameForm currentCompanyName={account.company_name} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
