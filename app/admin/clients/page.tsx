@@ -46,9 +46,6 @@ export default async function AdminClientsPage() {
             <thead>
               <tr className="border-b border-[#eadfca] bg-[#fffdf7] text-left">
                 <th className="px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                  Client
-                </th>
-                <th className="px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
                   Entreprise
                 </th>
                 <th className="px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
@@ -62,15 +59,7 @@ export default async function AdminClientsPage() {
             <tbody>
               {accounts.map((account) => (
                 <tr key={account.id} className="border-b border-[#f2e9dc] align-top last:border-b-0">
-                  <td className="px-5 py-4">
-                    <p className="text-sm font-semibold text-[#4b4550]">
-                      {account.client_name ?? "Client"}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-[#7b7068]">
-                      {account.email}
-                    </p>
-                  </td>
-                  <td className="px-5 py-4 text-sm leading-6 text-[#7b7068]">
+                  <td className="px-5 py-4 text-sm font-semibold leading-6 text-[#4b4550]">
                     {account.company_name ?? "Non renseignee"}
                   </td>
                   <td className="px-5 py-4 text-sm leading-6 text-[#7b7068]">

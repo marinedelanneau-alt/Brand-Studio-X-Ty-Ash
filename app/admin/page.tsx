@@ -146,14 +146,9 @@ export default async function AdminDashboardPage() {
                   key={account.id}
                   className="flex flex-col gap-3 rounded-[1rem] border border-[#eadfca] bg-[#fffdf7] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-[#4b4550]">
-                      {account.client_name ?? account.email}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-[#7b7068]">
-                      {account.email}
-                    </p>
-                  </div>
+                  <p className="text-sm font-semibold text-[#4b4550]">
+                    {account.company_name ?? account.project_name ?? "Compte client"}
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="rounded-full bg-[#f2eef7] px-3 py-1 text-[0.72rem] font-black uppercase tracking-[0.14em] text-[#7a7087]">
                       {account.project_name ? "Projet actif" : "Sans projet"}
