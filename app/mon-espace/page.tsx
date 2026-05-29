@@ -231,6 +231,8 @@ export default async function MonEspacePage() {
       : missingGuideItems > 0
         ? "En cours"
         : "Pret a generer";
+  const workspaceTitle =
+    account.company_name?.trim() || workspace.project?.name || "Mon projet";
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
@@ -243,7 +245,7 @@ export default async function MonEspacePage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={workspace.project.logo_url}
-                    alt={`Logo de ${workspace.project.name}`}
+                    alt={`Logo de ${workspaceTitle}`}
                     className="h-16 w-16 rounded-[1rem] border border-[#eadfca] bg-white object-contain p-2"
                   />
                 ) : (
@@ -262,7 +264,7 @@ export default async function MonEspacePage() {
               </div>
               <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
                 <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[#2f2a33] sm:text-[4rem]">
-                  {workspace.project?.name ?? "Mon projet"}
+                  {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
                   En route vers ta nouvelle identite de marque
@@ -373,7 +375,7 @@ export default async function MonEspacePage() {
                     {workspace.project ? (
                       <WorkspaceLogoForm
                         currentLogoUrl={workspace.project.logo_url}
-                        projectName={workspace.project.name}
+                        projectName={workspaceTitle}
                       />
                     ) : null}
                   </div>
