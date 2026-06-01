@@ -687,12 +687,53 @@ function PreviewPaletteCard({
   );
 }
 
+function PreviewEditorialCalendar() {
+  return (
+    <div className="overflow-hidden rounded-[1.4rem] border border-[#eadfca] bg-white">
+      <div className="flex items-center justify-between border-b border-[#eadfca] bg-[#fffdf7] px-4 py-4">
+        <div>
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+            Calendrier editorial
+          </p>
+          <p className="mt-1 text-xl font-semibold text-[#4b4550]">Vue mensuelle</p>
+        </div>
+        <span className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+          Ajouter
+        </span>
+      </div>
+      <div className="grid grid-cols-7 bg-[#fffaf4] text-center text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#9a8f86]">
+        {["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."].map((day) => (
+          <div key={day} className="px-2 py-2">
+            {day}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7">
+        {Array.from({ length: 14 }, (_, index) => (
+          <div key={index} className="min-h-20 border-r border-t border-[#f0e4d3] p-2">
+            <p className="text-xs font-semibold text-[#6b625a]">{index + 1}</p>
+            {index === 2 || index === 8 ? (
+              <div className="mt-2 rounded-[0.7rem] border border-[#eadfca] bg-[#fffdf9] px-2 py-2 text-left text-xs text-[#4b4550]">
+                Idee de contenu
+                <span className="mt-1 block w-fit rounded-full bg-[#f4e4f8] px-2 py-1 text-[0.62rem] text-[#8b5aa2]">
+                  A produire
+                </span>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ExercisePreview({ exercise }: { exercise: PreviewExercise }) {
   const prompts = getQuestionPrompts(exercise);
   const showMainQuestion =
     exercise.type !== "prompt_open" &&
     exercise.type !== "brand_persona" &&
     exercise.type !== "color_palette" &&
+    exercise.type !== "editorial_calendar" &&
     !isPassiveContentType(exercise.type) &&
     exercise.type !== "fill_blank" &&
     exercise.type !== "group_open" &&
@@ -730,6 +771,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
       {exercise.type === "popup_message" ? <PreviewPopupMessage exercise={exercise} /> : null}
       {exercise.type === "image_upload" ? <PreviewImageUpload exercise={exercise} /> : null}
       {exercise.type === "moodboard" ? <PreviewImageUpload exercise={exercise} /> : null}
+      {exercise.type === "editorial_calendar" ? <PreviewEditorialCalendar /> : null}
       {exercise.type === "brand_persona" ? <PreviewBrandPersona exercise={exercise} /> : null}
       {exercise.type === "spectrum" ? <PreviewSpectrum exercise={exercise} /> : null}
       {exercise.type === "color_palette" ? <PreviewColorPalette exercise={exercise} /> : null}

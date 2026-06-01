@@ -13,6 +13,11 @@ import {
   getSerializedColorPaletteOptions,
   isColorPaletteOptions,
 } from "@/lib/color-palette";
+import {
+  EDITORIAL_CALENDAR_CONFIG_PREFIX,
+  getSerializedEditorialCalendarOptions,
+  isEditorialCalendarOptions,
+} from "@/lib/editorial-calendar";
 import { isSmartFeedbackOption } from "@/lib/smart-feedback";
 
 export type ExerciseType =
@@ -32,6 +37,7 @@ export type ExerciseType =
   | "brand_persona"
   | "spectrum"
   | "color_palette"
+  | "editorial_calendar"
   | "moodboard";
 
 const GROUP_OPEN_PREFIX = "__group_open__:";
@@ -75,6 +81,7 @@ export const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
   brand_persona: "Persona de marque",
   spectrum: "Curseur spectrum",
   color_palette: "Palette de couleurs",
+  editorial_calendar: "Calendrier editorial",
   moodboard: "Moodboard",
 };
 
@@ -137,6 +144,7 @@ export function exerciseNeedsOptions(type: ExerciseType) {
     type !== "static_text" &&
     type !== "popup_message" &&
     type !== "image_upload" &&
+    type !== "editorial_calendar" &&
     type !== "moodboard" &&
     type !== "open" &&
     type !== "checklist" &&
@@ -179,6 +187,10 @@ export function normalizeExerciseOptions(type: ExerciseType, rawOptions: string[
 
   if (type === "image_upload") {
     return getSerializedImageUploadOptions(getDefaultImageUploadConfig());
+  }
+
+  if (type === "editorial_calendar") {
+    return getSerializedEditorialCalendarOptions();
   }
 
   if (type === "moodboard") {
@@ -238,6 +250,10 @@ export function getPersistedExerciseType(type: ExerciseType) {
   }
 
   if (type === "image_upload") {
+    return "multiple";
+  }
+
+  if (type === "editorial_calendar") {
     return "multiple";
   }
 
@@ -325,6 +341,10 @@ export function resolveExerciseType(
     return "image_upload";
   }
 
+  if (type === "multiple" && isEditorialCalendarOptions(options)) {
+    return "editorial_calendar";
+  }
+
   if (type === "multiple" && hasMoodboardConfigOptions(options)) {
     return "moodboard";
   }
@@ -391,6 +411,12 @@ export function resolveStoredExerciseOptions(type: ExerciseType, rawOptions: str
 
   if (type === "image_upload") {
     return sanitizedOptions.filter((option) => option.startsWith(IMAGE_UPLOAD_MAX_PREFIX));
+  }
+
+  if (type === "editorial_calendar") {
+    return sanitizedOptions.filter((option) =>
+      option.startsWith(EDITORIAL_CALENDAR_CONFIG_PREFIX),
+    );
   }
 
   if (type === "moodboard") {
@@ -613,7 +639,12 @@ export function parseChecklistEntries(values: string[]) {
 }
 
 export function getEditorOptionsText(type: ExerciseType, rawOptions: string[]) {
-  if (type === "table" || type === "image_upload" || type === "moodboard") {
+  if (
+    type === "table" ||
+    type === "image_upload" ||
+    type === "editorial_calendar" ||
+    type === "moodboard"
+  ) {
     return "";
   }
 

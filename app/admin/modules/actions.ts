@@ -61,6 +61,7 @@ function parseQuestion(rawQuestion: unknown) {
       type !== "multiple" &&
       type !== "popup_message" &&
       type !== "image_upload" &&
+      type !== "editorial_calendar" &&
       type !== "moodboard" &&
       type !== "checklist" &&
       type !== "table" &&
@@ -92,6 +93,7 @@ function parseQuestion(rawQuestion: unknown) {
         type !== "static_text" &&
         type !== "popup_message" &&
           type !== "image_upload" &&
+          type !== "editorial_calendar" &&
           type !== "moodboard" &&
           type !== "fill_blank" &&
         type !== "checklist" &&

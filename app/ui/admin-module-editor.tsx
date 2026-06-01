@@ -41,6 +41,7 @@ import {
   parseStoredMoodboardConfig,
   type MoodboardConfig,
 } from "@/lib/exercise-types";
+import { getSerializedEditorialCalendarOptions } from "@/lib/editorial-calendar";
 import {
   getDefaultSmartFeedbackConfig,
   type SmartFeedbackConfig,
@@ -141,6 +142,8 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
         ? "Ou se situe ta marque entre sobriete et expression ?"
         : type === "color_palette"
           ? "Construis la palette de couleurs de ta marque"
+          : type === "editorial_calendar"
+            ? "Construis ton calendrier editorial"
           : type === "moodboard"
             ? "Creer un moodboard d'inspiration pour ta marque"
             : "",
@@ -192,7 +195,11 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     answerPlaceholder: exercise.answer_placeholder ?? "",
     question:
       getEditorExerciseQuestion(exercise.type, exercise.question) ||
-      (exercise.type === "moodboard" ? "Creer un moodboard d'inspiration pour ta marque" : ""),
+      (exercise.type === "editorial_calendar"
+        ? "Construis ton calendrier editorial"
+        : exercise.type === "moodboard"
+          ? "Creer un moodboard d'inspiration pour ta marque"
+          : ""),
     optionsText: getEditorOptionsText(exercise.type, exercise.options),
     tableRows: tableConfig.rows,
     tableColumns: tableConfig.columns,
@@ -236,6 +243,7 @@ function getQuestionLabel(type: ExerciseType) {
   if (type === "static_text") return "Texte a afficher";
   if (type === "popup_message") return "Message ou citation";
   if (type === "image_upload") return "Question ou intention";
+  if (type === "editorial_calendar") return "Question calendrier";
   if (type === "moodboard") return "Question moodboard";
   if (type === "prompt_open") return "Libelle";
   if (type === "brand_persona") return "Titre de l'exercice";
@@ -250,6 +258,7 @@ function getQuestionHint(type: ExerciseType) {
   if (type === "static_text") return "Ce bloc affiche simplement du texte entre deux questions.";
   if (type === "popup_message") return "Ce bloc ouvre une pop-up inspirante avec un message motivant ou une citation que l'utilisateur peut fermer.";
   if (type === "image_upload") return "L'utilisateur pourra importer plusieurs images pour composer un tableau d'inspiration.";
+  if (type === "editorial_calendar") return "L'utilisateur pourra remplir un calendrier editorial en vue mensuelle, avec des contenus par date.";
   if (type === "moodboard") return "L'utilisateur verra un moodboard intelligent uniquement si ce type est choisi ici.";
   if (type === "boolean") return "Les choix Oui et Non sont ajoutes automatiquement.";
   if (type === "checklist") return "L'utilisateur pourra ajouter autant d'elements qu'il souhaite.";
@@ -272,13 +281,14 @@ function supportsExplanationField(type: ExerciseType) {
 }
 
 function supportsPlaceholderField(type: ExerciseType) {
-  return !isPassiveContentType(type) && type !== "image_upload" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
+  return !isPassiveContentType(type) && type !== "image_upload" && type !== "editorial_calendar" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
 }
 
 function supportsSmartFeedbackField(type: ExerciseType) {
   return (
     !isPassiveContentType(type) &&
     type !== "image_upload" &&
+    type !== "editorial_calendar" &&
     type !== "moodboard" &&
     type !== "brand_persona" &&
     type !== "spectrum" &&
@@ -337,6 +347,8 @@ function serializeQuestion(question: EditorQuestion) {
         ]
       : question.type === "image_upload"
         ? [`__image_upload_max__:${Math.max(1, question.imageUploadMax)}`]
+      : question.type === "editorial_calendar"
+        ? getSerializedEditorialCalendarOptions()
       : question.type === "moodboard"
         ? getSerializedMoodboardOptions(question.moodboardConfig)
       : question.type === "brand_persona"

@@ -46,6 +46,7 @@ import {
   parseStoredColorPaletteAnswer,
   parseStoredColorPaletteConfig,
 } from "@/lib/color-palette";
+import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
 import {
   getSerializedSmartFeedbackOption,
   parseStoredSmartFeedbackConfig,
@@ -302,6 +303,10 @@ function getModuleProgress(
         parseStoredColorPaletteAnswer(answerMap[exercise.id] ?? []),
         parseStoredColorPaletteConfig(exercise.options),
       );
+    }
+
+    if (exercise.type === "editorial_calendar") {
+      return isEditorialCalendarComplete(answerMap[exercise.id] ?? []);
     }
 
     if (exercise.type === "table") {

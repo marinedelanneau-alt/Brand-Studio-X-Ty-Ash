@@ -31,10 +31,12 @@ import {
   parseStoredMoodboardAnswer,
   serializeMoodboardAnswer,
 } from "@/lib/moodboard";
+import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
 import SpectrumExercise from "./spectrum-exercise";
 import SmartFeedback from "./smart-feedback";
 import ColorPaletteExercise from "./color-palette-exercise";
 import MoodboardExercise from "./moodboard-exercise";
+import EditorialCalendarExercise from "./editorial-calendar-exercise";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import {
   getFillBlankCount,
@@ -86,6 +88,7 @@ function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
     exercise.type === "prompt_open" ||
     exercise.type === "group_open" ||
     exercise.type === "checklist" ||
+    exercise.type === "editorial_calendar" ||
     exercise.type === "fill_blank" ||
     exercise.type === "table"
   );
@@ -171,6 +174,7 @@ function normalizeTextEntryValues(
     exercise.type !== "open" &&
     exercise.type !== "prompt_open" &&
     exercise.type !== "group_open" &&
+    exercise.type !== "editorial_calendar" &&
     exercise.type !== "fill_blank" &&
     exercise.type !== "table"
   ) {
@@ -250,6 +254,10 @@ function normalizeSubmissionValues(
 
   if (exercise.type === "image_upload") {
     return getImageUploadValues(normalizedValues);
+  }
+
+  if (exercise.type === "editorial_calendar") {
+    return normalizedValues;
   }
 
   if (exercise.type !== "moodboard") {
@@ -561,6 +569,10 @@ function isExerciseAnswered(
 
   if (exercise.type === "moodboard") {
     return isMoodboardComplete(parseStoredMoodboardAnswer(normalizedValues));
+  }
+
+  if (exercise.type === "editorial_calendar") {
+    return isEditorialCalendarComplete(normalizedValues);
   }
 
   if (exercise.type === "table") {
@@ -1822,6 +1834,18 @@ export default function ModuleAnswerForm({
                 exercise={currentExercise}
                 answers={answers[currentExercise.id] ?? []}
                 allAnswers={answers}
+                onChange={(nextValues) =>
+                  setAnswers((current) => ({
+                    ...current,
+                    [currentExercise.id]: nextValues,
+                  }))
+                }
+              />
+            ) : null}
+
+            {currentExercise.type === "editorial_calendar" ? (
+              <EditorialCalendarExercise
+                answers={answers[currentExercise.id] ?? []}
                 onChange={(nextValues) =>
                   setAnswers((current) => ({
                     ...current,
