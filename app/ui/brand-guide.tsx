@@ -44,7 +44,7 @@ export default function BrandGuideLayout({
 
   async function copyGuide() {
     await navigator.clipboard.writeText(guideText);
-    setMessage("Le contenu du guide est copie.");
+    setMessage("Le contenu du guide est copié.");
   }
 
   return (
@@ -73,7 +73,7 @@ export default function BrandGuideLayout({
               onClick={() => setMode("express")}
               className={tabClass(mode === "express")}
             >
-              Synthese express
+              Synthèse express
             </button>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -110,7 +110,7 @@ export default function BrandGuideLayout({
             <GuideSection kicker="01" title="ADN de marque">
               <div className="grid gap-4 md:grid-cols-2">
                 <GuideCard label="Activite" value={guide.dna.activity} />
-                <GuideCard label="Raison d'etre" value={guide.dna.essence} />
+                <GuideCard label="Raison d'être" value={guide.dna.essence} />
                 <GuideCard label="Mission" value={guide.dna.mission} />
                 <GuideCard label="Vision" value={guide.dna.vision} />
                 <GuideCard label="Promesse" value={guide.dna.promise} />
@@ -134,8 +134,8 @@ export default function BrandGuideLayout({
                 <GuideCard label="Traits dominants" value={guide.personality.traits.join(", ")} />
                 <GuideCard label="Posture relationnelle" value={guide.personality.relationship} />
                 <GuideCard label="Ton de voix" value={guide.personality.tone} />
-                <GuideCard label="Vocabulaire a privilegier" value={guide.personality.wordsToUse.join(", ")} />
-                <GuideCard label="Vocabulaire a eviter" value={guide.personality.wordsToAvoid.join(", ")} />
+                <GuideCard label="Vocabulaire à privilégier" value={guide.personality.wordsToUse.join(", ")} />
+                <GuideCard label="Vocabulaire à éviter" value={guide.personality.wordsToAvoid.join(", ")} />
               </div>
             </GuideSection>
             <GuideSection kicker="04" title="Baseline">
@@ -169,7 +169,7 @@ export default function BrandGuideLayout({
             <GuideSection kicker="07" title="Checklists">
               <div className="grid gap-4 md:grid-cols-2">
                 <GuideChecklist title="Avant publication d'un visuel" items={guide.checklists.visual} />
-                <GuideChecklist title="Avant redaction d'un contenu" items={guide.checklists.editorial} />
+                <GuideChecklist title="Avant rédaction d'un contenu" items={guide.checklists.editorial} />
                 <GuideChecklist title="Avant creation d'un support" items={guide.checklists.support} />
                 <GuideChecklist title="Avant evolution de la marque" items={guide.checklists.evolution} />
               </div>
@@ -207,12 +207,12 @@ function CompletionBanner({
           <p className="mt-2 text-lg font-semibold text-[#4b4550]">{warning}</p>
           <p className="mt-2 text-sm leading-6 text-[#7b7068]">
             {latestGeneratedAt
-              ? `Derniere generation sauvegardee : ${formatDate(latestGeneratedAt)}`
+              ? `Dernière génération sauvegardée : ${formatDate(latestGeneratedAt)}`
               : "Aucun snapshot sauvegarde pour le moment."}
           </p>
         </div>
         <button type="button" onClick={onSave} className={secondaryButtonClass} disabled={isPending}>
-          {isPending ? "Generation..." : "Generer mon Guide de Marque"}
+          {isPending ? "Génération..." : "Générer mon Guide de Marque"}
         </button>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -228,7 +228,7 @@ function CompletionBanner({
                   : "border-[#efd7b8] bg-[#fff6e3] text-[#cf7430]"
             }`}
           >
-            {item.label} : {item.status === "ok" ? "OK" : item.status === "optional" ? "optionnel" : "a completer"}
+            {item.label} : {item.status === "ok" ? "OK" : item.status === "optional" ? "optionnel" : "à compléter"}
           </Link>
         ))}
       </div>
@@ -259,7 +259,7 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
           <div className="mt-10">
             <p className="text-base italic leading-8 text-[#5f544a]">{guide.cover.introLine}</p>
             <p className="mt-4 text-sm font-black uppercase tracking-[0.18em] text-[#7a7087]">
-              Genere le {formatDate(guide.generatedAt)}
+              Généré le {formatDate(guide.generatedAt)}
             </p>
           </div>
         </div>
@@ -285,7 +285,7 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
             ))
           ) : (
             <div className="col-span-2 flex items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-white p-6 text-center text-sm font-semibold text-[#7b7068]">
-              Apercu neutre. Palette a completer dans le module Palette de couleurs.
+              Aperçu neutre. Palette à compléter dans le module Palette de couleurs.
             </div>
           )}
         </div>
@@ -347,7 +347,7 @@ export function GuideColorPalette({
   const colors = [...primary, ...secondary];
 
   if (colors.length === 0) {
-    return <GuideCard label="Palette" value="Palette ou intention visuelle a completer dans le module Palette de couleurs." />;
+    return <GuideCard label="Palette" value="Palette ou intention visuelle à compléter dans le module Palette de couleurs." />;
   }
 
   return (
@@ -370,7 +370,7 @@ export function GuideColorPalette({
 
 export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
   if (items.length === 0) {
-    return <GuideCard label="Moodboard" value="Moodboard a completer pour enrichir l'univers visuel." wide />;
+    return <GuideCard label="Moodboard" value="Moodboard à compléter pour enrichir l'univers visuel." wide />;
   }
 
   return (
@@ -426,7 +426,7 @@ export function GuideSummary({
   return (
     <section className={`${compact ? "" : "min-h-[70vh]"} rounded-[1.4rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.08)] sm:p-8 print:shadow-none`}>
       <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--guide-accent)]">
-        Synthese express
+        Synthèse express
       </p>
       <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.98] text-[#3f3945]">
         {guide.brandName} en une page
@@ -447,13 +447,13 @@ export function EmptyGuideState() {
   return (
     <section className="rounded-[1.4rem] border border-[#eadfca] bg-white p-8 text-center shadow-[0_18px_46px_rgba(210,189,152,0.08)]">
       <p className="font-[family:var(--font-cormorant)] text-[2.5rem] leading-tight text-[#3f3945]">
-        Ton guide attend encore ses premieres matieres.
+        Ton guide attend encore ses premières matières.
       </p>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#6f645b]">
-        Complete au moins une reponse dans les modules Brand Studio pour generer un guide personnalise.
+        Complète au moins une réponse dans les modules Brand Studio pour générer un guide personnalisé.
       </p>
       <Link href="/mon-espace" className={`${primaryButtonClass} mt-6`}>
-        Modifier mes reponses
+        Modifier mes réponses
       </Link>
     </section>
   );

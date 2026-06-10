@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { SparklesIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -190,7 +190,7 @@ function normalizePlaceholderText(value: string) {
 
 function normalizeDisplayText(value: string | null | undefined) {
   return String(value ?? "")
-    .replace(/[’`]/g, "'")
+    .replace(/[â€™`]/g, "'")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase()
@@ -230,7 +230,7 @@ function shouldShowExerciseExplanation(
 function getAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   displayedQuestion?: string,
-  fallback = "Votre reponse",
+  fallback = "Ta réponse",
 ) {
   const placeholder = exercise.answer_placeholder.trim();
 
@@ -604,7 +604,7 @@ function getNextStepLabel(input: {
     return "Sous-module suivant";
   }
 
-  return "Voir le resume du module";
+  return "Voir le résumé du module";
 }
 
 function getModuleSummaryHref(moduleId: number) {
@@ -697,7 +697,7 @@ function PopupMessageCard({
         </div>
 
         <div className="mt-6 rounded-[1.5rem] bg-[linear-gradient(135deg,rgba(255,248,235,0.95),rgba(255,255,255,0.94))] px-6 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-          <p className="text-4xl leading-none text-[#cf7430]/60">“</p>
+          <p className="text-4xl leading-none text-[#cf7430]/60">â€œ</p>
           <div
             className="module-content mt-2 max-w-none font-[family:var(--font-cormorant)] text-[2rem] leading-[1.15] text-[#2f3d4f] sm:text-[2.35rem]"
             dangerouslySetInnerHTML={{ __html: getStaticTextHtml(question) }}
@@ -907,7 +907,7 @@ export default function ModuleAnswerForm({
       [exercise.id]: {
         status: "loading",
         mode,
-        message: mode === "suggest" ? "Generation en cours..." : "Relecture en cours...",
+        message: mode === "suggest" ? "Génération en cours..." : "Relecture en cours...",
       },
     }));
 
@@ -999,7 +999,7 @@ export default function ModuleAnswerForm({
               : "Aucun exercice dans ce sous-module"}
           </p>
           <p className="text-sm text-[#8a8077]">
-            {progressCount}/{totalAnswerableExercises} completees
+            {progressCount}/{totalAnswerableExercises} complétées
           </p>
         </div>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
@@ -1027,7 +1027,7 @@ export default function ModuleAnswerForm({
           <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7a7087]">
             {visibleExerciseGroups.length > 0
               ? `Exercice ${currentIndex + 1}`
-              : "Exercices a venir"}
+              : "Exercices à venir"}
           </p>
         ) : null}
 
@@ -2211,7 +2211,7 @@ export default function ModuleAnswerForm({
         >
           {currentIndex > 0 || isFirstSubmodule
             ? "Question precedente"
-            : "Sous-module precedent"}
+            : "Sous-module précédent"}
         </button>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
@@ -2375,7 +2375,7 @@ function ImageUploadExercise({
 
     const timeoutId = window.setTimeout(() => {
       setIsUploading(false);
-      setMessage("L'upload prend trop de temps. Reessayez avec moins d'images ou des fichiers plus legers.");
+      setMessage("L'upload prend trop de temps. Réessaie avec moins d'images ou des fichiers plus légers.");
     }, IMAGE_UPLOAD_TIMEOUT_MS + 1000);
 
     return () => window.clearTimeout(timeoutId);
@@ -2410,7 +2410,7 @@ function ImageUploadExercise({
               resolve({
                 status: "error",
                 message:
-                  "L'upload prend trop de temps. Reessayez avec moins d'images ou des fichiers plus legers.",
+                  "L'upload prend trop de temps. Réessaie avec moins d'images ou des fichiers plus légers.",
               }),
             IMAGE_UPLOAD_TIMEOUT_MS,
           );
@@ -2424,7 +2424,7 @@ function ImageUploadExercise({
 
       onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "L'upload a echoue. Reessayez avec une autre image.");
+      setMessage(error instanceof Error ? error.message : "L'upload a échoué. Réessaie avec une autre image.");
     } finally {
       setIsUploading(false);
     }
@@ -2535,7 +2535,7 @@ function ExerciseAiActions({
         <div className="pointer-events-none absolute right-0 top-11 z-20 w-72 translate-y-1 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
           <div className="rounded-[1.1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff6eb)] p-4 shadow-[0_18px_42px_rgba(120,92,56,0.14)]">
             <p className="text-sm leading-6 text-[#6f645b]">
-              L&apos;IA peut proposer une reponse ou retravailler votre texte.
+              L&apos;IA peut proposer une réponse ou retravailler ton texte.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -2544,7 +2544,7 @@ function ExerciseAiActions({
                 disabled={isLoading}
                 className="flex h-10 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
-                {isLoading && state.mode === "suggest" ? "Generation..." : "Suggere"}
+                {isLoading && state.mode === "suggest" ? "Génération..." : "Suggère"}
               </button>
               <button
                 type="button"
@@ -2691,7 +2691,7 @@ function ChecklistExerciseBlocks({
                 placeholder={getAnswerPlaceholder(
                   exercise,
                   prompt,
-                  "Ajouter un mot ou une idee",
+                  "Ajouter un mot ou une idée",
                 )}
               />
               <button

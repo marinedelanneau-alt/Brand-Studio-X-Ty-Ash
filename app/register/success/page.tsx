@@ -33,8 +33,8 @@ export default async function RegisterSuccessPage() {
                 {clientName ?? "dans Brand Studio"}
               </h1>
               <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[#82766b]">
-                Votre compte est pret. Votre code d&apos;activation a ete consomme
-                et votre acces se fait maintenant avec votre e-mail et votre mot
+                Ton compte est prêt. Ton code d&apos;activation a été consommé
+                et ton accès se fait maintenant avec ton e-mail et ton mot
                 de passe.
               </p>
 
@@ -55,9 +55,9 @@ export default async function RegisterSuccessPage() {
                     Confirmation
                   </p>
                   <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[#514b57] sm:text-[3rem]">
-                    Votre acces
+                    Ton accès
                     <br />
-                    est pret
+                    est prêt
                   </h2>
                 </div>
                 <div className="rounded-[1.6rem] bg-[#fff5da] px-4 py-3 text-right">
@@ -65,14 +65,14 @@ export default async function RegisterSuccessPage() {
                     Activation
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Connexion immediate
+                    Connexion immédiate
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
-                Conservez votre code et utilisez-le pour vos prochaines
-                connexions a l&apos;espace client.
+                Conserve ton code et utilise-le pour tes prochaines
+                connexions à l&apos;espace client.
               </p>
 
               <div className="mt-8 flex flex-col gap-4">
@@ -86,7 +86,7 @@ export default async function RegisterSuccessPage() {
                   href="/"
                   className="flex h-15 w-full items-center justify-center rounded-[1.15rem] border border-[#eadfca] bg-white px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Retour a la connexion
+                  Retour à la connexion
                 </Link>
               </div>
             </div>

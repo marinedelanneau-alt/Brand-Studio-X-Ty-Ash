@@ -37,7 +37,7 @@ function isImageUploadValue(value: string) {
 async function fileToDataUrl(file: File) {
   if (file.size > MAX_DATA_URL_SIZE) {
     throw new Error(
-      "L'image reste trop lourde apres optimisation. Essayez une image plus legere.",
+      "L'image reste trop lourde après optimisation. Essaie une image plus légère.",
     );
   }
 
@@ -74,7 +74,7 @@ export async function uploadExerciseImages(
     if (files.some((file) => !file.type.startsWith("image/"))) {
       return {
         status: "error",
-        message: "Tous les fichiers doivent etre des images.",
+        message: "Tous les fichiers doivent être des images.",
       };
     }
 
@@ -82,7 +82,7 @@ export async function uploadExerciseImages(
       return {
         status: "error",
         message:
-          "Une image est encore trop lourde. Essayez une image plus legere ou une capture reduite.",
+          "Une image est encore trop lourde. Essaie une image plus légère ou une capture réduite.",
       };
     }
 
@@ -91,7 +91,7 @@ export async function uploadExerciseImages(
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Creez d'abord votre projet de marque.",
+        message: "Crée d'abord ton projet de marque.",
       };
     }
 
@@ -121,14 +121,14 @@ export async function uploadExerciseImages(
     if (remainingSlots <= 0) {
       return {
         status: "error",
-        message: `La limite de ${config.maxImages} image${config.maxImages > 1 ? "s" : ""} est deja atteinte.`,
+        message: `La limite de ${config.maxImages} image${config.maxImages > 1 ? "s" : ""} est déjà atteinte.`,
       };
     }
 
     if (files.length > remainingSlots) {
       return {
         status: "error",
-        message: `Vous pouvez encore ajouter ${remainingSlots} image${remainingSlots > 1 ? "s" : ""}.`,
+        message: `Tu peux encore ajouter ${remainingSlots} image${remainingSlots > 1 ? "s" : ""}.`,
       };
     }
 

@@ -63,7 +63,7 @@ export async function registerAccount(
   if (password.length < 8) {
     return {
       status: "error",
-      message: "Le mot de passe doit contenir au moins 8 caracteres.",
+      message: "Le mot de passe doit contenir au moins 8 caractères.",
     };
   }
 
@@ -77,14 +77,14 @@ export async function registerAccount(
     if (!activation && !legacyAccount) {
       return {
         status: "error",
-        message: "Code d'activation invalide, expire ou deja utilise.",
+        message: "Code d'activation invalide, expiré ou déjà utilisé.",
       };
     }
 
     if (legacyAccount && legacyAccount.email.toLowerCase() !== email) {
       return {
         status: "error",
-        message: "Ce code n'est pas associe a cet e-mail.",
+        message: "Ce code n'est pas associé à cet e-mail.",
       };
     }
 
@@ -93,7 +93,7 @@ export async function registerAccount(
     if (existingAccount?.auth_user_id) {
       return {
         status: "error",
-        message: "Un compte existe deja avec cet e-mail. Connectez-vous directement.",
+        message: "Un compte existe déjà avec cet e-mail. Connecte-toi directement.",
       };
     }
 
@@ -112,7 +112,7 @@ export async function registerAccount(
     if (authError || !authData.user) {
       return {
         status: "error",
-        message: authError?.message ?? "Le compte n'a pas pu etre cree.",
+        message: authError?.message ?? "Le compte n'a pas pu être créé.",
       };
     }
 
@@ -136,7 +136,7 @@ export async function registerAccount(
     if (!account) {
       return {
         status: "error",
-        message: "Le compte client n'a pas pu etre retrouve apres creation.",
+        message: "Le compte client n'a pas pu être retrouvé après création.",
       };
     }
 
@@ -163,7 +163,7 @@ export async function registerAccount(
     if (signInError) {
       return {
         status: "error",
-        message: "Compte cree. Connectez-vous avec votre e-mail et votre mot de passe.",
+        message: "Compte créé. Connecte-toi avec ton e-mail et ton mot de passe.",
       };
     }
 
@@ -179,7 +179,7 @@ export async function registerAccount(
     return {
       status: "error",
       message:
-        "L'activation du compte a echoue. Verifiez votre code ou contactez le support.",
+        "L'activation du compte a échoué. Vérifie ton code ou contacte le support.",
     };
   }
 

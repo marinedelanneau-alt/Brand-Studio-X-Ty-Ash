@@ -119,11 +119,11 @@ export default function RegisterForm() {
 
       <div className="rounded-[1.65rem] border border-[#eadfca] bg-[#fffdf7] p-5 shadow-[0_14px_28px_rgba(223,203,171,0.12)]">
         <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
-          Ce que vous obtenez
+          Ce que tu obtiens
         </p>
         <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Le code recu apres paiement sert uniquement a activer votre compte.
-          Ensuite, la connexion se fait avec votre e-mail et votre mot de passe.
+          Le code reçu après paiement sert uniquement à activer ton compte.
+          Ensuite, la connexion se fait avec ton e-mail et ton mot de passe.
         </p>
       </div>
 
@@ -132,7 +132,7 @@ export default function RegisterForm() {
         disabled={pending}
         className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
-        {pending ? "Activation du compte..." : "Creer mon compte"}
+        {pending ? "Activation du compte..." : "Créer mon compte"}
       </button>
 
       <div className="min-h-7">

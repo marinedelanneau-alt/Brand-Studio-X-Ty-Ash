@@ -54,7 +54,7 @@ const COLOR_PALETTE_CONFIG_PREFIX = "__color_palette_config__:";
 const COLOR_PALETTE_ANSWER_PREFIX = "__color_palette_answer__:";
 
 const DEFAULT_HELPER_TEXT =
-  "Compose une palette principale et secondaire, puis precise l'usage de chaque couleur.";
+  "Compose une palette principale et secondaire, puis précise l'usage de chaque couleur.";
 
 const DEFAULT_EXAMPLES: ColorPaletteExample[] = [
   {
@@ -75,14 +75,14 @@ const DEFAULT_EXAMPLES: ColorPaletteExample[] = [
     id: "example-jaune-accent",
     name: "Jaune accent",
     hex: "#F3C447",
-    usage: "Accent / bouton / details",
+    usage: "Accent / bouton / détails",
     type: "secondary",
   },
   {
     id: "example-vert-doux",
     name: "Vert doux",
     hex: "#A7C4A0",
-    usage: "Respiration visuelle / repere secondaire",
+    usage: "Respiration visuelle / repère secondaire",
     type: "secondary",
   },
 ];
@@ -311,38 +311,38 @@ export function suggestColorMeaning(input: string) {
   const { hue, saturation, lightness } = hexToHsl(normalizedHex);
 
   if (lightness < 12) {
-    return "Cette couleur peut evoquer l'elegance, l'autorite et un contraste assume.";
+    return "Cette couleur peut évoquer l'elegance, l'autorite et un contraste assume.";
   }
 
   if (saturation < 10 && lightness > 80) {
-    return "Cette couleur peut evoquer la douceur, l'air, la simplicite et un premium discret.";
+    return "Cette couleur peut évoquer la douceur, l'air, la simplicite et un premium discret.";
   }
 
   if (hue >= 35 && hue <= 55) {
-    return "Cette couleur peut evoquer l'energie, la chaleur et la creativite.";
+    return "Cette couleur peut évoquer l'energie, la chaleur et la creativite.";
   }
 
   if (hue >= 190 && hue <= 240) {
-    return "Cette couleur peut evoquer la confiance, la structure et le calme.";
+    return "Cette couleur peut évoquer la confiance, la structure et le calme.";
   }
 
   if (hue >= 80 && hue <= 165) {
-    return "Cette couleur peut evoquer le naturel, l'equilibre et l'apaisement.";
+    return "Cette couleur peut évoquer le naturel, l'équilibre et l'apaisement.";
   }
 
   if ((hue >= 330 || hue <= 15) && saturation < 35 && lightness > 75) {
-    return "Cette couleur peut evoquer la douceur, la proximite et une sensibilite editoriale.";
+    return "Cette couleur peut évoquer la douceur, la proximité et une sensibilité éditoriale.";
   }
 
   if ((hue >= 18 && hue <= 38) && saturation < 35 && lightness > 70) {
-    return "Cette couleur peut evoquer la douceur, le naturel et un premium discret.";
+    return "Cette couleur peut évoquer la douceur, le naturel et un premium discret.";
   }
 
   if (hue >= 300 || hue <= 330) {
-    return "Cette couleur peut evoquer l'emotion, la singularite et la proximite.";
+    return "Cette couleur peut évoquer l'émotion, la singularité et la proximité.";
   }
 
-  return "Cette couleur peut evoquer une presence forte. Precise ensuite son usage pour clarifier son role dans la marque.";
+  return "Cette couleur peut évoquer une présence forte. Précise ensuite son usage pour clarifier son rôle dans la marque.";
 }
 
 function normalizeColorPaletteAnswer(

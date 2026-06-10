@@ -25,8 +25,8 @@ export default function PricingPage() {
             Brand Studio
           </h1>
           <p className="mt-6 text-lg leading-8 text-[#6f645b]">
-            Accedez a la formation Brand Studio pour structurer votre strategie,
-            votre positionnement, votre personnalite de marque et votre guide de
+            Accède à la formation Brand Studio pour structurer ta stratégie,
+            ton positionnement, ta personnalité de marque et ton guide de
             marque final.
           </p>
 
@@ -39,7 +39,7 @@ export default function PricingPage() {
             </div>
             <div className="border-l border-[#eadfca] pl-5">
               <p className="font-black uppercase tracking-[0.16em] text-[#cf7430]">
-                Acces
+                Accès
               </p>
               <p className="mt-2">Paiement unique ou abonnement selon la configuration.</p>
             </div>
@@ -58,7 +58,7 @@ export default function PricingPage() {
             href="/"
             className="mt-5 inline-flex text-sm font-bold text-[#cf7430] underline-offset-4 hover:underline"
           >
-            Retour a la connexion
+            Retour à la connexion
           </Link>
         </aside>
       </section>

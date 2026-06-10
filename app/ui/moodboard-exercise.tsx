@@ -80,11 +80,11 @@ function fileToDataUrl(file: File) {
         return;
       }
 
-      reject(new Error("Le fichier n'a pas pu etre converti en image."));
+      reject(new Error("Le fichier n'a pas pu être converti en image."));
     };
 
     reader.onerror = () => {
-      reject(reader.error ?? new Error("La lecture du fichier a echoue."));
+      reject(reader.error ?? new Error("La lecture du fichier a échoué."));
     };
 
     reader.readAsDataURL(file);
@@ -115,7 +115,7 @@ function loadImage(url: string) {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("Image impossible a charger."));
+    image.onerror = () => reject(new Error("Image impossible à charger."));
     image.src = url;
   });
 }
@@ -379,7 +379,7 @@ function collectMoodboardSignals(
           (word) =>
             !new Set([
               "entre",
-              "votre",
+              "ton",
               "notre",
               "marque",
               "avec",
@@ -392,10 +392,10 @@ function collectMoodboardSignals(
               "ainsi",
               "comme",
               "leurs",
-              "votre",
+              "ton",
               "elles",
               "nous",
-              "vous",
+              "tu",
             ]).has(word),
         ),
     ),
@@ -634,7 +634,7 @@ export default function MoodboardExercise({
       updateBlocks(autoArrange([...board.blocks, ...nextImages], board.layoutStyle));
       setUploadState({
         status: "error",
-        message: "Images ajoutees localement. L'enregistrement distant n'a pas encore abouti.",
+        message: "Images ajoutées localement. L'enregistrement distant n'a pas encore abouti.",
       });
     } catch {
       setUploadState({
@@ -652,7 +652,7 @@ export default function MoodboardExercise({
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
 
     if (!blob) {
-      throw new Error("L'export PNG a echoue.");
+      throw new Error("L'export PNG a échoué.");
     }
 
     triggerDownload(blob, "brand-studio-moodboard.png");
@@ -681,10 +681,10 @@ export default function MoodboardExercise({
                 Compose ton univers visuel
               </h3>
               <p className="mt-4 font-[family:var(--font-caveat)] text-[1.4rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.55rem]">
-                {exercise.explanation || "Mele images, couleurs, citations et mots-clés pour faire émerger une direction artistique cohérente."}
+                {exercise.explanation || "Mêle images, couleurs, citations et mots-clés pour faire émerger une direction artistique cohérente."}
               </p>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
-                Generation locale basee sur ta palette, tes reponses et le persona de marque deja defini dans Brand Studio.
+                Génération locale basée sur ta palette, tes réponses et le persona de marque déjà défini dans Brand Studio.
               </p>
             </div>
 
@@ -693,7 +693,7 @@ export default function MoodboardExercise({
                 Ambiance
               </p>
               <p className="mt-3 max-w-56 text-sm leading-6 text-[#5f544a]">
-                {board.feedback || "Ton moodboard se construira ici, avec une lecture immediate de son equilibre visuel."}
+                {board.feedback || "Ton moodboard se construira ici, avec une lecture immédiate de son équilibre visuel."}
               </p>
             </div>
           </div>
@@ -799,7 +799,7 @@ export default function MoodboardExercise({
                   Suggestions d&apos;images
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#7b7068]">
-                  Propositions construites a partir de tes mots cles, de ta palette et du ton deja emerge.
+                  Propositions construites à partir de tes mots-clés, de ta palette et du ton déjà émergé.
                 </p>
               </div>
               <p className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#7a7087]">
@@ -825,7 +825,7 @@ export default function MoodboardExercise({
                         {suggestion.caption || `Suggestion ${index + 1}`}
                       </p>
                       <p className="text-xs uppercase tracking-[0.14em] text-[#8a8077]">
-                        Coherence editoriale
+                        Cohérence éditoriale
                       </p>
                     </div>
                     <button
@@ -1019,7 +1019,7 @@ export default function MoodboardExercise({
 
             <div className="rounded-[1.4rem] border border-[#eadfca] bg-white p-5 shadow-[0_16px_34px_rgba(210,189,152,0.1)]">
               <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
-                Bloc selectionne
+                Bloc sélectionné
               </p>
 
               {selectedBlock ? (
@@ -1130,7 +1130,7 @@ export default function MoodboardExercise({
                 </div>
               ) : (
                 <p className="mt-4 text-sm leading-7 text-[#7b7068]">
-                  Selectionne un bloc dans la composition pour l&apos;affiner.
+                  Sélectionne un bloc dans la composition pour l&apos;affiner.
                 </p>
               )}
             </div>

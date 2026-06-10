@@ -10,10 +10,6 @@ import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
 import LogoutButton from "../ui/logout-button";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
-import {
-  generateGuideFromAnswers,
-  getLatestBrandGuideExport,
-} from "@/lib/brand-guide";
 import { getWorkspaceData } from "@/lib/training";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
@@ -84,7 +80,7 @@ function getResumeHref(modules: WorkspaceModule[]) {
 
 function getAccessLabel(status: string) {
   if (["active", "paid", "trialing"].includes(status)) {
-    return "Acces actif";
+    return "Accès actif";
   }
 
   if (["past_due", "unpaid", "canceled", "incomplete_expired"].includes(status)) {
@@ -97,7 +93,6 @@ function getAccessLabel(status: string) {
 export default async function MonEspacePage() {
   let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
-  let latestGuideExport: Awaited<ReturnType<typeof getLatestBrandGuideExport>> | null = null;
   let accessStatus: Awaited<ReturnType<typeof getSubscriptionAccessStatus>> | null = null;
   let loadError = "";
 
@@ -117,9 +112,6 @@ export default async function MonEspacePage() {
       workspace = null;
     } else {
       workspace = await getWorkspaceData(account.id);
-      if (workspace.project) {
-        latestGuideExport = await getLatestBrandGuideExport(workspace.project.id);
-      }
     }
   } catch (error) {
     unstable_rethrow(error);
@@ -131,7 +123,7 @@ export default async function MonEspacePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Votre espace ne peut pas etre charge"
+            title="Ton espace ne peut pas être chargé"
             message={loadError}
           />
         </section>
@@ -157,10 +149,10 @@ export default async function MonEspacePage() {
                   priority
                 />
                 <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[#4b4550] sm:text-[4.1rem]">
-                  Votre acces Brand Studio
+                  Ton accès Brand Studio
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-[#6f645b]">
-                  Votre paiement doit etre confirme par Stripe avant de debloquer
+                  Ton paiement doit être confirmé par Stripe avant de débloquer
                   les modules de formation.
                 </p>
               </div>
@@ -172,8 +164,8 @@ export default async function MonEspacePage() {
                 <p className="mt-4 text-2xl font-black text-[#4b4550]">{accessLabel}</p>
                 <p className="mt-3 text-sm leading-7 text-[#7b7068]">
                   {accessStatus?.status === "none"
-                    ? "Debloquez Brand Studio pour acceder aux modules."
-                    : "Si vous venez de payer, l'acces apparaitra des que le webhook Stripe aura confirme le paiement."}
+                    ? "Débloque Brand Studio pour accéder aux modules."
+                    : "Si tu viens de payer, l'accès apparaîtra dès que le webhook Stripe aura confirmé le paiement."}
                 </p>
                 <div className="mt-6 space-y-3">
                   <Link
@@ -198,7 +190,7 @@ export default async function MonEspacePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Votre espace ne peut pas etre charge"
+            title="Ton espace ne peut pas être chargé"
             message={loadError}
           />
         </section>
@@ -215,22 +207,6 @@ export default async function MonEspacePage() {
       : "/mon-espace";
   const continueHref = getResumeHref(workspace.modules);
   const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
-  const guide = workspace.project
-    ? generateGuideFromAnswers({
-        project: workspace.project,
-        modules: workspace.modules,
-      })
-    : null;
-  const hasGuideData = guide?.completion.hasAnyData ?? false;
-  const missingGuideItems =
-    guide?.completion.items.filter((item) => item.status === "missing").length ?? 0;
-  const guideStatus = !hasGuideData
-    ? "Non genere"
-    : latestGuideExport
-      ? "Pret"
-      : missingGuideItems > 0
-        ? "En cours"
-        : "Pret a generer";
   const workspaceTitle =
     account.company_name?.trim() || workspace.project?.name || "Mon projet";
 
@@ -267,7 +243,7 @@ export default async function MonEspacePage() {
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
-                  En route vers ta nouvelle identite de marque
+                  En route vers ta nouvelle identité de marque
                 </p>
               </div>
               <div className="relative mt-12 max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-8">
@@ -286,30 +262,30 @@ export default async function MonEspacePage() {
                       Bienvenue dans le Brand Studio
                     </p>
                     <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-4 text-[1.05rem] leading-8 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
-                      Hello, ca y est, c&apos;est le grand moment ! Je te remercie
+                      Hello, ça y est, c&apos;est le grand moment ! Je te remercie
                       encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
-                      belle mission de structurer ton identite de marque. Es-tu pret
-                      a entrer dans la peau d&apos;un Directeur Artistique ?
+                      belle mission de structurer ton identité de marque. Es-tu prêt
+                      à entrer dans la peau d&apos;un Directeur Artistique ?
                     </p>
                     <div className="space-y-4 text-base leading-8 text-[#6f645b]">
                       <p>
-                        Ce guide est le document de reference de ton identite,{" "}
+                        Ce guide est le document de référence de ton identité,{" "}
                         <span className="font-semibold italic text-[#5f544a]">
-                          un kit cle en main pour poser les bases d&apos;une marque forte.
+                          un kit clé en main pour poser les bases d&apos;une marque forte.
                         </span>
                       </p>
                       <p>
-                        Il rassemble les fondations strategiques et visuelles de ta
+                        Il rassemble les fondations stratégiques et visuelles de ta
                         marque afin de garantir une communication{" "}
                         <strong className="font-extrabold text-[#4b4550]">
-                          coherente, professionnelle et durable
+                          cohérente, professionnelle et durable
                         </strong>
                         .
                       </p>
                       <p className="text-[#6f645b]">
                         <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
-                        utilise-le comme un repere pour creer, decliner et faire
-                        evoluer ta marque en toute autonomie.
+                        utilise-le comme un repère pour créer, décliner et faire
+                        évoluer ta marque en toute autonomie.
                       </p>
                     </div>
                     {workspace.modules.length > 0 ? (
@@ -340,7 +316,7 @@ export default async function MonEspacePage() {
                         Navigation
                       </p>
                       <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
-                        Vos modules
+                        Tes modules
                       </h3>
                       <div className="mt-4 flex flex-wrap gap-3">
                         {workspace.modules.map((module) => (
@@ -379,7 +355,7 @@ export default async function MonEspacePage() {
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#7b7068]">
                       {workspace.completedModulesCount} module
-                      {workspace.completedModulesCount > 1 ? "s" : ""} termine
+                      {workspace.completedModulesCount > 1 ? "s" : ""} terminé
                       {workspace.completedModulesCount > 1 ? "s" : ""} sur{" "}
                       {workspace.totalModulesCount}
                     </p>
@@ -396,24 +372,6 @@ export default async function MonEspacePage() {
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
                         Ton Guide de Marque
                       </p>
-                      <p className="mt-4 text-2xl font-black leading-none text-[#4b4550]">
-                        {guideStatus}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-[#7b7068]">
-                        {latestGuideExport
-                          ? `Derniere generation : ${new Intl.DateTimeFormat("fr-FR", {
-                              day: "2-digit",
-                              month: "long",
-                              year: "numeric",
-                            }).format(new Date(latestGuideExport.generated_at))}`
-                          : "Genere un guide structure a partir de tes reponses existantes."}
-                      </p>
-                      {missingGuideItems > 0 ? (
-                        <p className="mt-2 text-sm font-semibold text-[#cf7430]">
-                          {missingGuideItems} element
-                          {missingGuideItems > 1 ? "s" : ""} a completer.
-                        </p>
-                      ) : null}
                       <div className="mt-5 flex flex-wrap gap-3">
                         <Link
                           href="/brand-guide"
@@ -445,7 +403,7 @@ export default async function MonEspacePage() {
                     href="/admin/modules"
                     className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
                   >
-                    Gerer les modules
+                    Gérer les modules
                   </Link>
                 ) : null}
                 <LogoutButton />
@@ -454,7 +412,7 @@ export default async function MonEspacePage() {
           </div>
           <div className="mt-8 border-t border-[#eadfca] pt-7">
             <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[#5d5259] sm:text-[2.9rem] lg:text-[3.35rem]">
-              Votre histoire commence ici, ecrivons-la ensemble !
+              Ton histoire commence ici, écrivons-la ensemble !
             </p>
           </div>
         </div>
@@ -464,14 +422,14 @@ export default async function MonEspacePage() {
             <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
               <div>
                 <p className="inline-flex rounded-full bg-[#f2eef7] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
-                  Creation
+                  Création
                 </p>
                 <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[#4b4550] sm:text-[3rem]">
-                  Creez votre unique projet de marque
+                  Crée ton unique projet de marque
                 </h2>
                 <p className="mt-4 max-w-xl text-base leading-8 text-[#7b7068]">
-                  Le projet commence simplement avec un nom. Vous pourrez ensuite
-                  suivre les modules, les videos, le contenu et les exercices
+                  Le projet commence simplement avec un nom. Tu pourras ensuite
+                  suivre les modules, les vidéos, le contenu et les exercices
                   dans le bon ordre.
                 </p>
               </div>

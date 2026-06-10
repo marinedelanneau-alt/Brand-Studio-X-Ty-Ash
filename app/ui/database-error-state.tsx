@@ -4,7 +4,7 @@ export default function DatabaseErrorState({
   title,
   message,
   backHref = "/",
-  backLabel = "Retour a l'accueil",
+  backLabel = "Retour à l'accueil",
 }: {
   title: string;
   message: string;

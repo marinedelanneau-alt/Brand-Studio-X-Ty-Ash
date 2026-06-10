@@ -22,7 +22,7 @@ export async function loginWithPassword(
   if (!email || !password) {
     return {
       status: "error",
-      message: "Merci de renseigner votre e-mail et votre mot de passe.",
+      message: "Merci de renseigner ton e-mail et ton mot de passe.",
     };
   }
 
@@ -42,7 +42,7 @@ export async function loginWithPassword(
 
     return {
       status: "success",
-      message: "Connexion reussie, redirection en cours...",
+      message: "Connexion réussie, redirection en cours...",
     };
   } catch (error) {
     return {

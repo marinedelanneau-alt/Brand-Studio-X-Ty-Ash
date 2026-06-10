@@ -54,7 +54,7 @@ export function buildModuleSummaryCard(input: {
     highlights,
     quickRecap,
     footer:
-      "Un recap rapide de ce qui a ete formule pendant le module, a relire et completer quand vous le souhaitez.",
+      "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand tu le souhaites.",
   } satisfies ModuleSummaryCard;
 }
 
@@ -98,7 +98,7 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       label: "Promesse",
       item: findPromptHighlight(module, "promesse", "Promesse"),
     },
-  ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "A completer"));
+  ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "À compléter"));
 
   return recap;
 }
@@ -129,7 +129,7 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "fill_blank") {
-    return buildHighlight("Phrase cle", buildFillBlankSentence(exercise.question, values));
+    return buildHighlight("Phrase clé", buildFillBlankSentence(exercise.question, values));
   }
 
   if (exercise.type === "group_open") {
@@ -340,7 +340,7 @@ function collectFocusWords(module: WorkspaceModule) {
 
 function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
   if (highlights.length === 0) {
-    return "Les grands axes de ce module sont poses et peuvent maintenant servir de repere concret.";
+    return "Les grands axes de ce module sont posés et peuvent maintenant servir de repère concret.";
   }
 
   const firstPoints = highlights.slice(0, 2).map((highlight) => highlight.value);
@@ -373,7 +373,7 @@ function buildHighlight(label: string, value: string, maxValueLength = 120) {
   }
 
   return {
-    label: truncateText(compactText(label) || "Point cle", 34),
+    label: truncateText(compactText(label) || "Point clé", 34),
     value: truncateText(normalizedValue, maxValueLength),
   } satisfies ModuleSummaryHighlight;
 }

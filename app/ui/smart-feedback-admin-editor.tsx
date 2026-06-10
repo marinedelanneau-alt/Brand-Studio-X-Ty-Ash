@@ -55,7 +55,7 @@ export default function SmartFeedbackAdminEditor({
         <div>
           <p className="text-sm font-semibold text-[#4b4550]">Feedback intelligent</p>
           <p className="text-sm leading-6 text-[#7b7068]">
-            Affiche un conseil doux et utile sous la reponse utilisateur.
+            Affiche un conseil doux et utile sous la réponse utilisateur.
           </p>
         </div>
         <input
@@ -95,7 +95,7 @@ export default function SmartFeedbackAdminEditor({
 
             <label className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
               <span className="text-sm font-semibold text-[#5f544a]">
-                Afficher un score de clarte
+                Afficher un score de clarté
               </span>
               <input
                 type="checkbox"
@@ -152,7 +152,7 @@ export default function SmartFeedbackAdminEditor({
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                Mots generiques a eviter
+                Mots génériques à éviter
               </span>
               <textarea
                 value={normalizedValue.forbiddenKeywords.join("\n")}
@@ -187,7 +187,7 @@ export default function SmartFeedbackAdminEditor({
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
               <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                Message si reponse trop courte
+                Message si réponse trop courte
               </span>
               <textarea
                 value={normalizedValue.improvementMessage}
@@ -203,7 +203,7 @@ export default function SmartFeedbackAdminEditor({
 
             <label className="space-y-2">
               <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                Message si reponse trop vague
+                Message si réponse trop vague
               </span>
               <textarea
                 value={normalizedValue.neutralMessage}
@@ -219,7 +219,7 @@ export default function SmartFeedbackAdminEditor({
 
             <label className="space-y-2">
               <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                Message si reponse correcte
+                Message si réponse correcte
               </span>
               <textarea
                 value={normalizedValue.positiveMessage}
@@ -235,7 +235,7 @@ export default function SmartFeedbackAdminEditor({
 
             <label className="space-y-2">
               <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                Message si reponse excellente
+                Message si réponse excellente
               </span>
               <textarea
                 value={normalizedValue.excellentMessage}

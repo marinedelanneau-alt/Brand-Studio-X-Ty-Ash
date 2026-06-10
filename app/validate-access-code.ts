@@ -22,7 +22,7 @@ export async function validateAccessCode(
   if (!accessCode) {
     return {
       status: "error",
-      message: "Veuillez renseigner votre code d'acces.",
+      message: "Merci de renseigner ton code d'accès.",
     };
   }
 
@@ -32,7 +32,7 @@ export async function validateAccessCode(
     if (!data || data.is_active === false) {
       return {
         status: "error",
-        message: "Code invalide ou desactive. Reessayez avec votre acces.",
+        message: "Code invalide ou désactivé. Réessaie avec ton accès.",
       };
     }
 

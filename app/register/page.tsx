@@ -3,8 +3,8 @@ import Link from "next/link";
 import RegisterForm from "../ui/register-form";
 
 const values = [
-  "Code d'activation recu apres paiement",
-  "Creation du compte avec mot de passe",
+  "Code d'activation reçu après paiement",
+  "Création du compte avec mot de passe",
   "Connexion ensuite par e-mail et mot de passe",
 ];
 
@@ -32,12 +32,12 @@ export default function RegisterPage() {
                   priority
                 />
                 <h1 className="mt-8 max-w-lg font-[family:var(--font-cormorant)] text-[3rem] leading-[0.96] tracking-[-0.04em] text-[#514b57] sm:text-[4rem]">
-                  Ouvrir votre
+                  Ouvrir ton
                   <br />
                   espace client
                 </h1>
                 <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[#82766b]">
-                  Creez un acces elegant et professionnel, concu comme une
+                  Crée un accès élégant et professionnel, conçu comme une
                   interface de studio de design graphique.
                 </p>
               </div>
@@ -58,7 +58,7 @@ export default function RegisterPage() {
 
                 <div className="rounded-[2rem] border border-[#eadfca] bg-[#fffaf1] p-6 shadow-[0_18px_36px_rgba(221,204,176,0.14)]">
                   <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
-                    Ce que vous obtenez
+                    Ce que tu obtiens
                   </p>
                   <div className="mt-5 grid gap-3">
                     {values.map((item) => (
@@ -87,9 +87,9 @@ export default function RegisterPage() {
                     Inscription
                   </p>
                   <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[#514b57] sm:text-[3rem]">
-                    Creer votre
+                    Créer ton
                     <br />
-                    acces studio
+                    accès studio
                   </h2>
                 </div>
                 <div className="rounded-[1.6rem] bg-[#fff5da] px-4 py-3 text-right">
@@ -97,14 +97,14 @@ export default function RegisterPage() {
                     Activation
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Code envoye apres paiement
+                    Code envoyé après paiement
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
-                Renseignez le code recu par e-mail, puis choisissez votre mot de
-                passe pour activer votre acces.
+                Renseigne le code reçu par e-mail, puis choisis ton mot de
+                passe pour activer ton accès.
               </p>
 
               <div className="mt-7">

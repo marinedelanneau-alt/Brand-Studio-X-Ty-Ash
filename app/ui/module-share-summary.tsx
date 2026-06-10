@@ -32,7 +32,7 @@ export default function ModuleShareSummary({
       <div className="border-b border-[#efe1cf] px-6 py-8 sm:px-8 sm:py-10">
         <div className="max-w-3xl">
           <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
-            Resume du module
+            Résumé du module
           </p>
           <h2 className="mt-4 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.95] text-[#4b4550] sm:text-[2.9rem]">
             {summary.title}
@@ -43,7 +43,7 @@ export default function ModuleShareSummary({
           <p className="mt-5 max-w-2xl text-base leading-8 text-[#6f645b]">
             Voici la synthese des elements rediges dans ce module. L&apos;objectif est
             de te permettre de relire rapidement l&apos;essentiel, sans effet de card
-            ni mise en page decorative qui nuit a la lecture.
+            ni mise en page décorative qui nuit à la lecture.
           </p>
         </div>
       </div>
@@ -70,9 +70,9 @@ export default function ModuleShareSummary({
             Lecture rapide
           </p>
           <p className="mt-3 text-sm leading-7 text-[#6f645b]">
-            Ce resume apparait uniquement a la fin du module. Tu peux t&apos;en servir
+            Ce résumé apparaît uniquement à la fin du module. Tu peux t&apos;en servir
             comme recap de travail, puis revenir ensuite sur le module si tu veux
-            completer ou ajuster certaines reponses.
+            compléter ou ajuster certaines réponses.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
@@ -94,7 +94,7 @@ export default function ModuleShareSummary({
                 href="/brand-guide"
                 className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#efd7b8] bg-[#fff6e3] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430]"
               >
-                Generer mon Guide de Marque
+                Générer mon Guide de Marque
               </Link>
             ) : null}
           </div>

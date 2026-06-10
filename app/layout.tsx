@@ -35,7 +35,7 @@ const moreSugar = localFont({
 
 export const metadata: Metadata = {
   title: "Espace Client | Formation Brand Studio",
-  description: "Accedez a votre espace de formation via votre code d'acces.",
+  description: "Accède à ton espace de formation via ton code d'accès.",
 };
 
 export default function RootLayout({

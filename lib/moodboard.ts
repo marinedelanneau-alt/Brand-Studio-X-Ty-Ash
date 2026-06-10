@@ -334,20 +334,20 @@ export function autoArrange(
 }
 
 function inferAmbiance(input: MoodboardGenerationInput) {
-  const leadKeyword = input.keywords[0] ?? "editorial";
+  const leadKeyword = input.keywords[0] ?? "éditorial";
   const persona = input.persona.trim();
 
   if (persona) {
-    return `${persona}, ${leadKeyword} et coherent`;
+    return `${persona}, ${leadKeyword} et cohérent`;
   }
 
-  return `Univers ${leadKeyword}, coherent et inspire`;
+  return `Univers ${leadKeyword}, cohérent et inspiré`;
 }
 
 function getLayoutDescriptor(style: MoodboardLayoutStyle) {
   switch (style) {
     case "minimal":
-      return "calme, structuree et epuree";
+      return "calme, structurée et epuree";
     case "collage":
       return "creative, vibrante et libre";
     case "grid":
@@ -355,7 +355,7 @@ function getLayoutDescriptor(style: MoodboardLayoutStyle) {
     case "bold":
       return "affirmée, graphique et intentionnelle";
     default:
-      return "editoriale, douce et premium";
+      return "éditoriale, douce et premium";
   }
 }
 
@@ -370,8 +370,8 @@ export function analyzeMoodboard(answer: MoodboardAnswer) {
     imageCount >= 4 && hasColorBlock && hasTextualBlock
       ? "avec une belle diversite visuelle"
       : imageCount >= 3
-        ? "avec une base visuelle deja solide"
-        : "avec une intention encore a enrichir";
+        ? "avec une base visuelle déjà solide"
+        : "avec une intention encore à enrichir";
 
   return `Ton moodboard evoque une marque ${descriptor}, ${diversity}.`;
 }
@@ -600,7 +600,7 @@ export function createSuggestedMoodboardImages(
   const keywords =
     input.keywords.length > 0
       ? input.keywords
-      : ["texture", "lumiere", "matiere", "contraste", "cadence", "atmosphere"];
+      : ["texture", "lumière", "matière", "contraste", "cadence", "atmosphere"];
 
   return Array.from({ length: count }, (_, index) =>
     createGeneratedImageBlock({
@@ -625,7 +625,7 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
   const seededKeywords =
     uniqueKeywords.length > 0
       ? uniqueKeywords
-      : ["editorial", "lumiere", "matiere", "equilibre", "presence", "raffinement"];
+      : ["éditorial", "lumière", "matière", "équilibre", "présence", "raffinement"];
   const imageKeywords = seededKeywords.slice(0, maxImages);
   const imageBlocks = imageKeywords.map((keyword, index) =>
     createGeneratedImageBlock({
@@ -656,7 +656,7 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
       {
         id: createBlockId("mood-keyword"),
         type: "keyword" as const,
-        keyword: seededKeywords[0] ?? "presence",
+        keyword: seededKeywords[0] ?? "présence",
         x: 0,
         y: 0,
         w: 0,
@@ -669,7 +669,7 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
         type: "text" as const,
         text:
           input.quote?.trim() ||
-          `Une direction ${seededKeywords[0] ?? "editoriale"} portee par ${secondaryColor}.`,
+          `Une direction ${seededKeywords[0] ?? "éditoriale"} portée par ${secondaryColor}.`,
         author: input.persona || "Brand Studio",
         x: 0,
         y: 0,

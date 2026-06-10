@@ -25,7 +25,7 @@ export function isSupabaseUnavailableError(error: unknown) {
 
 export function getUserFacingDataErrorMessage(error: unknown) {
   if (isSupabaseUnavailableError(error)) {
-    return "La connexion a Supabase est indisponible pour le moment. Verifiez les variables d'environnement et le service, puis reessayez.";
+    return "La connexion a Supabase est indisponible pour le moment. Vérifie les variables d'environnement et le service, puis réessaie.";
   }
 
   const message = getErrorMessage(error);

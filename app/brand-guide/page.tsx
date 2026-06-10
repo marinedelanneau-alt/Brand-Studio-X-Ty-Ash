@@ -36,10 +36,10 @@ export default async function BrandGuidePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Votre guide ne peut pas etre charge"
-            message={loadError || "Creez d'abord votre projet de marque."}
+            title="Ton guide ne peut pas être chargé"
+            message={loadError || "Crée d'abord ton projet de marque."}
             backHref="/mon-espace"
-            backLabel="Retour a mon espace"
+            backLabel="Retour à mon espace"
           />
         </section>
       </main>

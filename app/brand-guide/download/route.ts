@@ -33,7 +33,7 @@ export async function GET() {
 
     if (!workspace.project) {
       return NextResponse.json(
-        { message: "Creez d'abord votre projet de marque." },
+        { message: "Crée d'abord ton projet de marque." },
         { status: 400 },
       );
     }
@@ -61,7 +61,7 @@ export async function GET() {
   } catch (error) {
     unstable_rethrow(error);
     return NextResponse.json(
-      { message: "Le PDF n'a pas pu etre genere." },
+      { message: "Le PDF n'a pas pu être généré." },
       { status: 500 },
     );
   }

@@ -20,7 +20,7 @@ export async function recoverAccessCode(
   if (!email) {
     return {
       status: "error",
-      message: "Merci de renseigner votre e-mail.",
+      message: "Merci de renseigner ton e-mail.",
     };
   }
 
@@ -39,7 +39,7 @@ export async function recoverAccessCode(
     return {
       status: "error",
       message:
-        "Impossible de verifier votre adresse pour le moment. Reessayez dans un instant.",
+        "Impossible de vérifier ton adresse pour le moment. Réessaie dans un instant.",
     };
   }
 
@@ -47,7 +47,7 @@ export async function recoverAccessCode(
     return {
       status: "success",
       message:
-        "Si un compte existe avec cet e-mail, un message contenant votre code vient d'etre envoye.",
+        "Si un compte existe avec cet e-mail, un message contenant ton code vient d'être envoyé.",
     };
   }
 
@@ -56,7 +56,7 @@ export async function recoverAccessCode(
       return {
         status: "success",
         message:
-          "Si un compte existe avec cet e-mail, utilisez la connexion par mot de passe.",
+          "Si un compte existe avec cet e-mail, utilise la connexion par mot de passe.",
       };
     }
 
@@ -70,13 +70,13 @@ export async function recoverAccessCode(
     return {
       status: "error",
       message:
-        "L'envoi de l'e-mail a echoue. Verifiez votre configuration Brevo.",
+        "L'envoi de l'e-mail a échoué. Vérifie ta configuration Brevo.",
     };
   }
 
   return {
     status: "success",
     message:
-      "Si un compte existe avec cet e-mail, un message contenant votre code vient d'etre envoye.",
+      "Si un compte existe avec cet e-mail, un message contenant ton code vient d'être envoyé.",
   };
 }

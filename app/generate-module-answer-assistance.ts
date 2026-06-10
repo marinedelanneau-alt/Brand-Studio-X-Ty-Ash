@@ -46,7 +46,7 @@ export async function requestModuleAnswerAssistance(input: {
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Creez d'abord votre projet de marque.",
+        message: "Crée d'abord ton projet de marque.",
         coachingNote: "",
         values: [],
       };
@@ -98,8 +98,8 @@ export async function requestModuleAnswerAssistance(input: {
       status: "success",
       message:
         input.mode === "suggest"
-          ? "Une proposition a ete injectee dans le champ."
-          : "La reponse a ete retravaillee par l'IA.",
+          ? "Une proposition a été injectée dans le champ."
+          : "La réponse a été retravaillée par l'IA.",
       coachingNote: result.coachingNote,
       values: result.values,
     };

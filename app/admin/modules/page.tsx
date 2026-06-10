@@ -25,7 +25,7 @@ export default async function AdminModulesPage({
   if (loadError) {
     return (
       <DatabaseErrorState
-        title="Les modules ne peuvent pas etre charges"
+        title="Les modules ne peuvent pas être chargés"
         message={loadError}
         backHref="/admin"
         backLabel="Retour au dashboard"
@@ -56,7 +56,7 @@ export default async function AdminModulesPage({
           Gestion des modules
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[#7b7068]">
-          Creez, publiez et mettez a jour les modules du parcours. Chaque
+          Créez, publiez et mettez à jour les modules du parcours. Chaque
           module compte de facon egale dans la progression totale.
         </p>
         {message ? (

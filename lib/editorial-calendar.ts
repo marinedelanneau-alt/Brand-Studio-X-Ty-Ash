@@ -19,7 +19,7 @@ export const EDITORIAL_CALENDAR_CONFIG_PREFIX = "__editorial_calendar_config__:"
 
 export const EDITORIAL_CALENDAR_STATUS_LABELS: Record<EditorialCalendarStatus, string> = {
   idea: "Idee",
-  draft: "A produire",
+  draft: "À produire",
   scheduled: "Programme",
   published: "Publie",
 };

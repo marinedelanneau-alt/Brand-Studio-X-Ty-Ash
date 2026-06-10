@@ -22,14 +22,14 @@ export async function updateWorkspaceLogo(
     if (!(logo instanceof File) || logo.size === 0) {
       return {
         status: "error",
-        message: "Selectionnez un logo a importer.",
+        message: "Sélectionne un logo à importer.",
       };
     }
 
     if (!logo.type.startsWith("image/")) {
       return {
         status: "error",
-        message: "Le fichier doit etre une image.",
+        message: "Le fichier doit être une image.",
       };
     }
 
@@ -62,6 +62,6 @@ export async function updateWorkspaceLogo(
 
   return {
     status: "success",
-    message: "Logo mis a jour.",
+    message: "Logo mis à jour.",
   };
 }

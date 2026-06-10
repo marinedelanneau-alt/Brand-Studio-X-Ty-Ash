@@ -218,7 +218,7 @@ export default function ColorPaletteExercise({
       });
       setEyeDropperMessage("");
     } catch {
-      setEyeDropperMessage("La pipette a ete annulee ou n'est pas disponible.");
+      setEyeDropperMessage("La pipette a été annulée ou n'est pas disponible.");
     }
   }
 
@@ -288,7 +288,7 @@ export default function ColorPaletteExercise({
 
         <PaletteSection
           title="Couleurs principales"
-          helper={`Jusqu'a ${config.maxPrimaryColors} couleur${config.maxPrimaryColors > 1 ? "s" : ""} pour les teintes structurantes de la marque.`}
+          helper={`Jusqu'à ${config.maxPrimaryColors} couleur${config.maxPrimaryColors > 1 ? "s" : ""} pour les teintes structurantes de la marque.`}
           items={primaryColors}
           maxItems={config.maxPrimaryColors}
           requireUsage={config.requireUsage}
@@ -304,7 +304,7 @@ export default function ColorPaletteExercise({
 
         <PaletteSection
           title="Couleurs secondaires"
-          helper={`Jusqu'a ${config.maxSecondaryColors} couleur${config.maxSecondaryColors > 1 ? "s" : ""} pour les accents, respirations et details.`}
+          helper={`Jusqu'à ${config.maxSecondaryColors} couleur${config.maxSecondaryColors > 1 ? "s" : ""} pour les accents, respirations et détails.`}
           items={secondaryColors}
           maxItems={config.maxSecondaryColors}
           requireUsage={config.requireUsage}
@@ -600,7 +600,7 @@ export default function ColorPaletteExercise({
                     <div className="space-y-4">
                       <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-4">
                         <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
-                          Apercu
+                          Aperçu
                         </p>
                         <div
                           className="mt-3 h-44 rounded-[1.1rem] border border-[#eadfca]"
@@ -616,8 +616,8 @@ export default function ColorPaletteExercise({
                           </p>
                           {config.enableColorMeaningHelper && currentDraftMeaning ? (
                             <p className="rounded-[0.9rem] bg-[#fff7ec] px-3 py-3 text-sm leading-6 text-[#6f645b]">
-                              Cette couleur peut evoquer...
-                              <span className="block">{currentDraftMeaning.replace("Cette couleur peut evoquer ", "")}</span>
+                              Cette couleur peut évoquer...
+                              <span className="block">{currentDraftMeaning.replace("Cette couleur peut évoquer ", "")}</span>
                             </p>
                           ) : null}
                         </div>
@@ -632,7 +632,7 @@ export default function ColorPaletteExercise({
                               disabled={!eyeDropperAvailable}
                               title={
                                 eyeDropperAvailable
-                                  ? "Prelever une couleur a l'ecran"
+                                  ? "Prélever une couleur à l'écran"
                                   : "Non disponible sur ce navigateur"
                               }
                               className="flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-60"
@@ -747,7 +747,7 @@ function PaletteSection({
                 <div
                   className="h-16 rounded-[1rem] border border-[#eadfca]"
                   style={{ background: getPaletteColorCss(item) }}
-                  aria-label={`Apercu ${item.mode === "gradient" ? "du degrade" : "de la couleur"} ${item.name || index + 1}`}
+                  aria-label={`Aperçu ${item.mode === "gradient" ? "du dégradé" : "de la couleur"} ${item.name || index + 1}`}
                 />
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -759,7 +759,7 @@ function PaletteSection({
                     </span>
                     {!isComplete ? (
                       <span className="rounded-full bg-[#fff7ec] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#cf7430]">
-                        A completer
+                        À compléter
                       </span>
                     ) : null}
                   </div>

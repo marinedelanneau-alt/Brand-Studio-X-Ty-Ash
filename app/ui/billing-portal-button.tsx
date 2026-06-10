@@ -39,7 +39,7 @@ export default function BillingPortalButton() {
         disabled={isLoading}
         className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] transition disabled:cursor-wait disabled:opacity-70"
       >
-        {isLoading ? "Ouverture..." : "Mettre a jour ma facturation"}
+        {isLoading ? "Ouverture..." : "Mettre à jour ma facturation"}
       </button>
       {error ? <p className="text-xs font-semibold text-[#b84a33]">{error}</p> : null}
     </div>

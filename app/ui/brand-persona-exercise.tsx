@@ -149,11 +149,11 @@ export default function BrandPersonaExercise({
                 Persona de marque
               </p>
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
-                {exercise.question || "Cree le persona incarne de ta marque"}
+                {exercise.question || "Crée le persona incarné de ta marque"}
               </h3>
               <p className="mt-4 font-[family:var(--font-caveat)] text-[1.4rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.55rem]">
                 {exercise.explanation ||
-                  "Imagine ta marque comme une vraie personne. Cet exercice va t'aider a definir sa personnalite, sa maniere de parler, son attitude et son univers."}
+                  "Imagine ta marque comme une vraie personne. Cet exercice va t'aider à définir sa personnalité, sa manière de parler, son attitude et son univers."}
               </p>
             </div>
 
@@ -171,7 +171,7 @@ export default function BrandPersonaExercise({
                 />
               </div>
               <p className="mt-3 text-sm leading-6 text-[#7b7068]">
-                {completedRequiredCount}/{requiredFields.length} reponses essentielles completees
+                {completedRequiredCount}/{requiredFields.length} réponses essentielles complétées
               </p>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function BrandPersonaExercise({
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <SummaryCard title="Profil resume" content={summary.profile} />
+          <SummaryCard title="Profil résumé" content={summary.profile} />
           <SummaryCard title="Traits dominants" content={summary.traits} />
           <SummaryCard title="Ton de voix" content={summary.tone} />
           <SummaryCard title="Valeurs incarnees" content={summary.values} />
@@ -390,7 +390,7 @@ function SummaryCard({ title, content }: { title: string; content: string }) {
         {title}
       </p>
       <p className="mt-3 text-sm leading-7 text-[#5f544a]">
-        {content || "A completer dans l'exercice."}
+        {content || "À compléter dans l'exercice."}
       </p>
     </div>
   );

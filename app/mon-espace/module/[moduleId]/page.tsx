@@ -44,10 +44,10 @@ export default async function WorkspaceModulePage({
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Ce module ne peut pas etre charge"
+            title="Ce module ne peut pas être chargé"
             message={loadError}
             backHref="/mon-espace"
-            backLabel="Retour a mon espace"
+            backLabel="Retour à mon espace"
           />
         </section>
       </main>
@@ -109,7 +109,7 @@ export default async function WorkspaceModulePage({
             href="/mon-espace"
             className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
           >
-            Retour a mon espace
+            Retour à mon espace
           </Link>
         </div>
 

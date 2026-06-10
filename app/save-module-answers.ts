@@ -40,7 +40,7 @@ async function persistModuleAnswers(input: {
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Creez d'abord votre projet de marque.",
+        message: "Crée d'abord ton projet de marque.",
       } satisfies ModuleState;
     }
 
@@ -132,8 +132,8 @@ async function persistModuleAnswers(input: {
     return {
       status: "success",
       message: input.markModuleCompleted
-        ? "Le module est termine. Vous pourrez revenir plus tard sur les questions laissees en attente."
-        : "Vos reponses ont bien ete enregistrees.",
+        ? "Le module est terminé. Tu pourras revenir plus tard sur les questions laissées en attente."
+        : "Tes réponses ont bien été enregistrées.",
     } satisfies ModuleState;
   } catch (error) {
     return {
@@ -152,7 +152,7 @@ export async function saveModuleAnswers(
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error",
-        message: "Debloquez Brand Studio pour enregistrer vos reponses.",
+        message: "Débloque Brand Studio pour enregistrer tes réponses.",
       };
     }
 
@@ -175,7 +175,7 @@ export async function saveModuleDraft(formData: FormData): Promise<ModuleState> 
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error",
-        message: "Debloquez Brand Studio pour enregistrer vos reponses.",
+        message: "Débloque Brand Studio pour enregistrer tes réponses.",
       };
     }
 

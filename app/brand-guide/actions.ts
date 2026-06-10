@@ -14,7 +14,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error" as const,
-        message: "Debloquez Brand Studio pour sauvegarder votre guide.",
+        message: "Débloque Brand Studio pour sauvegarder ton guide.",
       };
     }
     const workspace = await getWorkspaceData(account.id);
@@ -22,7 +22,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
     if (!workspace.project) {
       return {
         status: "error" as const,
-        message: "Creez d'abord votre projet de marque.",
+        message: "Crée d'abord ton projet de marque.",
       };
     }
 
@@ -36,7 +36,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
 
     return {
       status: "success" as const,
-      message: "Ton Guide de Marque est pret. Le snapshot a ete sauvegarde.",
+      message: "Ton Guide de Marque est prêt. Le snapshot a été sauvegardé.",
     };
   } catch (error) {
     return {

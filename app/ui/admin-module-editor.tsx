@@ -143,9 +143,9 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
         : type === "color_palette"
           ? "Construis la palette de couleurs de ta marque"
           : type === "editorial_calendar"
-            ? "Construis ton calendrier editorial"
+            ? "Construis ton calendrier éditorial"
           : type === "moodboard"
-            ? "Creer un moodboard d'inspiration pour ta marque"
+            ? "Créer un moodboard d'inspiration pour ta marque"
             : "",
     optionsText: getExerciseDefaultOptionsText(type),
     tableRows: tableConfig.rows,
@@ -196,9 +196,9 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     question:
       getEditorExerciseQuestion(exercise.type, exercise.question) ||
       (exercise.type === "editorial_calendar"
-        ? "Construis ton calendrier editorial"
+        ? "Construis ton calendrier éditorial"
         : exercise.type === "moodboard"
-          ? "Creer un moodboard d'inspiration pour ta marque"
+          ? "Créer un moodboard d'inspiration pour ta marque"
           : ""),
     optionsText: getEditorOptionsText(exercise.type, exercise.options),
     tableRows: tableConfig.rows,
@@ -240,7 +240,7 @@ function toEditorModule(module: AdminModule): EditorModule {
 }
 
 function getQuestionLabel(type: ExerciseType) {
-  if (type === "static_text") return "Texte a afficher";
+  if (type === "static_text") return "Texte à afficher";
   if (type === "popup_message") return "Message ou citation";
   if (type === "image_upload") return "Question ou intention";
   if (type === "editorial_calendar") return "Question calendrier";
@@ -253,18 +253,18 @@ function getQuestionLabel(type: ExerciseType) {
 }
 
 function getQuestionHint(type: ExerciseType) {
-  if (type === "fill_blank") return "Utilisez `___` dans la question pour creer les trous a completer.";
+  if (type === "fill_blank") return "Utilise `___` dans la question pour créer les trous à compléter.";
   if (type === "prompt_open") return "Exemple : `Ta Mission`. L'utilisateur verra `Ta Mission :` suivi d'un champ.";
   if (type === "static_text") return "Ce bloc affiche simplement du texte entre deux questions.";
   if (type === "popup_message") return "Ce bloc ouvre une pop-up inspirante avec un message motivant ou une citation que l'utilisateur peut fermer.";
   if (type === "image_upload") return "L'utilisateur pourra importer plusieurs images pour composer un tableau d'inspiration.";
-  if (type === "editorial_calendar") return "L'utilisateur pourra remplir un calendrier editorial en vue mensuelle, avec des contenus par date.";
+  if (type === "editorial_calendar") return "L'utilisateur pourra remplir un calendrier éditorial en vue mensuelle, avec des contenus par date.";
   if (type === "moodboard") return "L'utilisateur verra un moodboard intelligent uniquement si ce type est choisi ici.";
   if (type === "boolean") return "Les choix Oui et Non sont ajoutes automatiquement.";
   if (type === "checklist") return "L'utilisateur pourra ajouter autant d'elements qu'il souhaite.";
   if (type === "brand_persona") return "Configure ici les sections et questions du persona de marque, avec leur ordre, leur type et leurs exemples.";
   if (type === "spectrum") return "Configure un axe entre deux polarites, avec emojis, justification et effets subtils aux extremes.";
-  if (type === "color_palette") return "Configure un exercice de palette avec couleurs principales, secondaires, picker visuel, HEX, pipette et eventuels degradés.";
+  if (type === "color_palette") return "Configure un exercice de palette avec couleurs principales, secondaires, picker visuel, HEX, pipette et éventuels dégradés.";
   return "";
 }
 
@@ -302,10 +302,10 @@ function getPlaceholderFieldLabel(type: ExerciseType) {
   }
 
   if (type === "group_open") {
-    return "Exemple de reponse par champ (placeholder)";
+    return "Exemple de réponse par champ (placeholder)";
   }
 
-  return "Exemple de reponse (placeholder)";
+  return "Exemple de réponse (placeholder)";
 }
 
 function getPlaceholderFieldHint(type: ExerciseType) {
@@ -318,14 +318,14 @@ function getPlaceholderFieldHint(type: ExerciseType) {
   }
 
   if (type === "group_open") {
-    return "Ex. Votre reponse ici";
+    return "Ex. Ta réponse ici";
   }
 
   if (type === "table") {
-    return "Ex. Saisissez votre idee";
+    return "Ex. Saisis ton idée";
   }
 
-  return "Ex. Votre reponse ici";
+  return "Ex. Ta réponse ici";
 }
 
 function serializeQuestion(question: EditorQuestion) {
@@ -788,7 +788,7 @@ function QuestionCard({
                 title="Previsualiser le rendu"
               >
                 <MagnifyingGlassIcon className="h-4 w-4" />
-                <span>Apercu</span>
+                <span>Aperçu</span>
               </button>
             </span>
             {usesRichTextEditor(question.type) ? (
@@ -853,7 +853,7 @@ function QuestionCard({
                     className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
                   />
                   <p className="text-sm leading-6 text-[#8a8077]">
-                    Ce texte apparait en grise dans le champ de reponse tant que l&apos;utilisateur n&apos;a rien saisi.
+                    Ce texte apparaît en gris dans le champ de réponse tant que l&apos;utilisateur n&apos;a rien saisi.
                   </p>
                 </label>
               ) : null}
@@ -1051,7 +1051,7 @@ function QuestionCard({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
-                  Apercu
+                  Aperçu
                 </p>
                 <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
                   Question {questionIndex + 1}
@@ -1349,7 +1349,7 @@ function ModuleForm({
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">URL video</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">URL vidéo</span>
                       <input
                         type="url"
                         value={activeSubmodule.videoUrl}
@@ -1486,7 +1486,7 @@ function ModuleForm({
 
                           <MoveToSubmoduleControl
                             title="Deplacer cet exercice"
-                            helper="L'exercice entier sera ajoute a la fin du sous-module cible."
+                            helper="L'exercice entier sera ajouté à la fin du sous-module cible."
                             availableTargets={module.submodules
                               .filter((submodule) => submodule.id !== activeSubmodule.id)
                               .map((submodule, submoduleIndex) => ({
@@ -1681,14 +1681,14 @@ export default function AdminModuleEditor({ modules }: { modules: AdminModule[] 
     {
       key: "new-module",
       heading: "Nouveau module",
-      submitLabel: "Creer le module",
+      submitLabel: "Créer le module",
       value: createEmptyModule(nextPosition),
       defaultOpen: true,
     },
     ...modules.map((module) => ({
       key: `module-${module.id}`,
       heading: `Modifier ${module.title}`,
-      submitLabel: "Mettre a jour le module",
+      submitLabel: "Mettre à jour le module",
       value: toEditorModule(module),
       defaultOpen: false,
     })),

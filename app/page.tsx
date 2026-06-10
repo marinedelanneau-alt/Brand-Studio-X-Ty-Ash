@@ -4,9 +4,9 @@ import AccessLoginForm from "./ui/access-login-form";
 import { getCurrentAccount } from "@/lib/session";
 
 const studioNotes = [
-  "Acces immediat a votre espace de formation",
-  "Code personnel simple a reutiliser",
-  "Interface editoriale inspiree de Brand Studio",
+  "Accès immédiat à ton espace de formation",
+  "Code personnel simple à réutiliser",
+  "Interface éditoriale inspirée de Brand Studio",
 ];
 
 export default async function Home() {
@@ -56,8 +56,8 @@ export default async function Home() {
                     {homeTitle}
                   </h1>
                   <p className="mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[#7b7068]">
-                    Un espace editorial pour structurer votre parcours, acceder
-                    a vos ressources et avancer avec plus de clarte.
+                    Un espace éditorial pour structurer ton parcours, accéder
+                    à tes ressources et avancer avec plus de clarté.
                   </p>
 
                   <div className="mt-6 grid gap-3 border-l border-[#eadfca] pl-5">
@@ -81,7 +81,7 @@ export default async function Home() {
               <div>
                 <div className="flex flex-col items-start gap-5">
                   <h2 className="font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.92] tracking-[-0.04em] text-[#4b4550] sm:text-[2.7rem]">
-                    Ouvrir votre espace
+                    Ouvrir ton espace
                   </h2>
                   <p className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-5 py-3 text-[0.7rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
                     Espace de travail
@@ -89,8 +89,8 @@ export default async function Home() {
                 </div>
 
                 <p className="mt-5 max-w-[23rem] text-[0.95rem] leading-[1.8] text-[#7b7068]">
-                  Connectez-vous avec votre e-mail et votre mot de passe pour
-                  retrouver votre espace de travail.
+                  Connecte-toi avec ton e-mail et ton mot de passe pour
+                  retrouver ton espace de travail.
                 </p>
               </div>
 
@@ -106,7 +106,7 @@ export default async function Home() {
                       </span>
                     </div>
                     <p className="text-base leading-7 text-[#7b7068]">
-                      Votre acces est deja reconnu. Ouvrez directement votre
+                      Ton accès est déjà reconnu. Ouvre directement ton
                       espace client.
                     </p>
                     <Link
@@ -119,7 +119,7 @@ export default async function Home() {
                       href="/brand-guide"
                       className="flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#efd7b8] bg-[#fff6e3] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430] transition duration-200 hover:-translate-y-0.5"
                     >
-                      Generer mon Guide de Marque
+                      Générer mon Guide de Marque
                     </Link>
                   </div>
                 ) : (

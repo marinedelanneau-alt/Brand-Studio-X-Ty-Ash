@@ -113,7 +113,7 @@ function PreviewTextInput({ placeholder }: { placeholder: string }) {
       type="text"
       readOnly
       value=""
-      placeholder={placeholder || "Votre reponse"}
+      placeholder={placeholder || "Ta réponse"}
       className="w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a]"
     />
   );
@@ -124,7 +124,7 @@ function PreviewTextarea({ placeholder }: { placeholder: string }) {
     <textarea
       readOnly
       value=""
-      placeholder={placeholder || "Votre reponse"}
+      placeholder={placeholder || "Ta réponse"}
       className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a]"
     />
   );
@@ -211,7 +211,7 @@ function PreviewChecklist({ exercise, prompt }: { exercise: PreviewExercise; pro
           type="text"
           readOnly
           value=""
-          placeholder={exercise.answer_placeholder || "Ajouter un mot ou une idee"}
+          placeholder={exercise.answer_placeholder || "Ajouter un mot ou une idée"}
           className="h-12 flex-1 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-base text-[#5f544a]"
         />
         <button
@@ -373,7 +373,7 @@ function PreviewImageUpload({ exercise }: { exercise: PreviewExercise }) {
           <div className="absolute left-[68%] top-[33%] h-[30%] w-[24%] rotate-[4deg] overflow-hidden rounded-[1.1rem] border border-white/70 bg-[linear-gradient(145deg,#f5efe6,#d7b486,#69788c)] shadow-[0_18px_36px_rgba(71,52,33,0.14)]" />
           <div className="absolute left-[7%] top-[68%] h-[16%] w-[26%] rotate-[-2deg] overflow-hidden rounded-[1.1rem] border border-white/80 bg-white px-4 py-4 shadow-[0_18px_36px_rgba(71,52,33,0.14)]">
             <p className="font-[family:var(--font-cormorant)] text-[1.3rem] italic leading-none text-[#4b4550]">
-              Une presence douce et structuree.
+              Une présence douce et structurée.
             </p>
           </div>
           <div className="absolute left-[36%] top-[66%] h-[15%] w-[26%] rotate-[1deg] overflow-hidden rounded-[1.1rem] border border-white/70 bg-[linear-gradient(145deg,#f7efe4,#d7b486,#8a938f)] shadow-[0_18px_36px_rgba(71,52,33,0.14)]" />
@@ -414,7 +414,7 @@ function PreviewBrandPersona({ exercise }: { exercise: PreviewExercise }) {
           Persona de marque
         </p>
         <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
-          {exercise.question || "Cree le persona incarne de ta marque"}
+          {exercise.question || "Crée le persona incarné de ta marque"}
         </h3>
         <p className="mt-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
           {exercise.explanation}
@@ -563,7 +563,7 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
       <div className="grid gap-4 lg:grid-cols-2">
         <PreviewPaletteCard
           title="Couleurs principales"
-          helper={`Jusqu'a ${config.maxPrimaryColors} couleurs principales.`}
+          helper={`Jusqu'à ${config.maxPrimaryColors} couleurs principales.`}
           items={seededPrimary.map((item) => ({
             id: item.id,
             mode: "solid" as const,
@@ -574,7 +574,7 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
         />
         <PreviewPaletteCard
           title="Couleurs secondaires"
-          helper={`Jusqu'a ${config.maxSecondaryColors} couleurs secondaires.`}
+          helper={`Jusqu'à ${config.maxSecondaryColors} couleurs secondaires.`}
           items={seededSecondary.map((item) => ({
             id: item.id,
             mode: "solid" as const,
@@ -587,7 +587,7 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
 
       <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-5">
         <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
-          Apercu du picker
+          Aperçu du picker
         </p>
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem]">
           <div className="rounded-[1.2rem] border border-[#f0dfc6] bg-[#fffdf8] p-4">
@@ -621,7 +621,7 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
       </div>
 
       <div className="rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4 text-sm leading-7 text-[#6f645b]">
-        Reponse sauvegardee sous forme d&apos;un objet `color_palette` avec listes
+        Réponse sauvegardée sous forme d&apos;un objet `color_palette` avec listes
         `primaryColors` et `secondaryColors`.
       </div>
     </div>
@@ -693,7 +693,7 @@ function PreviewEditorialCalendar() {
       <div className="flex items-center justify-between border-b border-[#eadfca] bg-[#fffdf7] px-4 py-4">
         <div>
           <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
-            Calendrier editorial
+            Calendrier éditorial
           </p>
           <p className="mt-1 text-xl font-semibold text-[#4b4550]">Vue mensuelle</p>
         </div>
@@ -716,7 +716,7 @@ function PreviewEditorialCalendar() {
               <div className="mt-2 rounded-[0.7rem] border border-[#eadfca] bg-[#fffdf9] px-2 py-2 text-left text-xs text-[#4b4550]">
                 Idee de contenu
                 <span className="mt-1 block w-fit rounded-full bg-[#f4e4f8] px-2 py-1 text-[0.62rem] text-[#8b5aa2]">
-                  A produire
+                  À produire
                 </span>
               </div>
             ) : null}
@@ -743,7 +743,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
     <div className="space-y-4">
       {!isPassiveContentType(exercise.type) ? (
         <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7a7087]">
-          Apercu de l&apos;exercice
+          Aperçu de l&apos;exercice
         </p>
       ) : null}
 
@@ -845,7 +845,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
                   {prompt}
                 </span>
                 <div className="mt-3">
-                  <PreviewTextInput placeholder={exercise.answer_placeholder || "Votre reponse"} />
+                  <PreviewTextInput placeholder={exercise.answer_placeholder || "Ta réponse"} />
                 </div>
               </label>
             ))}
@@ -858,7 +858,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
               </span>
               <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">:</span>
               <div className="min-w-64 flex-1">
-                <PreviewTextInput placeholder={exercise.answer_placeholder || "Votre reponse"} />
+                <PreviewTextInput placeholder={exercise.answer_placeholder || "Ta réponse"} />
               </div>
             </div>
           </div>
@@ -1044,7 +1044,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
             </div>
             {getFillBlankCount(exercise.question) === 0 ? (
               <p className="mt-3 text-sm leading-6 text-[#8a8077]">
-                Ajoutez `___` dans la question pour afficher les champs a completer.
+                Ajoute `___` dans la question pour afficher les champs à compléter.
               </p>
             ) : null}
           </div>

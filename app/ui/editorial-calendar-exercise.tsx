@@ -115,7 +115,7 @@ export default function EditorialCalendarExercise({
       <div className="flex flex-col gap-4 border-b border-[#eadfca] bg-[#fffdf7] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
-            Calendrier editorial
+            Calendrier éditorial
           </p>
           <h3 className="mt-1 text-xl font-semibold capitalize text-[#4b4550]">
             {monthLabel}
@@ -126,7 +126,7 @@ export default function EditorialCalendarExercise({
             type="button"
             onClick={() => moveMonth(-1)}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a]"
-            aria-label="Mois precedent"
+            aria-label="Mois précédent"
           >
             <ChevronLeftIcon className="h-4 w-4" />
           </button>
@@ -255,7 +255,7 @@ export default function EditorialCalendarExercise({
           <textarea
             value={draft.notes}
             onChange={(event) => setDraft({ ...draft, notes: event.target.value })}
-            placeholder="Notes, angle, appel a l'action..."
+            placeholder="Notes, angle, appel à l'action..."
             className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
           />
           <div className="mt-3 flex flex-wrap justify-between gap-3">

@@ -10,7 +10,7 @@ import type {
 const FIELD_TYPE_LABELS: Record<BrandPersonaFieldType, string> = {
   text: "Texte court",
   textarea: "Texte long",
-  checkbox: "Cases a cocher",
+  checkbox: "Cases à cocher",
   select: "Liste deroulante",
 };
 

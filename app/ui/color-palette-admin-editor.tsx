@@ -33,7 +33,7 @@ export default function ColorPaletteAdminEditor({
           </p>
           <p className="mt-1 text-sm leading-6 text-[#8a8077]">
             Configure le picker visuel, les limites de palette et les couleurs
-            d&apos;exemple proposees a l&apos;utilisateur.
+            d&apos;exemple proposées a l&apos;utilisateur.
           </p>
         </div>
         <button
@@ -200,7 +200,7 @@ export default function ColorPaletteAdminEditor({
               <div className="grid gap-4 md:grid-cols-[5rem_minmax(0,1.2fr)_minmax(0,1fr)_10rem_auto]">
                 <label className="space-y-2">
                   <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                    Apercu
+                    Aperçu
                   </span>
                   <span
                     className="block h-12 rounded-[0.9rem] border border-[#eadfca]"

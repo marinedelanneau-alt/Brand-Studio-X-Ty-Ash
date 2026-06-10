@@ -137,15 +137,15 @@ export type BrandExportRecord = {
 };
 
 const MISSING = {
-  activity: "Activite a completer dans le module Vision & marque.",
-  essence: "ADN de marque a completer dans le module Vision & marque.",
-  mission: "Mission a completer dans le module Vision & marque.",
-  vision: "Vision a completer dans le module Vision & marque.",
-  values: "Valeurs a completer dans le module Vision & marque.",
-  promise: "Promesse a completer dans le module Vision & marque.",
-  positioning: "Positionnement a completer dans le module Positionnement.",
-  tone: "Ton de marque a completer dans le module Personnalite & ton.",
-  palette: "Palette ou intention visuelle a completer dans le module Palette de couleurs.",
+  activity: "Activité à compléter dans le module Vision & marque.",
+  essence: "ADN de marque à compléter dans le module Vision & marque.",
+  mission: "Mission à compléter dans le module Vision & marque.",
+  vision: "Vision à compléter dans le module Vision & marque.",
+  values: "Valeurs à compléter dans le module Vision & marque.",
+  promise: "Promesse à compléter dans le module Vision & marque.",
+  positioning: "Positionnement à compléter dans le module Positionnement.",
+  tone: "Ton de marque à compléter dans le module Personnalité & ton.",
+  palette: "Palette ou intention visuelle à compléter dans le module Palette de couleurs.",
 };
 
 function compactText(value: string | null | undefined) {
@@ -316,7 +316,7 @@ function collectColors(sources: AnswerSource[]) {
     return {
       id: color.id,
       name: color.name || (role === "primary" ? "Couleur principale" : "Couleur secondaire"),
-      usage: color.usage || "Usage a preciser dans la palette.",
+      usage: color.usage || "Usage à préciser dans la palette.",
       css: getPaletteColorCss(color),
       hex: color.mode === "gradient" ? `${color.from} -> ${color.to}` : color.hex,
       role,
@@ -352,7 +352,7 @@ function collectMoodboard(sources: AnswerSource[]) {
           type: "color" as const,
           color: block.color,
           label: block.label || "Couleur",
-          description: block.usage || "Role visuel a preciser.",
+          description: block.usage || "Rôle visuel à préciser.",
         };
       }
 
@@ -382,10 +382,10 @@ function listFromText(text: string, fallback: string[]) {
 
 function buildPitch(brandName: string, target: string, problem: string, promise: string) {
   if (!hasRealValue(target) || !hasRealValue(problem) || !hasRealValue(promise)) {
-    return "Pitch a finaliser lorsque la cible, le probleme resolu et la promesse seront completes.";
+    return "Pitch à finaliser lorsque la cible, le problème résolu et la promesse seront complétés.";
   }
 
-  return `${brandName} aide ${target} a depasser ${problem} grace a une promesse claire : ${promise}`;
+  return `${brandName} aide ${target} à dépasser ${problem} grâce à une promesse claire : ${promise}`;
 }
 
 export function generateGuideFromAnswers(input: {
@@ -415,12 +415,12 @@ export function generateBrandGuide(input: {
   const mission = findText(sources, [["mission"]], MISSING.mission);
   const vision = findText(sources, [["vision"]], MISSING.vision);
   const promise = findText(sources, [["promesse"], ["promise"]], MISSING.promise);
-  const target = findText(sources, [["cible"], ["audience"], ["client", "ideal"]], "Cible principale a completer dans le module Positionnement.");
-  const problem = findText(sources, [["probleme"], ["frustration"], ["douleur"]], "Probleme client a completer dans le module Positionnement.");
-  const differentiation = findText(sources, [["differenciation"], ["different"], ["singulier"]], "Differenciation a completer dans le module Positionnement.");
-  const competitors = findText(sources, [["concurrent"]], "Concurrents a renseigner si utile.");
+  const target = findText(sources, [["cible"], ["audience"], ["client", "ideal"]], "Cible principale à compléter dans le module Positionnement.");
+  const problem = findText(sources, [["probleme"], ["frustration"], ["douleur"]], "Problème client à compléter dans le module Positionnement.");
+  const differentiation = findText(sources, [["differenciation"], ["different"], ["singulier"]], "Différenciation à compléter dans le module Positionnement.");
+  const competitors = findText(sources, [["concurrent"]], "Concurrents à renseigner si utile.");
   const finalPositioning = findText(sources, [["positionnement", "final"], ["positionnement"]], MISSING.positioning);
-  const baseline = findText(sources, [["baseline"], ["slogan"], ["signature"]], "Baseline a completer dans le module Baseline.");
+  const baseline = findText(sources, [["baseline"], ["slogan"], ["signature"]], "Baseline à compléter dans le module Baseline.");
   const traitsText =
     collectPersonaValue(sources, ["dominant_traits", "traits dominants"]) ||
     findText(sources, [["trait"], ["personnalite"]], "");
@@ -430,15 +430,15 @@ export function generateBrandGuide(input: {
   const persona =
     collectPersonaValue(sources, ["final_summary_sentence", "phrase", "resume"]) ||
     collectPersonaValue(sources, ["persona_first_name", "prenom"]) ||
-    findText(sources, [["persona"]], "Persona de marque a completer dans le module Persona.");
+    findText(sources, [["persona"]], "Persona de marque à compléter dans le module Persona.");
   const relationship =
     collectPersonaValue(sources, ["communication_style", "style de communication"]) ||
     collectPersonaValue(sources, ["welcome_style", "accueille"]) ||
-    "Posture relationnelle a completer dans le module Personnalite & ton.";
+    "Posture relationnelle à compléter dans le module Personnalité & ton.";
   const visualAmbiance =
     moodboard.ambiance ||
     collectPersonaValue(sources, ["visual_mood", "ambiance visuelle"]) ||
-    findText(sources, [["ambiance"], ["univers", "visuel"]], "Ambiance visuelle a completer dans le module Moodboard.");
+    findText(sources, [["ambiance"], ["univers", "visuel"]], "Ambiance visuelle à compléter dans le module Moodboard.");
   const supports = listFromText(
     findText(sources, [["support"], ["application"], ["reseaux"], ["site web"]], ""),
     ["Reseaux sociaux", "Site web", "Presentations", "Documents commerciaux"],
@@ -452,11 +452,11 @@ export function generateBrandGuide(input: {
   );
   const wordsToUse = listFromText(
     findText(sources, [["mots", "utiliser"], ["vocabulaire", "privilegier"]], ""),
-    ["Mots alignes avec le ton de marque a completer."],
+    ["Mots alignés avec le ton de marque à compléter."],
   );
   const wordsToAvoid = listFromText(
     findText(sources, [["mots", "eviter"], ["vocabulaire", "eviter"]], ""),
-    ["Mots a eviter a completer."],
+    ["Mots à éviter à compléter."],
   );
 
   const completionItems: GuideCompletionItem[] = [
@@ -487,10 +487,10 @@ export function generateBrandGuide(input: {
       hasAnyData: sources.length > 0,
       warning:
         sources.length === 0
-          ? "Aucune reponse n'est encore disponible pour generer le guide."
+          ? "Aucune réponse n'est encore disponible pour générer le guide."
           : missingRequiredCount > 0
-            ? "Ton guide peut etre genere, mais certaines sections seront incompletes."
-            : "Ton Guide de Marque est pret.",
+            ? "Ton guide peut être généré, mais certaines sections seront incomplètes."
+            : "Ton Guide de Marque est prêt.",
       items: completionItems,
     },
     cover: {
@@ -498,7 +498,7 @@ export function generateBrandGuide(input: {
       subtitle: baseline,
       introLine: `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.`,
     },
-    introduction: `Ce guide rassemble les fondations strategiques, verbales et visuelles de ${brandName}. Il sert de reference pour creer des contenus, guider les visuels et garder une communication coherente dans le temps.`,
+    introduction: `Ce guide rassemble les fondations stratégiques, verbales et visuelles de ${brandName}. Il sert de référence pour créer des contenus, guider les visuels et garder une communication cohérente dans le temps.`,
     dna: {
       activity,
       essence,
@@ -509,7 +509,7 @@ export function generateBrandGuide(input: {
     },
     positioning: {
       target,
-      context: findText(sources, [["contexte"], ["situation", "client"]], "Contexte client a preciser dans le module Positionnement."),
+      context: findText(sources, [["contexte"], ["situation", "client"]], "Contexte client à préciser dans le module Positionnement."),
       problem,
       differentiation,
       competitors,
@@ -536,30 +536,30 @@ export function generateBrandGuide(input: {
     visualUniverse: {
       palette: colors,
       ambiance: visualAmbiance,
-      graphicElements: findText(sources, [["element", "graphique"], ["codes", "visuels"]], "Elements graphiques a preciser dans le module Univers visuel."),
+      graphicElements: findText(sources, [["element", "graphique"], ["codes", "visuels"]], "Éléments graphiques à préciser dans le module Univers visuel."),
       prioritySupports: supports,
       moodboard: moodboard.items,
     },
     applicationRules: {
       social: [
         "Utiliser le ton defini avant de publier un contenu.",
-        "Conserver une presence visuelle reguliere avec les couleurs principales.",
-        "Faire ressortir une idee forte par publication.",
+        "Conserver une présence visuelle régulière avec les couleurs principales.",
+        "Faire ressortir une idée forte par publication.",
       ],
       website: [
         "Faire apparaitre clairement la promesse des les premiers ecrans.",
-        "Garder la palette principale pour les zones de decision et de repere.",
+        "Garder la palette principale pour les zones de décision et de repère.",
         "Utiliser la baseline comme signature, pas comme texte explicatif principal.",
       ],
       presentations: [
         "Ouvrir avec le positionnement et la promesse.",
-        "Limiter chaque page a une idee directrice.",
+        "Limiter chaque page à une idée directrice.",
         "Reprendre les couleurs et les mots-clefs de la marque.",
       ],
       salesDocs: [
         "Mettre en avant le probleme resolu et la difference de la marque.",
-        "Utiliser un vocabulaire clair, concret et coherent avec le ton.",
-        "Terminer par une action simple a comprendre.",
+        "Utiliser un vocabulaire clair, concret et cohérent avec le ton.",
+        "Terminer par une action simple à comprendre.",
       ],
       prioritySupports: supports,
     },
@@ -568,13 +568,13 @@ export function generateBrandGuide(input: {
         "La palette principale est-elle respectee ?",
         "Le niveau de contraste rend-il le texte lisible ?",
         "L'ambiance correspond-elle au moodboard ?",
-        "Le visuel reste-t-il coherent avec la promesse ?",
+        "Le visuel reste-t-il cohérent avec la promesse ?",
       ],
       editorial: [
-        "Le message parle-t-il clairement a la cible ?",
+        "Le message parle-t-il clairement à la cible ?",
         "Le ton correspond-il aux traits de marque ?",
-        "Les mots a privilegier sont-ils presents ?",
-        "Les mots a eviter ont-ils ete retires ?",
+        "Les mots à privilégier sont-ils présents ?",
+        "Les mots à éviter ont-ils été retirés ?",
       ],
       support: [
         "Le support a-t-il un objectif unique ?",
@@ -584,7 +584,7 @@ export function generateBrandGuide(input: {
       evolution: [
         "La modification renforce-t-elle l'ADN de marque ?",
         "Le positionnement reste-t-il reconnaissable ?",
-        "Les nouveaux choix peuvent-ils etre reutilises sur plusieurs supports ?",
+        "Les nouveaux choix peuvent-ils être réutilisés sur plusieurs supports ?",
       ],
     },
     expressSummary: {

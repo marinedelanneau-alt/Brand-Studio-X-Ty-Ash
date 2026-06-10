@@ -40,7 +40,7 @@ export type SmartFeedbackResult = {
 const SMART_FEEDBACK_PREFIX = "__smart_feedback__:";
 
 export const DEFAULT_GENERIC_WORDS = [
-  "qualite",
+  "qualité",
   "personnalise",
   "sur-mesure",
   "unique",
@@ -67,7 +67,7 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "length_less_than",
         value: 80,
         message:
-          "Ta reponse est encore courte. Tu peux preciser qui tu aides, ce que tu apportes et comment.",
+          "Ta réponse est encore courte. Tu peux préciser qui tu aides, ce que tu apportes et comment.",
         level: "improve",
       },
       {
@@ -75,7 +75,7 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "contains_generic_words",
         value: DEFAULT_GENERIC_WORDS,
         message:
-          "Certains mots sont encore generiques. Essaie de rendre ta reponse plus concrete.",
+          "Certains mots sont encore génériques. Essaie de rendre ta réponse plus concrète.",
         level: "warning",
       },
       {
@@ -83,20 +83,20 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "length_between",
         value: [120, 400],
         message:
-          "C'est clair. Tu peux encore renforcer ta reponse avec un exemple ou un benefice concret.",
+          "C'est clair. Tu peux encore renforcer ta réponse avec un exemple ou un bénéfice concret.",
         level: "good",
       },
       {
         id: "excellent_answer",
         condition: "passes_all_checks",
-        message: "Excellent. Ta reponse est claire, specifique et exploitable.",
+        message: "Excellent. Ta réponse est claire, spécifique et exploitable.",
         level: "excellent",
       },
     ],
     positiveMessage: "C'est clair, tu peux encore ajouter un exemple.",
-    neutralMessage: "Bonne base. Tu peux preciser davantage pour rendre la reponse plus exploitable.",
-    improvementMessage: "Ta reponse est encore un peu floue. Essaie d'ajouter un resultat concret.",
-    excellentMessage: "Excellent, cette reponse est exploitable.",
+    neutralMessage: "Bonne base. Tu peux préciser davantage pour rendre la réponse plus exploitable.",
+    improvementMessage: "Ta réponse est encore un peu floue. Essaie d'ajouter un résultat concret.",
+    excellentMessage: "Excellent, cette réponse est exploitable.",
   };
 }
 
@@ -322,7 +322,7 @@ function evaluateRuleBasedFeedback(
     return {
       level: "warning",
       message:
-        "Ce mot peut etre utile, mais il gagne a etre precise par un exemple concret.",
+        "Ce mot peut être utile, mais il gagne à être précisé par un exemple concret.",
       clarityScore,
     };
   }
@@ -362,7 +362,7 @@ function calculateClarityScore(value: string, config: SmartFeedbackConfig) {
 
 export function getClarityLabel(score: number) {
   if (score < 35) {
-    return "A preciser";
+    return "À préciser";
   }
 
   if (score < 65) {

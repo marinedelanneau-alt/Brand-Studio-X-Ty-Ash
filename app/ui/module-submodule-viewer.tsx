@@ -86,7 +86,7 @@ export default function ModuleSubmoduleViewer({
             </div>
           ) : (
             <div className="rounded-[1.4rem] border border-dashed border-[#eadfca] bg-white px-5 py-6 text-sm leading-7 text-[#8a8077]">
-              Aucune video n&apos;est associee a ce sous-module.
+              Aucune vidéo n&apos;est associée a ce sous-module.
             </div>
           )}
 
@@ -107,7 +107,7 @@ export default function ModuleSubmoduleViewer({
             disabled={currentIndex === 0}
             className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Sous-module precedent
+            Sous-module précédent
           </button>
 
           <button

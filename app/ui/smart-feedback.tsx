@@ -13,14 +13,14 @@ const LEVEL_STYLES = {
     bg: "bg-[#fffaf4]",
     text: "text-[#7f6856]",
     badge: "bg-[#f7ead7] text-[#b07b48]",
-    label: "A ajuster",
+    label: "À ajuster",
   },
   warning: {
     border: "border-[#e8dccb]",
     bg: "bg-[#fffaf6]",
     text: "text-[#7b6453]",
     badge: "bg-[#f6e7db] text-[#b16f52]",
-    label: "A preciser",
+    label: "À préciser",
   },
   good: {
     border: "border-[#dde7df]",
@@ -76,7 +76,7 @@ export default function SmartFeedback({
         </span>
         {typeof feedback.clarityScore === "number" ? (
           <span className="text-xs font-semibold text-[#8a8077]">
-            Clarte : {feedback.clarityScore}/100 ({getClarityLabel(feedback.clarityScore)})
+            Clarté : {feedback.clarityScore}/100 ({getClarityLabel(feedback.clarityScore)})
           </span>
         ) : null}
       </div>

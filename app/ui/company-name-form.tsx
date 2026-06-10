@@ -86,7 +86,7 @@ export default function CompanyNameForm({
         disabled={pending}
         className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430] disabled:cursor-wait disabled:opacity-70"
       >
-        {pending ? "Mise a jour..." : "Enregistrer"}
+        {pending ? "Mise à jour..." : "Enregistrer"}
       </button>
 
       {state.status === "error" && state.message ? (

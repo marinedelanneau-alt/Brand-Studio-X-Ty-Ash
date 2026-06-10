@@ -292,7 +292,7 @@ function Palette({
         wide
         theme={theme}
         label="Palette"
-        value="Apercu neutre. Palette ou intention visuelle a completer dans le module Palette de couleurs."
+        value="Aperçu neutre. Palette ou intention visuelle à compléter dans le module Palette de couleurs."
       />
     );
   }
@@ -339,7 +339,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         <View>
           <Palette colors={colors.slice(0, 6)} theme={theme} />
           <Text style={[styles.subtitle, { color: theme.text }]}>{guide.cover.introLine}</Text>
-          <Text style={[styles.date, { color: theme.accent }]}>Genere le {formatDate(guide.generatedAt)}</Text>
+          <Text style={[styles.date, { color: theme.accent }]}>Généré le {formatDate(guide.generatedAt)}</Text>
         </View>
       </Page>
 
@@ -350,7 +350,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         <Section eyebrow="01" title="ADN de marque" theme={theme}>
           <View style={styles.grid}>
             <Card label="Activite" value={guide.dna.activity} theme={theme} />
-            <Card label="Raison d'etre" value={guide.dna.essence} theme={theme} />
+            <Card label="Raison d'être" value={guide.dna.essence} theme={theme} />
             <Card label="Mission" value={guide.dna.mission} theme={theme} />
             <Card label="Vision" value={guide.dna.vision} theme={theme} />
             <Card label="Promesse" value={guide.dna.promise} theme={theme} />
@@ -376,8 +376,8 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
             <Card label="Traits dominants" value={guide.personality.traits.join(", ")} theme={theme} />
             <Card label="Posture relationnelle" value={guide.personality.relationship} theme={theme} />
             <Card label="Ton de voix" value={guide.personality.tone} theme={theme} />
-            <Card label="Vocabulaire a privilegier" value={guide.personality.wordsToUse.join(", ")} theme={theme} />
-            <Card label="Vocabulaire a eviter" value={guide.personality.wordsToAvoid.join(", ")} theme={theme} />
+            <Card label="Vocabulaire à privilégier" value={guide.personality.wordsToUse.join(", ")} theme={theme} />
+            <Card label="Vocabulaire à éviter" value={guide.personality.wordsToAvoid.join(", ")} theme={theme} />
           </View>
         </Section>
         <Section eyebrow="04" title="Baseline" theme={theme}>
@@ -407,7 +407,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         <Section eyebrow="07" title="Checklists" theme={theme}>
           <View style={styles.grid}>
             <Checklist title="Avant publication d'un visuel" items={guide.checklists.visual} theme={theme} />
-            <Checklist title="Avant redaction d'un contenu" items={guide.checklists.editorial} theme={theme} />
+            <Checklist title="Avant rédaction d'un contenu" items={guide.checklists.editorial} theme={theme} />
             <Checklist title="Avant creation d'un support" items={guide.checklists.support} theme={theme} />
             <Checklist title="Avant evolution de la marque" items={guide.checklists.evolution} theme={theme} />
           </View>
@@ -415,7 +415,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
       </Page>
 
       <Page size="A4" orientation="landscape" style={[styles.page, styles.summaryPage, { backgroundColor: theme.background, color: theme.text }]}>
-        <Section eyebrow="Synthese express" title={`${guide.brandName} en une page`} theme={theme}>
+        <Section eyebrow="Synthèse express" title={`${guide.brandName} en une page`} theme={theme}>
           <View style={styles.grid}>
             <Card label="Mission en 1 phrase" value={guide.expressSummary.mission} theme={theme} />
             <Card label="Positionnement en 1 phrase" value={guide.expressSummary.positioning} theme={theme} />

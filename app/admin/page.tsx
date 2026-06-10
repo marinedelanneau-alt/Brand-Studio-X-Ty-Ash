@@ -53,7 +53,7 @@ export default async function AdminDashboardPage() {
   if (!overview) {
     return (
       <DatabaseErrorState
-        title="Le tableau de bord ne peut pas etre charge"
+        title="Le tableau de bord ne peut pas être chargé"
         message={loadError}
         backHref="/admin"
         backLabel="Actualiser plus tard"
@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
             href="/admin/modules"
             className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
           >
-            Gerer les modules
+            Gérer les modules
           </Link>
         </div>
       </section>
@@ -176,7 +176,7 @@ export default async function AdminDashboardPage() {
               </h2>
             </div>
             <span className="rounded-full bg-[#fff6e3] px-3 py-1 text-[0.72rem] font-black uppercase tracking-[0.14em] text-[#cf7430]">
-              {overview.publishedModuleCount} publies
+              {overview.publishedModuleCount} publiés
             </span>
           </div>
 
@@ -197,7 +197,7 @@ export default async function AdminDashboardPage() {
                         {moduleItem.title}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-[#7b7068]">
-                        Module {moduleItem.position} · {moduleItem.exercises.length} exercice
+                        Module {moduleItem.position} Â· {moduleItem.exercises.length} exercice
                         {moduleItem.exercises.length > 1 ? "s" : ""}
                       </p>
                     </div>

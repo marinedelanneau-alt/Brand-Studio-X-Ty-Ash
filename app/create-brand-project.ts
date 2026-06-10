@@ -26,7 +26,7 @@ export async function createBrandProject(
     if (!name) {
       return {
         status: "error",
-        message: "Ajoutez un nom pour creer votre projet de marque.",
+        message: "Ajoute un nom pour créer ton projet de marque.",
       };
     }
 
@@ -39,7 +39,7 @@ export async function createBrandProject(
       if (!isImage) {
         return {
           status: "error",
-          message: "Le logo doit etre une image.",
+          message: "Le logo doit être une image.",
         };
       }
 

@@ -45,16 +45,16 @@ export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
         <div style="height:6px; background:linear-gradient(90deg,#b67d3d,#e4bb72);"></div>
         <div style="padding:32px;">
           <p style="margin:0; letter-spacing:0.25em; text-transform:uppercase; font-size:12px; color:#ab7331; font-weight:700;">Brand Studio</p>
-          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:36px; line-height:1.1;">Votre code de connexion</h1>
+          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:36px; line-height:1.1;">Ton code de connexion</h1>
           <p style="margin:0 0 20px; color:#5f6882; font-size:16px; line-height:1.7;">
-            Bonjour ${input.clientName}, voici votre code d'acces pour vous connecter a votre espace${input.companyName ? ` chez ${input.companyName}` : ""}.
+            Bonjour ${input.clientName}, voici ton code d'accès pour te connecter à ton espace${input.companyName ? ` chez ${input.companyName}` : ""}.
           </p>
           <div style="padding:20px 24px; border-radius:18px; background:#fbf5ec; border:1px solid #ebdeca; margin:24px 0;">
             <p style="margin:0 0 8px; text-transform:uppercase; letter-spacing:0.22em; font-size:12px; color:#ab7331; font-weight:700;">Code personnel</p>
             <p style="margin:0; color:#1d2740; font-size:32px; font-weight:800; letter-spacing:0.16em;">${input.accessCode}</p>
           </div>
           <p style="margin:0 0 22px; color:#5f6882; font-size:15px; line-height:1.7;">
-            Conservez ce code precieusement. Vous pourrez aussi en demander l'envoi a nouveau depuis l'ecran de connexion.
+            Conserve ce code précieusement. Tu pourras aussi demander un nouvel envoi depuis l'écran de connexion.
           </p>
           <a href="${dashboardUrl}" style="display:inline-block; padding:16px 26px; border-radius:16px; background:linear-gradient(135deg,#b67d3d,#e4bb72); color:#17130d; text-decoration:none; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; font-size:13px;">
             Se connecter
@@ -67,14 +67,14 @@ export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
   const text = [
     `Bonjour ${input.clientName},`,
     "",
-    "Voici votre code de connexion Brand Studio :",
+    "Voici ton code de connexion Brand Studio :",
     input.accessCode,
     "",
-    `Connectez-vous ici : ${dashboardUrl}`,
+    `Connecte-toi ici : ${dashboardUrl}`,
   ].join("\n");
 
   await brevo.transactionalEmails.sendTransacEmail({
-    subject: "Votre code de connexion Brand Studio",
+    subject: "Ton code de connexion Brand Studio",
     sender: {
       email: config.senderEmail,
       name: config.senderName,
@@ -113,16 +113,16 @@ export async function sendActivationCodeEmail(input: SendAccessCodeEmailInput) {
         <div style="height:6px; background:linear-gradient(90deg,#b67d3d,#e4bb72);"></div>
         <div style="padding:32px;">
           <p style="margin:0; letter-spacing:0.25em; text-transform:uppercase; font-size:12px; color:#ab7331; font-weight:700;">Brand Studio</p>
-          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:34px; line-height:1.1;">Activez votre compte</h1>
+          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:34px; line-height:1.1;">Active ton compte</h1>
           <p style="margin:0 0 20px; color:#5f6882; font-size:16px; line-height:1.7;">
-            Votre paiement est confirme. Utilisez ce code pour creer votre compte Brand Studio et choisir votre mot de passe.
+            Ton paiement est confirmé. Utilise ce code pour créer ton compte Brand Studio et choisir ton mot de passe.
           </p>
           <div style="padding:20px 24px; border-radius:18px; background:#fbf5ec; border:1px solid #ebdeca; margin:24px 0;">
             <p style="margin:0 0 8px; text-transform:uppercase; letter-spacing:0.22em; font-size:12px; color:#ab7331; font-weight:700;">Code d'activation</p>
             <p style="margin:0; color:#1d2740; font-size:32px; font-weight:800; letter-spacing:0.16em;">${input.accessCode}</p>
           </div>
           <a href="${registerUrl}" style="display:inline-block; padding:16px 26px; border-radius:16px; background:linear-gradient(135deg,#b67d3d,#e4bb72); color:#17130d; text-decoration:none; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; font-size:13px;">
-            Creer mon compte
+            Créer mon compte
           </a>
         </div>
       </div>
@@ -130,16 +130,16 @@ export async function sendActivationCodeEmail(input: SendAccessCodeEmailInput) {
   `;
 
   const text = [
-    "Votre paiement Brand Studio est confirme.",
+    "Ton paiement Brand Studio est confirmé.",
     "",
     "Code d'activation :",
     input.accessCode,
     "",
-    `Creez votre compte ici : ${registerUrl}`,
+    `Crée ton compte ici : ${registerUrl}`,
   ].join("\n");
 
   await brevo.transactionalEmails.sendTransacEmail({
-    subject: "Activez votre compte Brand Studio",
+    subject: "Active ton compte Brand Studio",
     sender: {
       email: config.senderEmail,
       name: config.senderName,

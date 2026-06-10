@@ -67,7 +67,7 @@ async function getEmbedding(text: string, apiKey: string) {
   }
 
   if (!payload?.data || !Array.isArray(payload.data) || payload.data.length === 0) {
-    throw new Error("Aucun embedding n'a ete retourne par l'API.");
+    throw new Error("Aucun embedding n'a été retourné par l'API.");
   }
 
   return payload.data[0].embedding as number[];
@@ -277,7 +277,7 @@ function formatQuestionAnswerForContext(exercise: ModuleExercise, rawValues: str
     return questionConfig.items
       .map((prompt, questionIndex) => {
         const values = getQuestionValues(exercise, rawValues, questionIndex).join(" | ");
-        return `${prompt} : ${values || "Sans reponse"}`;
+        return `${prompt} : ${values || "Sans réponse"}`;
       })
       .join(" || ");
   }
@@ -465,7 +465,7 @@ export async function generateModuleAnswerAssistance(input: {
   const relevantRagItems = await selectRelevantRagContext(ragContextItems, queryEmbedding, apiKey);
   const ragContextText = relevantRagItems.length
     ? formatRagContext(relevantRagItems)
-    : "Aucun contexte additionnel pertinent n'a ete trouve.";
+    : "Aucun contexte additionnel pertinent n'a été trouvé.";
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -516,7 +516,7 @@ export async function generateModuleAnswerAssistance(input: {
         {
           role: "system",
           content:
-            "Tu es un directeur artistique senior dans une agence de communication. Tu accompagnes un candidat qui construit sa marque. Reponds toujours en francais. Tes propositions doivent etre credibles, concretes, coherentes avec les reponses deja donnees et utiles pour une plateforme de formation de marque. Tu dois tenir compte explicitement du nom de marque fourni et, s'il existe, du nom d'entreprise du client. Si le contexte est incomplet, formule une hypothese raisonnable plutot qu'un discours vague. En mode improve, preserve l'intention du candidat tout en rendant la formulation plus claire, plus specifique et plus impactante. Ne fournis pas de meta-commentaire dans les champs de reponse.",
+            "Tu es un directeur artistique senior dans une agence de communication. Tu accompagnes un candidat qui construit sa marque. Réponds toujours en français. Tes propositions doivent être crédibles, concrètes, cohérentes avec les réponses déjà données et utiles pour une plateforme de formation de marque. Tu dois tenir compte explicitement du nom de marque fourni et, s'il existe, du nom d'entreprise du client. Si le contexte est incomplet, formule une hypothèse raisonnable plutôt qu'un discours vague. En mode improve, préserve l'intention du candidat tout en rendant la formulation plus claire, plus spécifique et plus impactante. Ne fournis pas de méta-commentaire dans les champs de réponse.",
         },
         {
           role: "system",
@@ -538,10 +538,10 @@ export async function generateModuleAnswerAssistance(input: {
             currentDraft,
             previousAnswers: contextItems,
             instructions: [
-              "Le nom de marque est prioritaire: ancre tes propositions dans cet univers de marque et reutilise-le quand cela rend la reponse plus juste.",
-              "Prends en compte toutes les reponses precedentes fournies dans previousAnswers pour rester coherent avec le positionnement, le ton et les choix deja exprimes.",
-              "Si currentDraft contient deja une intention exploitable, preserve-la et fais-la monter en qualite au lieu de repartir de zero.",
-              "Ignore totalement les exemples de reponse eventuellement affiches en placeholder dans l'interface. Ils ne doivent pas influencer le fond ni la formulation.",
+              "Le nom de marque est prioritaire: ancre tes propositions dans cet univers de marque et réutilise-le quand cela rend la réponse plus juste.",
+              "Prends en compte toutes les réponses précédentes fournies dans previousAnswers pour rester cohérent avec le positionnement, le ton et les choix déjà exprimés.",
+              "Si currentDraft contient déjà une intention exploitable, préserve-la et fais-la monter en qualité au lieu de repartir de zéro.",
+              "Ignore totalement les exemples de réponse éventuellement affichés en placeholder dans l'interface. Ils ne doivent pas influencer le fond ni la formulation.",
               "Remplis chaque questionIndex present dans questionSpecs.",
               "Respecte exactement le nombre attendu de valeurs par question.",
               "Pour kind=list, renvoie uniquement des libelles brefs, distinctifs et directement exploitables.",
@@ -561,14 +561,14 @@ export async function generateModuleAnswerAssistance(input: {
     const message =
       typeof payload?.error?.message === "string"
         ? payload.error.message
-        : "Le service OpenAI n'a pas repondu correctement.";
+        : "Le service OpenAI n'a pas répondu correctement.";
     throw new Error(message);
   }
 
   const content = getChatCompletionContent(payload);
 
   if (!content) {
-    throw new Error("La reponse IA est vide.");
+    throw new Error("La réponse IA est vide.");
   }
 
   const parsed = JSON.parse(content) as AssistanceResponse;

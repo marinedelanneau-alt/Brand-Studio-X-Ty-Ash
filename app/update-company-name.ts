@@ -25,14 +25,14 @@ export async function updateCompanyName(
     if (!companyName) {
       return {
         status: "error",
-        message: "Ajoutez le nom de votre entreprise.",
+        message: "Ajoute le nom de ton entreprise.",
       };
     }
 
     if (companyName.length > 120) {
       return {
         status: "error",
-        message: "Le nom de l'entreprise doit faire moins de 120 caracteres.",
+        message: "Le nom de l'entreprise doit faire moins de 120 caractères.",
       };
     }
 
@@ -55,6 +55,6 @@ export async function updateCompanyName(
 
   return {
     status: "success",
-    message: "Nom d'entreprise mis a jour.",
+    message: "Nom d'entreprise mis à jour.",
   };
 }
