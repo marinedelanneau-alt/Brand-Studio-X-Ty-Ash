@@ -3,7 +3,7 @@ param()
 
 $ErrorActionPreference = "Stop"
 
-$root = Split-Path -Parent $PSScriptRoot
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $runtimeDir = Join-Path $root ".runtime"
 $lockFile = Join-Path $runtimeDir "auto-push-deploy.lock"
 $statusFile = Join-Path $runtimeDir "auto-push-deploy.status.log"
