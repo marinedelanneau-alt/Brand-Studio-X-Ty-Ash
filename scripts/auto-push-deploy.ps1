@@ -80,7 +80,11 @@ function Get-GitRoot {
     Set-Location $root
     $result = & $gitCommand rev-parse --show-toplevel 2>$null
     Set-Location $current
-    return if ($LASTEXITCODE -eq 0) { $result.Trim() } else { $null }
+    if ($LASTEXITCODE -eq 0) {
+      return $result.Trim()
+    }
+
+    return $null
   } catch {
     return $null
   }
@@ -98,7 +102,11 @@ function Get-GitRemoteUrl {
     $gitCommand = Get-GitCommand
     $result = & $gitCommand remote get-url origin 2>$null
     Set-Location $current
-    return if ($LASTEXITCODE -eq 0) { $result.Trim() } else { $null }
+    if ($LASTEXITCODE -eq 0) {
+      return $result.Trim()
+    }
+
+    return $null
   } catch {
     return $null
   }
