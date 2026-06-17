@@ -21,7 +21,7 @@ function Write-Status {
 
 function Get-WatchedFiles {
   $watchedFiles = @()
-  $directories = @("app", "lib", "public", "supabase")
+  $directories = @("app", "lib", "public", "scripts", "supabase")
 
   foreach ($directory in $directories) {
     $path = Join-Path $root $directory
