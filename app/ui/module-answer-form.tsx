@@ -1188,9 +1188,13 @@ export default function ModuleAnswerForm({
             ) : null}
 
             {currentExercise.type === "static_text" ? (
-              <div className="mt-4">
+              <div className="relative mt-4 overflow-hidden rounded-[2rem] border border-white/90 bg-white px-6 py-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 sm:px-7 sm:py-7">
                 <div
-                  className="module-content static-text-content max-w-none text-[1rem] font-medium not-italic leading-8 text-[#2f3d4f] sm:text-[1.06rem]"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+                />
+                <div
+                  className="module-content relative max-w-none text-[1rem] leading-8 text-[#5f544a] sm:text-[1.06rem]"
                   dangerouslySetInnerHTML={{
                     __html: getStaticTextHtml(currentExercise.question),
                   }}
