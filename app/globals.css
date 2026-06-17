@@ -115,6 +115,11 @@ select {
   text-decoration: underline;
 }
 
+.static-text-content,
+.static-text-content * {
+  font-style: normal;
+}
+
 .tiptap-editor blockquote,
 .module-content blockquote {
   border-left: 3px solid #efd7b8;

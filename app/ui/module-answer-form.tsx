@@ -246,6 +246,101 @@ function getAnswerPlaceholder(
   return duplicateSources.includes(normalizedPlaceholder) ? fallback : placeholder;
 }
 
+function getTextMatchCandidates(value: string) {
+  const normalizedValue = value.replace(/\s+/g, " ").trim();
+  const candidates = [normalizedValue];
+  const withoutQuotes = normalizedValue.replace(/[«»"']/g, "").trim();
+  const separators = ["«", "\"", "'", " : ", ":"];
+
+  if (withoutQuotes) {
+    candidates.push(withoutQuotes);
+  }
+
+  separators.forEach((separator) => {
+    const index = normalizedValue.lastIndexOf(separator);
+
+    if (index >= 0) {
+      const candidate = normalizedValue.slice(index + separator.length).trim();
+      const candidateWithoutQuotes = candidate.replace(/[«»"']/g, "").trim();
+
+      if (candidate) {
+        candidates.push(candidate);
+      }
+
+      if (candidateWithoutQuotes) {
+        candidates.push(candidateWithoutQuotes);
+      }
+    }
+  });
+
+  return Array.from(new Set(candidates)).filter(Boolean);
+}
+
+function findTextCandidateIndex(haystack: string, candidates: string[], fromIndex = 0) {
+  return candidates.reduce((bestIndex, candidate) => {
+    const index = haystack.indexOf(candidate, fromIndex);
+
+    if (index < 0) {
+      return bestIndex;
+    }
+
+    return bestIndex < 0 || index < bestIndex ? index : bestIndex;
+  }, -1);
+}
+
+function getFillBlankAnswerPlaceholder(
+  exercise: WorkspaceModule["exercises"][number],
+  sourceQuestion: string,
+  blankIndex: number,
+  fallback = "Ta rÃ©ponse",
+) {
+  const placeholder = getAnswerPlaceholder(exercise, sourceQuestion, fallback);
+
+  if (placeholder === fallback || !placeholder.trim()) {
+    return placeholder;
+  }
+
+  const questionParts = splitFillBlankText(sourceQuestion);
+
+  if (questionParts.length < 2 || blankIndex >= questionParts.length - 1) {
+    return placeholder;
+  }
+
+  const beforeCandidates = getTextMatchCandidates(questionParts[blankIndex] ?? "");
+  const afterCandidates = getTextMatchCandidates(questionParts[blankIndex + 1] ?? "");
+  const beforeStartIndex = findTextCandidateIndex(placeholder, beforeCandidates);
+
+  if (beforeStartIndex < 0 || beforeCandidates.length === 0) {
+    return placeholder;
+  }
+
+  const beforeCandidate =
+    beforeCandidates.find((candidate) => placeholder.startsWith(candidate, beforeStartIndex)) ??
+    beforeCandidates[0] ??
+    "";
+  const valueStartIndex = beforeStartIndex + beforeCandidate.length;
+
+  if (afterCandidates.length === 0) {
+    const extracted = placeholder.slice(valueStartIndex).replace(/[»"']+\s*$/, "").trim();
+
+    return extracted || placeholder;
+  }
+
+  const afterStartIndex = findTextCandidateIndex(
+    placeholder,
+    afterCandidates,
+    valueStartIndex,
+  );
+
+  if (afterStartIndex < valueStartIndex) {
+    return placeholder;
+  }
+
+  const extracted = placeholder.slice(valueStartIndex, afterStartIndex).trim();
+
+  return extracted || placeholder;
+}
+
 function normalizeSubmissionValues(
   exercise: WorkspaceModule["exercises"][number],
   values: string[],
@@ -1093,13 +1188,9 @@ export default function ModuleAnswerForm({
             ) : null}
 
             {currentExercise.type === "static_text" ? (
-              <div className="relative mt-4 overflow-hidden rounded-[2rem] border border-white/90 bg-white px-6 py-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 sm:px-7 sm:py-7">
+              <div className="mt-4">
                 <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
-                />
-                <div
-                  className="module-content relative max-w-none text-[1rem] leading-8 text-[#5f544a] sm:text-[1.06rem]"
+                  className="module-content static-text-content max-w-none text-[1rem] font-medium not-italic leading-8 text-[#2f3d4f] sm:text-[1.06rem]"
                   dangerouslySetInnerHTML={{
                     __html: getStaticTextHtml(currentExercise.question),
                   }}
@@ -1928,7 +2019,11 @@ export default function ModuleAnswerForm({
                                   })
                                 }
                                 className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                                placeholder={getAnswerPlaceholder(currentExercise, prompt)}
+                                placeholder={getFillBlankAnswerPlaceholder(
+                                  currentExercise,
+                                  prompt,
+                                  index,
+                                )}
                                 style={{
                                   width: getAdaptiveInlineInputWidth(
                                     normalizeTextEntryValue(
@@ -1939,7 +2034,11 @@ export default function ModuleAnswerForm({
                                         questionIndex,
                                       )[index] ?? "",
                                     ),
-                                    getAnswerPlaceholder(currentExercise, prompt),
+                                    getFillBlankAnswerPlaceholder(
+                                      currentExercise,
+                                      prompt,
+                                      index,
+                                    ),
                                   ),
                                 }}
                               />
@@ -1994,14 +2093,22 @@ export default function ModuleAnswerForm({
                                 })
                               }
                               className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                              placeholder={getAnswerPlaceholder(currentExercise)}
+                              placeholder={getFillBlankAnswerPlaceholder(
+                                currentExercise,
+                                currentExercise.question,
+                                index,
+                              )}
                               style={{
                                 width: getAdaptiveInlineInputWidth(
                                   normalizeTextEntryValue(
                                     currentExercise,
                                     answers[currentExercise.id]?.[index] ?? "",
                                   ),
-                                  getAnswerPlaceholder(currentExercise),
+                                  getFillBlankAnswerPlaceholder(
+                                    currentExercise,
+                                    currentExercise.question,
+                                    index,
+                                  ),
                                 ),
                               }}
                             />

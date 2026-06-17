@@ -760,9 +760,9 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
       ) : null}
 
       {exercise.type === "static_text" ? (
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/90 bg-white px-6 py-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 sm:px-7 sm:py-7">
+        <div>
           <div
-            className="module-content relative max-w-none text-[1rem] leading-8 text-[#5f544a] sm:text-[1.06rem]"
+            className="module-content static-text-content max-w-none text-[1rem] font-medium not-italic leading-8 text-[#2f3d4f] sm:text-[1.06rem]"
             dangerouslySetInnerHTML={{ __html: getStaticTextHtml(exercise.question) }}
           />
         </div>
