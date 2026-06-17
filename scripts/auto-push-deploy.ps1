@@ -55,7 +55,18 @@ function Get-TreeFingerprint {
 }
 
 function Get-GitCommand {
-  return Get-Command git -ErrorAction SilentlyContinue
+  $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+  if ($gitCommand) {
+    return $gitCommand.Source
+  }
+
+  $candidates = @(
+    (Join-Path $env:ProgramFiles "Git\cmd\git.exe"),
+    (Join-Path ${env:ProgramFiles(x86)} "Git\cmd\git.exe"),
+    (Join-Path $env:LOCALAPPDATA "Programs\Git\cmd\git.exe")
+  )
+
+  return $candidates | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
 }
 
 function Get-GitRoot {
@@ -67,7 +78,7 @@ function Get-GitRoot {
   try {
     $current = Get-Location
     Set-Location $root
-    $result = git rev-parse --show-toplevel 2>$null
+    $result = & $gitCommand rev-parse --show-toplevel 2>$null
     Set-Location $current
     return if ($LASTEXITCODE -eq 0) { $result.Trim() } else { $null }
   } catch {
@@ -84,7 +95,8 @@ function Get-GitRemoteUrl {
   try {
     $current = Get-Location
     Set-Location $gitRoot
-    $result = git remote get-url origin 2>$null
+    $gitCommand = Get-GitCommand
+    $result = & $gitCommand remote get-url origin 2>$null
     Set-Location $current
     return if ($LASTEXITCODE -eq 0) { $result.Trim() } else { $null }
   } catch {
@@ -100,7 +112,8 @@ function Has-GitChanges {
 
   $current = Get-Location
   Set-Location $gitRoot
-  $status = git status --porcelain 2>$null
+  $gitCommand = Get-GitCommand
+  $status = & $gitCommand status --porcelain 2>$null
   Set-Location $current
   return -not [string]::IsNullOrWhiteSpace($status)
 }
@@ -127,7 +140,8 @@ function Commit-And-Push {
   $current = Get-Location
   Set-Location $gitRoot
 
-  git add -A
+  $gitCommand = Get-GitCommand
+  & $gitCommand add -A
   if ($LASTEXITCODE -ne 0) {
     Write-Status "Erreur lors de l'ajout Git."
     Set-Location $current
@@ -135,14 +149,14 @@ function Commit-And-Push {
   }
 
   $commitMessage = "Auto sync $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-  git commit -m "$commitMessage" 2>$null
+  & $gitCommand commit -m "$commitMessage" 2>$null
   if ($LASTEXITCODE -ne 0) {
     Write-Status "Aucun commit cree (peut-etre aucun changement a committer ou erreur)."
   } else {
     Write-Status "Commit cree : $commitMessage"
   }
 
-  git push origin HEAD
+  & $gitCommand push origin HEAD
   if ($LASTEXITCODE -ne 0) {
     Write-Status "Push Git echoue. Verifiez la configuration du remote et des identifiants."
   } else {
