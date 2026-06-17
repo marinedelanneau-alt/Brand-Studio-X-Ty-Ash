@@ -749,7 +749,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
 
       {exercise.explanation && !isPassiveContentType(exercise.type) ? (
         exercise.type === "color_palette" ? null : (
-        <div className="rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
+        <div className="border-l-2 border-[#8f98a9]/45 pl-4 text-[0.95rem] font-semibold leading-7 text-[#2f3d4f] sm:text-[1rem]">
           {exercise.explanation}
         </div>
         )

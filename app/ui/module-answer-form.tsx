@@ -1132,7 +1132,7 @@ export default function ModuleAnswerForm({
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "brand_persona" &&
             currentExercise.type !== "color_palette" ? (
-              <div className="mt-3 rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
+              <div className="mt-3 border-l-2 border-[#8f98a9]/45 pl-4 text-[0.95rem] font-semibold leading-7 text-[#2f3d4f] sm:text-[1rem]">
                 {currentExercise.explanation}
               </div>
             ) : null}
