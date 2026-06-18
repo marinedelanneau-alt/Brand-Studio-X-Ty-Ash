@@ -92,7 +92,7 @@ export default async function WorkspaceModulePage({
   const showSummary = shouldForceSummary;
   const summaryCard = workspace.project
     ? buildModuleSummaryCard({
-        projectName: workspace.project.name,
+        projectName: account.company_name?.trim() || workspace.project.name,
         module: currentModule,
       })
     : null;
