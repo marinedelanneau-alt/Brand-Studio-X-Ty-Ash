@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ModuleSummaryCard } from "@/lib/module-summary";
 
 export default function ModuleShareSummary({
@@ -17,12 +17,27 @@ export default function ModuleShareSummary({
   nextHref?: string;
   nextLabel?: string;
 }) {
+  const [isCompleting, setIsCompleting] = useState(false);
+
   useEffect(() => {
     void fetch(completionHref, {
       method: "POST",
       credentials: "same-origin",
     }).catch(() => undefined);
   }, [completionHref]);
+
+  async function completeAndNavigate(nextUrl: string) {
+    setIsCompleting(true);
+
+    try {
+      await fetch(completionHref, {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } finally {
+      window.location.assign(nextUrl);
+    }
+  }
 
   return (
     <section
@@ -82,12 +97,14 @@ export default function ModuleShareSummary({
               Revenir aux questions
             </Link>
             {nextHref ? (
-              <Link
-                href={nextHref}
-                className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-white"
+              <button
+                type="button"
+                disabled={isCompleting}
+                onClick={() => void completeAndNavigate(nextHref)}
+                className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
               >
-                {nextLabel ?? "Passer au module suivant"}
-              </Link>
+                {isCompleting ? "Ouverture..." : (nextLabel ?? "Passer au module suivant")}
+              </button>
             ) : null}
             {!nextHref ? (
               <Link

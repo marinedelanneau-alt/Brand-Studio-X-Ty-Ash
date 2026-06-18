@@ -162,9 +162,7 @@ export default async function WorkspaceModulePage({
               completionHref={completionHref}
               nextHref={
                 nextModule
-                  ? `${completionHref}?next=${encodeURIComponent(
-                      `/mon-espace/module/${nextModule.id}`,
-                    )}`
+                  ? `/mon-espace/module/${nextModule.id}`
                   : undefined
               }
               nextLabel={
