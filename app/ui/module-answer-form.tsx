@@ -4,6 +4,7 @@ import { SparklesIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   startTransition,
   useActionState,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -83,6 +84,7 @@ const initialAiAssistState: AiAssistState = {
 const IMAGE_UPLOAD_TIMEOUT_MS = 45000;
 const IMAGE_UPLOAD_MAX_CLIENT_SIZE = 900 * 1024;
 const IMAGE_UPLOAD_MAX_DIMENSION = 1600;
+const MODULE_ANSWERS_DRAFT_PREFIX = "brand-studio-module-answers";
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
   return (
@@ -535,8 +537,87 @@ function buildSubmissionFormData(
   return formData;
 }
 
+function getLocalAnswersDraftKey(moduleId: number) {
+  return `${MODULE_ANSWERS_DRAFT_PREFIX}:${moduleId}`;
+}
+
+function parseLocalAnswersDraft(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    const rawAnswers =
+      "answers" in parsed && parsed.answers && typeof parsed.answers === "object"
+        ? parsed.answers
+        : parsed;
+
+    return Object.fromEntries(
+      Object.entries(rawAnswers)
+        .filter((entry): entry is [string, unknown[]] => Array.isArray(entry[1]))
+        .map(([exerciseId, values]) => [
+          Number(exerciseId),
+          values.filter((value): value is string => typeof value === "string"),
+        ])
+        .filter(([exerciseId]) => Number.isFinite(exerciseId)),
+    ) satisfies AnswersByExercise;
+  } catch {
+    return null;
+  }
+}
+
+function readLocalAnswersDraft(moduleId: number) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return parseLocalAnswersDraft(window.localStorage.getItem(getLocalAnswersDraftKey(moduleId)));
+}
+
+function writeLocalAnswersDraft(moduleId: number, answers: AnswersByExercise) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      getLocalAnswersDraftKey(moduleId),
+      JSON.stringify({
+        updatedAt: Date.now(),
+        answers,
+      }),
+    );
+  } catch {
+    // Local storage is only a backup; server persistence remains the source of truth.
+  }
+}
+
+function mergeLocalAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
+  const localDraft = readLocalAnswersDraft(module.id);
+
+  if (!localDraft) {
+    return answers;
+  }
+
+  const exerciseIds = new Set(module.exercises.map((exercise) => exercise.id));
+  const validLocalEntries = Object.fromEntries(
+    Object.entries(localDraft).filter(([exerciseId]) => exerciseIds.has(Number(exerciseId))),
+  ) as AnswersByExercise;
+
+  return {
+    ...answers,
+    ...validLocalEntries,
+  };
+}
+
 function createInitialAnswers(module: WorkspaceModule) {
-  return module.exercises.reduce<AnswersByExercise>((accumulator, exercise) => {
+  const answers = module.exercises.reduce<AnswersByExercise>((accumulator, exercise) => {
     const savedAnswers = normalizeTextEntryValues(
       exercise,
       module.answers[exercise.id] ?? [],
@@ -561,6 +642,8 @@ function createInitialAnswers(module: WorkspaceModule) {
 
     return accumulator;
   }, {});
+
+  return mergeLocalAnswersDraft(module, answers);
 }
 
 function mergeAnswers(
@@ -866,6 +949,7 @@ export default function ModuleAnswerForm({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [, startAutoSaveTransition] = useTransition();
   const latestAnswersRef = useRef<AnswersByExercise>(answers);
+  const draftSaveQueueRef = useRef<Promise<ModuleState | null>>(Promise.resolve(null));
   const hasMountedRef = useRef(false);
   const previousModuleIdRef = useRef(module.id);
   const allowExplicitSubmitRef = useRef(false);
@@ -918,16 +1002,37 @@ export default function ModuleAnswerForm({
     isLastSubmodule,
   });
 
-  async function saveCurrentDraft(nextAnswers = latestAnswersRef.current) {
-    setIsSavingDraft(true);
+  const persistCurrentDraft = useCallback(({ showPending = false } = {}) => {
+    if (showPending) {
+      setIsSavingDraft(true);
+    }
 
+    draftSaveQueueRef.current = draftSaveQueueRef.current
+      .catch(() => null)
+      .then(async () => {
+        const result = await saveModuleDraft(
+          buildSubmissionFormData(module, latestAnswersRef.current),
+        );
+        setAutoSaveState(result);
+
+        return result;
+      })
+      .finally(() => {
+        if (showPending) {
+          setIsSavingDraft(false);
+        }
+      });
+
+    return draftSaveQueueRef.current;
+  }, [module]);
+
+  async function saveCurrentDraft() {
     try {
-      const result = await saveModuleDraft(buildSubmissionFormData(module, nextAnswers));
-      setAutoSaveState(result);
+      const result = await persistCurrentDraft({ showPending: true });
 
-      return result.status !== "error";
-    } finally {
-      setIsSavingDraft(false);
+      return result?.status !== "error";
+    } catch {
+      return false;
     }
   }
 
@@ -974,7 +1079,8 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     latestAnswersRef.current = answers;
-  }, [answers]);
+    writeLocalAnswersDraft(module.id, answers);
+  }, [answers, module.id]);
 
   useEffect(() => {
     setCurrentIndex((current) =>
@@ -1010,20 +1116,17 @@ export default function ModuleAnswerForm({
     }
 
     const timeoutId = window.setTimeout(() => {
-      const formData = buildSubmissionFormData(module, latestAnswersRef.current);
-
       startAutoSaveTransition(async () => {
-        const result = await saveModuleDraft(formData);
-        setAutoSaveState(result);
+        await persistCurrentDraft();
       });
     }, 700);
 
     return () => window.clearTimeout(timeoutId);
-  }, [answers, module]);
+  }, [answers, module, persistCurrentDraft]);
 
   useEffect(() => {
     function saveBeforeLeaving() {
-      void saveModuleDraft(buildSubmissionFormData(module, latestAnswersRef.current));
+      void persistCurrentDraft();
     }
 
     function handleVisibilityChange() {
@@ -1039,7 +1142,7 @@ export default function ModuleAnswerForm({
       window.removeEventListener("pagehide", saveBeforeLeaving);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [module]);
+  }, [module, persistCurrentDraft]);
 
   useEffect(() => {
     if (!isPopupOpen) {
