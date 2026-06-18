@@ -41,6 +41,7 @@ import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import {
   getFillBlankCount,
   getTableCellCount,
+  getAnswerPlaceholderItems,
   parseIndexedAnswerItems,
   parseStoredExerciseQuestionConfig,
   parseStoredImageUploadConfig,
@@ -295,6 +296,16 @@ function getFillBlankAnswerPlaceholder(
   fallback = "Ta rÃ©ponse",
 ) {
   const placeholder = getAnswerPlaceholder(exercise, sourceQuestion, fallback);
+  const blankCount = getFillBlankCount(sourceQuestion);
+  const placeholderItems = getAnswerPlaceholderItems(placeholder, blankCount);
+  const indexedPlaceholder = placeholderItems[blankIndex]?.trim();
+
+  if (
+    indexedPlaceholder &&
+    (blankCount > 1 || placeholderItems.some((item) => item.trim()))
+  ) {
+    return indexedPlaceholder;
+  }
 
   if (placeholder === fallback || !placeholder.trim()) {
     return placeholder;

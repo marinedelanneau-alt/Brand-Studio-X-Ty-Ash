@@ -504,6 +504,21 @@ export function getStoredAnswerPlaceholder(rawOptions: string[]) {
     : "";
 }
 
+export function getAnswerPlaceholderItems(
+  answerPlaceholder: string | null | undefined,
+  count: number,
+) {
+  const normalizedCount = Math.max(count, 0);
+  const values = String(answerPlaceholder ?? "")
+    .split(/\r?\n/)
+    .map((item) => item.trim());
+
+  return Array.from(
+    { length: normalizedCount },
+    (_, index) => values[index] ?? "",
+  );
+}
+
 export function getStoredExplanation(rawOptions: string[]) {
   const explanationOption = rawOptions.find((option) =>
     option.startsWith(EXPLANATION_PREFIX),

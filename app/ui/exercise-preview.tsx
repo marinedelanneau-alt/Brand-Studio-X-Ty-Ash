@@ -1,4 +1,5 @@
 import {
+  getAnswerPlaceholderItems,
   getFillBlankCount,
   getPromptOpenLabel,
   parseChecklistEntries,
@@ -994,32 +995,39 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
               )}, minmax(0, 1fr))`,
             }}
           >
-            {prompts.map((prompt, questionIndex) => (
-              <div
-                key={`${exercise.id}-fill-preview-${questionIndex}`}
-                className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-base leading-8 text-[#5f544a]"
-              >
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#7a7087]">
-                  Complete la phrase
-                </p>
-                <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
-                  {splitFillBlankText(prompt).map((part, index, parts) => (
-                    <div key={`${exercise.id}-fill-part-${questionIndex}-${index}`} className="contents">
-                      {part ? <span>{part}</span> : null}
-                      {index < parts.length - 1 ? (
-                        <input
-                          type="text"
-                          readOnly
-                          value=""
-                          placeholder={exercise.answer_placeholder || undefined}
-                          className="min-w-28 flex-1 rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm text-[#5f544a]"
-                        />
-                      ) : null}
-                    </div>
-                  ))}
+            {prompts.map((prompt, questionIndex) => {
+              const placeholderItems = getAnswerPlaceholderItems(
+                exercise.answer_placeholder,
+                getFillBlankCount(prompt),
+              );
+
+              return (
+                <div
+                  key={`${exercise.id}-fill-preview-${questionIndex}`}
+                  className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-base leading-8 text-[#5f544a]"
+                >
+                  <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#7a7087]">
+                    Complete la phrase
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
+                    {splitFillBlankText(prompt).map((part, index, parts) => (
+                      <div key={`${exercise.id}-fill-part-${questionIndex}-${index}`} className="contents">
+                        {part ? <span>{part}</span> : null}
+                        {index < parts.length - 1 ? (
+                          <input
+                            type="text"
+                            readOnly
+                            value=""
+                            placeholder={placeholderItems[index] || undefined}
+                            className="min-w-28 flex-1 rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm text-[#5f544a]"
+                          />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-base leading-8 text-[#5f544a]">
@@ -1035,7 +1043,12 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
                       type="text"
                       readOnly
                       value=""
-                      placeholder={exercise.answer_placeholder || undefined}
+                      placeholder={
+                        getAnswerPlaceholderItems(
+                          exercise.answer_placeholder,
+                          getFillBlankCount(exercise.question),
+                        )[index] || undefined
+                      }
                       className="min-w-28 flex-1 rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm text-[#5f544a]"
                     />
                   ) : null}

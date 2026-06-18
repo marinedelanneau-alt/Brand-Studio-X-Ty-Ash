@@ -6,11 +6,13 @@ import { deleteAdminModule, saveAdminModule } from "../admin/modules/actions";
 import {
   EXERCISE_TYPE_LABELS,
   exerciseNeedsOptions,
+  getAnswerPlaceholderItems,
   getDefaultTableConfig,
   getDefaultImageUploadConfig,
   getEditorExerciseQuestion,
   getEditorOptionsText,
   getExerciseDefaultOptionsText,
+  getFillBlankCount,
   normalizeExerciseOptions,
   parseColorOption,
   parseStoredImageUploadConfig,
@@ -326,6 +328,25 @@ function getPlaceholderFieldHint(type: ExerciseType) {
   }
 
   return "Ex. Ta réponse ici";
+}
+
+function getFillBlankPlaceholderValues(question: EditorQuestion) {
+  return getAnswerPlaceholderItems(
+    question.answerPlaceholder,
+    getFillBlankCount(question.question),
+  );
+}
+
+function updateFillBlankPlaceholderValue(
+  answerPlaceholder: string,
+  count: number,
+  index: number,
+  value: string,
+) {
+  const nextValues = getAnswerPlaceholderItems(answerPlaceholder, count);
+  nextValues[index] = value;
+
+  return nextValues.join("\n");
 }
 
 function serializeQuestion(question: EditorQuestion) {
@@ -839,6 +860,51 @@ function QuestionCard({
               </label>
 
               {supportsPlaceholderField(question.type) ? (
+                question.type === "fill_blank" ? (
+                  <div className="space-y-2">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      Exemples de reponse (placeholders)
+                    </span>
+                    {getFillBlankPlaceholderValues(question).length > 0 ? (
+                      <div className="grid gap-3">
+                        {getFillBlankPlaceholderValues(question).map((placeholder, index) => (
+                          <label
+                            key={`${question.id}-fill-placeholder-${index}`}
+                            className="space-y-1"
+                          >
+                            <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#8a8077]">
+                              Champ a completer {index + 1}
+                            </span>
+                            <input
+                              type="text"
+                              value={placeholder}
+                              onChange={(event) =>
+                                onChange((current) => ({
+                                  ...current,
+                                  answerPlaceholder: updateFillBlankPlaceholderValue(
+                                    current.answerPlaceholder,
+                                    getFillBlankCount(current.question),
+                                    index,
+                                    event.target.value,
+                                  ),
+                                }))
+                              }
+                              placeholder={`Ex. reponse ${index + 1}`}
+                              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-6 text-[#8a8077]">
+                        Ajoute au moins un `___` dans la question pour creer les placeholders.
+                      </p>
+                    )}
+                    <p className="text-sm leading-6 text-[#8a8077]">
+                      Chaque exemple apparait dans le champ correspondant tant que l&apos;utilisateur n&apos;a rien saisi.
+                    </p>
+                  </div>
+                ) : (
                 <label className="space-y-2">
                   <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
                     {getPlaceholderFieldLabel(question.type)}
@@ -856,6 +922,7 @@ function QuestionCard({
                     Ce texte apparaît en gris dans le champ de réponse tant que l&apos;utilisateur n&apos;a rien saisi.
                   </p>
                 </label>
+                )
               ) : null}
             </>
           ) : null}
