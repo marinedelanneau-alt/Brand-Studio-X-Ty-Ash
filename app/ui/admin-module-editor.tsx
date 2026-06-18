@@ -852,11 +852,21 @@ function QuestionCard({
                       ? "Texte d'introduction"
                       : "Consigne ou contexte"}
                 </span>
-                <textarea
-                  value={question.explanation}
-                  onChange={(event) => onChange((current) => ({ ...current, explanation: event.target.value }))}
-                  className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
-                />
+                {question.type === "popup_message" ? (
+                  <textarea
+                    value={question.explanation}
+                    onChange={(event) => onChange((current) => ({ ...current, explanation: event.target.value }))}
+                    className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                  />
+                ) : (
+                  <RichTextEditor
+                    value={question.explanation}
+                    onChange={(contentHtml) =>
+                      onChange((current) => ({ ...current, explanation: contentHtml }))
+                    }
+                    placeholder="Ajoutez ici une description pédagogique, une astuce, un exemple ou un point d'attention."
+                  />
+                )}
               </label>
 
               {supportsPlaceholderField(question.type) ? (

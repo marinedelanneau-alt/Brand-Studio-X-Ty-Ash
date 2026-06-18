@@ -64,62 +64,161 @@ select {
   pointer-events: none;
 }
 
+.tiptap-editor h1,
+.module-content h1,
+.pedagogical-content h1 {
+  margin: 2rem 0 0.85rem;
+  font-family: var(--font-cormorant), serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #24364f;
+}
+
 .tiptap-editor h2,
-.module-content h2 {
+.module-content h2,
+.pedagogical-content h2 {
   margin: 1.5rem 0 0.75rem;
   font-family: var(--font-cormorant), serif;
-  font-size: 1.8rem;
-  line-height: 1.05;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.18;
   color: #4b4550;
 }
 
 .tiptap-editor h3,
-.module-content h3 {
+.module-content h3,
+.pedagogical-content h3 {
   margin: 1.25rem 0 0.6rem;
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   font-weight: 800;
   color: #4b4550;
 }
 
 .tiptap-editor p,
 .module-content p,
+.pedagogical-content p,
 .tiptap-editor ul,
 .module-content ul,
+.pedagogical-content ul,
 .tiptap-editor ol,
 .module-content ol,
+.pedagogical-content ol,
 .tiptap-editor blockquote,
-.module-content blockquote {
+.module-content blockquote,
+.pedagogical-content blockquote {
   margin: 0.85rem 0;
 }
 
 .tiptap-editor ul,
 .module-content ul,
+.pedagogical-content ul,
 .tiptap-editor ol,
-.module-content ol {
+.module-content ol,
+.pedagogical-content ol {
   padding-left: 1.4rem;
 }
 
 .tiptap-editor ul,
-.module-content ul {
+.module-content ul,
+.pedagogical-content ul {
   list-style: disc;
 }
 
 .tiptap-editor ol,
-.module-content ol {
+.module-content ol,
+.pedagogical-content ol {
   list-style: decimal;
 }
 
 .tiptap-editor a,
-.module-content a {
+.module-content a,
+.pedagogical-content a {
   color: #cf7430;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .tiptap-editor blockquote,
-.module-content blockquote {
+.module-content blockquote,
+.pedagogical-content blockquote {
   border-left: 3px solid #efd7b8;
   padding-left: 1rem;
   color: #7b7068;
+}
+
+.tiptap-editor hr,
+.pedagogical-content hr {
+  margin: 1.8rem 0;
+  border: 0;
+  border-top: 1px solid #eadfca;
+}
+
+.pedagogical-content {
+  max-width: 46rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #4f463f;
+}
+
+.pedagogical-content > :first-child,
+.tiptap-editor > :first-child {
+  margin-top: 0;
+}
+
+.pedagogical-content > :last-child,
+.tiptap-editor > :last-child {
+  margin-bottom: 0;
+}
+
+.tiptap-editor [data-info-box],
+.pedagogical-content [data-info-box] {
+  margin: 1.15rem 0;
+  border: 1px solid #eadfca;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  background: #fffaf0;
+  color: #4f463f;
+}
+
+.tiptap-editor [data-info-box="tip"],
+.pedagogical-content [data-info-box="tip"] {
+  border-color: #cfe7d0;
+  background: #f2fbf1;
+}
+
+.tiptap-editor [data-info-box="example"],
+.pedagogical-content [data-info-box="example"] {
+  border-color: #f1df9a;
+  background: #fff9dc;
+}
+
+.tiptap-editor [data-info-box="warning"],
+.pedagogical-content [data-info-box="warning"] {
+  border-color: #ead3b4;
+  background: #fff2e3;
+}
+
+.tiptap-editor [data-info-box="remember"],
+.pedagogical-content [data-info-box="remember"] {
+  border-color: #f0cf55;
+  background: #fff4ba;
+}
+
+.tiptap-editor [data-info-box="note"],
+.pedagogical-content [data-info-box="note"] {
+  border-color: #d9d2e8;
+  background: #f8f5ff;
+}
+
+.tiptap-editor [data-info-box] > :first-child,
+.pedagogical-content [data-info-box] > :first-child {
+  margin-top: 0;
+}
+
+.tiptap-editor [data-info-box] > :last-child,
+.pedagogical-content [data-info-box] > :last-child {
+  margin-bottom: 0;
 }
 
 .tiptap-editor .ProseMirror {

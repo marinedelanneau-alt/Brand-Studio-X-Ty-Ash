@@ -36,6 +36,7 @@ import {
   parseStoredMoodboardConfig,
   type MoodboardConfig,
 } from "@/lib/exercise-types";
+import PedagogicalContent from "./pedagogical-content";
 
 type ExerciseLike = WorkspaceModule["exercises"][number];
 
@@ -680,9 +681,13 @@ export default function MoodboardExercise({
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
                 Compose ton univers visuel
               </h3>
-              <p className="mt-4 font-[family:var(--font-caveat)] text-[1.4rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.55rem]">
-                {exercise.explanation || "Mêle images, couleurs, citations et mots-clés pour faire émerger une direction artistique cohérente."}
-              </p>
+              <PedagogicalContent
+                content={
+                  exercise.explanation ||
+                  "Mele images, couleurs, citations et mots-cles pour faire emerger une direction artistique coherente."
+                }
+                className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+              />
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
                 Génération locale basée sur ta palette, tes réponses et le persona de marque déjà défini dans Brand Studio.
               </p>

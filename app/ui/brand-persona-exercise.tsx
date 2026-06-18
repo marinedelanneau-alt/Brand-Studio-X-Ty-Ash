@@ -12,6 +12,7 @@ import {
   serializeIndexedAnswerItem,
   type ExerciseType,
 } from "@/lib/exercise-types";
+import PedagogicalContent from "./pedagogical-content";
 
 type ExerciseLike = {
   id: string | number;
@@ -151,10 +152,19 @@ export default function BrandPersonaExercise({
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
                 {exercise.question || "Crée le persona incarné de ta marque"}
               </h3>
-              <p className="mt-4 font-[family:var(--font-caveat)] text-[1.4rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.55rem]">
+              <PedagogicalContent
+                content={
+                  exercise.explanation ||
+                  "Imagine ta marque comme une vraie personne. Cet exercice va t'aider a definir sa personnalite, sa maniere de parler, son attitude et son univers."
+                }
+                className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+              />
+              {false ? (
+              <p>
                 {exercise.explanation ||
                   "Imagine ta marque comme une vraie personne. Cet exercice va t'aider à définir sa personnalité, sa manière de parler, son attitude et son univers."}
               </p>
+              ) : null}
             </div>
 
             <div className="min-w-56 rounded-[1.2rem] border border-[#eadfca] bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)]">

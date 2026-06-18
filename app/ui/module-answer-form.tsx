@@ -37,6 +37,7 @@ import SmartFeedback from "./smart-feedback";
 import ColorPaletteExercise from "./color-palette-exercise";
 import MoodboardExercise from "./moodboard-exercise";
 import EditorialCalendarExercise from "./editorial-calendar-exercise";
+import PedagogicalContent from "./pedagogical-content";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import {
   getFillBlankCount,
@@ -1143,9 +1144,10 @@ export default function ModuleAnswerForm({
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "brand_persona" &&
             currentExercise.type !== "color_palette" ? (
-              <div className="mt-3 border-l-2 border-[#8f98a9]/45 pl-4 text-[0.95rem] font-semibold leading-7 text-[#2f3d4f] sm:text-[1rem]">
-                {currentExercise.explanation}
-              </div>
+              <PedagogicalContent
+                content={currentExercise.explanation}
+                className="mt-5 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
+              />
             ) : null}
             {currentExercise.type !== "prompt_open" &&
             !isPassiveContentType(currentExercise.type) &&
@@ -1211,9 +1213,10 @@ export default function ModuleAnswerForm({
                   }}
                 />
                 {shouldShowExerciseExplanation(currentExercise) ? (
-                  <div className="relative mt-5 border-l-2 border-[#8f98a9]/45 pl-4 text-[0.95rem] font-semibold leading-7 text-[#2f3d4f] sm:text-[1rem]">
-                    {currentExercise.explanation}
-                  </div>
+                  <PedagogicalContent
+                    content={currentExercise.explanation}
+                    className="relative mt-5 rounded-[1.2rem] border border-[#eadfca] bg-[#fffaf2] px-5 py-5"
+                  />
                 ) : null}
               </div>
             ) : null}
@@ -2400,9 +2403,10 @@ function MultiQuestionOpenExerciseGroup({
           className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
         >
           {shouldShowExerciseExplanation(question) ? (
-            <span className="mb-3 block rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
-              {question.explanation}
-            </span>
+            <PedagogicalContent
+              content={question.explanation}
+              className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+            />
           ) : null}
           <span className="flex items-start gap-3">
             <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">

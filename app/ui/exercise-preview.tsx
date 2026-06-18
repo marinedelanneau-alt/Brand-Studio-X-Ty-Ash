@@ -16,6 +16,7 @@ import {
   getPaletteColorCss,
   parseStoredColorPaletteConfig,
 } from "@/lib/color-palette";
+import PedagogicalContent from "./pedagogical-content";
 
 type PreviewExercise = {
   id: string | number;
@@ -417,9 +418,12 @@ function PreviewBrandPersona({ exercise }: { exercise: PreviewExercise }) {
         <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
           {exercise.question || "Crée le persona incarné de ta marque"}
         </h3>
-        <p className="mt-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
-          {exercise.explanation}
-        </p>
+        {exercise.explanation ? (
+          <PedagogicalContent
+            content={exercise.explanation}
+            className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+          />
+        ) : null}
       </div>
 
       {sections.map((section) => (
@@ -554,9 +558,10 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
           {exercise.question || "Construis la palette de couleurs de ta marque"}
         </h3>
         {exercise.explanation ? (
-          <p className="mt-4 font-[family:var(--font-caveat)] text-[1.35rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.5rem]">
-            {exercise.explanation}
-          </p>
+          <PedagogicalContent
+            content={exercise.explanation}
+            className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+          />
         ) : null}
         <p className="mt-2 text-sm leading-7 text-[#8a8077]">{config.helperText}</p>
       </div>
@@ -750,9 +755,10 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
 
       {exercise.explanation && !isPassiveContentType(exercise.type) ? (
         exercise.type === "color_palette" ? null : (
-        <div className="border-l-2 border-[#8f98a9]/45 pl-4 text-[0.95rem] font-semibold leading-7 text-[#2f3d4f] sm:text-[1rem]">
-          {exercise.explanation}
-        </div>
+        <PedagogicalContent
+          content={exercise.explanation}
+          className="rounded-[1.2rem] border border-[#eadfca] bg-white/82 px-5 py-5"
+        />
         )
       ) : null}
 

@@ -22,6 +22,7 @@ import {
   type PaletteColor,
 } from "@/lib/color-palette";
 import type { ExerciseType } from "@/lib/exercise-types";
+import PedagogicalContent from "./pedagogical-content";
 
 type ExerciseLike = {
   id: string | number;
@@ -233,9 +234,10 @@ export default function ColorPaletteExercise({
             {exercise.question || "Construis la palette de couleurs de ta marque"}
           </h3>
           {exercise.explanation ? (
-            <p className="mt-4 font-[family:var(--font-caveat)] text-[1.4rem] italic leading-[1.35] text-[#8b684f] sm:text-[1.55rem]">
-              {exercise.explanation}
-            </p>
+            <PedagogicalContent
+              content={exercise.explanation}
+              className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+            />
           ) : null}
           <p className="mt-3 text-sm leading-7 text-[#8a8077]">{config.helperText}</p>
         </div>
