@@ -1,6 +1,7 @@
 import {
   getTableCellCount,
   getPromptOpenLabel,
+  isAnswerableExerciseType,
   parseChecklistEntries,
   parseColorOption,
   parseStoredTableConfig,
@@ -42,7 +43,7 @@ export function buildModuleSummaryCard(input: {
   const focusWords = collectFocusWords(input.module).slice(0, 8);
   const highlights = detailedHighlights.slice(0, 5);
   const quickRecap =
-    buildModuleSpecificQuickRecap(input.module) ?? detailedHighlights.slice(0, 8);
+    buildModuleSpecificQuickRecap(input.module) ?? buildGenericQuickRecap(input.module);
 
   return {
     eyebrow: `Module ${input.module.position}`,
@@ -101,6 +102,31 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
   ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "À compléter"));
 
   return recap;
+}
+
+function buildGenericQuickRecap(module: WorkspaceModule) {
+  const answerableExercises = module.exercises.filter((exercise) =>
+    isAnswerableExerciseType(exercise.type),
+  );
+
+  if (answerableExercises.length === 0) {
+    return [
+      buildEmptyHighlight(
+        "Contenu du module",
+        "Ce module contient surtout de la lecture ou de l'inspiration.",
+      ),
+    ];
+  }
+
+  return answerableExercises.slice(0, 8).map((exercise) => {
+    const values = module.answers[exercise.id] ?? [];
+    const summary = summarizeExerciseAnswer(exercise, values);
+
+    return (
+      summary ??
+      buildEmptyHighlight(getExerciseSummaryLabel(exercise), "A completer")
+    );
+  });
 }
 
 function summarizeExerciseAnswer(
@@ -181,7 +207,109 @@ function summarizeExerciseAnswer(
     return buildHighlight(exercise.question, preview.join(" | "));
   }
 
+  const genericSummary = summarizeGenericValues(values);
+
+  if (genericSummary) {
+    return buildHighlight(getExerciseSummaryLabel(exercise), genericSummary, 180);
+  }
+
   return null;
+}
+
+function getExerciseSummaryLabel(exercise: WorkspaceModule["exercises"][number]) {
+  if (exercise.type === "prompt_open") {
+    return getPromptOpenLabel(exercise.question) || "Point cle";
+  }
+
+  if (exercise.type === "image_upload") {
+    return exercise.question || "Images ajoutees";
+  }
+
+  if (exercise.type === "brand_persona") {
+    return exercise.question || "Persona de marque";
+  }
+
+  if (exercise.type === "color_palette") {
+    return exercise.question || "Palette de couleurs";
+  }
+
+  if (exercise.type === "moodboard") {
+    return exercise.question || "Moodboard";
+  }
+
+  if (exercise.type === "editorial_calendar") {
+    return exercise.question || "Calendrier editorial";
+  }
+
+  if (exercise.type === "spectrum") {
+    return exercise.question || "Positionnement";
+  }
+
+  return exercise.question || "Point cle";
+}
+
+function summarizeGenericValues(values: string[]) {
+  const readableValues = values
+    .map((value) => compactText(value))
+    .filter(Boolean)
+    .map((value) => {
+      if (value.startsWith("{") || value.startsWith("[")) {
+        return summarizeJsonValue(value);
+      }
+
+      return value;
+    })
+    .filter(Boolean)
+    .slice(0, 4);
+
+  return readableValues.join(" | ");
+}
+
+function summarizeJsonValue(value: string) {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((item) => summarizeUnknownValue(item))
+        .filter(Boolean)
+        .slice(0, 4)
+        .join(", ");
+    }
+
+    return summarizeUnknownValue(parsed);
+  } catch {
+    return "";
+  }
+}
+
+function summarizeUnknownValue(value: unknown): string {
+  if (typeof value === "string") {
+    return compactText(value);
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  if (!value || typeof value !== "object") {
+    return "";
+  }
+
+  return Object.entries(value)
+    .flatMap(([key, item]) => {
+      if (typeof item === "string" && item.trim()) {
+        return [`${key}: ${compactText(item)}`];
+      }
+
+      if (typeof item === "number" || typeof item === "boolean") {
+        return [`${key}: ${String(item)}`];
+      }
+
+      return [];
+    })
+    .slice(0, 4)
+    .join(", ");
 }
 
 function findExerciseHighlight(
