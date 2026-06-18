@@ -1298,14 +1298,11 @@ export default function ModuleAnswerForm({
                       </span>
                       <textarea
                         value={
-                          normalizeTextEntryValue(
+                          getQuestionValues(
                             currentExercise,
-                            getQuestionValues(
-                              currentExercise,
-                              answers[currentExercise.id] ?? [],
-                              questionIndex,
-                            )[0] ?? "",
-                          )
+                            answers[currentExercise.id] ?? [],
+                            questionIndex,
+                          )[0] ?? ""
                         }
                         onChange={(event) =>
                           setAnswers((current) => ({
@@ -1340,10 +1337,7 @@ export default function ModuleAnswerForm({
                 ) : (
                   <>
                     <textarea
-                      value={normalizeTextEntryValue(
-                        currentExercise,
-                        answers[currentExercise.id]?.[0] ?? "",
-                      )}
+                      value={answers[currentExercise.id]?.[0] ?? ""}
                       onChange={(event) =>
                         setAnswers((current) => ({
                           ...current,
@@ -1399,14 +1393,11 @@ export default function ModuleAnswerForm({
                       <input
                         type="text"
                         value={
-                          normalizeTextEntryValue(
+                          getQuestionValues(
                             currentExercise,
-                            getQuestionValues(
-                              currentExercise,
-                              answers[currentExercise.id] ?? [],
-                              questionIndex,
-                            )[0] ?? "",
-                          )
+                            answers[currentExercise.id] ?? [],
+                            questionIndex,
+                          )[0] ?? ""
                         }
                         onChange={(event) =>
                           setAnswers((current) => ({
@@ -1423,14 +1414,11 @@ export default function ModuleAnswerForm({
                         placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                         style={{
                           width: getAdaptiveInlineInputWidth(
-                            normalizeTextEntryValue(
+                            getQuestionValues(
                               currentExercise,
-                              getQuestionValues(
-                                currentExercise,
-                                answers[currentExercise.id] ?? [],
-                                questionIndex,
-                              )[0] ?? "",
-                            ),
+                              answers[currentExercise.id] ?? [],
+                              questionIndex,
+                            )[0] ?? "",
                             getAnswerPlaceholder(currentExercise, prompt),
                           ),
                         }}
@@ -1468,10 +1456,7 @@ export default function ModuleAnswerForm({
                       />
                       <input
                         type="text"
-                        value={normalizeTextEntryValue(
-                          currentExercise,
-                          answers[currentExercise.id]?.[0] ?? "",
-                        )}
+                        value={answers[currentExercise.id]?.[0] ?? ""}
                         onChange={(event) =>
                           setAnswers((current) => ({
                             ...current,
@@ -1485,10 +1470,7 @@ export default function ModuleAnswerForm({
                         )}
                         style={{
                           width: getAdaptiveInlineInputWidth(
-                            normalizeTextEntryValue(
-                              currentExercise,
-                              answers[currentExercise.id]?.[0] ?? "",
-                            ),
+                            answers[currentExercise.id]?.[0] ?? "",
                             getAnswerPlaceholder(
                               currentExercise,
                               getPromptOpenLabel(currentExercise.question),
@@ -1986,14 +1968,11 @@ export default function ModuleAnswerForm({
                               <input
                                 type="text"
                                 value={
-                                  normalizeTextEntryValue(
+                                  getQuestionValues(
                                     currentExercise,
-                                    getQuestionValues(
-                                      currentExercise,
-                                      answers[currentExercise.id] ?? [],
-                                      questionIndex,
-                                    )[index] ?? "",
-                                  )
+                                    answers[currentExercise.id] ?? [],
+                                    questionIndex,
+                                  )[index] ?? ""
                                 }
                                 onChange={(event) =>
                                   setAnswers((current) => {
@@ -2030,14 +2009,11 @@ export default function ModuleAnswerForm({
                                 )}
                                 style={{
                                   width: getAdaptiveInlineInputWidth(
-                                    normalizeTextEntryValue(
+                                    getQuestionValues(
                                       currentExercise,
-                                      getQuestionValues(
-                                        currentExercise,
-                                        answers[currentExercise.id] ?? [],
-                                        questionIndex,
-                                      )[index] ?? "",
-                                    ),
+                                      answers[currentExercise.id] ?? [],
+                                      questionIndex,
+                                    )[index] ?? "",
                                     getFillBlankAnswerPlaceholder(
                                       currentExercise,
                                       prompt,
@@ -2075,10 +2051,7 @@ export default function ModuleAnswerForm({
                           {index < parts.length - 1 ? (
                             <input
                               type="text"
-                              value={normalizeTextEntryValue(
-                                currentExercise,
-                                answers[currentExercise.id]?.[index] ?? "",
-                              )}
+                              value={answers[currentExercise.id]?.[index] ?? ""}
                               onChange={(event) =>
                                 setAnswers((current) => {
                                   const currentValues =
@@ -2104,10 +2077,7 @@ export default function ModuleAnswerForm({
                               )}
                               style={{
                                 width: getAdaptiveInlineInputWidth(
-                                  normalizeTextEntryValue(
-                                    currentExercise,
-                                    answers[currentExercise.id]?.[index] ?? "",
-                                  ),
+                                  answers[currentExercise.id]?.[index] ?? "",
                                   getFillBlankAnswerPlaceholder(
                                     currentExercise,
                                     currentExercise.question,
@@ -2217,10 +2187,7 @@ export default function ModuleAnswerForm({
                                               >
                                                 <input
                                                   type="text"
-                                                  value={normalizeTextEntryValue(
-                                                    currentExercise,
-                                                    questionValues[cellIndex] ?? "",
-                                                  )}
+                                                  value={questionValues[cellIndex] ?? ""}
                                                   onChange={(event) =>
                                                     setAnswers((current) => {
                                                       const currentValues =
@@ -2440,7 +2407,7 @@ function MultiQuestionOpenExerciseGroup({
             ) : null}
           </span>
           <textarea
-            value={normalizeTextEntryValue(question, answers[question.id]?.[0] ?? "")}
+            value={answers[question.id]?.[0] ?? ""}
             onChange={(event) => onChange(question.id, [event.target.value])}
             className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
             placeholder={getAnswerPlaceholder(question)}
