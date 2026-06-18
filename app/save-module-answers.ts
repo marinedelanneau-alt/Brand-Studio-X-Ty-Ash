@@ -82,15 +82,18 @@ async function persistModuleAnswers(input: {
         exercise.type === "boolean" ||
         exercise.type === "color"
       ) {
-        const value =
-          typeof input.formData.get(fieldName) === "string"
-            ? String(input.formData.get(fieldName)).trim()
-            : "";
+        const values = input.formData
+          .getAll(fieldName)
+          .filter((item): item is string => typeof item === "string")
+          .map((item) => item.trim())
+          .filter(Boolean);
+        const hasIndexedValues = parseIndexedAnswerItems(values).length > 0;
+        const value = values[0] ?? "";
 
         return [{
           exerciseId: exercise.id,
           answerText: null,
-          selectedOptions: value ? [value] : [],
+          selectedOptions: hasIndexedValues ? values : value ? [value] : [],
         }];
       }
 

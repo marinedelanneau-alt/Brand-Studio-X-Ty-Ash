@@ -86,6 +86,7 @@ const IMAGE_UPLOAD_TIMEOUT_MS = 45000;
 const IMAGE_UPLOAD_MAX_CLIENT_SIZE = 900 * 1024;
 const IMAGE_UPLOAD_MAX_DIMENSION = 1600;
 const MODULE_ANSWERS_DRAFT_PREFIX = "brand-studio-module-answers";
+const OTHER_CHOICE_VALUE_PREFIX = "__other_choice__:";
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
   return (
@@ -195,6 +196,174 @@ function normalizePlaceholderText(value: string) {
 
 function normalizeDisplayText(value: string | null | undefined) {
   return normalizeVisibleContent(value);
+}
+
+function isOtherChoiceOption(value: string | null | undefined) {
+  const normalizedValue = normalizeDisplayText(value);
+
+  return (
+    normalizedValue === "autre" ||
+    normalizedValue === "autres" ||
+    normalizedValue === "other"
+  );
+}
+
+function getOtherChoiceOption(exercise: WorkspaceModule["exercises"][number]) {
+  return exercise.options.find((option) => isOtherChoiceOption(option)) ?? null;
+}
+
+function serializeOtherChoiceValue(value: string) {
+  return `${OTHER_CHOICE_VALUE_PREFIX}${value}`;
+}
+
+function isSerializedOtherChoiceValue(value: string) {
+  return value.startsWith(OTHER_CHOICE_VALUE_PREFIX);
+}
+
+function parseSerializedOtherChoiceValue(value: string) {
+  return isSerializedOtherChoiceValue(value)
+    ? value.slice(OTHER_CHOICE_VALUE_PREFIX.length)
+    : "";
+}
+
+function getOtherChoiceText(values: string[]) {
+  return (
+    values
+      .map((value) => parseSerializedOtherChoiceValue(value))
+      .find((value) => value.trim().length > 0) ?? ""
+  );
+}
+
+function setOtherChoiceText(
+  values: string[],
+  otherOption: string,
+  text: string,
+) {
+  const keptValues = values.filter((value) => !isSerializedOtherChoiceValue(value));
+  const valuesWithOtherOption = keptValues.includes(otherOption)
+    ? keptValues
+    : [...keptValues, otherOption];
+
+  return text.length > 0
+    ? [...valuesWithOtherOption, serializeOtherChoiceValue(text)]
+    : valuesWithOtherOption;
+}
+
+function removeOtherChoiceValues(values: string[], otherOption: string) {
+  return values.filter(
+    (value) => value !== otherOption && !isSerializedOtherChoiceValue(value),
+  );
+}
+
+function normalizeOtherChoiceValuesForState(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+): string[] {
+  if (exercise.type !== "single" && exercise.type !== "multiple") {
+    return values;
+  }
+
+  const otherOption = getOtherChoiceOption(exercise);
+
+  if (!otherOption) {
+    return values;
+  }
+
+  const indexedItems = parseIndexedAnswerItems(values);
+
+  if (indexedItems.length > 0) {
+    const groupedValues = new Map<number, string[]>();
+
+    indexedItems.forEach((item) => {
+      groupedValues.set(item.questionIndex, [
+        ...(groupedValues.get(item.questionIndex) ?? []),
+        item.value,
+      ]);
+    });
+
+    return Array.from(groupedValues.entries()).flatMap(([questionIndex, itemValues]) =>
+      normalizeOtherChoiceValuesForState(exercise, itemValues).map((value, valueIndex) =>
+        serializeIndexedAnswerItem(questionIndex, valueIndex, value),
+      ),
+    );
+  }
+
+  const optionLabels = new Set(exercise.options);
+  const otherTextValues = values.filter(
+    (value) =>
+      value.trim().length > 0 &&
+      !optionLabels.has(value) &&
+      !isSerializedOtherChoiceValue(value) &&
+      parseIndexedAnswerItems([value]).length === 0,
+  );
+
+  if (otherTextValues.length === 0) {
+    return values;
+  }
+
+  const keptValues = values.filter((value) => !otherTextValues.includes(value));
+  const nextValues = keptValues.includes(otherOption)
+    ? keptValues
+    : [...keptValues, otherOption];
+
+  return [
+    ...nextValues,
+    ...otherTextValues.map((value) => serializeOtherChoiceValue(value)),
+  ];
+}
+
+function normalizeOtherChoiceValuesForSubmission(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+): string[] {
+  if (exercise.type !== "single" && exercise.type !== "multiple") {
+    return values;
+  }
+
+  const otherOption = getOtherChoiceOption(exercise);
+
+  if (!otherOption) {
+    return values.filter((value) => !isSerializedOtherChoiceValue(value));
+  }
+
+  const indexedItems = parseIndexedAnswerItems(values);
+
+  if (indexedItems.length > 0) {
+    const groupedValues = new Map<number, string[]>();
+
+    indexedItems.forEach((item) => {
+      groupedValues.set(item.questionIndex, [
+        ...(groupedValues.get(item.questionIndex) ?? []),
+        item.value,
+      ]);
+    });
+
+    return Array.from(groupedValues.entries()).flatMap(([questionIndex, itemValues]) =>
+      normalizeOtherChoiceValuesForSubmission(exercise, itemValues).map(
+        (value, valueIndex) =>
+          serializeIndexedAnswerItem(questionIndex, valueIndex, value),
+      ),
+    );
+  }
+
+  const otherText = getOtherChoiceText(values).trim();
+  const valuesWithoutTechnicalOther = values.filter(
+    (value) => !isSerializedOtherChoiceValue(value),
+  );
+
+  if (!otherText) {
+    return valuesWithoutTechnicalOther;
+  }
+
+  const valuesWithoutOtherOption = valuesWithoutTechnicalOther.filter(
+    (value) => value !== otherOption,
+  );
+
+  if (exercise.type === "single") {
+    return [otherText];
+  }
+
+  return [...valuesWithoutOtherOption, otherText];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -365,7 +534,10 @@ function normalizeSubmissionValues(
   exercise: WorkspaceModule["exercises"][number],
   values: string[],
 ) {
-  const normalizedValues = normalizeTextEntryValues(exercise, values);
+  const normalizedValues = normalizeOtherChoiceValuesForSubmission(
+    exercise,
+    normalizeTextEntryValues(exercise, values),
+  );
 
   if (exercise.type === "image_upload") {
     return getImageUploadValues(normalizedValues);
@@ -620,9 +792,12 @@ function mergeLocalAnswersDraft(module: WorkspaceModule, answers: AnswersByExerc
         return [];
       }
 
-      const normalizedValues = normalizeTextEntryValues(
+      const normalizedValues = normalizeOtherChoiceValuesForState(
         exercise,
-        values.filter((value): value is string => typeof value === "string"),
+        normalizeTextEntryValues(
+          exercise,
+          values.filter((value): value is string => typeof value === "string"),
+        ),
       );
 
       return [[Number(exerciseId), normalizedValues]];
@@ -645,7 +820,7 @@ function createInitialAnswers(module: WorkspaceModule) {
     const normalizedSavedAnswers =
       exercise.type === "image_upload"
         ? getImageUploadValues(savedAnswers)
-        : savedAnswers;
+        : normalizeOtherChoiceValuesForState(exercise, savedAnswers);
 
     accumulator[exercise.id] =
       exercise.type === "fill_blank" && normalizedSavedAnswers.length === 0
@@ -1708,65 +1883,128 @@ export default function ModuleAnswerForm({
                         {prompt}
                       </p>
                       <div className="mt-3 space-y-3">
-                        {currentExercise.options.map((option) => (
-                          <label
-                            key={`${questionIndex}-${option}`}
-                            className="flex items-start gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm leading-6 text-[#5f544a]"
-                          >
-                            <input
-                              type="radio"
-                              name={`visible-exercise-${currentExercise.id}-${questionIndex}`}
-                              value={option}
-                              checked={
-                                getQuestionValues(
-                                  currentExercise,
-                                  answers[currentExercise.id] ?? [],
-                                  questionIndex,
-                                )[0] === option
-                              }
-                              onChange={() =>
-                                setAnswers((current) => ({
-                                  ...current,
-                                  [currentExercise.id]: setQuestionValues(
-                                    currentExercise,
-                                    current[currentExercise.id] ?? [],
-                                    questionIndex,
-                                    [option],
-                                  ),
-                                }))
-                              }
-                              className="mt-1"
-                            />
-                            <span>{option}</span>
-                          </label>
-                        ))}
+                        {currentExercise.options.map((option) => {
+                          const questionValues = getQuestionValues(
+                            currentExercise,
+                            answers[currentExercise.id] ?? [],
+                            questionIndex,
+                          );
+                          const isOtherOption = isOtherChoiceOption(option);
+                          const isChecked = questionValues[0] === option;
+
+                          return (
+                            <div
+                              key={`${questionIndex}-${option}`}
+                              className="border-b border-[#f0e5d4] px-1 py-3"
+                            >
+                              <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                                <input
+                                  type="radio"
+                                  name={`visible-exercise-${currentExercise.id}-${questionIndex}`}
+                                  value={option}
+                                  checked={isChecked}
+                                  onChange={() =>
+                                    setAnswers((current) => ({
+                                      ...current,
+                                      [currentExercise.id]: setQuestionValues(
+                                        currentExercise,
+                                        current[currentExercise.id] ?? [],
+                                        questionIndex,
+                                        [option],
+                                      ),
+                                    }))
+                                  }
+                                  className="mt-1"
+                                />
+                                <span>{option}</span>
+                              </label>
+                              {isOtherOption && isChecked ? (
+                                <input
+                                  type="text"
+                                  value={getOtherChoiceText(questionValues)}
+                                  onChange={(event) =>
+                                    setAnswers((current) => {
+                                      const currentQuestionValues = getQuestionValues(
+                                        currentExercise,
+                                        current[currentExercise.id] ?? [],
+                                        questionIndex,
+                                      );
+
+                                      return {
+                                        ...current,
+                                        [currentExercise.id]: setQuestionValues(
+                                          currentExercise,
+                                          current[currentExercise.id] ?? [],
+                                          questionIndex,
+                                          setOtherChoiceText(
+                                            currentQuestionValues,
+                                            option,
+                                            event.target.value,
+                                          ),
+                                        ),
+                                      };
+                                    })
+                                  }
+                                  placeholder="Précise ta réponse"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                                />
+                              ) : null}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="mt-4 space-y-3">
-                  {currentExercise.options.map((option) => (
-                    <label
-                      key={option}
-                      className="flex items-start gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm leading-6 text-[#5f544a]"
-                    >
-                      <input
-                        type="radio"
-                        name={`visible-exercise-${currentExercise.id}`}
-                        value={option}
-                        checked={(answers[currentExercise.id] ?? []).includes(option)}
-                        onChange={() =>
-                          setAnswers((current) => ({
-                            ...current,
-                            [currentExercise.id]: [option],
-                          }))
-                        }
-                        className="mt-1"
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
+                  {currentExercise.options.map((option) => {
+                    const currentValues = answers[currentExercise.id] ?? [];
+                    const isOtherOption = isOtherChoiceOption(option);
+                    const isChecked = currentValues.includes(option);
+
+                    return (
+                      <div
+                        key={option}
+                        className="border-b border-[#f0e5d4] px-1 py-3"
+                      >
+                        <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                          <input
+                            type="radio"
+                            name={`visible-exercise-${currentExercise.id}`}
+                            value={option}
+                            checked={isChecked}
+                            onChange={() =>
+                              setAnswers((current) => ({
+                                ...current,
+                                [currentExercise.id]: [option],
+                              }))
+                            }
+                            className="mt-1"
+                          />
+                          <span>{option}</span>
+                        </label>
+                        {isOtherOption && isChecked ? (
+                          <input
+                            type="text"
+                            value={getOtherChoiceText(currentValues)}
+                            onChange={(event) =>
+                              setAnswers((current) => ({
+                                ...current,
+                                [currentExercise.id]: setOtherChoiceText(
+                                  current[currentExercise.id] ?? [],
+                                  option,
+                                  event.target.value,
+                                ),
+                              }))
+                            }
+                            placeholder="Précise ta réponse"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                          />
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               )
             ) : null}
@@ -1878,40 +2116,82 @@ export default function ModuleAnswerForm({
                           );
                           const isChecked = questionValues.includes(option);
 
-                          return (
-                            <label
-                              key={`${questionIndex}-${option}`}
-                              className="flex items-start gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm leading-6 text-[#5f544a]"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(event) =>
-                                  setAnswers((current) => {
-                                    const currentValues = getQuestionValues(
-                                      currentExercise,
-                                      current[currentExercise.id] ?? [],
-                                      questionIndex,
-                                    );
-                                    const nextValues = event.target.checked
-                                      ? [...currentValues, option]
-                                      : currentValues.filter((value) => value !== option);
+                          const isOtherOption = isOtherChoiceOption(option);
 
-                                    return {
-                                      ...current,
-                                      [currentExercise.id]: setQuestionValues(
+                          return (
+                            <div
+                              key={`${questionIndex}-${option}`}
+                              className="border-b border-[#f0e5d4] px-1 py-3"
+                            >
+                              <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(event) =>
+                                    setAnswers((current) => {
+                                      const currentValues = getQuestionValues(
                                         currentExercise,
                                         current[currentExercise.id] ?? [],
                                         questionIndex,
-                                        nextValues,
-                                      ),
-                                    };
-                                  })
-                                }
-                                className="mt-1"
-                              />
-                              <span>{option}</span>
-                            </label>
+                                      );
+                                      const nextValues = event.target.checked
+                                        ? [...currentValues, option]
+                                        : isOtherOption
+                                          ? removeOtherChoiceValues(
+                                              currentValues,
+                                              option,
+                                            )
+                                          : currentValues.filter(
+                                              (value) => value !== option,
+                                            );
+
+                                      return {
+                                        ...current,
+                                        [currentExercise.id]: setQuestionValues(
+                                          currentExercise,
+                                          current[currentExercise.id] ?? [],
+                                          questionIndex,
+                                          nextValues,
+                                        ),
+                                      };
+                                    })
+                                  }
+                                  className="mt-1"
+                                />
+                                <span>{option}</span>
+                              </label>
+                              {isOtherOption && isChecked ? (
+                                <input
+                                  type="text"
+                                  value={getOtherChoiceText(questionValues)}
+                                  onChange={(event) =>
+                                    setAnswers((current) => {
+                                      const currentQuestionValues = getQuestionValues(
+                                        currentExercise,
+                                        current[currentExercise.id] ?? [],
+                                        questionIndex,
+                                      );
+
+                                      return {
+                                        ...current,
+                                        [currentExercise.id]: setQuestionValues(
+                                          currentExercise,
+                                          current[currentExercise.id] ?? [],
+                                          questionIndex,
+                                          setOtherChoiceText(
+                                            currentQuestionValues,
+                                            option,
+                                            event.target.value,
+                                          ),
+                                        ),
+                                      };
+                                    })
+                                  }
+                                  placeholder="Précise ta réponse"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                                />
+                              ) : null}
+                            </div>
                           );
                         })}
                       </div>
@@ -1923,30 +2203,58 @@ export default function ModuleAnswerForm({
                   {currentExercise.options.map((option) => {
                     const isChecked = (answers[currentExercise.id] ?? []).includes(option);
 
-                    return (
-                      <label
-                        key={option}
-                        className="flex items-start gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm leading-6 text-[#5f544a]"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(event) =>
-                            setAnswers((current) => {
-                              const currentValues = current[currentExercise.id] ?? [];
+                    const isOtherOption = isOtherChoiceOption(option);
 
-                              return {
+                    return (
+                      <div
+                        key={option}
+                        className="border-b border-[#f0e5d4] px-1 py-3"
+                      >
+                        <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(event) =>
+                              setAnswers((current) => {
+                                const currentValues = current[currentExercise.id] ?? [];
+
+                                return {
+                                  ...current,
+                                  [currentExercise.id]: event.target.checked
+                                    ? [...currentValues, option]
+                                    : isOtherOption
+                                      ? removeOtherChoiceValues(currentValues, option)
+                                      : currentValues.filter(
+                                          (value) => value !== option,
+                                        ),
+                                };
+                              })
+                            }
+                            className="mt-1"
+                          />
+                          <span>{option}</span>
+                        </label>
+                        {isOtherOption && isChecked ? (
+                          <input
+                            type="text"
+                            value={getOtherChoiceText(
+                              answers[currentExercise.id] ?? [],
+                            )}
+                            onChange={(event) =>
+                              setAnswers((current) => ({
                                 ...current,
-                                [currentExercise.id]: event.target.checked
-                                  ? [...currentValues, option]
-                                  : currentValues.filter((value) => value !== option),
-                              };
-                            })
-                          }
-                          className="mt-1"
-                        />
-                        <span>{option}</span>
-                      </label>
+                                [currentExercise.id]: setOtherChoiceText(
+                                  current[currentExercise.id] ?? [],
+                                  option,
+                                  event.target.value,
+                                ),
+                              }))
+                            }
+                            placeholder="Précise ta réponse"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                          />
+                        ) : null}
+                      </div>
                     );
                   })}
                 </div>
