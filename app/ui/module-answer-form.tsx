@@ -861,9 +861,11 @@ export default function ModuleAnswerForm({
   );
   const [checklistDrafts, setChecklistDrafts] = useState<Record<string, string>>({});
   const [, setAutoSaveState] = useState<ModuleState>(initialState);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [aiAssistStates, setAiAssistStates] = useState<Record<number, AiAssistState>>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [, startAutoSaveTransition] = useTransition();
+  const latestAnswersRef = useRef<AnswersByExercise>(answers);
   const hasMountedRef = useRef(false);
   const previousModuleIdRef = useRef(module.id);
   const allowExplicitSubmitRef = useRef(false);
@@ -916,7 +918,26 @@ export default function ModuleAnswerForm({
     isLastSubmodule,
   });
 
-  function goToNextStep() {
+  async function saveCurrentDraft(nextAnswers = latestAnswersRef.current) {
+    setIsSavingDraft(true);
+
+    try {
+      const result = await saveModuleDraft(buildSubmissionFormData(module, nextAnswers));
+      setAutoSaveState(result);
+
+      return result.status !== "error";
+    } finally {
+      setIsSavingDraft(false);
+    }
+  }
+
+  async function goToNextStep() {
+    const didSave = await saveCurrentDraft();
+
+    if (!didSave) {
+      return;
+    }
+
     if (currentExercise && currentIndex < visibleExerciseGroups.length - 1) {
       setCurrentIndex((current) =>
         Math.min(current + 1, visibleExerciseGroups.length - 1),
@@ -932,9 +953,28 @@ export default function ModuleAnswerForm({
     window.location.assign(getModuleSummaryHref(module.id));
   }
 
+  async function goToPreviousStep() {
+    const didSave = await saveCurrentDraft();
+
+    if (!didSave) {
+      return;
+    }
+
+    if (currentIndex > 0) {
+      setCurrentIndex((current) => Math.max(current - 1, 0));
+      return;
+    }
+
+    onPreviousSubmodule?.();
+  }
+
   useEffect(() => {
     setCurrentIndex(initialExerciseIndex);
   }, [activeSubmoduleId, initialExerciseIndex]);
+
+  useEffect(() => {
+    latestAnswersRef.current = answers;
+  }, [answers]);
 
   useEffect(() => {
     setCurrentIndex((current) =>
@@ -970,7 +1010,7 @@ export default function ModuleAnswerForm({
     }
 
     const timeoutId = window.setTimeout(() => {
-      const formData = buildSubmissionFormData(module, answers);
+      const formData = buildSubmissionFormData(module, latestAnswersRef.current);
 
       startAutoSaveTransition(async () => {
         const result = await saveModuleDraft(formData);
@@ -980,6 +1020,26 @@ export default function ModuleAnswerForm({
 
     return () => window.clearTimeout(timeoutId);
   }, [answers, module]);
+
+  useEffect(() => {
+    function saveBeforeLeaving() {
+      void saveModuleDraft(buildSubmissionFormData(module, latestAnswersRef.current));
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "hidden") {
+        saveBeforeLeaving();
+      }
+    }
+
+    window.addEventListener("pagehide", saveBeforeLeaving);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("pagehide", saveBeforeLeaving);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [module]);
 
   useEffect(() => {
     if (!isPopupOpen) {
@@ -1076,11 +1136,11 @@ export default function ModuleAnswerForm({
         allowExplicitSubmitRef.current = false;
         const submitMode = submitModeRef.current;
         submitModeRef.current = null;
-        const formData = buildSubmissionFormData(module, answers);
+        const formData = buildSubmissionFormData(module, latestAnswersRef.current);
 
         if (submitMode === "complete") {
           shouldOpenSummaryAfterSaveRef.current = true;
-          onComplete?.(answers);
+          onComplete?.(latestAnswersRef.current);
         }
 
         startTransition(() => {
@@ -2290,15 +2350,8 @@ export default function ModuleAnswerForm({
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button
           type="button"
-          onClick={() => {
-            if (currentIndex > 0) {
-              setCurrentIndex((current) => Math.max(current - 1, 0));
-              return;
-            }
-
-            onPreviousSubmodule?.();
-          }}
-          disabled={currentIndex === 0 && isFirstSubmodule}
+          onClick={() => void goToPreviousStep()}
+          disabled={(currentIndex === 0 && isFirstSubmodule) || isSavingDraft || pending}
           className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {currentIndex > 0 || isFirstSubmodule
@@ -2312,23 +2365,21 @@ export default function ModuleAnswerForm({
             currentIndex === visibleExerciseGroups.length - 1 &&
             isLastSubmodule ? (
               <button
-                type="submit"
-                disabled={pending}
-                onClick={() => {
-                  allowExplicitSubmitRef.current = true;
-                  submitModeRef.current = "draft";
-                }}
+                type="button"
+                disabled={pending || isSavingDraft}
+                onClick={() => void goToNextStep()}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
-                Passer et revenir plus tard
+                {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
               </button>
             ) : (
               <button
                 type="button"
-                onClick={goToNextStep}
-                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                disabled={pending || isSavingDraft}
+                onClick={() => void goToNextStep()}
+                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
-                Passer et revenir plus tard
+                {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
               </button>
             )
           ) : null}
@@ -2336,23 +2387,25 @@ export default function ModuleAnswerForm({
           {currentExercise && currentIndex < visibleExerciseGroups.length - 1 ? (
             <button
               type="button"
-              onClick={goToNextStep}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+              disabled={pending || isSavingDraft}
+              onClick={() => void goToNextStep()}
+              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
-              {nextStepLabel}
+              {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
           ) : !isLastSubmodule ? (
             <button
               type="button"
-              onClick={goToNextStep}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+              disabled={pending || isSavingDraft}
+              onClick={() => void goToNextStep()}
+              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
-              {nextStepLabel}
+              {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
           ) : (
             <button
               type="submit"
-              disabled={pending}
+              disabled={pending || isSavingDraft}
               onClick={() => {
                 allowExplicitSubmitRef.current = true;
                 submitModeRef.current = "complete";
