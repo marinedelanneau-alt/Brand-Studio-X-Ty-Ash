@@ -16,6 +16,7 @@ import {
   getPaletteColorCss,
   parseStoredColorPaletteConfig,
 } from "@/lib/color-palette";
+import { normalizeVisibleContent } from "@/lib/pedagogical-content";
 import PedagogicalContent from "./pedagogical-content";
 
 type PreviewExercise = {
@@ -57,6 +58,21 @@ function getStaticTextHtml(content: string) {
 
 function isPassiveContentType(type: ExerciseType) {
   return type === "static_text" || type === "popup_message";
+}
+
+function isDuplicateVisibleText(
+  value: string | null | undefined,
+  candidates: Array<string | null | undefined>,
+) {
+  const normalizedValue = normalizeVisibleContent(value);
+
+  if (!normalizedValue) {
+    return false;
+  }
+
+  return candidates.some(
+    (candidate) => normalizeVisibleContent(candidate) === normalizedValue,
+  );
 }
 
 function PreviewPopupMessage({ exercise }: { exercise: PreviewExercise }) {
@@ -753,7 +769,9 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
         </p>
       ) : null}
 
-      {exercise.explanation && !isPassiveContentType(exercise.type) ? (
+      {exercise.explanation &&
+      !isPassiveContentType(exercise.type) &&
+      !isDuplicateVisibleText(exercise.explanation, [exercise.question]) ? (
         exercise.type === "color_palette" ? null : (
         <PedagogicalContent
           content={exercise.explanation}

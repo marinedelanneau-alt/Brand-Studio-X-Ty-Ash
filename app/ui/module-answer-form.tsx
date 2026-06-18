@@ -18,6 +18,7 @@ import { uploadExerciseImages } from "../upload-exercise-images";
 import BrandPersonaExercise from "./brand-persona-exercise";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+import { normalizeVisibleContent } from "@/lib/pedagogical-content";
 import {
   parseStoredSpectrumAnswer,
   parseStoredSpectrumConfig,
@@ -193,6 +194,11 @@ function normalizePlaceholderText(value: string) {
 }
 
 function normalizeDisplayText(value: string | null | undefined) {
+  return normalizeVisibleContent(value);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function normalizeLegacyDisplayText(value: string | null | undefined) {
   return String(value ?? "")
     .replace(/[â€™`]/g, "'")
     .replace(/\s+/g, " ")
