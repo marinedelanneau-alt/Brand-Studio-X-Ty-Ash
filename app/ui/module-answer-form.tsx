@@ -190,7 +190,7 @@ function normalizeTextEntryValues(
 }
 
 function normalizePlaceholderText(value: string) {
-  return value.replace(/\s+/g, " ").trim().toLowerCase();
+  return normalizeVisibleContent(value);
 }
 
 function normalizeDisplayText(value: string | null | undefined) {
@@ -611,9 +611,22 @@ function mergeLocalAnswersDraft(module: WorkspaceModule, answers: AnswersByExerc
     return answers;
   }
 
-  const exerciseIds = new Set(module.exercises.map((exercise) => exercise.id));
+  const exerciseById = new Map(module.exercises.map((exercise) => [exercise.id, exercise]));
   const validLocalEntries = Object.fromEntries(
-    Object.entries(localDraft).filter(([exerciseId]) => exerciseIds.has(Number(exerciseId))),
+    Object.entries(localDraft).flatMap(([exerciseId, values]) => {
+      const exercise = exerciseById.get(Number(exerciseId));
+
+      if (!exercise || !Array.isArray(values)) {
+        return [];
+      }
+
+      const normalizedValues = normalizeTextEntryValues(
+        exercise,
+        values.filter((value): value is string => typeof value === "string"),
+      );
+
+      return [[Number(exerciseId), normalizedValues]];
+    }),
   ) as AnswersByExercise;
 
   return {
