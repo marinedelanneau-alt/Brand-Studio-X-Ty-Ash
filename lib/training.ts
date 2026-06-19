@@ -495,28 +495,28 @@ export async function uploadProjectExerciseImage(input: {
 }
 
 export async function uploadAdminVoiceNote(file: File) {
-  const isMp4 =
-    file.type === "audio/mp4" ||
-    file.type === "video/mp4" ||
-    file.name.toLowerCase().endsWith(".mp4");
+  const isMp3 =
+    file.type === "audio/mpeg" ||
+    file.type === "audio/mp3" ||
+    file.name.toLowerCase().endsWith(".mp3");
 
-  if (!isMp4) {
-    throw new Error("Le fichier de note vocale doit etre au format MP4.");
+  if (!isMp3) {
+    throw new Error("Le fichier de note vocale doit etre au format MP3.");
   }
 
   const maxSize = 24 * 1024 * 1024;
   if (file.size > maxSize) {
-    throw new Error("La note vocale MP4 doit peser moins de 24 Mo.");
+    throw new Error("La note vocale MP3 doit peser moins de 24 Mo.");
   }
 
   const supabase = createSupabaseServerClient();
-  const filePath = `admin-voice-notes/${Date.now()}-${crypto.randomUUID()}.mp4`;
+  const filePath = `admin-voice-notes/${Date.now()}-${crypto.randomUUID()}.mp3`;
   const arrayBuffer = await file.arrayBuffer();
 
   const { error: uploadError } = await supabase.storage
     .from("project-assets")
     .upload(filePath, arrayBuffer, {
-      contentType: file.type || "video/mp4",
+      contentType: file.type || "audio/mpeg",
       upsert: false,
     });
 

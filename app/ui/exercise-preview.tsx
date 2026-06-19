@@ -160,8 +160,7 @@ function PreviewVoiceNote({ src }: { src?: string | null }) {
         Note vocale
       </p>
       <audio controls preload="metadata" className="mt-3 w-full">
-        <source src={src} type="audio/mp4" />
-        <source src={src} type="video/mp4" />
+        <source src={src} type="audio/mpeg" />
         Votre navigateur ne peut pas lire cette note vocale.
       </audio>
     </div>

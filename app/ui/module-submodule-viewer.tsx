@@ -96,8 +96,7 @@ export default function ModuleSubmoduleViewer({
                 Note vocale
               </p>
               <audio controls preload="metadata" className="mt-3 w-full">
-                <source src={currentSubmodule.audio_url} type="audio/mp4" />
-                <source src={currentSubmodule.audio_url} type="video/mp4" />
+                <source src={currentSubmodule.audio_url} type="audio/mpeg" />
                 Votre navigateur ne peut pas lire cette note vocale.
               </audio>
             </div>

@@ -304,7 +304,7 @@ export async function uploadAdminVoiceNoteFile(formData: FormData) {
     if (!file) {
       return {
         status: "error",
-        message: "Selectionne un fichier MP4.",
+        message: "Selectionne un fichier MP3.",
         url: "",
       };
     }

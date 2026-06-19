@@ -883,12 +883,12 @@ function QuestionCard({
 
           <label className="space-y-2">
             <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
-              Note vocale MP4 de la question
+              Note vocale MP3 de la question
             </span>
             <input
               name={`questionAudioFile-${question.id}`}
               type="file"
-              accept="audio/mp4,video/mp4,.mp4"
+              accept="audio/mpeg,audio/mp3,.mp3"
               disabled={isVoiceUploading}
               onChange={(event) => {
                 void uploadQuestionVoiceNote(event.target.files?.[0] ?? null);
@@ -896,15 +896,14 @@ function QuestionCard({
               className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
             />
             <p className="text-sm leading-6 text-[#8a8077]">
-              Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
+              Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
             </p>
             {voiceUploadMessage ? (
               <p className="text-sm leading-6 text-[#6b625a]">{voiceUploadMessage}</p>
             ) : null}
             {question.audioUrl ? (
               <audio controls preload="metadata" className="w-full">
-                <source src={question.audioUrl} type="audio/mp4" />
-                <source src={question.audioUrl} type="video/mp4" />
+                <source src={question.audioUrl} type="audio/mpeg" />
               </audio>
             ) : null}
           </label>
@@ -1554,11 +1553,11 @@ function ModuleForm({
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP4 d&apos;introduction</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP3 d&apos;introduction</span>
                       <input
                         name={`submoduleAudioFile-${activeSubmodule.id}`}
                         type="file"
-                        accept="audio/mp4,video/mp4,.mp4"
+                        accept="audio/mpeg,audio/mp3,.mp3"
                         disabled={uploadingSubmoduleVoiceId === activeSubmodule.id}
                         onChange={(event) => {
                           void uploadSubmoduleVoiceNote(
@@ -1569,7 +1568,7 @@ function ModuleForm({
                         className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
                       />
                       <p className="text-sm leading-6 text-[#8a8077]">
-                        Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
+                        Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
                       </p>
                       {submoduleVoiceUploadMessages[activeSubmodule.id] ? (
                         <p className="text-sm leading-6 text-[#6b625a]">
@@ -1578,8 +1577,7 @@ function ModuleForm({
                       ) : null}
                       {activeSubmodule.audioUrl ? (
                         <audio controls preload="metadata" className="w-full">
-                          <source src={activeSubmodule.audioUrl} type="audio/mp4" />
-                          <source src={activeSubmodule.audioUrl} type="video/mp4" />
+                          <source src={activeSubmodule.audioUrl} type="audio/mpeg" />
                         </audio>
                       ) : null}
                     </label>
