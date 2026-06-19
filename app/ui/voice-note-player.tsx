@@ -26,7 +26,6 @@ export default function VoiceNotePlayer({
             fill
             sizes="(max-width: 768px) 100vw, 22rem"
             className="object-contain object-bottom p-4"
-            priority={false}
           />
         </div>
 
