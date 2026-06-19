@@ -438,6 +438,40 @@ export async function uploadProjectExerciseImage(input: {
   return data.publicUrl;
 }
 
+export async function uploadAdminVoiceNote(file: File) {
+  const isMp4 =
+    file.type === "audio/mp4" ||
+    file.type === "video/mp4" ||
+    file.name.toLowerCase().endsWith(".mp4");
+
+  if (!isMp4) {
+    throw new Error("Le fichier de note vocale doit etre au format MP4.");
+  }
+
+  const maxSize = 24 * 1024 * 1024;
+  if (file.size > maxSize) {
+    throw new Error("La note vocale MP4 doit peser moins de 24 Mo.");
+  }
+
+  const supabase = createSupabaseServerClient();
+  const filePath = `admin-voice-notes/${Date.now()}-${crypto.randomUUID()}.mp4`;
+  const arrayBuffer = await file.arrayBuffer();
+
+  const { error: uploadError } = await supabase.storage
+    .from("project-assets")
+    .upload(filePath, arrayBuffer, {
+      contentType: file.type || "video/mp4",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(uploadError.message);
+  }
+
+  const { data } = supabase.storage.from("project-assets").getPublicUrl(filePath);
+  return data.publicUrl;
+}
+
 export async function updateProjectLogoForAccount(input: {
   accountId: number;
   logoUrl: string;

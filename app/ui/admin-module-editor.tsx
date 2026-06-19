@@ -388,6 +388,7 @@ function serializeQuestion(question: EditorQuestion) {
       : normalizeExerciseOptions(question.type, question.optionsText.split("\n"));
 
   return {
+    clientId: question.id,
     type: question.type,
     explanation: question.explanation.trim(),
     answerPlaceholder: question.answerPlaceholder.trim(),
@@ -857,17 +858,20 @@ function QuestionCard({
               Note vocale MP4 de la question
             </span>
             <input
-              type="url"
-              value={question.audioUrl}
-              onChange={(event) =>
-                onChange((current) => ({ ...current, audioUrl: event.target.value }))
-              }
-              placeholder="https://.../note-vocale.mp4"
+              name={`questionAudioFile-${question.id}`}
+              type="file"
+              accept="audio/mp4,video/mp4,.mp4"
               className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
             />
             <p className="text-sm leading-6 text-[#8a8077]">
-              Ajoute ici l&apos;URL d&apos;un fichier MP4 audio pour accompagner cette question.
+              Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
             </p>
+            {question.audioUrl ? (
+              <audio controls preload="metadata" className="w-full">
+                <source src={question.audioUrl} type="audio/mp4" />
+                <source src={question.audioUrl} type="video/mp4" />
+              </audio>
+            ) : null}
           </label>
 
           {supportsExplanationField(question.type) ? (
@@ -1210,6 +1214,7 @@ function ModuleForm({
     () =>
       JSON.stringify(
         module.submodules.map((submodule, submoduleIndex) => ({
+          clientId: submodule.id,
           title: submodule.title.trim(),
           position: submoduleIndex + 1,
           videoUrl: submodule.videoUrl.trim(),
@@ -1265,7 +1270,11 @@ function ModuleForm({
 
       {isOpen ? (
         <div className="border-t border-[#eadfca] bg-[#fffdf7] px-4 py-6 sm:px-6">
-          <form action={saveAdminModule} className="mx-auto max-w-6xl space-y-6">
+          <form
+            action={saveAdminModule}
+            encType="multipart/form-data"
+            className="mx-auto max-w-6xl space-y-6"
+          >
             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
             <input type="hidden" name="submodulesJson" value={submodulesJson} />
             <div className="grid gap-4 md:grid-cols-2">
@@ -1474,19 +1483,20 @@ function ModuleForm({
                     <label className="space-y-2">
                       <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP4 d&apos;introduction</span>
                       <input
-                        type="url"
-                        value={activeSubmodule.audioUrl}
-                        onChange={(event) =>
-                          onChange((current) => ({
-                            ...current,
-                            submodules: current.submodules.map((item) =>
-                              item.id === activeSubmodule.id ? { ...item, audioUrl: event.target.value } : item,
-                            ),
-                          }))
-                        }
-                        placeholder="https://.../note-vocale.mp4"
+                        name={`submoduleAudioFile-${activeSubmodule.id}`}
+                        type="file"
+                        accept="audio/mp4,video/mp4,.mp4"
                         className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
                       />
+                      <p className="text-sm leading-6 text-[#8a8077]">
+                        Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
+                      </p>
+                      {activeSubmodule.audioUrl ? (
+                        <audio controls preload="metadata" className="w-full">
+                          <source src={activeSubmodule.audioUrl} type="audio/mp4" />
+                          <source src={activeSubmodule.audioUrl} type="video/mp4" />
+                        </audio>
+                      ) : null}
                     </label>
 
                     <div className="space-y-3">

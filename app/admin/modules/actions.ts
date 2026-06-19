@@ -12,10 +12,15 @@ import {
   normalizeSmartFeedbackConfig,
   type SmartFeedbackConfig,
 } from "@/lib/smart-feedback";
-import { deleteModuleDefinition, saveModuleDefinition } from "@/lib/training";
+import {
+  deleteModuleDefinition,
+  saveModuleDefinition,
+  uploadAdminVoiceNote,
+} from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
 
 type EditorExercise = {
+  clientId: string;
   type: ExerciseType;
   explanation: string;
   answerPlaceholder: string;
@@ -31,6 +36,7 @@ type EditorExerciseGroup = {
 };
 
 type EditorSubmodule = {
+  clientId: string;
   title: string;
   position: number;
   videoUrl: string;
@@ -41,6 +47,10 @@ type EditorSubmodule = {
 
 function parseQuestion(rawQuestion: unknown) {
   const item = rawQuestion as Partial<EditorExercise>;
+    const clientId =
+      typeof item.clientId === "string" && item.clientId.trim()
+        ? item.clientId.trim()
+        : crypto.randomUUID();
     const type = item.type;
     const explanation =
       typeof item.explanation === "string" ? item.explanation.trim() : "";
@@ -113,6 +123,7 @@ function parseQuestion(rawQuestion: unknown) {
     }
 
     return {
+      clientId,
       type,
       explanation,
       answerPlaceholder,
@@ -164,6 +175,10 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
 
   return parsed.map((submodule, index) => {
     const item = submodule as Partial<EditorSubmodule>;
+    const clientId =
+      typeof item.clientId === "string" && item.clientId.trim()
+        ? item.clientId.trim()
+        : crypto.randomUUID();
     const title = typeof item.title === "string" ? item.title.trim() : "";
     const videoUrl =
       typeof item.videoUrl === "string" ? item.videoUrl.trim() : "";
@@ -178,6 +193,7 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
     }
 
     return {
+      clientId,
       title,
       position: index + 1,
       videoUrl,
@@ -186,6 +202,45 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
       exerciseGroups,
     };
   });
+}
+
+function getUploadedFile(formData: FormData, fieldName: string) {
+  const value = formData.get(fieldName);
+
+  if (!(value instanceof File) || value.size === 0) {
+    return null;
+  }
+
+  return value;
+}
+
+async function attachUploadedVoiceNotes(
+  formData: FormData,
+  submodules: EditorSubmodule[],
+) {
+  for (const submodule of submodules) {
+    const submoduleFile = getUploadedFile(
+      formData,
+      `submoduleAudioFile-${submodule.clientId}`,
+    );
+
+    if (submoduleFile) {
+      submodule.audioUrl = await uploadAdminVoiceNote(submoduleFile);
+    }
+
+    for (const exerciseGroup of submodule.exerciseGroups) {
+      for (const question of exerciseGroup.questions) {
+        const questionFile = getUploadedFile(
+          formData,
+          `questionAudioFile-${question.clientId}`,
+        );
+
+        if (questionFile) {
+          question.audioUrl = await uploadAdminVoiceNote(questionFile);
+        }
+      }
+    }
+  }
 }
 
 export async function saveAdminModule(formData: FormData) {
@@ -213,6 +268,12 @@ export async function saveAdminModule(formData: FormData) {
     }
 
     if (submodules.length === 0) {
+      redirect("/admin/modules?status=error");
+    }
+
+    try {
+      await attachUploadedVoiceNotes(formData, submodules);
+    } catch {
       redirect("/admin/modules?status=error");
     }
 
