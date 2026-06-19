@@ -15,6 +15,7 @@ export type BrandModule = {
   title: string;
   position: number;
   video_url: string;
+  audio_url: string | null;
   content_html: string;
   is_published: boolean;
   created_at: string;
@@ -27,6 +28,7 @@ export type BrandSubmodule = {
   title: string;
   position: number;
   video_url: string;
+  audio_url: string | null;
   content_html: string;
   created_at: string;
   updated_at: string;
@@ -40,6 +42,7 @@ export type ModuleExercise = {
   type: ExerciseType;
   explanation: string;
   answer_placeholder: string;
+  audio_url: string | null;
   question: string;
   options: string[];
   exercise_group_id?: string | null;

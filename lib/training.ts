@@ -520,7 +520,10 @@ export async function getModulesWithExercises({
       .order("position", { ascending: true })
       .returns<
         Array<
-          Omit<ModuleExercise, "options" | "submodule_id"> & {
+          Omit<
+            ModuleExercise,
+            "options" | "submodule_id" | "audio_url"
+          > & {
             options: unknown;
           }
         >
@@ -528,6 +531,7 @@ export async function getModulesWithExercises({
 
     exercises = (legacyExercisesResult.data ?? []).map((exercise) => ({
       ...exercise,
+      audio_url: null,
       submodule_id: null,
     }));
     exercisesError = legacyExercisesResult.error;
@@ -588,6 +592,10 @@ export async function getModulesWithExercises({
           ? exercise.answer_placeholder
           : getStoredAnswerPlaceholder(normalizedExerciseOptions) ||
             getStoredAnswerPlaceholderFromQuestion(exercise.question),
+      audio_url:
+        "audio_url" in exercise && typeof exercise.audio_url === "string"
+          ? exercise.audio_url
+          : null,
       question: getEditorExerciseQuestion(resolvedType, exercise.question),
       options: resolvedOptions,
     });
@@ -810,6 +818,7 @@ export async function saveModuleDefinition(input: {
     title: string;
     position: number;
     videoUrl: string;
+    audioUrl: string;
     contentHtml: string;
     exerciseGroups: Array<{
       groupId: string;
@@ -817,6 +826,7 @@ export async function saveModuleDefinition(input: {
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;
+        audioUrl: string;
         question: string;
         options: string[];
         feedbackConfig: SmartFeedbackConfig;
@@ -828,21 +838,28 @@ export async function saveModuleDefinition(input: {
   const now = new Date().toISOString();
   const firstSubmodule = input.submodules[0];
   const supportsSubmodules = await supportsSubmoduleStorage(supabase);
+  const supportsModuleAudioColumn = await supportsModuleAudio(supabase);
+  const supportsSubmoduleAudioColumn =
+    supportsSubmodules && (await supportsSubmoduleAudio(supabase));
   const supportsExerciseExplanationColumn = await supportsExerciseExplanation(supabase);
   const supportsExerciseAnswerPlaceholderColumn =
     await supportsExerciseAnswerPlaceholder(supabase);
+  const supportsExerciseAudioColumn = await supportsExerciseAudio(supabase);
+  const moduleAudioUrl = firstSubmodule?.audioUrl?.trim() || null;
 
   if (input.moduleId) {
+    const moduleUpdate = {
+      title: input.title,
+      position: input.position,
+      video_url: firstSubmodule?.videoUrl?.trim() || "",
+      content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+      is_published: input.isPublished,
+      updated_at: now,
+      ...(supportsModuleAudioColumn ? { audio_url: moduleAudioUrl } : {}),
+    };
     const { error: updateError } = await supabase
       .from("brand_modules")
-      .update({
-        title: input.title,
-        position: input.position,
-        video_url: firstSubmodule?.videoUrl?.trim() || "",
-        content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
-        is_published: input.isPublished,
-        updated_at: now,
-      })
+      .update(moduleUpdate)
       .eq("id", input.moduleId);
 
     if (updateError) {
@@ -865,6 +882,7 @@ export async function saveModuleDefinition(input: {
         input.submodules,
         supportsExerciseExplanationColumn,
         supportsExerciseAnswerPlaceholderColumn,
+        supportsExerciseAudioColumn,
       );
       return;
     }
@@ -915,8 +933,10 @@ export async function saveModuleDefinition(input: {
       input.moduleId,
       input.submodules,
       now,
+      supportsSubmoduleAudioColumn,
       supportsExerciseExplanationColumn,
       supportsExerciseAnswerPlaceholderColumn,
+      supportsExerciseAudioColumn,
     );
 
     if (!firstSubmodule) {
@@ -926,17 +946,19 @@ export async function saveModuleDefinition(input: {
     return;
   }
 
+  const moduleInsert = {
+    title: input.title,
+    position: input.position,
+    video_url: firstSubmodule?.videoUrl?.trim() || "",
+    content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+    is_published: input.isPublished,
+    created_at: now,
+    updated_at: now,
+    ...(supportsModuleAudioColumn ? { audio_url: moduleAudioUrl } : {}),
+  };
   const { data: moduleData, error: insertModuleError } = await supabase
     .from("brand_modules")
-    .insert({
-      title: input.title,
-      position: input.position,
-      video_url: firstSubmodule?.videoUrl?.trim() || "",
-      content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
-      is_published: input.isPublished,
-      created_at: now,
-      updated_at: now,
-    })
+    .insert(moduleInsert)
     .select("id")
     .single<{ id: number }>();
 
@@ -955,6 +977,7 @@ export async function saveModuleDefinition(input: {
       input.submodules,
       supportsExerciseExplanationColumn,
       supportsExerciseAnswerPlaceholderColumn,
+      supportsExerciseAudioColumn,
     );
     return;
   }
@@ -964,8 +987,10 @@ export async function saveModuleDefinition(input: {
     moduleData.id,
     input.submodules,
     now,
+    supportsSubmoduleAudioColumn,
     supportsExerciseExplanationColumn,
     supportsExerciseAnswerPlaceholderColumn,
+    supportsExerciseAudioColumn,
   );
 }
 
@@ -982,6 +1007,7 @@ function buildModuleSubmodules(
         title: module.title,
         position: 1,
         video_url: module.video_url,
+        audio_url: module.audio_url ?? null,
         content_html: module.content_html,
         created_at: module.created_at,
         updated_at: module.updated_at,
@@ -992,6 +1018,7 @@ function buildModuleSubmodules(
 
   return submodules.map((submodule) => ({
     ...submodule,
+    audio_url: submodule.audio_url ?? null,
     exercises: exercises.filter((exercise) => exercise.submodule_id === submodule.id),
   }));
 }
@@ -1003,6 +1030,7 @@ async function insertSubmodulesAndExercises(
     title: string;
     position: number;
     videoUrl: string;
+    audioUrl: string;
     contentHtml: string;
     exerciseGroups: Array<{
       groupId: string;
@@ -1010,6 +1038,7 @@ async function insertSubmodulesAndExercises(
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;
+        audioUrl: string;
         question: string;
         options: string[];
         feedbackConfig: SmartFeedbackConfig;
@@ -1017,8 +1046,10 @@ async function insertSubmodulesAndExercises(
     }>;
   }>,
   now: string,
+  supportsSubmoduleAudioColumn: boolean,
   supportsExerciseExplanationColumn: boolean,
   supportsExerciseAnswerPlaceholderColumn: boolean,
+  supportsExerciseAudioColumn: boolean,
 ) {
   if (submodules.length === 0) {
     return;
@@ -1032,6 +1063,9 @@ async function insertSubmodulesAndExercises(
         title: submodule.title,
         position: index + 1,
         video_url: submodule.videoUrl.trim(),
+        ...(supportsSubmoduleAudioColumn
+          ? { audio_url: submodule.audioUrl.trim() || null }
+          : {}),
         content_html: submodule.contentHtml,
         created_at: now,
         updated_at: now,
@@ -1083,12 +1117,21 @@ async function insertSubmodulesAndExercises(
           }
         : baseRow;
 
-      return supportsExerciseAnswerPlaceholderColumn
+      const rowWithAnswerPlaceholder = supportsExerciseAnswerPlaceholderColumn
         ? {
             ...rowWithExplanation,
             answer_placeholder: exercise.answerPlaceholder,
           }
         : rowWithExplanation;
+
+      const rowWithAudio = supportsExerciseAudioColumn
+        ? {
+            ...rowWithAnswerPlaceholder,
+            audio_url: exercise.audioUrl.trim() || null,
+          }
+        : rowWithAnswerPlaceholder;
+
+      return rowWithAudio;
       }),
     ),
   );
@@ -1107,13 +1150,18 @@ async function insertSubmodulesAndExercises(
 
   if (
     (supportsExerciseExplanationColumn ||
-      supportsExerciseAnswerPlaceholderColumn) &&
+      supportsExerciseAnswerPlaceholderColumn ||
+      supportsExerciseAudioColumn) &&
     isMissingDatabaseObject(insertExercisesError)
   ) {
     const fallbackRows = exerciseRows.map((row) => {
       const fallbackRow = {
         ...row,
-      } as typeof row & { explanation?: string; answer_placeholder?: string };
+      } as typeof row & {
+        explanation?: string;
+        answer_placeholder?: string;
+        audio_url?: string | null;
+      };
       fallbackRow.options = appendExplanationOption(
         appendAnswerPlaceholderOption(
           normalizeOptions(fallbackRow.options),
@@ -1123,6 +1171,7 @@ async function insertSubmodulesAndExercises(
       );
       delete fallbackRow.explanation;
       delete fallbackRow.answer_placeholder;
+      delete fallbackRow.audio_url;
       return fallbackRow;
     });
     const { error: fallbackInsertExercisesError } = await supabase
@@ -1153,6 +1202,20 @@ async function supportsSubmoduleStorage(
   );
 }
 
+async function supportsModuleAudio(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase.from("brand_modules").select("audio_url").limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
+async function supportsSubmoduleAudio(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase.from("brand_submodules").select("audio_url").limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
 async function supportsExerciseExplanation(
   supabase: ReturnType<typeof createSupabaseServerClient>,
 ) {
@@ -1170,6 +1233,13 @@ async function supportsExerciseAnswerPlaceholder(
   return !isMissingDatabaseObject(probe.error);
 }
 
+async function supportsExerciseAudio(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase.from("module_exercises").select("audio_url").limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
 async function insertExercisesLegacy(
   supabase: ReturnType<typeof createSupabaseServerClient>,
   moduleId: number,
@@ -1180,6 +1250,7 @@ async function insertExercisesLegacy(
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;
+        audioUrl: string;
         question: string;
         options: string[];
         feedbackConfig: SmartFeedbackConfig;
@@ -1188,6 +1259,7 @@ async function insertExercisesLegacy(
   }>,
   supportsExerciseExplanationColumn: boolean,
   supportsExerciseAnswerPlaceholderColumn: boolean,
+  supportsExerciseAudioColumn: boolean,
 ) {
   let globalExercisePosition = 1;
   const exerciseRows = submodules.flatMap((submodule) =>
@@ -1223,12 +1295,21 @@ async function insertExercisesLegacy(
           }
         : baseRow;
 
-      return supportsExerciseAnswerPlaceholderColumn
+      const rowWithAnswerPlaceholder = supportsExerciseAnswerPlaceholderColumn
         ? {
             ...rowWithExplanation,
             answer_placeholder: exercise.answerPlaceholder,
           }
         : rowWithExplanation;
+
+      const rowWithAudio = supportsExerciseAudioColumn
+        ? {
+            ...rowWithAnswerPlaceholder,
+            audio_url: exercise.audioUrl.trim() || null,
+          }
+        : rowWithAnswerPlaceholder;
+
+      return rowWithAudio;
       }),
     ),
   );
@@ -1245,13 +1326,18 @@ async function insertExercisesLegacy(
 
   if (
     (supportsExerciseExplanationColumn ||
-      supportsExerciseAnswerPlaceholderColumn) &&
+      supportsExerciseAnswerPlaceholderColumn ||
+      supportsExerciseAudioColumn) &&
     isMissingDatabaseObject(error)
   ) {
     const fallbackRows = exerciseRows.map((row) => {
       const fallbackRow = {
         ...row,
-      } as typeof row & { explanation?: string; answer_placeholder?: string };
+      } as typeof row & {
+        explanation?: string;
+        answer_placeholder?: string;
+        audio_url?: string | null;
+      };
       fallbackRow.options = appendExplanationOption(
         appendAnswerPlaceholderOption(
           normalizeOptions(fallbackRow.options),
@@ -1261,6 +1347,7 @@ async function insertExercisesLegacy(
       );
       delete fallbackRow.explanation;
       delete fallbackRow.answer_placeholder;
+      delete fallbackRow.audio_url;
       return fallbackRow;
     });
     const { error: fallbackError } = await supabase

@@ -54,11 +54,15 @@ create table if not exists public.brand_modules (
   title text not null,
   position integer not null unique,
   video_url text not null,
+  audio_url text,
   content_html text not null,
   is_published boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.brand_modules
+  add column if not exists audio_url text;
 
 create table if not exists public.brand_submodules (
   id bigint generated always as identity primary key,
@@ -66,11 +70,15 @@ create table if not exists public.brand_submodules (
   title text not null,
   position integer not null,
   video_url text not null,
+  audio_url text,
   content_html text not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (module_id, position)
 );
+
+alter table public.brand_submodules
+  add column if not exists audio_url text;
 
 create table if not exists public.module_exercises (
   id bigint generated always as identity primary key,
@@ -80,6 +88,7 @@ create table if not exists public.module_exercises (
   type text not null check (type in ('open', 'single', 'multiple', 'boolean', 'color', 'fill_blank')),
   explanation text not null default '',
   answer_placeholder text not null default '',
+  audio_url text,
   question text not null,
   options jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
@@ -91,6 +100,9 @@ alter table public.module_exercises
 
 alter table public.module_exercises
   add column if not exists answer_placeholder text not null default '';
+
+alter table public.module_exercises
+  add column if not exists audio_url text;
 
 alter table public.module_exercises
   add column if not exists submodule_id bigint references public.brand_submodules(id) on delete cascade;

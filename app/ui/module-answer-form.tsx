@@ -1109,6 +1109,25 @@ function PopupMessageCard({
   );
 }
 
+function VoiceNotePlayer({ src }: { src?: string | null }) {
+  if (!src?.trim()) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-[1.2rem] border border-[#f0e4d3] bg-[#fffdf7] px-5 py-4">
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+        Note vocale
+      </p>
+      <audio controls preload="metadata" className="mt-3 w-full">
+        <source src={src} type="audio/mp4" />
+        <source src={src} type="video/mp4" />
+        Votre navigateur ne peut pas lire cette note vocale.
+      </audio>
+    </div>
+  );
+}
+
 export default function ModuleAnswerForm({
   module,
   activeSubmoduleId,
@@ -1506,6 +1525,7 @@ export default function ModuleAnswerForm({
                 className="mt-5 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
               />
             ) : null}
+            <VoiceNotePlayer src={currentExercise.audio_url} />
             {currentExercise.type !== "prompt_open" &&
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "fill_blank" &&
@@ -2891,6 +2911,7 @@ function MultiQuestionOpenExerciseGroup({
               className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
             />
           ) : null}
+          <VoiceNotePlayer src={question.audio_url} />
           <span className="flex items-start gap-3">
             <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
               {question.question}
@@ -3228,6 +3249,7 @@ function ChecklistExerciseBlocks({
             {prompt ? (
               <p className="text-sm font-semibold leading-7 text-[#5f544a]">{prompt}</p>
             ) : null}
+            {questionIndex === 0 ? <VoiceNotePlayer src={exercise.audio_url} /> : null}
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="text"

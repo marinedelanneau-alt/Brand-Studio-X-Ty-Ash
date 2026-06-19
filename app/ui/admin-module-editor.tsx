@@ -63,6 +63,7 @@ type EditorQuestion = {
   type: ExerciseType;
   explanation: string;
   answerPlaceholder: string;
+  audioUrl: string;
   question: string;
   optionsText: string;
   tableRows: number;
@@ -82,6 +83,7 @@ type EditorSubmodule = {
   id: string;
   title: string;
   videoUrl: string;
+  audioUrl: string;
   contentHtml: string;
   exerciseGroups: EditorExerciseGroup[];
 };
@@ -97,6 +99,7 @@ type AdminModule = {
   title: string;
   position: number;
   video_url: string;
+  audio_url: string | null;
   content_html: string;
   is_published: boolean;
   submodules: Array<BrandSubmodule & { exercises: ModuleExercise[] }>;
@@ -139,6 +142,7 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
     type,
     explanation: "",
     answerPlaceholder: "",
+    audioUrl: "",
     question:
       type === "spectrum"
         ? "Ou se situe ta marque entre sobriete et expression ?"
@@ -172,6 +176,7 @@ function createEmptySubmodule(position: number): EditorSubmodule {
     id: crypto.randomUUID(),
     title: `Sous-module ${position}`,
     videoUrl: "",
+    audioUrl: "",
     contentHtml: "<p>Ajoutez ici le contenu du sous-module.</p>",
     exerciseGroups: [createEmptyExerciseGroup()],
   };
@@ -195,6 +200,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     type: exercise.type,
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
+    audioUrl: exercise.audio_url ?? "",
     question:
       getEditorExerciseQuestion(exercise.type, exercise.question) ||
       (exercise.type === "editorial_calendar"
@@ -235,6 +241,7 @@ function toEditorModule(module: AdminModule): EditorModule {
       id: String(submodule.id ?? index + 1),
       title: submodule.title,
       videoUrl: submodule.video_url,
+      audioUrl: submodule.audio_url ?? "",
       contentHtml: submodule.content_html,
       exerciseGroups: toEditorExerciseGroups(submodule.exercises),
     })),
@@ -384,6 +391,7 @@ function serializeQuestion(question: EditorQuestion) {
     type: question.type,
     explanation: question.explanation.trim(),
     answerPlaceholder: question.answerPlaceholder.trim(),
+    audioUrl: question.audioUrl.trim(),
     question: question.question.trim(),
     options,
     feedbackConfig: question.smartFeedbackConfig,
@@ -402,6 +410,7 @@ function toPreviewExercise(question: EditorQuestion) {
     type: serializedQuestion.type,
     explanation: serializedQuestion.explanation,
     answer_placeholder: serializedQuestion.answerPlaceholder,
+    audio_url: serializedQuestion.audioUrl,
     question: serializedQuestion.question,
     options: serializedQuestion.options,
   };
@@ -786,6 +795,7 @@ function QuestionCard({
                   question: current.question,
                   explanation: current.explanation,
                   answerPlaceholder: current.answerPlaceholder,
+                  audioUrl: current.audioUrl,
                 }));
               }}
               className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
@@ -841,6 +851,24 @@ function QuestionCard({
               </p>
             ) : null}
           </div>
+
+          <label className="space-y-2">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              Note vocale MP4 de la question
+            </span>
+            <input
+              type="url"
+              value={question.audioUrl}
+              onChange={(event) =>
+                onChange((current) => ({ ...current, audioUrl: event.target.value }))
+              }
+              placeholder="https://.../note-vocale.mp4"
+              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            />
+            <p className="text-sm leading-6 text-[#8a8077]">
+              Ajoute ici l&apos;URL d&apos;un fichier MP4 audio pour accompagner cette question.
+            </p>
+          </label>
 
           {supportsExplanationField(question.type) ? (
             <>
@@ -1185,6 +1213,7 @@ function ModuleForm({
           title: submodule.title.trim(),
           position: submoduleIndex + 1,
           videoUrl: submodule.videoUrl.trim(),
+          audioUrl: submodule.audioUrl.trim(),
           contentHtml: submodule.contentHtml.trim(),
           exerciseGroups: submodule.exerciseGroups.map((group) => ({
             groupId: group.id,
@@ -1438,6 +1467,24 @@ function ModuleForm({
                             ),
                           }))
                         }
+                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
+                      />
+                    </label>
+
+                    <label className="space-y-2">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP4 d&apos;introduction</span>
+                      <input
+                        type="url"
+                        value={activeSubmodule.audioUrl}
+                        onChange={(event) =>
+                          onChange((current) => ({
+                            ...current,
+                            submodules: current.submodules.map((item) =>
+                              item.id === activeSubmodule.id ? { ...item, audioUrl: event.target.value } : item,
+                            ),
+                          }))
+                        }
+                        placeholder="https://.../note-vocale.mp4"
                         className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
                       />
                     </label>
