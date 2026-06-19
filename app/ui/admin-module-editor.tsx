@@ -726,6 +726,8 @@ function QuestionCard({
 
     const formData = new FormData();
     formData.set("voiceNote", file);
+    formData.set("target", "question");
+    formData.set("exerciseId", question.id);
     const result = await uploadAdminVoiceNoteFile(formData);
 
     if (result.status === "success" && result.url) {
@@ -1290,6 +1292,9 @@ function ModuleForm({
 
     const formData = new FormData();
     formData.set("voiceNote", file);
+    formData.set("target", "submodule");
+    formData.set("moduleId", String(module.id ?? 0));
+    formData.set("submoduleId", submoduleId);
     const result = await uploadAdminVoiceNoteFile(formData);
 
     if (result.status === "success" && result.url) {

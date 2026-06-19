@@ -14,6 +14,8 @@ import {
 } from "@/lib/smart-feedback";
 import {
   deleteModuleDefinition,
+  persistExerciseVoiceNote,
+  persistSubmoduleVoiceNote,
   saveModuleDefinition,
   uploadAdminVoiceNote,
 } from "@/lib/training";
@@ -308,6 +310,25 @@ export async function uploadAdminVoiceNoteFile(formData: FormData) {
     }
 
     const url = await uploadAdminVoiceNote(file);
+    const target = String(formData.get("target") ?? "");
+    const moduleId = Number(formData.get("moduleId"));
+    const submoduleId = Number(formData.get("submoduleId"));
+    const exerciseId = Number(formData.get("exerciseId"));
+
+    if (target === "submodule") {
+      await persistSubmoduleVoiceNote({
+        moduleId,
+        submoduleId,
+        audioUrl: url,
+      });
+    }
+
+    if (target === "question") {
+      await persistExerciseVoiceNote({
+        exerciseId,
+        audioUrl: url,
+      });
+    }
 
     return {
       status: "success",

@@ -528,6 +528,126 @@ export async function uploadAdminVoiceNote(file: File) {
   return data.publicUrl;
 }
 
+export async function persistSubmoduleVoiceNote(input: {
+  moduleId: number;
+  submoduleId: number;
+  audioUrl: string;
+}) {
+  const audioUrl = input.audioUrl.trim();
+
+  if (
+    !audioUrl ||
+    !Number.isFinite(input.moduleId) ||
+    input.moduleId <= 0 ||
+    !Number.isFinite(input.submoduleId)
+  ) {
+    return;
+  }
+
+  const supabase = createSupabaseServerClient();
+  const now = new Date().toISOString();
+  const supportsAudioOnModules = await supportsModuleAudio(supabase);
+  const supportsAudioOnSubmodules = await supportsSubmoduleAudio(supabase);
+
+  if (Number.isFinite(input.submoduleId) && input.submoduleId > 0) {
+    const { data: submodule, error: submoduleError } = await supabase
+      .from("brand_submodules")
+      .select("content_html")
+      .eq("id", input.submoduleId)
+      .maybeSingle<{ content_html: string }>();
+
+    if (submoduleError) {
+      throw new Error(submoduleError.message);
+    }
+
+    if (submodule) {
+      const updatePayload = {
+        content_html: appendAudioUrlToHtml(submodule.content_html, audioUrl),
+        updated_at: now,
+        ...(supportsAudioOnSubmodules ? { audio_url: audioUrl } : {}),
+      };
+      const { error } = await supabase
+        .from("brand_submodules")
+        .update(updatePayload)
+        .eq("id", input.submoduleId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return;
+    }
+  }
+
+  const { data: module, error: moduleError } = await supabase
+    .from("brand_modules")
+    .select("content_html")
+    .eq("id", input.moduleId)
+    .maybeSingle<{ content_html: string }>();
+
+  if (moduleError) {
+    throw new Error(moduleError.message);
+  }
+
+  if (!module) {
+    return;
+  }
+
+  const updatePayload = {
+    content_html: appendAudioUrlToHtml(module.content_html, audioUrl),
+    updated_at: now,
+    ...(supportsAudioOnModules ? { audio_url: audioUrl } : {}),
+  };
+  const { error } = await supabase
+    .from("brand_modules")
+    .update(updatePayload)
+    .eq("id", input.moduleId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function persistExerciseVoiceNote(input: {
+  exerciseId: number;
+  audioUrl: string;
+}) {
+  const audioUrl = input.audioUrl.trim();
+
+  if (!audioUrl || !Number.isFinite(input.exerciseId) || input.exerciseId <= 0) {
+    return;
+  }
+
+  const supabase = createSupabaseServerClient();
+  const supportsAudioOnExercises = await supportsExerciseAudio(supabase);
+  const { data: exercise, error: exerciseError } = await supabase
+    .from("module_exercises")
+    .select("options")
+    .eq("id", input.exerciseId)
+    .maybeSingle<{ options: unknown }>();
+
+  if (exerciseError) {
+    throw new Error(exerciseError.message);
+  }
+
+  if (!exercise) {
+    return;
+  }
+
+  const updatePayload = {
+    options: appendAudioUrlOption(normalizeOptions(exercise.options), audioUrl),
+    ...(supportsAudioOnExercises ? { audio_url: audioUrl } : {}),
+  };
+  const { error } = await supabase
+    .from("module_exercises")
+    .update(updatePayload)
+    .eq("id", input.exerciseId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function updateProjectLogoForAccount(input: {
   accountId: number;
   logoUrl: string;
