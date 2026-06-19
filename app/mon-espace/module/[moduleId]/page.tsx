@@ -86,7 +86,7 @@ export default async function WorkspaceModulePage({
           Math.max(selectedSubmodule.exercises.length - 1, 0),
         )
       : 0;
-  const startInExercises = resolvedSearchParams?.mode !== "reading";
+  const startInExercises = resolvedSearchParams?.mode === "exercises";
   const shouldForceSummary = resolvedSearchParams?.summary === "1";
 
   const showSummary = shouldForceSummary;
