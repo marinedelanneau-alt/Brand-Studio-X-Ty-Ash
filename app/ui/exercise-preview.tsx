@@ -18,6 +18,7 @@ import {
 } from "@/lib/color-palette";
 import { normalizeVisibleContent } from "@/lib/pedagogical-content";
 import PedagogicalContent from "./pedagogical-content";
+import VoiceNotePlayer from "./voice-note-player";
 
 type PreviewExercise = {
   id: string | number;
@@ -146,24 +147,6 @@ function PreviewTextarea({ placeholder }: { placeholder: string }) {
       placeholder={placeholder || "Ta réponse"}
       className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a]"
     />
-  );
-}
-
-function PreviewVoiceNote({ src }: { src?: string | null }) {
-  if (!src?.trim()) {
-    return null;
-  }
-
-  return (
-    <div className="rounded-[1.2rem] border border-[#f0e4d3] bg-[#fffdf7] px-5 py-4">
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
-        Note vocale
-      </p>
-      <audio controls preload="metadata" className="mt-3 w-full">
-        <source src={src} type="audio/mpeg" />
-        Votre navigateur ne peut pas lire cette note vocale.
-      </audio>
-    </div>
   );
 }
 
@@ -799,7 +782,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
         )
       ) : null}
 
-      <PreviewVoiceNote src={exercise.audio_url} />
+      <VoiceNotePlayer src={exercise.audio_url} />
 
       {showMainQuestion ? (
         <p className="text-base leading-7 text-[#5f544a]">{exercise.question}</p>
