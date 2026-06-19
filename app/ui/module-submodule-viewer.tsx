@@ -2,6 +2,7 @@
 
 import type { WorkspaceModule } from "@/lib/training-types";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
+import VoiceNotePlayer from "./voice-note-player";
 
 export default function ModuleSubmoduleViewer({
   submodules,
@@ -90,17 +91,10 @@ export default function ModuleSubmoduleViewer({
             </div>
           )}
 
-          {currentSubmodule.audio_url ? (
-            <div className="rounded-[1.4rem] border border-[#f0e4d3] bg-[#fffdf7] px-5 py-4">
-              <p className="text-[0.74rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
-                Note vocale
-              </p>
-              <audio controls preload="metadata" className="mt-3 w-full">
-                <source src={currentSubmodule.audio_url} type="audio/mpeg" />
-                Votre navigateur ne peut pas lire cette note vocale.
-              </audio>
-            </div>
-          ) : null}
+          <VoiceNotePlayer
+            src={currentSubmodule.audio_url}
+            title="Introduction audio"
+          />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
             <div

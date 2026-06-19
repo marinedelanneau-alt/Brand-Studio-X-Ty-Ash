@@ -40,6 +40,7 @@ import ColorPaletteExercise from "./color-palette-exercise";
 import MoodboardExercise from "./moodboard-exercise";
 import EditorialCalendarExercise from "./editorial-calendar-exercise";
 import PedagogicalContent from "./pedagogical-content";
+import VoiceNotePlayer from "./voice-note-player";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import {
   getFillBlankCount,
@@ -1105,24 +1106,6 @@ function PopupMessageCard({
           </div>
         ) : null}
       </div>
-    </div>
-  );
-}
-
-function VoiceNotePlayer({ src }: { src?: string | null }) {
-  if (!src?.trim()) {
-    return null;
-  }
-
-  return (
-    <div className="rounded-[1.2rem] border border-[#f0e4d3] bg-[#fffdf7] px-5 py-4">
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
-        Note vocale
-      </p>
-      <audio controls preload="metadata" className="mt-3 w-full">
-        <source src={src} type="audio/mpeg" />
-        Votre navigateur ne peut pas lire cette note vocale.
-      </audio>
     </div>
   );
 }
