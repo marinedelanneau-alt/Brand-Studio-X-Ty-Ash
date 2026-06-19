@@ -890,7 +890,6 @@ function QuestionCard({
               disabled={isVoiceUploading}
               onChange={(event) => {
                 void uploadQuestionVoiceNote(event.target.files?.[0] ?? null);
-                event.currentTarget.value = "";
               }}
               className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
             />
@@ -1561,7 +1560,6 @@ function ModuleForm({
                             activeSubmodule.id,
                             event.target.files?.[0] ?? null,
                           );
-                          event.currentTarget.value = "";
                         }}
                         className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
                       />
