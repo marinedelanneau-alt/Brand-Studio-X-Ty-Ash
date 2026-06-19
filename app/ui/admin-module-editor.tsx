@@ -62,6 +62,7 @@ import MoodboardAdminEditor from "./moodboard-admin-editor";
 import RichTextEditor from "./rich-text-editor";
 import SmartFeedbackAdminEditor from "./smart-feedback-admin-editor";
 import SpectrumAdminEditor from "./spectrum-admin-editor";
+import VoiceNotePlayer from "./voice-note-player";
 import type { BrandSubmodule, ModuleExercise } from "@/lib/training-types";
 
 type EditorQuestion = {
@@ -986,9 +987,7 @@ function QuestionCard({
               <p className="text-sm leading-6 text-[#6b625a]">{voiceUploadMessage}</p>
             ) : null}
             {question.audioUrl ? (
-              <audio controls preload="metadata" className="w-full">
-                <source src={question.audioUrl} type="audio/mpeg" />
-              </audio>
+              <VoiceNotePlayer src={question.audioUrl} />
             ) : null}
           </label>
 
@@ -1680,9 +1679,10 @@ function ModuleForm({
                         </p>
                       ) : null}
                       {activeSubmodule.audioUrl ? (
-                        <audio controls preload="metadata" className="w-full">
-                          <source src={activeSubmodule.audioUrl} type="audio/mpeg" />
-                        </audio>
+                        <VoiceNotePlayer
+                          src={activeSubmodule.audioUrl}
+                          title="Introduction audio"
+                        />
                       ) : null}
                     </label>
 
