@@ -35,10 +35,10 @@ export default function VoiceNotePlayer({
       <div className="relative grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
         <div className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-[#d9d0e4] bg-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.95)]">
           <span className="absolute -left-3 top-4 rounded-[0.5rem] border-[3px] border-[#4b4550] bg-[#f3f0ea] px-2 py-1 text-lg leading-none text-[#4b4550] shadow-[4px_4px_0_rgba(75,69,80,0.18)]">
-            "
+            &quot;
           </span>
           <span className="absolute -right-3 bottom-3 rounded-[0.55rem] border-[3px] border-[#4b4550] bg-[#f3f0ea] px-2 py-1 text-lg leading-none text-[#4b4550] shadow-[4px_4px_0_rgba(75,69,80,0.18)]">
-            "
+            &quot;
           </span>
           <span className="flex h-14 w-9 items-end justify-center rounded-t-full rounded-b-[0.7rem] bg-[#2f2c2b] px-1.5 pb-2">
             <span className="h-8 w-full rounded-full bg-[#171514]" />
