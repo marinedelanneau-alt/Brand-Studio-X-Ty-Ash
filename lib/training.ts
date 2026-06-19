@@ -106,6 +106,62 @@ function normalizeOptions(value: unknown) {
     .filter(Boolean);
 }
 
+const AUDIO_URL_OPTION_PREFIX = "__audio_url__:";
+const AUDIO_URL_HTML_MARKER_PREFIX = "<!-- brand-studio-audio-url:";
+const AUDIO_URL_HTML_MARKER_SUFFIX = " -->";
+const AUDIO_URL_HTML_MARKER_PATTERN =
+  /<!--\s*brand-studio-audio-url:([^]*?)\s*-->/;
+const ALL_AUDIO_URL_HTML_MARKERS_PATTERN =
+  /<!--\s*brand-studio-audio-url:[^]*?\s*-->/g;
+
+function getStoredAudioUrl(options: string[]) {
+  const marker = options.find((option) => option.startsWith(AUDIO_URL_OPTION_PREFIX));
+  return marker?.slice(AUDIO_URL_OPTION_PREFIX.length).trim() || "";
+}
+
+function removeStoredAudioUrlOptions(options: string[]) {
+  return options.filter((option) => !option.startsWith(AUDIO_URL_OPTION_PREFIX));
+}
+
+function appendAudioUrlOption(options: string[], audioUrl: string) {
+  const cleanOptions = removeStoredAudioUrlOptions(options);
+  const trimmedAudioUrl = audioUrl.trim();
+
+  return trimmedAudioUrl
+    ? [...cleanOptions, `${AUDIO_URL_OPTION_PREFIX}${trimmedAudioUrl}`]
+    : cleanOptions;
+}
+
+function getStoredAudioUrlFromHtml(contentHtml: string) {
+  const match = contentHtml.match(AUDIO_URL_HTML_MARKER_PATTERN);
+  const encodedAudioUrl = match?.[1]?.trim();
+
+  if (!encodedAudioUrl) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(encodedAudioUrl);
+  } catch {
+    return encodedAudioUrl;
+  }
+}
+
+function stripStoredAudioUrlFromHtml(contentHtml: string) {
+  return contentHtml.replace(ALL_AUDIO_URL_HTML_MARKERS_PATTERN, "").trim();
+}
+
+function appendAudioUrlToHtml(contentHtml: string, audioUrl: string) {
+  const cleanContentHtml = stripStoredAudioUrlFromHtml(contentHtml);
+  const trimmedAudioUrl = audioUrl.trim();
+
+  if (!trimmedAudioUrl) {
+    return cleanContentHtml;
+  }
+
+  return `${AUDIO_URL_HTML_MARKER_PREFIX}${encodeURIComponent(trimmedAudioUrl)}${AUDIO_URL_HTML_MARKER_SUFFIX}${cleanContentHtml}`;
+}
+
 export function groupModuleExercises(exercises: ModuleExercise[]) {
   return groupExercisesByGroupId(exercises) as ModuleExerciseGroup[];
 }
@@ -591,14 +647,17 @@ export async function getModulesWithExercises({
   for (const exercise of exercises ?? []) {
     const bucket = exerciseMap.get(exercise.module_id) ?? [];
     const normalizedExerciseOptions = normalizeOptions(exercise.options);
+    const storedAudioUrl = getStoredAudioUrl(normalizedExerciseOptions);
+    const exerciseOptionsWithoutAudio =
+      removeStoredAudioUrlOptions(normalizedExerciseOptions);
     const resolvedType = resolveExerciseType(
       exercise.type,
       exercise.question,
-      normalizedExerciseOptions,
+      exerciseOptionsWithoutAudio,
     );
     const resolvedOptions = resolveStoredExerciseOptions(
       resolvedType,
-      normalizedExerciseOptions,
+      exerciseOptionsWithoutAudio,
     );
 
     if (
@@ -612,24 +671,26 @@ export async function getModulesWithExercises({
 
     bucket.push({
       ...exercise,
-      exercise_group_id: getStoredExerciseGroupId(normalizedExerciseOptions) || null,
-      feedback_config: parseStoredSmartFeedbackConfig(normalizedExerciseOptions),
+      exercise_group_id: getStoredExerciseGroupId(exerciseOptionsWithoutAudio) || null,
+      feedback_config: parseStoredSmartFeedbackConfig(exerciseOptionsWithoutAudio),
       type: resolvedType,
       explanation:
         "explanation" in exercise && typeof exercise.explanation === "string"
           ? exercise.explanation
-          : getStoredExplanation(normalizedExerciseOptions),
+          : getStoredExplanation(exerciseOptionsWithoutAudio),
       answer_placeholder:
         "answer_placeholder" in exercise &&
         typeof exercise.answer_placeholder === "string" &&
         exercise.answer_placeholder.trim().length > 0
           ? exercise.answer_placeholder
-          : getStoredAnswerPlaceholder(normalizedExerciseOptions) ||
+          : getStoredAnswerPlaceholder(exerciseOptionsWithoutAudio) ||
             getStoredAnswerPlaceholderFromQuestion(exercise.question),
       audio_url:
-        "audio_url" in exercise && typeof exercise.audio_url === "string"
+        "audio_url" in exercise &&
+        typeof exercise.audio_url === "string" &&
+        exercise.audio_url.trim().length > 0
           ? exercise.audio_url
-          : null,
+          : storedAudioUrl || null,
       question: getEditorExerciseQuestion(resolvedType, exercise.question),
       options: resolvedOptions,
     });
@@ -880,13 +941,17 @@ export async function saveModuleDefinition(input: {
     await supportsExerciseAnswerPlaceholder(supabase);
   const supportsExerciseAudioColumn = await supportsExerciseAudio(supabase);
   const moduleAudioUrl = firstSubmodule?.audioUrl?.trim() || null;
+  const moduleContentHtml = appendAudioUrlToHtml(
+    firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+    moduleAudioUrl ?? "",
+  );
 
   if (input.moduleId) {
     const moduleUpdate = {
       title: input.title,
       position: input.position,
       video_url: firstSubmodule?.videoUrl?.trim() || "",
-      content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+      content_html: moduleContentHtml,
       is_published: input.isPublished,
       updated_at: now,
       ...(supportsModuleAudioColumn ? { audio_url: moduleAudioUrl } : {}),
@@ -984,7 +1049,7 @@ export async function saveModuleDefinition(input: {
     title: input.title,
     position: input.position,
     video_url: firstSubmodule?.videoUrl?.trim() || "",
-    content_html: firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+    content_html: moduleContentHtml,
     is_published: input.isPublished,
     created_at: now,
     updated_at: now,
@@ -1034,6 +1099,9 @@ function buildModuleSubmodules(
   exercises: ModuleExercise[],
 ) {
   if (submodules.length === 0) {
+    const moduleAudioUrl =
+      module.audio_url ?? (getStoredAudioUrlFromHtml(module.content_html) || null);
+
     return [
       {
         id: -module.id,
@@ -1041,8 +1109,8 @@ function buildModuleSubmodules(
         title: module.title,
         position: 1,
         video_url: module.video_url,
-        audio_url: module.audio_url ?? null,
-        content_html: module.content_html,
+        audio_url: moduleAudioUrl,
+        content_html: stripStoredAudioUrlFromHtml(module.content_html),
         created_at: module.created_at,
         updated_at: module.updated_at,
         exercises,
@@ -1050,11 +1118,18 @@ function buildModuleSubmodules(
     ];
   }
 
-  return submodules.map((submodule) => ({
-    ...submodule,
-    audio_url: submodule.audio_url ?? null,
-    exercises: exercises.filter((exercise) => exercise.submodule_id === submodule.id),
-  }));
+  return submodules.map((submodule) => {
+    const submoduleAudioUrl =
+      submodule.audio_url ??
+      (getStoredAudioUrlFromHtml(submodule.content_html) || null);
+
+    return {
+      ...submodule,
+      audio_url: submoduleAudioUrl,
+      content_html: stripStoredAudioUrlFromHtml(submodule.content_html),
+      exercises: exercises.filter((exercise) => exercise.submodule_id === submodule.id),
+    };
+  });
 }
 
 async function insertSubmodulesAndExercises(
@@ -1100,7 +1175,7 @@ async function insertSubmodulesAndExercises(
         ...(supportsSubmoduleAudioColumn
           ? { audio_url: submodule.audioUrl.trim() || null }
           : {}),
-        content_html: submodule.contentHtml,
+        content_html: appendAudioUrlToHtml(submodule.contentHtml, submodule.audioUrl),
         created_at: now,
         updated_at: now,
       })),
@@ -1129,18 +1204,21 @@ async function insertSubmodulesAndExercises(
           exercise.question,
           exercise.answerPlaceholder,
         ),
-        options: appendExplanationOption(
-          appendAnswerPlaceholderOption(
-            appendExerciseGroupIdOption(
-              [
-                ...exercise.options,
-                getSerializedSmartFeedbackOption(exercise.feedbackConfig),
-              ],
-              exerciseGroup.groupId,
+        options: appendAudioUrlOption(
+          appendExplanationOption(
+            appendAnswerPlaceholderOption(
+              appendExerciseGroupIdOption(
+                [
+                  ...exercise.options,
+                  getSerializedSmartFeedbackOption(exercise.feedbackConfig),
+                ],
+                exerciseGroup.groupId,
+              ),
+              exercise.answerPlaceholder,
             ),
-            exercise.answerPlaceholder,
+            supportsExerciseExplanationColumn ? "" : exercise.explanation,
           ),
-          supportsExerciseExplanationColumn ? "" : exercise.explanation,
+          exercise.audioUrl,
         ),
       };
 
@@ -1307,18 +1385,21 @@ async function insertExercisesLegacy(
           exercise.question,
           exercise.answerPlaceholder,
         ),
-        options: appendExplanationOption(
-          appendAnswerPlaceholderOption(
-            appendExerciseGroupIdOption(
-              [
-                ...exercise.options,
-                getSerializedSmartFeedbackOption(exercise.feedbackConfig),
-              ],
-              exerciseGroup.groupId,
+        options: appendAudioUrlOption(
+          appendExplanationOption(
+            appendAnswerPlaceholderOption(
+              appendExerciseGroupIdOption(
+                [
+                  ...exercise.options,
+                  getSerializedSmartFeedbackOption(exercise.feedbackConfig),
+                ],
+                exerciseGroup.groupId,
+              ),
+              exercise.answerPlaceholder,
             ),
-            exercise.answerPlaceholder,
+            supportsExerciseExplanationColumn ? "" : exercise.explanation,
           ),
-          supportsExerciseExplanationColumn ? "" : exercise.explanation,
+          exercise.audioUrl,
         ),
       };
 
