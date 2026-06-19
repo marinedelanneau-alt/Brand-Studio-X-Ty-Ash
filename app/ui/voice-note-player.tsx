@@ -1,5 +1,5 @@
 import Image from "next/image";
-import audioHostVisual from "@/public/Icone Accueil - Brand Studio.png";
+import audioHostVisual from "@/public/visuel-note-vocale.png";
 
 type VoiceNotePlayerProps = {
   src?: string | null;
