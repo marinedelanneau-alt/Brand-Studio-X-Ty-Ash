@@ -13,11 +13,11 @@ import {
   type SmartFeedbackConfig,
 } from "@/lib/smart-feedback";
 import {
+  createAdminVoiceNoteUploadTarget,
   deleteModuleDefinition,
   persistExerciseVoiceNote,
   persistSubmoduleVoiceNote,
   saveModuleDefinition,
-  uploadAdminVoiceNote,
 } from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
 
@@ -206,45 +206,6 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
   });
 }
 
-function getUploadedFile(formData: FormData, fieldName: string) {
-  const value = formData.get(fieldName);
-
-  if (!(value instanceof File) || value.size === 0) {
-    return null;
-  }
-
-  return value;
-}
-
-async function attachUploadedVoiceNotes(
-  formData: FormData,
-  submodules: EditorSubmodule[],
-) {
-  for (const submodule of submodules) {
-    const submoduleFile = getUploadedFile(
-      formData,
-      `submoduleAudioFile-${submodule.clientId}`,
-    );
-
-    if (submoduleFile) {
-      submodule.audioUrl = await uploadAdminVoiceNote(submoduleFile);
-    }
-
-    for (const exerciseGroup of submodule.exerciseGroups) {
-      for (const question of exerciseGroup.questions) {
-        const questionFile = getUploadedFile(
-          formData,
-          `questionAudioFile-${question.clientId}`,
-        );
-
-        if (questionFile) {
-          question.audioUrl = await uploadAdminVoiceNote(questionFile);
-        }
-      }
-    }
-  }
-}
-
 export async function saveAdminModule(formData: FormData) {
   try {
     await getAuthenticatedAdmin();
@@ -273,12 +234,6 @@ export async function saveAdminModule(formData: FormData) {
       redirect("/admin/modules?status=error");
     }
 
-    try {
-      await attachUploadedVoiceNotes(formData, submodules);
-    } catch {
-      redirect("/admin/modules?status=error");
-    }
-
     await saveModuleDefinition({
       moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
       title,
@@ -296,20 +251,47 @@ export async function saveAdminModule(formData: FormData) {
   }
 }
 
-export async function uploadAdminVoiceNoteFile(formData: FormData) {
+export async function createAdminVoiceNoteUpload() {
   try {
     await getAuthenticatedAdmin();
-    const file = getUploadedFile(formData, "voiceNote");
+    const uploadTarget = await createAdminVoiceNoteUploadTarget();
 
-    if (!file) {
+    return {
+      status: "success",
+      message: "Pret pour l'import.",
+      ...uploadTarget,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "La note vocale n'a pas pu etre preparee.",
+      path: "",
+      token: "",
+      signedUrl: "",
+      publicUrl: "",
+    };
+  }
+}
+
+export async function persistAdminVoiceNoteUrl(formData: FormData) {
+  try {
+    await getAuthenticatedAdmin();
+    const url =
+      typeof formData.get("audioUrl") === "string"
+        ? String(formData.get("audioUrl")).trim()
+        : "";
+
+    if (!url) {
       return {
         status: "error",
-        message: "Selectionne un fichier MP3.",
+        message: "La note vocale n'a pas pu etre sauvegardee.",
         url: "",
       };
     }
 
-    const url = await uploadAdminVoiceNote(file);
     const target = String(formData.get("target") ?? "");
     const moduleId = Number(formData.get("moduleId"));
     const submoduleId = Number(formData.get("submoduleId"));
@@ -329,6 +311,9 @@ export async function uploadAdminVoiceNoteFile(formData: FormData) {
         audioUrl: url,
       });
     }
+
+    revalidatePath("/admin/modules");
+    revalidatePath("/mon-espace");
 
     return {
       status: "success",

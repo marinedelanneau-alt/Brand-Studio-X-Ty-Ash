@@ -528,6 +528,30 @@ export async function uploadAdminVoiceNote(file: File) {
   return data.publicUrl;
 }
 
+export async function createAdminVoiceNoteUploadTarget() {
+  const supabase = createSupabaseServerClient();
+  const filePath = `admin-voice-notes/${Date.now()}-${crypto.randomUUID()}.mp3`;
+
+  const { data, error } = await supabase.storage
+    .from("project-assets")
+    .createSignedUploadUrl(filePath, { upsert: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const publicUrlData = supabase.storage
+    .from("project-assets")
+    .getPublicUrl(filePath);
+
+  return {
+    path: data.path,
+    token: data.token,
+    signedUrl: data.signedUrl,
+    publicUrl: publicUrlData.data.publicUrl,
+  };
+}
+
 export async function persistSubmoduleVoiceNote(input: {
   moduleId: number;
   submoduleId: number;

@@ -1,11 +1,13 @@
 "use client";
 
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
 import {
+  createAdminVoiceNoteUpload,
   deleteAdminModule,
+  persistAdminVoiceNoteUrl,
   saveAdminModule,
-  uploadAdminVoiceNoteFile,
 } from "../admin/modules/actions";
 import {
   EXERCISE_TYPE_LABELS,
@@ -81,6 +83,73 @@ type EditorQuestion = {
   moodboardConfig: MoodboardConfig;
   smartFeedbackConfig: SmartFeedbackConfig;
 };
+
+const ADMIN_VOICE_NOTE_MAX_SIZE = 24 * 1024 * 1024;
+
+async function uploadAdminVoiceNoteFromBrowser(file: File) {
+  const isMp3 =
+    file.type === "audio/mpeg" ||
+    file.type === "audio/mp3" ||
+    file.name.toLowerCase().endsWith(".mp3");
+
+  if (!isMp3) {
+    return {
+      status: "error",
+      message: "Le fichier de note vocale doit etre au format MP3.",
+      url: "",
+    };
+  }
+
+  if (file.size > ADMIN_VOICE_NOTE_MAX_SIZE) {
+    return {
+      status: "error",
+      message: "La note vocale MP3 doit peser moins de 24 Mo.",
+      url: "",
+    };
+  }
+
+  const uploadTarget = await createAdminVoiceNoteUpload();
+
+  if (uploadTarget.status !== "success") {
+    return {
+      status: "error",
+      message: uploadTarget.message,
+      url: "",
+    };
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return {
+      status: "error",
+      message: "La configuration Supabase publique est manquante.",
+      url: "",
+    };
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const { error } = await supabase.storage
+    .from("project-assets")
+    .uploadToSignedUrl(uploadTarget.path, uploadTarget.token, file, {
+      contentType: file.type || "audio/mpeg",
+    });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+      url: "",
+    };
+  }
+
+  return {
+    status: "success",
+    message: "Note vocale importee.",
+    url: uploadTarget.publicUrl,
+  };
+}
 
 type EditorExerciseGroup = { id: string; questions: EditorQuestion[] };
 type EditorSubmodule = {
@@ -724,18 +793,34 @@ function QuestionCard({
     setIsVoiceUploading(true);
     setVoiceUploadMessage("Import de la note vocale...");
 
-    const formData = new FormData();
-    formData.set("voiceNote", file);
-    formData.set("target", "question");
-    formData.set("exerciseId", question.id);
-    const result = await uploadAdminVoiceNoteFile(formData);
+    try {
+      const uploadResult = await uploadAdminVoiceNoteFromBrowser(file);
 
-    if (result.status === "success" && result.url) {
-      onChange((current) => ({ ...current, audioUrl: result.url }));
+      if (uploadResult.status !== "success" || !uploadResult.url) {
+        setVoiceUploadMessage(uploadResult.message);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.set("audioUrl", uploadResult.url);
+      formData.set("target", "question");
+      formData.set("exerciseId", question.id);
+      const result = await persistAdminVoiceNoteUrl(formData);
+
+      if (result.status === "success" && result.url) {
+        onChange((current) => ({ ...current, audioUrl: result.url }));
+      }
+
+      setVoiceUploadMessage(result.message);
+    } catch (error) {
+      setVoiceUploadMessage(
+        error instanceof Error
+          ? error.message
+          : "La note vocale n'a pas pu etre importee.",
+      );
+    } finally {
+      setIsVoiceUploading(false);
     }
-
-    setVoiceUploadMessage(result.message);
-    setIsVoiceUploading(false);
   }
 
   return (
@@ -886,7 +971,6 @@ function QuestionCard({
               Note vocale MP3 de la question
             </span>
             <input
-              name={`questionAudioFile-${question.id}`}
               type="file"
               accept="audio/mpeg,audio/mp3,.mp3"
               disabled={isVoiceUploading}
@@ -1289,27 +1373,48 @@ function ModuleForm({
       [submoduleId]: "Import de la note vocale...",
     }));
 
-    const formData = new FormData();
-    formData.set("voiceNote", file);
-    formData.set("target", "submodule");
-    formData.set("moduleId", String(module.id ?? 0));
-    formData.set("submoduleId", submoduleId);
-    const result = await uploadAdminVoiceNoteFile(formData);
+    try {
+      const uploadResult = await uploadAdminVoiceNoteFromBrowser(file);
 
-    if (result.status === "success" && result.url) {
-      onChange((current) => ({
+      if (uploadResult.status !== "success" || !uploadResult.url) {
+        setSubmoduleVoiceUploadMessages((current) => ({
+          ...current,
+          [submoduleId]: uploadResult.message,
+        }));
+        return;
+      }
+
+      const formData = new FormData();
+      formData.set("audioUrl", uploadResult.url);
+      formData.set("target", "submodule");
+      formData.set("moduleId", String(module.id ?? 0));
+      formData.set("submoduleId", submoduleId);
+      const result = await persistAdminVoiceNoteUrl(formData);
+
+      if (result.status === "success" && result.url) {
+        onChange((current) => ({
+          ...current,
+          submodules: current.submodules.map((item) =>
+            item.id === submoduleId ? { ...item, audioUrl: result.url } : item,
+          ),
+        }));
+      }
+
+      setSubmoduleVoiceUploadMessages((current) => ({
         ...current,
-        submodules: current.submodules.map((item) =>
-          item.id === submoduleId ? { ...item, audioUrl: result.url } : item,
-        ),
+        [submoduleId]: result.message,
       }));
+    } catch (error) {
+      setSubmoduleVoiceUploadMessages((current) => ({
+        ...current,
+        [submoduleId]:
+          error instanceof Error
+            ? error.message
+            : "La note vocale n'a pas pu etre importee.",
+      }));
+    } finally {
+      setUploadingSubmoduleVoiceId("");
     }
-
-    setSubmoduleVoiceUploadMessages((current) => ({
-      ...current,
-      [submoduleId]: result.message,
-    }));
-    setUploadingSubmoduleVoiceId("");
   }
 
   return (
@@ -1555,7 +1660,6 @@ function ModuleForm({
                     <label className="space-y-2">
                       <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP3 d&apos;introduction</span>
                       <input
-                        name={`submoduleAudioFile-${activeSubmodule.id}`}
                         type="file"
                         accept="audio/mpeg,audio/mp3,.mp3"
                         disabled={uploadingSubmoduleVoiceId === activeSubmodule.id}
