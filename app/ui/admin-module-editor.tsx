@@ -2,7 +2,11 @@
 
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useState } from "react";
-import { deleteAdminModule, saveAdminModule } from "../admin/modules/actions";
+import {
+  deleteAdminModule,
+  saveAdminModule,
+  uploadAdminVoiceNoteFile,
+} from "../admin/modules/actions";
 import {
   EXERCISE_TYPE_LABELS,
   exerciseNeedsOptions,
@@ -693,6 +697,8 @@ function QuestionCard({
 }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(question.question.trim().length === 0);
+  const [voiceUploadMessage, setVoiceUploadMessage] = useState("");
+  const [isVoiceUploading, setIsVoiceUploading] = useState(false);
   const questionSummary = question.question.trim() || "Exercice sans titre";
 
   useEffect(() => {
@@ -709,6 +715,26 @@ function QuestionCard({
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isPreviewOpen]);
+
+  async function uploadQuestionVoiceNote(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    setIsVoiceUploading(true);
+    setVoiceUploadMessage("Import de la note vocale...");
+
+    const formData = new FormData();
+    formData.set("voiceNote", file);
+    const result = await uploadAdminVoiceNoteFile(formData);
+
+    if (result.status === "success" && result.url) {
+      onChange((current) => ({ ...current, audioUrl: result.url }));
+    }
+
+    setVoiceUploadMessage(result.message);
+    setIsVoiceUploading(false);
+  }
 
   return (
     <>
@@ -861,11 +887,19 @@ function QuestionCard({
               name={`questionAudioFile-${question.id}`}
               type="file"
               accept="audio/mp4,video/mp4,.mp4"
+              disabled={isVoiceUploading}
+              onChange={(event) => {
+                void uploadQuestionVoiceNote(event.target.files?.[0] ?? null);
+                event.currentTarget.value = "";
+              }}
               className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
             />
             <p className="text-sm leading-6 text-[#8a8077]">
               Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
             </p>
+            {voiceUploadMessage ? (
+              <p className="text-sm leading-6 text-[#6b625a]">{voiceUploadMessage}</p>
+            ) : null}
             {question.audioUrl ? (
               <audio controls preload="metadata" className="w-full">
                 <source src={question.audioUrl} type="audio/mp4" />
@@ -1204,6 +1238,10 @@ function ModuleForm({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
+  const [submoduleVoiceUploadMessages, setSubmoduleVoiceUploadMessages] = useState<
+    Record<string, string>
+  >({});
+  const [uploadingSubmoduleVoiceId, setUploadingSubmoduleVoiceId] = useState("");
   const visibleActiveSubmoduleId = module.submodules.some(
     (submodule) => submodule.id === activeSubmoduleId,
   )
@@ -1239,6 +1277,37 @@ function ModuleForm({
   );
   const resolvedActiveSubmoduleIndex = activeSubmoduleIndex >= 0 ? activeSubmoduleIndex : 0;
   const activeSubmodule = module.submodules[resolvedActiveSubmoduleIndex];
+
+  async function uploadSubmoduleVoiceNote(submoduleId: string, file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    setUploadingSubmoduleVoiceId(submoduleId);
+    setSubmoduleVoiceUploadMessages((current) => ({
+      ...current,
+      [submoduleId]: "Import de la note vocale...",
+    }));
+
+    const formData = new FormData();
+    formData.set("voiceNote", file);
+    const result = await uploadAdminVoiceNoteFile(formData);
+
+    if (result.status === "success" && result.url) {
+      onChange((current) => ({
+        ...current,
+        submodules: current.submodules.map((item) =>
+          item.id === submoduleId ? { ...item, audioUrl: result.url } : item,
+        ),
+      }));
+    }
+
+    setSubmoduleVoiceUploadMessages((current) => ({
+      ...current,
+      [submoduleId]: result.message,
+    }));
+    setUploadingSubmoduleVoiceId("");
+  }
 
   return (
     <div className="overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] shadow-[0_18px_42px_rgba(210,189,152,0.1)]">
@@ -1486,11 +1555,24 @@ function ModuleForm({
                         name={`submoduleAudioFile-${activeSubmodule.id}`}
                         type="file"
                         accept="audio/mp4,video/mp4,.mp4"
+                        disabled={uploadingSubmoduleVoiceId === activeSubmodule.id}
+                        onChange={(event) => {
+                          void uploadSubmoduleVoiceNote(
+                            activeSubmodule.id,
+                            event.target.files?.[0] ?? null,
+                          );
+                          event.currentTarget.value = "";
+                        }}
                         className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
                       />
                       <p className="text-sm leading-6 text-[#8a8077]">
                         Choisis un fichier MP4 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
                       </p>
+                      {submoduleVoiceUploadMessages[activeSubmodule.id] ? (
+                        <p className="text-sm leading-6 text-[#6b625a]">
+                          {submoduleVoiceUploadMessages[activeSubmodule.id]}
+                        </p>
+                      ) : null}
                       {activeSubmodule.audioUrl ? (
                         <audio controls preload="metadata" className="w-full">
                           <source src={activeSubmodule.audioUrl} type="audio/mp4" />

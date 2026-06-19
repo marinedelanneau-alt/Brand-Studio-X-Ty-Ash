@@ -294,6 +294,38 @@ export async function saveAdminModule(formData: FormData) {
   }
 }
 
+export async function uploadAdminVoiceNoteFile(formData: FormData) {
+  try {
+    await getAuthenticatedAdmin();
+    const file = getUploadedFile(formData, "voiceNote");
+
+    if (!file) {
+      return {
+        status: "error",
+        message: "Selectionne un fichier MP4.",
+        url: "",
+      };
+    }
+
+    const url = await uploadAdminVoiceNote(file);
+
+    return {
+      status: "success",
+      message: "Note vocale importee.",
+      url,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "La note vocale n'a pas pu etre importee.",
+      url: "",
+    };
+  }
+}
+
 export async function deleteAdminModule(formData: FormData) {
   try {
     await getAuthenticatedAdmin();
