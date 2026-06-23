@@ -1530,7 +1530,8 @@ async function insertSubmodulesAndExercises(
   if (
     (supportsExerciseExplanationColumn ||
       supportsExerciseAnswerPlaceholderColumn ||
-      supportsExerciseAudioColumn) &&
+      supportsExerciseAudioColumn ||
+      supportsExerciseAudioTranscriptColumn) &&
     isMissingDatabaseObject(insertExercisesError)
   ) {
     const fallbackRows = exerciseRows.map((row) => {
@@ -1540,6 +1541,7 @@ async function insertSubmodulesAndExercises(
         explanation?: string;
         answer_placeholder?: string;
         audio_url?: string | null;
+        audio_transcript?: string | null;
       };
       fallbackRow.options = appendExplanationOption(
         appendAnswerPlaceholderOption(
@@ -1551,6 +1553,7 @@ async function insertSubmodulesAndExercises(
       delete fallbackRow.explanation;
       delete fallbackRow.answer_placeholder;
       delete fallbackRow.audio_url;
+      delete fallbackRow.audio_transcript;
       return fallbackRow;
     });
     const { error: fallbackInsertExercisesError } = await supabase
@@ -1588,10 +1591,30 @@ async function supportsModuleAudio(
   return !isMissingDatabaseObject(probe.error);
 }
 
+async function supportsModuleAudioTranscript(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase
+    .from("brand_modules")
+    .select("audio_transcript")
+    .limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
 async function supportsSubmoduleAudio(
   supabase: ReturnType<typeof createSupabaseServerClient>,
 ) {
   const probe = await supabase.from("brand_submodules").select("audio_url").limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
+async function supportsSubmoduleAudioTranscript(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase
+    .from("brand_submodules")
+    .select("audio_transcript")
+    .limit(1);
   return !isMissingDatabaseObject(probe.error);
 }
 
@@ -1619,6 +1642,16 @@ async function supportsExerciseAudio(
   return !isMissingDatabaseObject(probe.error);
 }
 
+async function supportsExerciseAudioTranscript(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+) {
+  const probe = await supabase
+    .from("module_exercises")
+    .select("audio_transcript")
+    .limit(1);
+  return !isMissingDatabaseObject(probe.error);
+}
+
 async function insertExercisesLegacy(
   supabase: ReturnType<typeof createSupabaseServerClient>,
   moduleId: number,
@@ -1640,6 +1673,7 @@ async function insertExercisesLegacy(
   supportsExerciseExplanationColumn: boolean,
   supportsExerciseAnswerPlaceholderColumn: boolean,
   supportsExerciseAudioColumn: boolean,
+  supportsExerciseAudioTranscriptColumn: boolean,
 ) {
   let globalExercisePosition = 1;
   const exerciseRows = submodules.flatMap((submodule) =>
