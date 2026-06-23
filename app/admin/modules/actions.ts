@@ -27,6 +27,7 @@ type EditorExercise = {
   explanation: string;
   answerPlaceholder: string;
   audioUrl: string;
+  audioTranscript: string;
   question: string;
   options: string[];
   feedbackConfig: SmartFeedbackConfig;
@@ -43,6 +44,7 @@ type EditorSubmodule = {
   position: number;
   videoUrl: string;
   audioUrl: string;
+  audioTranscript: string;
   contentHtml: string;
   exerciseGroups: EditorExerciseGroup[];
 };
@@ -63,6 +65,8 @@ function parseQuestion(rawQuestion: unknown) {
         : getStoredAnswerPlaceholderFromQuestion(question);
     const audioUrl =
       typeof item.audioUrl === "string" ? item.audioUrl.trim() : "";
+    const audioTranscript =
+      typeof item.audioTranscript === "string" ? item.audioTranscript.trim() : "";
     const options = Array.isArray(item.options)
       ? item.options
           .filter((value): value is string => typeof value === "string")
@@ -130,6 +134,7 @@ function parseQuestion(rawQuestion: unknown) {
       explanation,
       answerPlaceholder,
       audioUrl,
+      audioTranscript,
       question: getPersistedExerciseQuestion(type, question),
       options: normalizedOptions,
       feedbackConfig: normalizeSmartFeedbackConfig(item.feedbackConfig),
@@ -186,6 +191,8 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
       typeof item.videoUrl === "string" ? item.videoUrl.trim() : "";
     const audioUrl =
       typeof item.audioUrl === "string" ? item.audioUrl.trim() : "";
+    const audioTranscript =
+      typeof item.audioTranscript === "string" ? item.audioTranscript.trim() : "";
     const contentHtml =
       typeof item.contentHtml === "string" ? item.contentHtml.trim() : "";
     const exerciseGroups = parseExerciseGroups(item.exerciseGroups);
@@ -200,6 +207,7 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
       position: index + 1,
       videoUrl,
       audioUrl,
+      audioTranscript,
       contentHtml,
       exerciseGroups,
     };
