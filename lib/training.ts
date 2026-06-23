@@ -1398,6 +1398,7 @@ async function insertSubmodulesAndExercises(
     position: number;
     videoUrl: string;
     audioUrl: string;
+    audioTranscript: string;
     contentHtml: string;
     exerciseGroups: Array<{
       groupId: string;
@@ -1406,6 +1407,7 @@ async function insertSubmodulesAndExercises(
         explanation: string;
         answerPlaceholder: string;
         audioUrl: string;
+        audioTranscript: string;
         question: string;
         options: string[];
         feedbackConfig: SmartFeedbackConfig;
