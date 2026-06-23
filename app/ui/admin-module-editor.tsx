@@ -1712,9 +1712,30 @@ function ModuleForm({
                         <VoiceNotePlayer
                           src={activeSubmodule.audioUrl}
                           title="Introduction audio"
-                          subtitles={activeSubmodule.contentHtml}
+                          subtitles={activeSubmodule.audioTranscript}
                         />
                       ) : null}
+                    </label>
+
+                    <label className="space-y-2">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                        Sous-titres de la note vocale d&apos;introduction
+                      </span>
+                      <textarea
+                        value={activeSubmodule.audioTranscript}
+                        onChange={(event) =>
+                          onChange((current) => ({
+                            ...current,
+                            submodules: current.submodules.map((item) =>
+                              item.id === activeSubmodule.id
+                                ? { ...item, audioTranscript: event.target.value }
+                                : item,
+                            ),
+                          }))
+                        }
+                        className="min-h-32 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3"
+                        placeholder="Colle ici la transcription exacte de cette note vocale."
+                      />
                     </label>
 
                     <div className="space-y-3">

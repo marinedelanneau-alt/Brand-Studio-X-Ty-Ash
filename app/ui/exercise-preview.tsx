@@ -26,6 +26,7 @@ type PreviewExercise = {
   explanation: string;
   answer_placeholder: string;
   audio_url?: string | null;
+  audio_transcript?: string | null;
   question: string;
   options: string[];
 };
@@ -784,7 +785,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
 
       <VoiceNotePlayer
         src={exercise.audio_url}
-        subtitles={exercise.explanation || exercise.question}
+        subtitles={exercise.audio_transcript}
       />
 
       {showMainQuestion ? (

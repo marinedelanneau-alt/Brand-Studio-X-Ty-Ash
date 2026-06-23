@@ -1509,7 +1509,7 @@ export default function ModuleAnswerForm({
             ) : null}
             <VoiceNotePlayer
               src={currentExercise.audio_url}
-              subtitles={currentExercise.explanation || currentExercise.question}
+              subtitles={currentExercise.audio_transcript}
             />
             {currentExercise.type !== "prompt_open" &&
             !isPassiveContentType(currentExercise.type) &&
@@ -2898,7 +2898,7 @@ function MultiQuestionOpenExerciseGroup({
           ) : null}
           <VoiceNotePlayer
             src={question.audio_url}
-            subtitles={question.explanation || question.question}
+            subtitles={question.audio_transcript}
           />
           <span className="flex items-start gap-3">
             <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
@@ -3240,7 +3240,7 @@ function ChecklistExerciseBlocks({
             {questionIndex === 0 ? (
               <VoiceNotePlayer
                 src={exercise.audio_url}
-                subtitles={exercise.explanation || exercise.question}
+                subtitles={exercise.audio_transcript}
               />
             ) : null}
             <div className="flex flex-col gap-3 sm:flex-row">
