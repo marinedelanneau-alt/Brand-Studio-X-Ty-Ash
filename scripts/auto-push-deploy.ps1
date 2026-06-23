@@ -194,9 +194,26 @@ function Deploy-Local {
   Set-Location $current
 }
 
+function Deploy-VercelProduction {
+  Write-Status "Deploiement Vercel production en cours..."
+
+  $current = Get-Location
+  Set-Location $root
+
+  cmd.exe /c "npx.cmd vercel --prod --yes"
+  if ($LASTEXITCODE -ne 0) {
+    Write-Status "Deploiement Vercel echoue. Verifiez la configuration Vercel et les identifiants."
+  } else {
+    Write-Status "Deploiement Vercel production termine avec succes."
+  }
+
+  Set-Location $current
+}
+
 function Sync-All {
   Commit-And-Push
   Deploy-Local
+  Deploy-VercelProduction
 }
 
 Write-Status "Auto push/deploy lance."
