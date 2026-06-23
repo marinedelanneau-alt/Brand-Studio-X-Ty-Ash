@@ -55,6 +55,7 @@ create table if not exists public.brand_modules (
   position integer not null unique,
   video_url text not null,
   audio_url text,
+  audio_transcript text,
   content_html text not null,
   is_published boolean not null default true,
   created_at timestamptz not null default now(),
@@ -64,6 +65,9 @@ create table if not exists public.brand_modules (
 alter table public.brand_modules
   add column if not exists audio_url text;
 
+alter table public.brand_modules
+  add column if not exists audio_transcript text;
+
 create table if not exists public.brand_submodules (
   id bigint generated always as identity primary key,
   module_id bigint not null references public.brand_modules(id) on delete cascade,
@@ -71,6 +75,7 @@ create table if not exists public.brand_submodules (
   position integer not null,
   video_url text not null,
   audio_url text,
+  audio_transcript text,
   content_html text not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -79,6 +84,9 @@ create table if not exists public.brand_submodules (
 
 alter table public.brand_submodules
   add column if not exists audio_url text;
+
+alter table public.brand_submodules
+  add column if not exists audio_transcript text;
 
 create table if not exists public.module_exercises (
   id bigint generated always as identity primary key,
@@ -89,6 +97,7 @@ create table if not exists public.module_exercises (
   explanation text not null default '',
   answer_placeholder text not null default '',
   audio_url text,
+  audio_transcript text,
   question text not null,
   options jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
@@ -103,6 +112,9 @@ alter table public.module_exercises
 
 alter table public.module_exercises
   add column if not exists audio_url text;
+
+alter table public.module_exercises
+  add column if not exists audio_transcript text;
 
 alter table public.module_exercises
   add column if not exists submodule_id bigint references public.brand_submodules(id) on delete cascade;
