@@ -71,6 +71,7 @@ type EditorQuestion = {
   explanation: string;
   answerPlaceholder: string;
   audioUrl: string;
+  audioTranscript: string;
   question: string;
   optionsText: string;
   tableRows: number;
@@ -158,6 +159,7 @@ type EditorSubmodule = {
   title: string;
   videoUrl: string;
   audioUrl: string;
+  audioTranscript: string;
   contentHtml: string;
   exerciseGroups: EditorExerciseGroup[];
 };
@@ -174,6 +176,7 @@ type AdminModule = {
   position: number;
   video_url: string;
   audio_url: string | null;
+  audio_transcript: string | null;
   content_html: string;
   is_published: boolean;
   submodules: Array<BrandSubmodule & { exercises: ModuleExercise[] }>;
@@ -217,6 +220,7 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
     explanation: "",
     answerPlaceholder: "",
     audioUrl: "",
+    audioTranscript: "",
     question:
       type === "spectrum"
         ? "Ou se situe ta marque entre sobriete et expression ?"
@@ -251,6 +255,7 @@ function createEmptySubmodule(position: number): EditorSubmodule {
     title: `Sous-module ${position}`,
     videoUrl: "",
     audioUrl: "",
+    audioTranscript: "",
     contentHtml: "<p>Ajoutez ici le contenu du sous-module.</p>",
     exerciseGroups: [createEmptyExerciseGroup()],
   };
@@ -275,6 +280,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
     audioUrl: exercise.audio_url ?? "",
+    audioTranscript: exercise.audio_transcript ?? "",
     question:
       getEditorExerciseQuestion(exercise.type, exercise.question) ||
       (exercise.type === "editorial_calendar"
@@ -316,6 +322,7 @@ function toEditorModule(module: AdminModule): EditorModule {
       title: submodule.title,
       videoUrl: submodule.video_url,
       audioUrl: submodule.audio_url ?? "",
+      audioTranscript: submodule.audio_transcript ?? "",
       contentHtml: submodule.content_html,
       exerciseGroups: toEditorExerciseGroups(submodule.exercises),
     })),
@@ -467,6 +474,7 @@ function serializeQuestion(question: EditorQuestion) {
     explanation: question.explanation.trim(),
     answerPlaceholder: question.answerPlaceholder.trim(),
     audioUrl: question.audioUrl.trim(),
+    audioTranscript: question.audioTranscript.trim(),
     question: question.question.trim(),
     options,
     feedbackConfig: question.smartFeedbackConfig,
@@ -486,6 +494,7 @@ function toPreviewExercise(question: EditorQuestion) {
     explanation: serializedQuestion.explanation,
     answer_placeholder: serializedQuestion.answerPlaceholder,
     audio_url: serializedQuestion.audioUrl,
+    audio_transcript: serializedQuestion.audioTranscript,
     question: serializedQuestion.question,
     options: serializedQuestion.options,
   };
@@ -989,9 +998,26 @@ function QuestionCard({
             {question.audioUrl ? (
               <VoiceNotePlayer
                 src={question.audioUrl}
-                subtitles={question.explanation || question.question}
+                subtitles={question.audioTranscript}
               />
             ) : null}
+          </label>
+
+          <label className="space-y-2">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              Sous-titres de la note vocale
+            </span>
+            <textarea
+              value={question.audioTranscript}
+              onChange={(event) =>
+                onChange((current) => ({
+                  ...current,
+                  audioTranscript: event.target.value,
+                }))
+              }
+              className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+              placeholder="Colle ici la transcription exacte de la note vocale."
+            />
           </label>
 
           {supportsExplanationField(question.type) ? (
@@ -1343,6 +1369,7 @@ function ModuleForm({
           position: submoduleIndex + 1,
           videoUrl: submodule.videoUrl.trim(),
           audioUrl: submodule.audioUrl.trim(),
+          audioTranscript: submodule.audioTranscript.trim(),
           contentHtml: submodule.contentHtml.trim(),
           exerciseGroups: submodule.exerciseGroups.map((group) => ({
             groupId: group.id,
