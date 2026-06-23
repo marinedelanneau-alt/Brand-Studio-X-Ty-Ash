@@ -85,15 +85,12 @@ export default function ModuleSubmoduleViewer({
                 />
               </div>
             </div>
-          ) : (
-            <div className="rounded-[1.4rem] border border-dashed border-[#eadfca] bg-white px-5 py-6 text-sm leading-7 text-[#8a8077]">
-              Aucune vidéo n&apos;est associée a ce sous-module.
-            </div>
-          )}
+          ) : null}
 
           <VoiceNotePlayer
             src={currentSubmodule.audio_url}
             title="Introduction audio"
+            subtitles={currentSubmodule.content_html}
           />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">

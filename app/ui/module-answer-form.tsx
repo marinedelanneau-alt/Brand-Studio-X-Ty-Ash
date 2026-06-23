@@ -1507,7 +1507,10 @@ export default function ModuleAnswerForm({
                 className="mt-5 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
               />
             ) : null}
-            <VoiceNotePlayer src={currentExercise.audio_url} />
+            <VoiceNotePlayer
+              src={currentExercise.audio_url}
+              subtitles={currentExercise.explanation || currentExercise.question}
+            />
             {currentExercise.type !== "prompt_open" &&
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "fill_blank" &&
@@ -2893,7 +2896,10 @@ function MultiQuestionOpenExerciseGroup({
               className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
             />
           ) : null}
-          <VoiceNotePlayer src={question.audio_url} />
+          <VoiceNotePlayer
+            src={question.audio_url}
+            subtitles={question.explanation || question.question}
+          />
           <span className="flex items-start gap-3">
             <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
               {question.question}
@@ -3231,7 +3237,12 @@ function ChecklistExerciseBlocks({
             {prompt ? (
               <p className="text-sm font-semibold leading-7 text-[#5f544a]">{prompt}</p>
             ) : null}
-            {questionIndex === 0 ? <VoiceNotePlayer src={exercise.audio_url} /> : null}
+            {questionIndex === 0 ? (
+              <VoiceNotePlayer
+                src={exercise.audio_url}
+                subtitles={exercise.explanation || exercise.question}
+              />
+            ) : null}
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="text"

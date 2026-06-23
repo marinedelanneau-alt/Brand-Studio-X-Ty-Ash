@@ -782,7 +782,10 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
         )
       ) : null}
 
-      <VoiceNotePlayer src={exercise.audio_url} />
+      <VoiceNotePlayer
+        src={exercise.audio_url}
+        subtitles={exercise.explanation || exercise.question}
+      />
 
       {showMainQuestion ? (
         <p className="text-base leading-7 text-[#5f544a]">{exercise.question}</p>

@@ -987,7 +987,10 @@ function QuestionCard({
               <p className="text-sm leading-6 text-[#6b625a]">{voiceUploadMessage}</p>
             ) : null}
             {question.audioUrl ? (
-              <VoiceNotePlayer src={question.audioUrl} />
+              <VoiceNotePlayer
+                src={question.audioUrl}
+                subtitles={question.explanation || question.question}
+              />
             ) : null}
           </label>
 
@@ -1682,6 +1685,7 @@ function ModuleForm({
                         <VoiceNotePlayer
                           src={activeSubmodule.audioUrl}
                           title="Introduction audio"
+                          subtitles={activeSubmodule.contentHtml}
                         />
                       ) : null}
                     </label>
