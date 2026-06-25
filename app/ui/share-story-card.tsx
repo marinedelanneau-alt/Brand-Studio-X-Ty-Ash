@@ -27,6 +27,7 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(function Sha
 ) {
   const title = showBrandName ? data.brandName : "Une marque en construction";
   const keywordLine = data.keywords.slice(0, 3).join(" · ");
+  const progress = Math.max(0, Math.min(data.progress, 100));
   const isColor = template === "color";
   const isMoodboard = template === "moodboard";
 
@@ -51,53 +52,55 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(function Sha
         </div>
       ) : null}
 
-      <div className="relative flex items-center justify-between">
-        <span className="rounded-full border border-white/70 bg-white/70 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+      <div className="relative flex items-center justify-between gap-3">
+        <span className="rounded-full border border-white/70 bg-white/70 px-4 py-2 text-[0.58rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
           Brand Studio
         </span>
-        <span className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[#6f645b]">
+        <span className="shrink-0 text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#6f645b]">
           {formatDate(data.completedAt)}
         </span>
       </div>
 
-      <div className="relative mt-16">
-        <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+      <div className="relative mt-14 min-w-0">
+        <p className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
           {data.moduleTitle} termine
         </p>
-        <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[3.15rem] leading-[0.88] text-[#332d35]">
+        <h2 className="mt-5 max-w-full break-words font-[family:var(--font-cormorant)] text-[2.65rem] leading-[0.92] text-[#332d35] [overflow-wrap:anywhere]">
           {title}
         </h2>
-        <p className="mt-7 max-w-[17rem] text-[1.28rem] leading-8 text-[#5f544a]">
+        <p className="mt-7 max-w-[17rem] text-[1.06rem] leading-7 text-[#5f544a]">
           {data.shareSentence}
         </p>
       </div>
 
-      <div className="relative mt-auto space-y-7">
+      <div className="relative mt-auto space-y-6">
         <div>
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
             Points abordes
           </p>
-          <p className="mt-3 text-[1.05rem] font-black text-[#332d35]">
+          <p className="mt-3 text-[0.98rem] font-black leading-6 text-[#332d35]">
             {keywordLine}
           </p>
         </div>
 
         <div>
           <div className="flex items-end justify-between">
-            <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
               Progression
             </p>
-            <p className="text-4xl font-black text-[#332d35]">{data.progress}%</p>
+            <p className="text-[2.35rem] font-black leading-none text-[#332d35]">
+              {progress}%
+            </p>
           </div>
           <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/70">
             <div
               className="h-full rounded-full bg-[#cf7430]"
-              style={{ width: `${Math.max(0, Math.min(data.progress, 100))}%` }}
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        <p className="border-t border-[#eadfca]/80 pt-5 text-center text-[0.74rem] font-black uppercase tracking-[0.16em] text-[#6f645b]">
+        <p className="border-t border-[#eadfca]/80 pt-5 text-center text-[0.68rem] font-black uppercase leading-5 tracking-[0.14em] text-[#6f645b]">
           Je construis ma marque avec Brand Studio
         </p>
       </div>

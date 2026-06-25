@@ -101,11 +101,14 @@ export default async function WorkspaceModulePage({
   const pdfHref = `/mon-espace/module/${currentModule.id}/summary-pdf`;
   const brandName = account.company_name?.trim() || workspace.project.name;
   const shareData = summaryCard
-    ? getModuleShareData({
-        brandName,
-        module: currentModule,
-        summary: summaryCard,
-      })
+    ? {
+        ...getModuleShareData({
+          brandName,
+          module: currentModule,
+          summary: summaryCard,
+        }),
+        progress: 100,
+      }
     : null;
   const nextModule = workspace.modules
     .filter((module) => module.position > currentModule.position)
