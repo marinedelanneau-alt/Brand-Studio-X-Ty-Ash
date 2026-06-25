@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect, unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
+import ModuleCompletionScreen from "@/app/ui/module-completion-screen";
 import ModuleLearningSection from "@/app/ui/module-learning-section";
 import ModulePreviewTrigger from "@/app/ui/module-preview-trigger";
-import ModuleShareSummary from "@/app/ui/module-share-summary";
+import { getModuleShareData } from "@/lib/get-module-share-data";
 import { buildModuleSummaryCard } from "@/lib/module-summary";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
@@ -97,6 +98,15 @@ export default async function WorkspaceModulePage({
       })
     : null;
   const completionHref = `/mon-espace/module/${currentModule.id}/complete`;
+  const pdfHref = `/mon-espace/module/${currentModule.id}/summary-pdf`;
+  const brandName = account.company_name?.trim() || workspace.project.name;
+  const shareData = summaryCard
+    ? getModuleShareData({
+        brandName,
+        module: currentModule,
+        summary: summaryCard,
+      })
+    : null;
   const nextModule = workspace.modules
     .filter((module) => module.position > currentModule.position)
     .sort((left, right) => left.position - right.position)[0];
@@ -155,11 +165,13 @@ export default async function WorkspaceModulePage({
             />
           ) : null}
 
-          {showSummary && summaryCard ? (
-            <ModuleShareSummary
+          {showSummary && summaryCard && shareData ? (
+            <ModuleCompletionScreen
               summary={summaryCard}
+              shareData={shareData}
               editHref={`/mon-espace/module/${currentModule.id}?mode=exercises`}
               completionHref={completionHref}
+              pdfHref={pdfHref}
               nextHref={
                 nextModule
                   ? `/mon-espace/module/${nextModule.id}`
