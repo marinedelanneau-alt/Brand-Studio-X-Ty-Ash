@@ -112,23 +112,23 @@ export default function ModuleCompletionScreen({
     const file = await dataUrlToFile(dataUrl, storyFilename);
     const sharePayload = {
       files: [file],
-      title: `Brand Studio - ${shareData.moduleTitle}`,
-      text: shareData.shareSentence,
+      title: `Story Brand Studio - ${shareData.moduleTitle}`,
+      text: `${shareData.shareSentence} Je construis ma marque avec Brand Studio.`,
     };
 
     if ("share" in navigator && (!("canShare" in navigator) || navigator.canShare(sharePayload))) {
       try {
         await navigator.share(sharePayload);
-        setStatusMessage("Story prete a etre partagee.");
+        setStatusMessage("Choisis Instagram dans le partage, puis ajoute l'image en story.");
         return;
       } catch {
-        setStatusMessage("Partage annule. Tu peux telecharger la story.");
+        setStatusMessage("Partage annule. Tu peux telecharger la story et l'ajouter sur Instagram.");
         return;
       }
     }
 
     downloadDataUrl(dataUrl, storyFilename);
-    setStatusMessage("Telecharge ta story puis ajoute-la sur Instagram, LinkedIn ou Facebook.");
+    setStatusMessage("Story telechargee. Ouvre Instagram, cree une story et selectionne cette image.");
   }
 
   async function copySummary() {
@@ -182,7 +182,7 @@ export default function ModuleCompletionScreen({
                   Story a partager
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#6f645b]">
-                  Choisis un rendu et decide si le nom de ta marque apparait.
+                  Choisis un rendu, puis partage l&apos;image directement depuis ton mobile.
                 </p>
               </div>
               <label className="flex items-center gap-3 text-sm font-bold text-[#5f544a]">
@@ -207,19 +207,19 @@ export default function ModuleCompletionScreen({
             </Link>
             <button
               type="button"
-              onClick={() => void downloadStory()}
+              onClick={() => void shareStory()}
               disabled={isExportingStory}
               className="inline-flex h-12 items-center justify-center rounded-[0.95rem] border border-[#efd7b8] bg-[#fff6e3] px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430] disabled:cursor-wait disabled:opacity-70"
             >
-              {isExportingStory ? "Generation..." : "Telecharger la story"}
+              {isExportingStory ? "Generation..." : "Partager en story Instagram"}
             </button>
             <button
               type="button"
-              onClick={() => void shareStory()}
+              onClick={() => void downloadStory()}
               disabled={isExportingStory}
               className="inline-flex h-12 items-center justify-center rounded-[0.95rem] border border-[#eadfca] bg-white px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
             >
-              Partager
+              Telecharger la story
             </button>
             <button
               type="button"
@@ -256,10 +256,14 @@ export default function ModuleCompletionScreen({
           {statusMessage ? (
             <p className="text-sm font-bold text-[#5f544a]">{statusMessage}</p>
           ) : (
-            <p className="text-sm leading-6 text-[#7b7068]">
-              Si le partage natif n&apos;est pas disponible, telecharge ta story puis
-              ajoute-la sur Instagram, LinkedIn ou Facebook.
-            </p>
+            <div className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-sm leading-6 text-[#7b7068]">
+              <p className="font-bold text-[#5f544a]">Pour Instagram Story</p>
+              <p className="mt-1">
+                Sur mobile, touche &quot;Partager en story Instagram&quot;, choisis Instagram
+                dans la feuille de partage, puis publie en story. Si Instagram
+                n&apos;apparait pas, telecharge l&apos;image et ajoute-la depuis ta galerie.
+              </p>
+            </div>
           )}
         </div>
 
