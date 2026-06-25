@@ -65,6 +65,10 @@ type ModuleState = {
 };
 
 type AnswersByExercise = Record<number, string[]>;
+type StoredAnswersDraft = {
+  updatedAt: number;
+  answers: AnswersByExercise;
+};
 type AiAssistMode = "suggest" | "improve";
 type AiAssistState = {
   status: "idle" | "loading" | "error" | "success";
@@ -87,6 +91,7 @@ const IMAGE_UPLOAD_TIMEOUT_MS = 45000;
 const IMAGE_UPLOAD_MAX_CLIENT_SIZE = 900 * 1024;
 const IMAGE_UPLOAD_MAX_DIMENSION = 1600;
 const MODULE_ANSWERS_DRAFT_PREFIX = "brand-studio-module-answers";
+const MODULE_ANSWERS_SESSION_DRAFT_PREFIX = "brand-studio-session-module-answers";
 const OTHER_CHOICE_VALUE_PREFIX = "__other_choice__:";
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
@@ -720,7 +725,11 @@ function getLocalAnswersDraftKey(moduleId: number) {
   return `${MODULE_ANSWERS_DRAFT_PREFIX}:${moduleId}`;
 }
 
-function parseLocalAnswersDraft(value: string | null) {
+function getSessionAnswersDraftKey(moduleId: number) {
+  return `${MODULE_ANSWERS_SESSION_DRAFT_PREFIX}:${moduleId}`;
+}
+
+function parseStoredAnswersDraft(value: string | null): StoredAnswersDraft | null {
   if (!value) {
     return null;
   }
@@ -737,7 +746,7 @@ function parseLocalAnswersDraft(value: string | null) {
         ? parsed.answers
         : parsed;
 
-    return Object.fromEntries(
+    const answers = Object.fromEntries(
       Object.entries(rawAnswers)
         .filter((entry): entry is [string, unknown[]] => Array.isArray(entry[1]))
         .map(([exerciseId, values]) => [
@@ -746,47 +755,79 @@ function parseLocalAnswersDraft(value: string | null) {
         ])
         .filter(([exerciseId]) => Number.isFinite(exerciseId)),
     ) satisfies AnswersByExercise;
+
+    const updatedAt =
+      "updatedAt" in parsed && typeof parsed.updatedAt === "number"
+        ? parsed.updatedAt
+        : 0;
+
+    return {
+      updatedAt,
+      answers,
+    };
   } catch {
     return null;
   }
 }
 
-function readLocalAnswersDraft(moduleId: number) {
+function readBrowserAnswersDraft(moduleId: number) {
   if (typeof window === "undefined") {
     return null;
   }
 
-  return parseLocalAnswersDraft(window.localStorage.getItem(getLocalAnswersDraftKey(moduleId)));
+  const localDraft = parseStoredAnswersDraft(
+    window.localStorage.getItem(getLocalAnswersDraftKey(moduleId)),
+  );
+  const sessionDraft = parseStoredAnswersDraft(
+    window.sessionStorage.getItem(getSessionAnswersDraftKey(moduleId)),
+  );
+
+  if (!localDraft) {
+    return sessionDraft?.answers ?? null;
+  }
+
+  if (!sessionDraft) {
+    return localDraft.answers;
+  }
+
+  return sessionDraft.updatedAt >= localDraft.updatedAt
+    ? sessionDraft.answers
+    : localDraft.answers;
 }
 
-function writeLocalAnswersDraft(moduleId: number, answers: AnswersByExercise) {
+function writeBrowserAnswersDraft(moduleId: number, answers: AnswersByExercise) {
   if (typeof window === "undefined") {
     return;
   }
 
+  const payload = JSON.stringify({
+    updatedAt: Date.now(),
+    answers,
+  });
+
   try {
-    window.localStorage.setItem(
-      getLocalAnswersDraftKey(moduleId),
-      JSON.stringify({
-        updatedAt: Date.now(),
-        answers,
-      }),
-    );
+    window.sessionStorage.setItem(getSessionAnswersDraftKey(moduleId), payload);
+  } catch {
+    // Session storage is a browser-side convenience; server persistence remains primary.
+  }
+
+  try {
+    window.localStorage.setItem(getLocalAnswersDraftKey(moduleId), payload);
   } catch {
     // Local storage is only a backup; server persistence remains the source of truth.
   }
 }
 
-function mergeLocalAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
-  const localDraft = readLocalAnswersDraft(module.id);
+function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
+  const browserDraft = readBrowserAnswersDraft(module.id);
 
-  if (!localDraft) {
+  if (!browserDraft) {
     return answers;
   }
 
   const exerciseById = new Map(module.exercises.map((exercise) => [exercise.id, exercise]));
   const validLocalEntries = Object.fromEntries(
-    Object.entries(localDraft).flatMap(([exerciseId, values]) => {
+    Object.entries(browserDraft).flatMap(([exerciseId, values]) => {
       const exercise = exerciseById.get(Number(exerciseId));
 
       if (!exercise || !Array.isArray(values)) {
@@ -838,7 +879,7 @@ function createInitialAnswers(module: WorkspaceModule) {
     return accumulator;
   }, {});
 
-  return mergeLocalAnswersDraft(module, answers);
+  return mergeBrowserAnswersDraft(module, answers);
 }
 
 function mergeAnswers(
@@ -1274,7 +1315,7 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     latestAnswersRef.current = answers;
-    writeLocalAnswersDraft(module.id, answers);
+    writeBrowserAnswersDraft(module.id, answers);
   }, [answers, module.id]);
 
   useEffect(() => {
