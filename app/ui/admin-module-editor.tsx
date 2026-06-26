@@ -3,6 +3,7 @@
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   createAdminVoiceNoteUpload,
   deleteAdminModule,
@@ -1387,7 +1388,9 @@ function ModuleForm({
   function onChange(updater: (module: EditorModule) => EditorModule) {
     const nextModule = updater(latestModuleRef.current);
     latestModuleRef.current = nextModule;
-    onModuleChange(() => nextModule);
+    flushSync(() => {
+      onModuleChange(() => nextModule);
+    });
   }
 
   const submodulesJson = useMemo(() => serializeSubmodules(module), [module]);
@@ -1503,7 +1506,8 @@ function ModuleForm({
               ref={submodulesInputRef}
               type="hidden"
               name="submodulesJson"
-              defaultValue={submodulesJson}
+              value={submodulesJson}
+              readOnly
             />
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
