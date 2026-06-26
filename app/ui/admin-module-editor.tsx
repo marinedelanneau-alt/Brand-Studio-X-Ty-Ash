@@ -2,7 +2,7 @@
 
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   createAdminVoiceNoteUpload,
   deleteAdminModule,
@@ -479,6 +479,24 @@ function serializeQuestion(question: EditorQuestion) {
     options,
     feedbackConfig: question.smartFeedbackConfig,
   };
+}
+
+function serializeSubmodules(module: EditorModule) {
+  return JSON.stringify(
+    module.submodules.map((submodule, submoduleIndex) => ({
+      clientId: submodule.id,
+      title: submodule.title.trim(),
+      position: submoduleIndex + 1,
+      videoUrl: submodule.videoUrl.trim(),
+      audioUrl: submodule.audioUrl.trim(),
+      audioTranscript: submodule.audioTranscript.trim(),
+      contentHtml: submodule.contentHtml.trim(),
+      exerciseGroups: submodule.exerciseGroups.map((group) => ({
+        groupId: group.id,
+        questions: group.questions.map((question) => serializeQuestion(question)),
+      })),
+    })),
+  );
 }
 
 function looksLikeHtml(value: string) {
@@ -1340,7 +1358,7 @@ function ModuleForm({
   heading,
   submitLabel,
   defaultOpen,
-  onChange,
+  onChange: onModuleChange,
 }: {
   module: EditorModule;
   heading: string;
@@ -1349,6 +1367,8 @@ function ModuleForm({
   onChange: (updater: (module: EditorModule) => EditorModule) => void;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const latestModuleRef = useRef(module);
+  const submodulesInputRef = useRef<HTMLInputElement>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
   const [submoduleVoiceUploadMessages, setSubmoduleVoiceUploadMessages] = useState<
     Record<string, string>
@@ -1360,25 +1380,17 @@ function ModuleForm({
     ? activeSubmoduleId
     : module.submodules[0]?.id ?? "";
 
-  const submodulesJson = useMemo(
-    () =>
-      JSON.stringify(
-        module.submodules.map((submodule, submoduleIndex) => ({
-          clientId: submodule.id,
-          title: submodule.title.trim(),
-          position: submoduleIndex + 1,
-          videoUrl: submodule.videoUrl.trim(),
-          audioUrl: submodule.audioUrl.trim(),
-          audioTranscript: submodule.audioTranscript.trim(),
-          contentHtml: submodule.contentHtml.trim(),
-          exerciseGroups: submodule.exerciseGroups.map((group) => ({
-            groupId: group.id,
-            questions: group.questions.map((question) => serializeQuestion(question)),
-          })),
-        })),
-      ),
-    [module.submodules],
-  );
+  useEffect(() => {
+    latestModuleRef.current = module;
+  }, [module]);
+
+  function onChange(updater: (module: EditorModule) => EditorModule) {
+    const nextModule = updater(latestModuleRef.current);
+    latestModuleRef.current = nextModule;
+    onModuleChange(() => nextModule);
+  }
+
+  const submodulesJson = useMemo(() => serializeSubmodules(module), [module]);
 
   const moduleLabel = module.title.trim() || heading;
   const totalExercises = module.submodules.reduce(
@@ -1479,10 +1491,20 @@ function ModuleForm({
           <form
             action={saveAdminModule}
             encType="multipart/form-data"
+            onSubmit={() => {
+              if (submodulesInputRef.current) {
+                submodulesInputRef.current.value = serializeSubmodules(latestModuleRef.current);
+              }
+            }}
             className="mx-auto max-w-6xl space-y-6"
           >
             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
-            <input type="hidden" name="submodulesJson" value={submodulesJson} />
+            <input
+              ref={submodulesInputRef}
+              type="hidden"
+              name="submodulesJson"
+              defaultValue={submodulesJson}
+            />
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
                 <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Titre du module</span>
