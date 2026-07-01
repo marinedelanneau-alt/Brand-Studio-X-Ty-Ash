@@ -1369,6 +1369,7 @@ function ModuleForm({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const latestModuleRef = useRef(module);
+  const formRef = useRef<HTMLFormElement>(null);
   const submodulesInputRef = useRef<HTMLInputElement>(null);
   const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
@@ -1381,10 +1382,15 @@ function ModuleForm({
   )
     ? activeSubmoduleId
     : module.submodules[0]?.id ?? "";
+  const visibleActiveSubmoduleIdRef = useRef(visibleActiveSubmoduleId);
 
   useEffect(() => {
     latestModuleRef.current = module;
   }, [module]);
+
+  useEffect(() => {
+    visibleActiveSubmoduleIdRef.current = visibleActiveSubmoduleId;
+  }, [visibleActiveSubmoduleId]);
 
   function onChange(updater: (module: EditorModule) => EditorModule) {
     const nextModule = updater(latestModuleRef.current);
@@ -1395,16 +1401,17 @@ function ModuleForm({
   }
 
   function getModuleReadyForSubmit() {
-    const editorHtml = activeSubmoduleContentEditorRef.current?.getHTML();
+    const editorHtml = activeSubmoduleContentEditorRef.current?.flush();
+    const activeContentSubmoduleId = visibleActiveSubmoduleIdRef.current;
 
-    if (editorHtml === undefined || !activeSubmodule) {
+    if (editorHtml === undefined || !activeContentSubmoduleId) {
       return latestModuleRef.current;
     }
 
     const nextModule = {
       ...latestModuleRef.current,
       submodules: latestModuleRef.current.submodules.map((submodule) =>
-        submodule.id === activeSubmodule.id
+        submodule.id === activeContentSubmoduleId
           ? { ...submodule, contentHtml: editorHtml }
           : submodule,
       ),
@@ -1413,6 +1420,34 @@ function ModuleForm({
     latestModuleRef.current = nextModule;
     return nextModule;
   }
+
+  function serializeLatestSubmodulesForSubmit() {
+    const submodulesPayload = serializeSubmodules(getModuleReadyForSubmit());
+
+    if (submodulesInputRef.current) {
+      submodulesInputRef.current.value = submodulesPayload;
+    }
+
+    return submodulesPayload;
+  }
+
+  useEffect(() => {
+    const form = formRef.current;
+
+    if (!form) {
+      return;
+    }
+
+    const handleFormData = (event: FormDataEvent) => {
+      event.formData.set("submodulesJson", serializeLatestSubmodulesForSubmit());
+    };
+
+    form.addEventListener("formdata", handleFormData);
+
+    return () => {
+      form.removeEventListener("formdata", handleFormData);
+    };
+  });
 
   const submodulesJson = useMemo(() => serializeSubmodules(module), [module]);
 
@@ -1513,12 +1548,11 @@ function ModuleForm({
       {isOpen ? (
         <div className="border-t border-[#eadfca] bg-[#fffdf7] px-4 py-6 sm:px-6">
           <form
+            ref={formRef}
             action={saveAdminModule}
             encType="multipart/form-data"
-            onSubmit={() => {
-              if (submodulesInputRef.current) {
-                submodulesInputRef.current.value = serializeSubmodules(getModuleReadyForSubmit());
-              }
+            onSubmitCapture={() => {
+              serializeLatestSubmodulesForSubmit();
             }}
             className="mx-auto max-w-6xl space-y-6"
           >
@@ -1527,7 +1561,7 @@ function ModuleForm({
               ref={submodulesInputRef}
               type="hidden"
               name="submodulesJson"
-              value={submodulesJson}
+              defaultValue={submodulesJson}
               readOnly
             />
             <div className="grid gap-4 md:grid-cols-2">
