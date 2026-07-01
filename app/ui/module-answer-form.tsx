@@ -201,7 +201,10 @@ function normalizePlaceholderText(value: string) {
 }
 
 function normalizeDisplayText(value: string | null | undefined) {
-  return normalizeVisibleContent(value);
+  return normalizeVisibleContent(value)
+    .replace(/[.!?;:]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function isOtherChoiceOption(value: string | null | undefined) {
@@ -393,9 +396,21 @@ function isDuplicateDisplayText(
     return false;
   }
 
-  return candidates.some(
-    (candidate) => normalizeDisplayText(candidate) === normalizedValue,
-  );
+  return candidates.some((candidate) => {
+    const normalizedCandidate = normalizeDisplayText(candidate);
+
+    if (!normalizedCandidate) {
+      return false;
+    }
+
+    return (
+      normalizedCandidate === normalizedValue ||
+      (normalizedCandidate.length >= 12 &&
+        normalizedValue.includes(normalizedCandidate)) ||
+      (normalizedValue.length >= 12 &&
+        normalizedCandidate.includes(normalizedValue))
+    );
+  });
 }
 
 function shouldShowExerciseExplanation(
@@ -425,10 +440,11 @@ function getAnswerPlaceholder(
 
   const normalizedPlaceholder = normalizePlaceholderText(placeholder);
   const duplicateSources = [displayedQuestion, exercise.question, exercise.explanation]
-    .filter((value): value is string => Boolean(value?.trim()))
-    .map(normalizePlaceholderText);
+    .filter((value): value is string => Boolean(value?.trim()));
 
-  return duplicateSources.includes(normalizedPlaceholder) ? fallback : placeholder;
+  return isDuplicateDisplayText(normalizedPlaceholder, duplicateSources)
+    ? fallback
+    : placeholder;
 }
 
 function getTextMatchCandidates(value: string) {
@@ -2931,7 +2947,7 @@ function MultiQuestionOpenExerciseGroup({
           key={question.id}
           className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
         >
-          {shouldShowExerciseExplanation(question) ? (
+          {shouldShowExerciseExplanation(question, [question.question]) ? (
             <PedagogicalContent
               content={question.explanation}
               className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
