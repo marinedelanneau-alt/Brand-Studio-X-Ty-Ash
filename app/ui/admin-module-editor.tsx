@@ -60,7 +60,7 @@ import BrandPersonaAdminEditor from "./brand-persona-admin-editor";
 import ColorPaletteAdminEditor from "./color-palette-admin-editor";
 import ExercisePreview from "./exercise-preview";
 import MoodboardAdminEditor from "./moodboard-admin-editor";
-import RichTextEditor from "./rich-text-editor";
+import RichTextEditor, { type RichTextEditorHandle } from "./rich-text-editor";
 import SmartFeedbackAdminEditor from "./smart-feedback-admin-editor";
 import SpectrumAdminEditor from "./spectrum-admin-editor";
 import VoiceNotePlayer from "./voice-note-player";
@@ -1370,6 +1370,7 @@ function ModuleForm({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const latestModuleRef = useRef(module);
   const submodulesInputRef = useRef<HTMLInputElement>(null);
+  const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
   const [submoduleVoiceUploadMessages, setSubmoduleVoiceUploadMessages] = useState<
     Record<string, string>
@@ -1391,6 +1392,26 @@ function ModuleForm({
     flushSync(() => {
       onModuleChange(() => nextModule);
     });
+  }
+
+  function getModuleReadyForSubmit() {
+    const editorHtml = activeSubmoduleContentEditorRef.current?.getHTML();
+
+    if (editorHtml === undefined || !activeSubmodule) {
+      return latestModuleRef.current;
+    }
+
+    const nextModule = {
+      ...latestModuleRef.current,
+      submodules: latestModuleRef.current.submodules.map((submodule) =>
+        submodule.id === activeSubmodule.id
+          ? { ...submodule, contentHtml: editorHtml }
+          : submodule,
+      ),
+    };
+
+    latestModuleRef.current = nextModule;
+    return nextModule;
   }
 
   const submodulesJson = useMemo(() => serializeSubmodules(module), [module]);
@@ -1496,7 +1517,7 @@ function ModuleForm({
             encType="multipart/form-data"
             onSubmit={() => {
               if (submodulesInputRef.current) {
-                submodulesInputRef.current.value = serializeSubmodules(latestModuleRef.current);
+                submodulesInputRef.current.value = serializeSubmodules(getModuleReadyForSubmit());
               }
             }}
             className="mx-auto max-w-6xl space-y-6"
@@ -1767,6 +1788,7 @@ function ModuleForm({
                     <div className="space-y-3">
                       <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Contenu</span>
                       <RichTextEditor
+                        ref={activeSubmoduleContentEditorRef}
                         value={activeSubmodule.contentHtml}
                         onChange={(contentHtml) =>
                           onChange((current) => ({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Node, mergeAttributes } from "@tiptap/core";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -59,15 +59,20 @@ function ToolbarButton({
   );
 }
 
-export default function RichTextEditor({
-  value,
-  onChange,
-  placeholder,
-}: {
+export type RichTextEditorHandle = {
+  flush: () => string;
+  getHTML: () => string;
+};
+
+const RichTextEditor = forwardRef<RichTextEditorHandle, {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
-}) {
+}>(function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+}, ref) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -100,6 +105,19 @@ export default function RichTextEditor({
       onChange(currentEditor.getHTML());
     },
   });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      flush: () => {
+        const html = editor?.getHTML() ?? value;
+        onChange(html);
+        return html;
+      },
+      getHTML: () => editor?.getHTML() ?? value,
+    }),
+    [editor, onChange, value],
+  );
 
   useEffect(() => {
     if (!editor) {
@@ -261,4 +279,6 @@ export default function RichTextEditor({
       <EditorContent editor={editor} />
     </div>
   );
-}
+});
+
+export default RichTextEditor;
