@@ -1,8 +1,58 @@
 "use client";
 
+import Image from "next/image";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
+
+const COLOR_SYMBOLISM_RESOURCE = {
+  href: "/symbolique-couleurs-communication.svg",
+  title: "La symbolique des couleurs en communication",
+  fileName: "symbolique-couleurs-communication.svg",
+};
+
+function normalizeForSearch(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function shouldShowColorSymbolismResource(
+  submodule: WorkspaceModule["submodules"][number],
+) {
+  const haystack = normalizeForSearch(
+    `${submodule.title} ${submodule.content_html}`,
+  );
+
+  return haystack.includes("palette") && haystack.includes("couleur");
+}
+
+function ColorSymbolismResource() {
+  return (
+    <figure className="mt-8 overflow-hidden rounded-[1.25rem] border border-[#eadfca] bg-[#fffdf8] p-3">
+      <Image
+        src={COLOR_SYMBOLISM_RESOURCE.href}
+        alt={COLOR_SYMBOLISM_RESOURCE.title}
+        width={1536}
+        height={960}
+        className="w-full rounded-[0.9rem] border border-[#f0e4d3] bg-white"
+      />
+      <figcaption className="flex flex-col gap-3 px-1 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm font-semibold leading-6 text-[#5f544a]">
+          {COLOR_SYMBOLISM_RESOURCE.title}
+        </p>
+        <a
+          href={COLOR_SYMBOLISM_RESOURCE.href}
+          download={COLOR_SYMBOLISM_RESOURCE.fileName}
+          className="inline-flex h-11 items-center justify-center rounded-[0.85rem] border border-[#df9b39] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#b5661f] transition hover:bg-[#fff8f1]"
+        >
+          Télécharger le visuel
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
 
 export default function ModuleSubmoduleViewer({
   submodules,
@@ -21,6 +71,9 @@ export default function ModuleSubmoduleViewer({
         isAnswerableExerciseType(exercise.type),
       ).length
     : 0;
+  const showColorSymbolismResource = currentSubmodule
+    ? shouldShowColorSymbolismResource(currentSubmodule)
+    : false;
 
   if (!currentSubmodule) {
     return (
@@ -98,6 +151,7 @@ export default function ModuleSubmoduleViewer({
               className="module-content max-w-none text-[#5f544a]"
               dangerouslySetInnerHTML={{ __html: currentSubmodule.content_html }}
             />
+            {showColorSymbolismResource ? <ColorSymbolismResource /> : null}
           </div>
         </div>
       </section>
