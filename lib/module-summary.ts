@@ -565,15 +565,36 @@ function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
   const summarizedValues = highlights
     .map((highlight) => getParagraphSummaryValue(highlight.value))
     .filter((value) => value && !isPlaceholderSummaryValue(value))
-    .slice(0, 4);
+    .slice(0, 8);
 
   if (summarizedValues.length === 0) {
     return "Les grands axes de ce module sont posés et peuvent maintenant servir de repère concret.";
   }
 
+  const mainPoints = summarizedValues.slice(0, 4);
+  const additionalPoints = summarizedValues.slice(4);
+  const paragraph = [
+    `En synthese, ${joinSummaryParts(mainPoints)}.`,
+    additionalPoints.length > 0
+      ? `On retient aussi ${joinSummaryParts(additionalPoints)}.`
+      : "",
+  ].filter(Boolean).join(" ");
+
+  return truncateText(paragraph, 520);
+}
+
+function joinSummaryParts(values: string[]) {
+  if (values.length <= 1) {
+    return values[0] ?? "";
+  }
+
+  if (values.length === 2) {
+    return `${values[0]} et ${values[1]}`;
+  }
+
   return truncateText(
-    `En synthese, ${summarizedValues.join(", ")}.`,
-    240,
+    `${values.slice(0, -1).join(", ")} et ${values[values.length - 1]}`,
+    480,
   );
 }
 
