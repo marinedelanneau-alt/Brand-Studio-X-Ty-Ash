@@ -624,25 +624,15 @@ function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
 }
 
 function buildSubmoduleInsightSentence(
-  submoduleTitle: string,
+  _submoduleTitle: string,
   highlights: ModuleSummaryHighlight[],
 ) {
-  const summarizedValues = [
-    ...new Set(
-      highlights
-        .map((highlight) => getParagraphSummaryValue(highlight.value))
-        .filter((value) => value && !isPlaceholderSummaryValue(value)),
-    ),
-  ].slice(0, 5);
-
-  if (summarizedValues.length === 0) {
+  if (highlights.length === 0) {
     return "Aucune réponse n'a encore été formulée dans ce sous-module.";
   }
 
-  return truncateText(
-    `${submoduleTitle} met en avant ${joinSummaryParts(summarizedValues)}.`,
-    360,
-  );
+  const pointLabel = highlights.length > 1 ? "points clés" : "point clé";
+  return `Tu as formulé ${highlights.length} ${pointLabel} dans ce sous-module. L'essentiel est résumé dans les cartes ci-dessous.`;
 }
 
 function joinSummaryParts(values: string[]) {
