@@ -1561,7 +1561,7 @@ function ModuleForm({
               ref={submodulesInputRef}
               type="hidden"
               name="submodulesJson"
-              defaultValue={submodulesJson}
+              value={submodulesJson}
               readOnly
             />
             <div className="grid gap-4 md:grid-cols-2">
@@ -1834,6 +1834,15 @@ function ModuleForm({
                         }
                         placeholder="Ajoutez ici le contenu du sous-module."
                       />
+                      <button
+                        type="submit"
+                        onClick={() => {
+                          serializeLatestSubmodulesForSubmit();
+                        }}
+                        className="flex h-11 items-center justify-center rounded-[0.8rem] border border-[#df9b39] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#b5661f] transition hover:bg-[#fff8f1]"
+                      >
+                        Enregistrer ce contenu
+                      </button>
                     </div>
 
                     <div className="space-y-4 rounded-[1rem] border border-[#f0e6d7] bg-[#fffdf7] p-4">
