@@ -64,20 +64,10 @@ export default function ModuleShareSummary({
       </div>
 
       <div className="px-6 py-8 sm:px-8 sm:py-10">
-        <div className="grid gap-4 lg:grid-cols-2">
-          {summary.quickRecap.map((item, index) => (
-            <article
-              key={`${item.label}-${index}`}
-              className="rounded-[1.35rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(91,73,57,0.05)]"
-            >
-              <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
-                {item.label}
-              </p>
-              <p className="mt-3 whitespace-pre-line text-[0.98rem] leading-7 text-[#564c45]">
-                {formatSummaryValue(item.value)}
-              </p>
-            </article>
-          ))}
+        <div className="rounded-[1.35rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(91,73,57,0.05)]">
+          <p className="whitespace-pre-line text-[0.98rem] leading-7 text-[#564c45]">
+            {summary.insight}
+          </p>
         </div>
 
         <div className="mt-6 rounded-[1.35rem] border border-[#eadfca] bg-white px-5 py-5">
@@ -119,8 +109,4 @@ export default function ModuleShareSummary({
       </div>
     </section>
   );
-}
-
-function formatSummaryValue(value: string) {
-  return value.replaceAll(" | ", "\n");
 }

@@ -18,8 +18,6 @@ function formatSummaryForClipboard(summary: ModuleSummaryCard) {
     `${summary.title} - ${summary.subtitle}`,
     "",
     summary.insight,
-    "",
-    ...summary.quickRecap.map((item) => `${item.label}: ${item.value}`),
   ].join("\n");
 }
 
@@ -161,18 +159,6 @@ export default function ModuleCompletionScreen({
               Resume court
             </p>
             <p className="mt-3 text-sm leading-7 text-[#6f645b]">{summary.insight}</p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {summary.quickRecap.slice(0, 4).map((item) => (
-                <div key={item.label} className="border-t border-[#f0e4d3] pt-3">
-                  <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
-                    {item.label}
-                  </p>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#5f544a]">
-                    {item.value}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
 
           <div className="space-y-4 rounded-[1.25rem] border border-[#eadfca] bg-white px-5 py-5">

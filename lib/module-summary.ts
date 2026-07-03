@@ -562,15 +562,33 @@ function collectFocusWords(module: WorkspaceModule) {
 }
 
 function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
-  if (highlights.length === 0) {
+  const summarizedValues = highlights
+    .map((highlight) => getParagraphSummaryValue(highlight.value))
+    .filter((value) => value && !isPlaceholderSummaryValue(value))
+    .slice(0, 4);
+
+  if (summarizedValues.length === 0) {
     return "Les grands axes de ce module sont posés et peuvent maintenant servir de repère concret.";
   }
 
-  const firstPoints = highlights.slice(0, 2).map((highlight) => highlight.value);
   return truncateText(
-    `En synthese: ${firstPoints.join(" Puis ")}.`,
-    200,
+    `En synthese, ${summarizedValues.join(", ")}.`,
+    240,
   );
+}
+
+function getParagraphSummaryValue(value: string) {
+  return compactText(value)
+    .split(" | ")
+    .map((part) => part.replace(/^[^:]{1,80}:\s*/, "").trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+function isPlaceholderSummaryValue(value: string) {
+  const normalized = normalizeForSearch(value);
+
+  return normalized === "a completer" || normalized.includes("a completer");
 }
 
 function buildFillBlankSentence(question: string, values: string[]) {
