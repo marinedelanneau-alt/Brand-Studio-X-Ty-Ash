@@ -64,10 +64,53 @@ export default function ModuleShareSummary({
       </div>
 
       <div className="px-6 py-8 sm:px-8 sm:py-10">
-        <div className="rounded-[1.35rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(91,73,57,0.05)]">
-          <p className="whitespace-pre-line text-[0.98rem] leading-7 text-[#564c45]">
-            {summary.insight}
-          </p>
+        <div className="grid gap-4">
+          {(summary.submoduleRecaps.length > 0
+            ? summary.submoduleRecaps
+            : [{
+                id: 0,
+                position: 1,
+                title: summary.title,
+                summary: summary.insight,
+                highlights: summary.highlights,
+              }]
+          ).map((submodule) => (
+            <article
+              key={`${submodule.id}-${submodule.position}`}
+              className="overflow-hidden rounded-[1.35rem] border border-[#eadfca] bg-white shadow-[0_12px_30px_rgba(91,73,57,0.05)]"
+            >
+              <div className="border-b border-[#f0e4d3] bg-[#fffaf2] px-5 py-4">
+                <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                  Sous-module {submodule.position}
+                </p>
+                <h3 className="mt-1 text-lg font-extrabold leading-6 text-[#4b4550]">
+                  {submodule.title}
+                </h3>
+              </div>
+              <div className="space-y-4 px-5 py-5">
+                <p className="text-[0.98rem] leading-7 text-[#564c45]">
+                  {submodule.summary}
+                </p>
+                {submodule.highlights.length > 0 ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {submodule.highlights.map((item, index) => (
+                      <div
+                        key={`${item.label}-${index}`}
+                        className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3"
+                      >
+                        <p className="text-[0.66rem] font-black uppercase tracking-[0.14em] text-[#7a7087]">
+                          {item.label}
+                        </p>
+                        <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
+                          {item.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </article>
+          ))}
         </div>
 
         <div className="mt-6 rounded-[1.35rem] border border-[#eadfca] bg-white px-5 py-5">

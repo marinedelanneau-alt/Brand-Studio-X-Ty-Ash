@@ -151,6 +151,24 @@ export function ModulePdfSummary({
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Resume par sous-module</Text>
+          <View style={styles.grid}>
+            {summary.submoduleRecaps.map((submodule) => (
+              <View key={submodule.id} style={styles.card}>
+                <Text style={styles.label}>Sous-module {submodule.position}</Text>
+                <Text style={styles.value}>{submodule.title}</Text>
+                <Text style={styles.bodyText}>{submodule.summary}</Text>
+                {submodule.highlights.slice(0, 3).map((item, index) => (
+                  <Text key={`${item.label}-${index}`} style={styles.bodyText}>
+                    {`${item.label}: ${item.value}`}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Conclusion</Text>
           <Text style={styles.conclusion}>
             {`${shareData.shareSentence} Tu disposes maintenant d'une base plus claire pour avancer dans la construction de ton identite de marque.`}

@@ -20,6 +20,14 @@ export type ModuleSummaryHighlight = {
   value: string;
 };
 
+export type ModuleSubmoduleSummary = {
+  id: number;
+  title: string;
+  position: number;
+  summary: string;
+  highlights: ModuleSummaryHighlight[];
+};
+
 export type ModuleSummaryCard = {
   eyebrow: string;
   title: string;
@@ -29,6 +37,7 @@ export type ModuleSummaryCard = {
   focusWords: string[];
   highlights: ModuleSummaryHighlight[];
   quickRecap: ModuleSummaryHighlight[];
+  submoduleRecaps: ModuleSubmoduleSummary[];
   footer: string;
 };
 
@@ -50,6 +59,7 @@ export function buildModuleSummaryCard(input: {
   const highlights = detailedHighlights.slice(0, 5);
   const quickRecap =
     buildModuleSpecificQuickRecap(input.module) ?? buildGenericQuickRecap(input.module);
+  const submoduleRecaps = buildSubmoduleRecaps(input.module);
 
   return {
     eyebrow: `Module ${input.module.position}`,
@@ -60,9 +70,32 @@ export function buildModuleSummaryCard(input: {
     focusWords,
     highlights,
     quickRecap,
+    submoduleRecaps,
     footer:
       "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand tu le souhaites.",
   } satisfies ModuleSummaryCard;
+}
+
+function buildSubmoduleRecaps(module: WorkspaceModule) {
+  return module.submodules.map((submodule) => {
+    const highlights = submodule.exercises.flatMap((exercise) => {
+      const values = module.answers[exercise.id] ?? [];
+      const summary = summarizeExerciseAnswer(exercise, values);
+
+      return summary ? [summary] : [];
+    });
+    const completedHighlights = highlights.filter(
+      (highlight) => !isPlaceholderSummaryValue(highlight.value),
+    );
+
+    return {
+      id: submodule.id,
+      title: submodule.title,
+      position: submodule.position,
+      summary: buildSubmoduleInsightSentence(submodule.title, completedHighlights),
+      highlights: completedHighlights.slice(0, 4),
+    } satisfies ModuleSubmoduleSummary;
+  });
 }
 
 function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
@@ -588,6 +621,28 @@ function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
   ].filter(Boolean).join(" ");
 
   return truncateText(paragraph, 1000);
+}
+
+function buildSubmoduleInsightSentence(
+  submoduleTitle: string,
+  highlights: ModuleSummaryHighlight[],
+) {
+  const summarizedValues = [
+    ...new Set(
+      highlights
+        .map((highlight) => getParagraphSummaryValue(highlight.value))
+        .filter((value) => value && !isPlaceholderSummaryValue(value)),
+    ),
+  ].slice(0, 5);
+
+  if (summarizedValues.length === 0) {
+    return "Aucune réponse n'a encore été formulée dans ce sous-module.";
+  }
+
+  return truncateText(
+    `${submoduleTitle} met en avant ${joinSummaryParts(summarizedValues)}.`,
+    360,
+  );
 }
 
 function joinSummaryParts(values: string[]) {
