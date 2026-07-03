@@ -332,6 +332,12 @@ export default async function MonEspacePage() {
                             {module.title}
                           </Link>
                         ))}
+                        <Link
+                          href="/mon-espace/plan-action-communication"
+                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
+                        >
+                          Plan d&apos;action communication
+                        </Link>
                       </div>
                     </nav>
                   ) : null}

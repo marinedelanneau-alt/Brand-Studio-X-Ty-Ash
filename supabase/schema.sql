@@ -283,6 +283,118 @@ create index if not exists purchase_activation_codes_email_idx
 create index if not exists purchase_activation_codes_checkout_session_idx
   on public.purchase_activation_codes (stripe_checkout_session_id);
 
+create table if not exists public.communication_actions (
+  id uuid primary key default gen_random_uuid(),
+  user_id bigint not null references public.client_access_codes(id) on delete cascade,
+  project_id bigint not null references public.brand_projects(id) on delete cascade,
+  source_idea_id uuid,
+  title text not null,
+  description text,
+  objective text,
+  secondary_objective text,
+  target_audience jsonb not null default '[]'::jsonb,
+  action_type text,
+  start_date date,
+  target_month text,
+  target_quarter text,
+  recurrence text,
+  impact_level text,
+  effort_level text,
+  calculated_priority text,
+  estimated_budget numeric,
+  required_resources jsonb not null default '[]'::jsonb,
+  external_help_needed text,
+  first_step text,
+  status text not null default 'Idée',
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.communication_actions
+  add column if not exists user_id bigint references public.client_access_codes(id) on delete cascade;
+
+alter table public.communication_actions
+  add column if not exists project_id bigint references public.brand_projects(id) on delete cascade;
+
+alter table public.communication_actions
+  add column if not exists source_idea_id uuid;
+
+alter table public.communication_actions
+  add column if not exists title text;
+
+alter table public.communication_actions
+  add column if not exists description text;
+
+alter table public.communication_actions
+  add column if not exists objective text;
+
+alter table public.communication_actions
+  add column if not exists secondary_objective text;
+
+alter table public.communication_actions
+  add column if not exists target_audience jsonb not null default '[]'::jsonb;
+
+alter table public.communication_actions
+  add column if not exists action_type text;
+
+alter table public.communication_actions
+  add column if not exists start_date date;
+
+alter table public.communication_actions
+  add column if not exists target_month text;
+
+alter table public.communication_actions
+  add column if not exists target_quarter text;
+
+alter table public.communication_actions
+  add column if not exists recurrence text;
+
+alter table public.communication_actions
+  add column if not exists impact_level text;
+
+alter table public.communication_actions
+  add column if not exists effort_level text;
+
+alter table public.communication_actions
+  add column if not exists calculated_priority text;
+
+alter table public.communication_actions
+  add column if not exists estimated_budget numeric;
+
+alter table public.communication_actions
+  add column if not exists required_resources jsonb not null default '[]'::jsonb;
+
+alter table public.communication_actions
+  add column if not exists external_help_needed text;
+
+alter table public.communication_actions
+  add column if not exists first_step text;
+
+alter table public.communication_actions
+  add column if not exists status text not null default 'Idée';
+
+alter table public.communication_actions
+  add column if not exists sort_order integer not null default 0;
+
+alter table public.communication_actions
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.communication_actions
+  add column if not exists updated_at timestamptz not null default now();
+
+create index if not exists communication_actions_project_idx
+  on public.communication_actions (project_id, sort_order, created_at desc);
+
+create index if not exists communication_actions_user_idx
+  on public.communication_actions (user_id);
+
+create index if not exists communication_actions_status_idx
+  on public.communication_actions (project_id, status);
+
+create index if not exists communication_actions_start_date_idx
+  on public.communication_actions (project_id, start_date);
+
 alter table public.client_access_codes enable row level security;
 alter table public.brand_projects enable row level security;
 alter table public.brand_modules enable row level security;
@@ -293,3 +405,64 @@ alter table public.project_module_states enable row level security;
 alter table public.brand_exports enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.purchase_activation_codes enable row level security;
+alter table public.communication_actions enable row level security;
+
+drop policy if exists communication_actions_select_own on public.communication_actions;
+create policy communication_actions_select_own
+  on public.communication_actions
+  for select
+  using (
+    exists (
+      select 1
+      from public.client_access_codes account
+      where account.id = communication_actions.user_id
+        and account.auth_user_id = auth.uid()
+    )
+  );
+
+drop policy if exists communication_actions_insert_own on public.communication_actions;
+create policy communication_actions_insert_own
+  on public.communication_actions
+  for insert
+  with check (
+    exists (
+      select 1
+      from public.client_access_codes account
+      where account.id = communication_actions.user_id
+        and account.auth_user_id = auth.uid()
+    )
+  );
+
+drop policy if exists communication_actions_update_own on public.communication_actions;
+create policy communication_actions_update_own
+  on public.communication_actions
+  for update
+  using (
+    exists (
+      select 1
+      from public.client_access_codes account
+      where account.id = communication_actions.user_id
+        and account.auth_user_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1
+      from public.client_access_codes account
+      where account.id = communication_actions.user_id
+        and account.auth_user_id = auth.uid()
+    )
+  );
+
+drop policy if exists communication_actions_delete_own on public.communication_actions;
+create policy communication_actions_delete_own
+  on public.communication_actions
+  for delete
+  using (
+    exists (
+      select 1
+      from public.client_access_codes account
+      where account.id = communication_actions.user_id
+        and account.auth_user_id = auth.uid()
+    )
+  );

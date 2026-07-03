@@ -47,6 +47,7 @@ import {
   parseStoredColorPaletteConfig,
 } from "@/lib/color-palette";
 import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
+import { isMissingDatabaseObject } from "@/lib/database-errors";
 import {
   getSerializedSmartFeedbackOption,
   parseStoredSmartFeedbackConfig,
@@ -83,17 +84,6 @@ export type {
   ModuleProgress,
   WorkspaceModule,
 };
-
-function isMissingDatabaseObject(error: { code?: string; message?: string } | null) {
-  const message = error?.message?.toLowerCase() ?? "";
-
-  return (
-    error?.code === "PGRST205" ||
-    message.includes("could not find the table") ||
-    message.includes("could not find the column") ||
-    message.includes("schema cache")
-  );
-}
 
 function normalizeOptions(value: unknown) {
   if (!Array.isArray(value)) {
