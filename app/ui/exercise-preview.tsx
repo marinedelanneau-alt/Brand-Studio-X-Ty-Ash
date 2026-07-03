@@ -715,38 +715,24 @@ function PreviewPaletteCard({
 function PreviewEditorialCalendar() {
   return (
     <div className="overflow-hidden rounded-[1.4rem] border border-[#eadfca] bg-white">
-      <div className="flex items-center justify-between border-b border-[#eadfca] bg-[#fffdf7] px-4 py-4">
+      <div className="flex items-center justify-between gap-4 border-b border-[#eadfca] bg-[#fffdf7] px-4 py-4">
         <div>
           <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
             Calendrier éditorial
           </p>
-          <p className="mt-1 text-xl font-semibold text-[#4b4550]">Vue mensuelle</p>
+          <p className="mt-1 text-xl font-semibold text-[#4b4550]">Vue Notion 2026</p>
         </div>
         <span className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
-          Ajouter
+          Notion
         </span>
       </div>
-      <div className="grid grid-cols-7 bg-[#fffaf4] text-center text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#9a8f86]">
-        {["lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim."].map((day) => (
-          <div key={day} className="px-2 py-2">
-            {day}
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7">
-        {Array.from({ length: 14 }, (_, index) => (
-          <div key={index} className="min-h-20 border-r border-t border-[#f0e4d3] p-2">
-            <p className="text-xs font-semibold text-[#6b625a]">{index + 1}</p>
-            {index === 2 || index === 8 ? (
-              <div className="mt-2 rounded-[0.7rem] border border-[#eadfca] bg-[#fffdf9] px-2 py-2 text-left text-xs text-[#4b4550]">
-                Idee de contenu
-                <span className="mt-1 block w-fit rounded-full bg-[#f4e4f8] px-2 py-1 text-[0.62rem] text-[#8b5aa2]">
-                  À produire
-                </span>
-              </div>
-            ) : null}
-          </div>
-        ))}
+      <div className="bg-[#fbf6ee] p-4">
+        <div className="flex min-h-52 items-center justify-center rounded-[1rem] border border-dashed border-[#eadfca] bg-white px-6 text-center">
+          <p className="max-w-md text-sm leading-7 text-[#6f645b]">
+            L&apos;exercice affichera le calendrier éditorial 2026 réalisé dans Notion, avec un accès
+            direct pour l&apos;ouvrir dans un nouvel onglet.
+          </p>
+        </div>
       </div>
     </div>
   );
