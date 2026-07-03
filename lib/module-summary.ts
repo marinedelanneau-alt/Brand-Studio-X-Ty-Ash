@@ -2,11 +2,17 @@ import {
   getTableCellCount,
   getPromptOpenLabel,
   isAnswerableExerciseType,
+  parseIndexedAnswerItems,
   parseChecklistEntries,
   parseColorOption,
+  parseStoredExerciseQuestionConfig,
   parseStoredTableConfig,
   splitFillBlankText,
 } from "@/lib/exercise-types";
+import {
+  getBrandPersonaFields,
+  parseStoredBrandPersonaConfig,
+} from "@/lib/brand-persona";
 import type { WorkspaceModule } from "@/lib/training-types";
 
 export type ModuleSummaryHighlight = {
@@ -159,6 +165,12 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "group_open") {
+    const indexedSummary = summarizeIndexedValues(exercise, values);
+
+    if (indexedSummary) {
+      return buildHighlight(exercise.question, indexedSummary, 180);
+    }
+
     const firstFilledAnswerIndex = values.findIndex((value) => value.trim().length > 0);
 
     if (firstFilledAnswerIndex === -1) {
@@ -169,6 +181,14 @@ function summarizeExerciseAnswer(
       exercise.options[firstFilledAnswerIndex] || exercise.question || "Reponse",
       values[firstFilledAnswerIndex],
     );
+  }
+
+  if (exercise.type === "brand_persona") {
+    const personaSummary = summarizeBrandPersonaValues(exercise, values);
+
+    return personaSummary
+      ? buildHighlight(exercise.question || "Persona", personaSummary, 220)
+      : null;
   }
 
   if (exercise.type === "checklist") {
@@ -249,6 +269,21 @@ function getExerciseSummaryLabel(exercise: WorkspaceModule["exercises"][number])
 }
 
 function summarizeGenericValues(values: string[]) {
+  const indexedValues = parseIndexedAnswerItems(values);
+
+  if (indexedValues.length > 0) {
+    return indexedValues
+      .sort((left, right) =>
+        left.questionIndex === right.questionIndex
+          ? left.valueIndex - right.valueIndex
+          : left.questionIndex - right.questionIndex,
+      )
+      .map((item) => compactText(item.value))
+      .filter(Boolean)
+      .slice(0, 4)
+      .join(" | ");
+  }
+
   const readableValues = values
     .map((value) => compactText(value))
     .filter(Boolean)
@@ -263,6 +298,66 @@ function summarizeGenericValues(values: string[]) {
     .slice(0, 4);
 
   return readableValues.join(" | ");
+}
+
+function summarizeBrandPersonaValues(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+) {
+  const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(exercise.options));
+  const indexedAnswers = parseIndexedAnswerItems(values);
+
+  if (indexedAnswers.length === 0) {
+    return summarizeGenericValues(values);
+  }
+
+  return fields
+    .map((field, fieldIndex) => {
+      const fieldValues = indexedAnswers
+        .filter((item) => item.questionIndex === fieldIndex)
+        .sort((left, right) => left.valueIndex - right.valueIndex)
+        .map((item) => compactText(item.value))
+        .filter(Boolean);
+
+      return fieldValues.length > 0 ? `${field.label}: ${fieldValues.join(", ")}` : "";
+    })
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" | ");
+}
+
+function summarizeIndexedValues(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+) {
+  const indexedAnswers = parseIndexedAnswerItems(values);
+
+  if (indexedAnswers.length === 0) {
+    return "";
+  }
+
+  const questionConfig = parseStoredExerciseQuestionConfig(exercise.type, exercise.options);
+  const questionIndexes = [...new Set(indexedAnswers.map((item) => item.questionIndex))]
+    .sort((left, right) => left - right)
+    .slice(0, 4);
+
+  return questionIndexes
+    .map((questionIndex) => {
+      const questionValues = indexedAnswers
+        .filter((item) => item.questionIndex === questionIndex)
+        .sort((left, right) => left.valueIndex - right.valueIndex)
+        .map((item) => compactText(item.value))
+        .filter(Boolean);
+
+      if (questionValues.length === 0) {
+        return "";
+      }
+
+      const label = compactText(questionConfig.items[questionIndex] ?? "");
+      return label ? `${label}: ${questionValues.join(", ")}` : questionValues.join(", ");
+    })
+    .filter(Boolean)
+    .join(" | ");
 }
 
 function summarizeJsonValue(value: string) {
