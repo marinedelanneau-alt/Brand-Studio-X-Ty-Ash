@@ -56,7 +56,7 @@ export function buildModuleSummaryCard(input: {
     title: input.module.title,
     subtitle: input.projectName.trim() || "Mon projet de marque",
     hero: heroSource?.value || "Les idees principales de ce module sont maintenant posees.",
-    insight: buildInsightSentence(quickRecap),
+    insight: buildInsightSentence(detailedHighlights.length > 0 ? detailedHighlights : quickRecap),
     focusWords,
     highlights,
     quickRecap,
@@ -562,25 +562,32 @@ function collectFocusWords(module: WorkspaceModule) {
 }
 
 function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
-  const summarizedValues = highlights
-    .map((highlight) => getParagraphSummaryValue(highlight.value))
-    .filter((value) => value && !isPlaceholderSummaryValue(value))
-    .slice(0, 8);
+  const summarizedValues = [
+    ...new Set(
+      highlights
+        .map((highlight) => getParagraphSummaryValue(highlight.value))
+        .filter((value) => value && !isPlaceholderSummaryValue(value)),
+    ),
+  ];
 
   if (summarizedValues.length === 0) {
     return "Les grands axes de ce module sont posés et peuvent maintenant servir de repère concret.";
   }
 
   const mainPoints = summarizedValues.slice(0, 4);
-  const additionalPoints = summarizedValues.slice(4);
+  const additionalPoints = summarizedValues.slice(4, 8);
+  const finalPoints = summarizedValues.slice(8);
   const paragraph = [
     `En synthese, ${joinSummaryParts(mainPoints)}.`,
     additionalPoints.length > 0
-      ? `On retient aussi ${joinSummaryParts(additionalPoints)}.`
+      ? `Le module précise aussi ${joinSummaryParts(additionalPoints)}.`
+      : "",
+    finalPoints.length > 0
+      ? `Enfin, le travail complète cette base avec ${joinSummaryParts(finalPoints)}.`
       : "",
   ].filter(Boolean).join(" ");
 
-  return truncateText(paragraph, 520);
+  return truncateText(paragraph, 1000);
 }
 
 function joinSummaryParts(values: string[]) {
