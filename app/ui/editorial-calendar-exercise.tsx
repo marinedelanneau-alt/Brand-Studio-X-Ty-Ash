@@ -3,8 +3,8 @@
 import {
   ArrowTopRightOnSquareIcon,
   CalendarDaysIcon,
-  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import { useEffect, useMemo } from "react";
 import {
   parseEditorialCalendarEntries,
@@ -71,60 +71,33 @@ export default function EditorialCalendarExercise({
       </div>
 
       <div className="bg-[#fbf6ee] p-3 sm:p-4">
-        <div className="grid gap-4 rounded-[1.1rem] border border-[#eadfca] bg-white p-4 sm:grid-cols-[minmax(0,1fr)_18rem] sm:p-5">
-          <div className="flex min-h-72 flex-col justify-between rounded-[1rem] border border-[#eadfca] bg-[#fffdf8] p-5">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
-                <CalendarDaysIcon className="h-4 w-4 text-[#cf7430]" />
-                Notion
-              </div>
-              <h4 className="mt-6 max-w-2xl text-2xl font-semibold text-[#2f2a36]">
-                Calendrier editorial 2026
-              </h4>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
-                Ton calendrier editorial est gere dans Notion pour conserver la vue complete, les
-                cartes et les statuts de publication au meme endroit.
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {["Vue Notion", "Mises a jour en direct", "Acces complet"].map((label) => (
-                <span
-                  key={label}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-xs font-semibold text-[#6f645b]"
-                >
-                  <CheckCircleIcon className="h-4 w-4 text-[#cf7430]" />
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[1rem] border border-[#eadfca] bg-[#faf6ef] p-4">
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: 35 }, (_, index) => (
-                <div
-                  key={index}
-                  className={`aspect-square rounded-[0.45rem] border border-[#eadfca] ${
-                    [4, 9, 15, 22, 28].includes(index)
-                      ? "bg-[#cf7430]"
-                      : index % 6 === 0
-                        ? "bg-[#f3dfbd]"
-                        : "bg-white"
-                  }`}
-                />
-              ))}
-            </div>
-            <a
-              href={NOTION_EDITORIAL_CALENDAR_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#2f2a36] px-4 text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#cf7430]"
-            >
-              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-              Acceder au calendrier
-            </a>
-          </div>
+        <a
+          href={NOTION_EDITORIAL_CALENDAR_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="group relative block overflow-hidden rounded-[1.1rem] border border-[#eadfca] bg-white shadow-[0_16px_34px_rgba(126,102,78,0.08)]"
+          aria-label="Ouvrir le calendrier editorial Notion"
+        >
+          <Image
+            src="/notion-editorial-calendar-preview.png"
+            alt="Apercu de la page Notion Calendrier editorial 2026"
+            width={1440}
+            height={1000}
+            sizes="(max-width: 768px) 100vw, 1080px"
+            className="w-full object-cover object-top"
+            priority
+          />
+          <span className="absolute right-4 top-4 inline-flex h-10 items-center gap-2 rounded-full bg-white/95 px-4 text-xs font-black uppercase tracking-[0.12em] text-[#2f2a36] opacity-100 shadow-[0_10px_24px_rgba(47,42,54,0.14)] transition group-hover:bg-[#2f2a36] group-hover:text-white sm:opacity-0 sm:group-hover:opacity-100">
+            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+            Ouvrir
+          </span>
+        </a>
+        <div className="mt-3 flex items-start gap-3 rounded-[1rem] border border-[#eadfca] bg-white px-4 py-3 text-sm leading-6 text-[#6f645b]">
+          <CalendarDaysIcon className="mt-0.5 h-5 w-5 shrink-0 text-[#cf7430]" />
+          <p>
+            Apercu direct de la page Notion. Clique sur l&apos;image ou sur le bouton pour modifier le
+            calendrier complet dans Notion.
+          </p>
         </div>
       </div>
     </div>
