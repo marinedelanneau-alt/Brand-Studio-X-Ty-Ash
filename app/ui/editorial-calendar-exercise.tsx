@@ -3,6 +3,7 @@
 import {
   ArrowTopRightOnSquareIcon,
   CalendarDaysIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useMemo } from "react";
 import {
@@ -70,21 +71,60 @@ export default function EditorialCalendarExercise({
       </div>
 
       <div className="bg-[#fbf6ee] p-3 sm:p-4">
-        <div className="overflow-hidden rounded-[1.1rem] border border-[#eadfca] bg-white">
-          <iframe
-            src={NOTION_EDITORIAL_CALENDAR_URL}
-            title="Calendrier editorial 2026 Notion"
-            className="h-[76vh] min-h-[680px] w-full bg-white"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-        <div className="mt-3 flex items-start gap-3 rounded-[1rem] border border-[#eadfca] bg-white px-4 py-3 text-sm leading-6 text-[#6f645b]">
-          <CalendarDaysIcon className="mt-0.5 h-5 w-5 shrink-0 text-[#cf7430]" />
-          <p>
-            Si Notion demande une connexion ou ouvre une page blanche dans l&apos;integration, utilise
-            le bouton ci-dessus pour acceder au calendrier dans un nouvel onglet.
-          </p>
+        <div className="grid gap-4 rounded-[1.1rem] border border-[#eadfca] bg-white p-4 sm:grid-cols-[minmax(0,1fr)_18rem] sm:p-5">
+          <div className="flex min-h-72 flex-col justify-between rounded-[1rem] border border-[#eadfca] bg-[#fffdf8] p-5">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+                <CalendarDaysIcon className="h-4 w-4 text-[#cf7430]" />
+                Notion
+              </div>
+              <h4 className="mt-6 max-w-2xl text-2xl font-semibold text-[#2f2a36]">
+                Calendrier editorial 2026
+              </h4>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
+                Ton calendrier editorial est gere dans Notion pour conserver la vue complete, les
+                cartes et les statuts de publication au meme endroit.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {["Vue Notion", "Mises a jour en direct", "Acces complet"].map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-xs font-semibold text-[#6f645b]"
+                >
+                  <CheckCircleIcon className="h-4 w-4 text-[#cf7430]" />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1rem] border border-[#eadfca] bg-[#faf6ef] p-4">
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: 35 }, (_, index) => (
+                <div
+                  key={index}
+                  className={`aspect-square rounded-[0.45rem] border border-[#eadfca] ${
+                    [4, 9, 15, 22, 28].includes(index)
+                      ? "bg-[#cf7430]"
+                      : index % 6 === 0
+                        ? "bg-[#f3dfbd]"
+                        : "bg-white"
+                  }`}
+                />
+              ))}
+            </div>
+            <a
+              href={NOTION_EDITORIAL_CALENDAR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#2f2a36] px-4 text-xs font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#cf7430]"
+            >
+              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+              Acceder au calendrier
+            </a>
+          </div>
         </div>
       </div>
     </div>
