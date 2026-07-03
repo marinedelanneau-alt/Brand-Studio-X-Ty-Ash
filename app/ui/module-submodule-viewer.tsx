@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
@@ -8,7 +9,7 @@ import VoiceNotePlayer from "./voice-note-player";
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.svg",
   title: "La symbolique des couleurs en communication",
-  fileName: "symbolique-couleurs-communication.svg",
+  fileName: "symbolique-couleurs-communication.jpg",
 };
 
 function normalizeForSearch(value: string) {
@@ -29,26 +30,69 @@ function shouldShowColorSymbolismResource(
 }
 
 function ColorSymbolismResource() {
+  async function downloadAsJpeg() {
+    const image = document.createElement("img");
+    image.decoding = "async";
+
+    const loadedImage = await new Promise<HTMLImageElement>((resolve, reject) => {
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Le visuel n'a pas pu etre prepare."));
+      image.src = COLOR_SYMBOLISM_RESOURCE.href;
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1536;
+    canvas.height = 960;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/jpeg", 0.94);
+    });
+
+    if (!blob) {
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = COLOR_SYMBOLISM_RESOURCE.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <figure className="mt-8 overflow-hidden rounded-[1.25rem] border border-[#eadfca] bg-[#fffdf8] p-3">
-      <Image
-        src={COLOR_SYMBOLISM_RESOURCE.href}
-        alt={COLOR_SYMBOLISM_RESOURCE.title}
-        width={1536}
-        height={960}
-        className="w-full rounded-[0.9rem] border border-[#f0e4d3] bg-white"
-      />
-      <figcaption className="flex flex-col gap-3 px-1 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="group relative">
+        <Image
+          src={COLOR_SYMBOLISM_RESOURCE.href}
+          alt={COLOR_SYMBOLISM_RESOURCE.title}
+          width={1536}
+          height={960}
+          className="w-full rounded-[0.9rem] border border-[#f0e4d3] bg-white"
+        />
+        <button
+          type="button"
+          onClick={() => void downloadAsJpeg()}
+          aria-label="Telecharger le visuel au format JPEG"
+          title="Telecharger le visuel au format JPEG"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white/95 text-[#b5661f] opacity-0 shadow-[0_10px_24px_rgba(91,73,57,0.14)] transition hover:bg-[#fff8f1] focus:opacity-100 group-hover:opacity-100"
+        >
+          <ArrowDownTrayIcon className="h-5 w-5" />
+        </button>
+      </div>
+      <figcaption className="px-1 py-4">
         <p className="text-sm font-semibold leading-6 text-[#5f544a]">
           {COLOR_SYMBOLISM_RESOURCE.title}
         </p>
-        <a
-          href={COLOR_SYMBOLISM_RESOURCE.href}
-          download={COLOR_SYMBOLISM_RESOURCE.fileName}
-          className="inline-flex h-11 items-center justify-center rounded-[0.85rem] border border-[#df9b39] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#b5661f] transition hover:bg-[#fff8f1]"
-        >
-          Télécharger le visuel
-        </a>
       </figcaption>
     </figure>
   );
