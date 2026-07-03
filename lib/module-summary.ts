@@ -13,6 +13,7 @@ import {
   getBrandPersonaFields,
   parseStoredBrandPersonaConfig,
 } from "@/lib/brand-persona";
+import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
 import type { WorkspaceModule } from "@/lib/training-types";
 
 export type ModuleSummaryHighlight = {
@@ -28,6 +29,14 @@ export type ModuleSubmoduleSummary = {
   highlights: ModuleSummaryHighlight[];
 };
 
+export type ModuleKeyTakeaway = {
+  id: string;
+  label: string;
+  value: string;
+  context: string;
+  icon: "persona" | "tone" | "odor" | "baseline" | "palette" | "moodboard" | "spark";
+};
+
 export type ModuleSummaryCard = {
   eyebrow: string;
   title: string;
@@ -38,6 +47,7 @@ export type ModuleSummaryCard = {
   highlights: ModuleSummaryHighlight[];
   quickRecap: ModuleSummaryHighlight[];
   submoduleRecaps: ModuleSubmoduleSummary[];
+  keyTakeaways: ModuleKeyTakeaway[];
   footer: string;
 };
 
@@ -60,6 +70,7 @@ export function buildModuleSummaryCard(input: {
   const quickRecap =
     buildModuleSpecificQuickRecap(input.module) ?? buildGenericQuickRecap(input.module);
   const submoduleRecaps = buildSubmoduleRecaps(input.module);
+  const keyTakeaways = buildModuleKeyTakeaways(input.module, submoduleRecaps);
 
   return {
     eyebrow: `Module ${input.module.position}`,
@@ -71,9 +82,17 @@ export function buildModuleSummaryCard(input: {
     highlights,
     quickRecap,
     submoduleRecaps,
+    keyTakeaways,
     footer:
       "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand tu le souhaites.",
   } satisfies ModuleSummaryCard;
+}
+
+export function getModuleSummary(input: {
+  projectName: string;
+  module: WorkspaceModule;
+}) {
+  return buildModuleSummaryCard(input);
 }
 
 function buildSubmoduleRecaps(module: WorkspaceModule) {
@@ -96,6 +115,265 @@ function buildSubmoduleRecaps(module: WorkspaceModule) {
       highlights: completedHighlights.slice(0, 4),
     } satisfies ModuleSubmoduleSummary;
   });
+}
+
+function buildModuleKeyTakeaways(
+  module: WorkspaceModule,
+  submoduleRecaps: ModuleSubmoduleSummary[],
+): ModuleKeyTakeaway[] {
+  const candidates: Array<ModuleKeyTakeaway | null> = [
+    buildPersonaTakeaway(module),
+    buildToneTakeaway(module, submoduleRecaps),
+    buildOdorTakeaway(submoduleRecaps),
+    buildBaselineTakeaway(submoduleRecaps),
+    buildPaletteTakeaway(module, submoduleRecaps),
+    buildMoodboardTakeaway(submoduleRecaps),
+  ];
+  const takeaways = candidates.filter((item): item is ModuleKeyTakeaway => item !== null);
+
+  const uniqueTakeaways = takeaways.filter((item, index, items) => {
+    const normalizedValue = normalizeForSearch(item.value);
+    return items.findIndex((candidate) => normalizeForSearch(candidate.value) === normalizedValue) === index;
+  });
+
+  if (uniqueTakeaways.length >= 3) {
+    return uniqueTakeaways.slice(0, 5);
+  }
+
+  const fallbackTakeaways = submoduleRecaps
+    .flatMap((submodule) =>
+      submodule.highlights.map((highlight, index) => ({
+        id: `extra-${submodule.id}-${index}`,
+        label: sanitizeTakeawayLabel(highlight.label),
+        value: cleanTakeawayValue(highlight.value),
+        context: submodule.title,
+        icon: "spark" as const,
+      })),
+    )
+    .filter((item) => hasUsableTakeawayValue(item.value))
+    .filter((item) =>
+      !uniqueTakeaways.some(
+        (takeaway) => normalizeForSearch(takeaway.value) === normalizeForSearch(item.value),
+      ),
+    );
+
+  return [...uniqueTakeaways, ...fallbackTakeaways].slice(0, 5);
+}
+
+function buildPersonaTakeaway(module: WorkspaceModule) {
+  const personaExercise = module.exercises.find((exercise) => exercise.type === "brand_persona");
+
+  if (!personaExercise) {
+    return null;
+  }
+
+  const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(personaExercise.options));
+  const indexedAnswers = parseIndexedAnswerItems(module.answers[personaExercise.id] ?? []);
+
+  function findFieldValue(keywords: string[]) {
+    const fieldIndex = fields.findIndex((field) => {
+      const haystack = normalizeForSearch(`${field.id} ${field.label}`);
+      return keywords.some((keyword) => haystack.includes(normalizeForSearch(keyword)));
+    });
+
+    if (fieldIndex < 0) {
+      return "";
+    }
+
+    return indexedAnswers
+      .filter((item) => item.questionIndex === fieldIndex)
+      .sort((left, right) => left.valueIndex - right.valueIndex)
+      .map((item) => compactText(item.value))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  const firstName = findFieldValue(["prenom", "first_name"]);
+  const age = findFieldValue(["age"]);
+  const profession = findFieldValue(["profession"]);
+  const sentence = findFieldValue(["phrase", "resume", "summary"]);
+  const traits = findFieldValue(["trait", "dominant"]);
+  const value = [
+    [firstName, age].filter(Boolean).join(", "),
+    profession,
+  ].filter(Boolean).join(" — ");
+  const context = traits
+    ? `Une personnalité ${traits}.`
+    : sentence || "Le visage et l'attitude qui incarnent ta marque.";
+
+  return hasUsableTakeawayValue(value)
+    ? {
+        id: "persona",
+        label: "Persona de marque",
+        value,
+        context,
+        icon: "persona",
+      } satisfies ModuleKeyTakeaway
+    : null;
+}
+
+function buildToneTakeaway(
+  module: WorkspaceModule,
+  submoduleRecaps: ModuleSubmoduleSummary[],
+) {
+  const personaExercise = module.exercises.find((exercise) => exercise.type === "brand_persona");
+
+  if (personaExercise) {
+    const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(personaExercise.options));
+    const indexedAnswers = parseIndexedAnswerItems(module.answers[personaExercise.id] ?? []);
+    const toneIndex = fields.findIndex((field) => {
+      const haystack = normalizeForSearch(`${field.id} ${field.label}`);
+      return ["ton", "voix", "communication"].some((keyword) => haystack.includes(keyword));
+    });
+
+    if (toneIndex >= 0) {
+      const tone = indexedAnswers
+        .filter((item) => item.questionIndex === toneIndex)
+        .sort((left, right) => left.valueIndex - right.valueIndex)
+        .map((item) => compactText(item.value))
+        .filter(Boolean)
+        .join(", ");
+
+      if (hasUsableTakeawayValue(tone)) {
+        return {
+          id: "tone",
+          label: "Ton de voix",
+          value: tone,
+          context: "La manière dont ta marque s'exprime et crée la relation.",
+          icon: "tone",
+        } satisfies ModuleKeyTakeaway;
+      }
+    }
+  }
+
+  const match = findHighlightByKeywords(submoduleRecaps, ["ton", "voix", "communication"]);
+  return match
+    ? {
+        id: "tone",
+        label: "Ton de voix",
+        value: cleanTakeawayValue(match.value),
+        context: "La manière dont ta marque s'exprime et crée la relation.",
+        icon: "tone",
+      } satisfies ModuleKeyTakeaway
+    : null;
+}
+
+function buildOdorTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
+  const match = findHighlightByKeywords(submoduleRecaps, ["odeur", "senteur", "sentir"]);
+  if (!match) return null;
+
+  return {
+    id: "odor",
+    label: "Odeur",
+    value: cleanTakeawayValue(match.value),
+    context: "Une sensation immédiate pour rendre ton univers plus vivant.",
+    icon: "odor",
+  } satisfies ModuleKeyTakeaway;
+}
+
+function buildBaselineTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
+  const match = findHighlightByKeywords(submoduleRecaps, ["baseline", "slogan", "signature"]);
+  if (!match) return null;
+
+  return {
+    id: "baseline",
+    label: "Baseline",
+    value: cleanTakeawayValue(match.value),
+    context: "Ta phrase repère pour présenter ton activité.",
+    icon: "baseline",
+  } satisfies ModuleKeyTakeaway;
+}
+
+function buildPaletteTakeaway(
+  module: WorkspaceModule,
+  submoduleRecaps: ModuleSubmoduleSummary[],
+) {
+  const paletteExercise = module.exercises.find((exercise) => exercise.type === "color_palette");
+  const paletteAnswer = paletteExercise
+    ? parseStoredColorPaletteAnswer(module.answers[paletteExercise.id] ?? [])
+    : null;
+  const paletteColors = paletteAnswer
+    ? [...paletteAnswer.primaryColors, ...paletteAnswer.secondaryColors]
+        .map((color) => color.name || ("hex" in color ? color.hex : `${color.from} -> ${color.to}`))
+        .filter(Boolean)
+    : [];
+
+  if (paletteColors.length > 0) {
+    return {
+      id: "palette",
+      label: "Palette",
+      value: paletteColors.slice(0, 5).join(" · "),
+      context: "Les repères visuels qui posent l'ambiance de ta marque.",
+      icon: "palette",
+    } satisfies ModuleKeyTakeaway;
+  }
+
+  const match = findHighlightByKeywords(submoduleRecaps, ["palette", "couleur", "couleurs"]);
+  return match
+    ? {
+        id: "palette",
+        label: "Palette",
+        value: cleanTakeawayValue(match.value),
+        context: "Les repères visuels qui posent l'ambiance de ta marque.",
+        icon: "palette",
+      } satisfies ModuleKeyTakeaway
+    : null;
+}
+
+function buildMoodboardTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
+  const match = findHighlightByKeywords(submoduleRecaps, [
+    "moodboard",
+    "ambiance",
+    "univers visuel",
+    "direction artistique",
+  ]);
+  if (!match) return null;
+
+  return {
+    id: "moodboard",
+    label: "Univers / Moodboard",
+    value: cleanTakeawayValue(match.value),
+    context: "Une direction visuelle pour guider tes prochains choix.",
+    icon: "moodboard",
+  } satisfies ModuleKeyTakeaway;
+}
+
+function findHighlightByKeywords(
+  submoduleRecaps: ModuleSubmoduleSummary[],
+  keywords: string[],
+) {
+  return submoduleRecaps
+    .flatMap((submodule) =>
+      submodule.highlights.map((highlight) => ({
+        label: highlight.label,
+        value: highlight.value,
+        haystack: normalizeForSearch(`${submodule.title} ${highlight.label}`),
+      })),
+    )
+    .find((item) =>
+      keywords.some((keyword) => item.haystack.includes(normalizeForSearch(keyword))),
+    );
+}
+
+function cleanTakeawayValue(value: string) {
+  return [
+    ...new Set(
+      compactText(value)
+        .split(" | ")
+        .map((part) => part.replace(/^[^:]{1,80}:\s*/, "").trim())
+        .filter(Boolean),
+    ),
+  ].join(" · ");
+}
+
+function sanitizeTakeawayLabel(label: string) {
+  const normalized = compactText(label);
+  return normalized.length > 34 ? `${normalized.slice(0, 31).trimEnd()}...` : normalized;
+}
+
+function hasUsableTakeawayValue(value: string) {
+  const normalized = normalizeForSearch(value);
+  return Boolean(value.trim()) && !normalized.includes("a completer") && normalized !== "undefined";
 }
 
 function buildModuleSpecificQuickRecap(module: WorkspaceModule) {

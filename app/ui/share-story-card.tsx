@@ -68,8 +68,8 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(function Sha
         <h2 className="mt-5 max-w-full break-words font-[family:var(--font-cormorant)] text-[2.65rem] leading-[0.92] text-[#332d35] [overflow-wrap:anywhere]">
           {title}
         </h2>
-        <p className="mt-7 max-w-[17rem] text-[1.06rem] leading-7 text-[#5f544a]">
-          {data.shareSentence}
+        <p className="mt-7 max-w-[17rem] text-[1.16rem] font-semibold leading-7 text-[#5f544a]">
+          Ma marque prend forme.
         </p>
       </div>
 
@@ -101,7 +101,7 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(function Sha
         </div>
 
         <p className="border-t border-[#eadfca]/80 pt-5 text-center text-[0.68rem] font-black uppercase leading-5 tracking-[0.14em] text-[#6f645b]">
-          Je construis ma marque avec Brand Studio
+          Créé avec Brand Studio
         </p>
       </div>
     </article>

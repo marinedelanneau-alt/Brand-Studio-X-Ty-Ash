@@ -147,7 +147,15 @@ export function ModulePdfSummary({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Synthese automatique</Text>
-          <Text style={styles.bodyText}>{summary.insight}</Text>
+          <View style={styles.grid}>
+            {summary.keyTakeaways.map((item) => (
+              <View key={item.id} style={styles.card}>
+                <Text style={styles.label}>{item.label}</Text>
+                <Text style={styles.value}>{item.value}</Text>
+                <Text style={styles.bodyText}>{item.context}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         <View style={styles.section}>

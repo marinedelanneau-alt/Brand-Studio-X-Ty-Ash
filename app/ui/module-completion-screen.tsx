@@ -16,7 +16,7 @@ import {
   SparklesIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import type { ModuleSummaryCard } from "@/lib/module-summary";
+import type { ModuleKeyTakeaway, ModuleSummaryCard } from "@/lib/module-summary";
 import type { ModuleShareData, StoryTemplate } from "@/lib/get-module-share-data";
 import { slugifyFilePart } from "@/lib/get-module-share-data";
 import {
@@ -26,16 +26,6 @@ import {
 } from "@/lib/export-story-as-png";
 import ShareStoryCard from "./share-story-card";
 import StoryTemplateSelector from "./story-template-selector";
-
-type TakeawayIcon = "persona" | "odor" | "baseline" | "palette" | "moodboard" | "spark";
-
-type KeyTakeaway = {
-  id: string;
-  label: string;
-  value: string;
-  context: string;
-  icon: TakeawayIcon;
-};
 
 function formatSummaryForClipboard(summary: ModuleSummaryCard) {
   return [
@@ -50,129 +40,14 @@ function formatSummaryForClipboard(summary: ModuleSummaryCard) {
   ].join("\n");
 }
 
-function normalizeForSearch(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
-function compactText(value: string) {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-function stripLabelPrefix(value: string) {
-  return compactText(value).replace(/^[^:]{1,80}:\s*/, "");
-}
-
-function cleanSummaryValue(value: string) {
-  return value
-    .split(" | ")
-    .map(stripLabelPrefix)
-    .filter(Boolean)
-    .join(" · ");
-}
-
-function isUsableValue(value: string) {
-  const normalized = normalizeForSearch(value);
-  return Boolean(value.trim()) && !normalized.includes("a completer") && normalized !== "undefined";
-}
-
-function TakeawayIconMark({ icon }: { icon: TakeawayIcon }) {
+function TakeawayIconMark({ icon }: { icon: ModuleKeyTakeaway["icon"] }) {
   if (icon === "persona") return <UserCircleIcon className="h-5 w-5" />;
+  if (icon === "tone") return <ChatBubbleLeftRightIcon className="h-5 w-5" />;
   if (icon === "odor") return <SparklesIcon className="h-5 w-5" />;
   if (icon === "baseline") return <PencilSquareIcon className="h-5 w-5" />;
   if (icon === "palette") return <PaintBrushIcon className="h-5 w-5" />;
   if (icon === "moodboard") return <PhotoIcon className="h-5 w-5" />;
   return <ChatBubbleLeftRightIcon className="h-5 w-5" />;
-}
-
-function getModuleKeyTakeaways(summary: ModuleSummaryCard) {
-  const sourceItems = summary.submoduleRecaps.flatMap((submodule) =>
-    submodule.highlights.map((highlight) => ({
-      submoduleTitle: submodule.title,
-      highlight,
-      haystack: normalizeForSearch(`${submodule.title} ${highlight.label} ${highlight.value}`),
-    })),
-  );
-
-  const definitions: Array<{
-    id: string;
-    label: string;
-    icon: TakeawayIcon;
-    keywords: string[];
-    context: string;
-  }> = [
-    {
-      id: "persona",
-      label: "Persona",
-      icon: "persona",
-      keywords: ["persona", "personnalite", "incarnee", "prenom", "profession"],
-      context: "Le visage et l'attitude qui incarnent ta marque.",
-    },
-    {
-      id: "odor",
-      label: "Odeur",
-      icon: "odor",
-      keywords: ["odeur", "sentir", "senteur"],
-      context: "Une sensation immediate pour rendre l'univers plus vivant.",
-    },
-    {
-      id: "baseline",
-      label: "Baseline",
-      icon: "baseline",
-      keywords: ["baseline", "slogan", "signature", "resume en une phrase"],
-      context: "Une formule courte pour clarifier ton message.",
-    },
-    {
-      id: "palette",
-      label: "Palette",
-      icon: "palette",
-      keywords: ["palette", "couleur", "couleurs"],
-      context: "Les indices visuels qui posent l'ambiance.",
-    },
-    {
-      id: "moodboard",
-      label: "Moodboard",
-      icon: "moodboard",
-      keywords: ["moodboard", "ambiance", "univers visuel", "direction artistique"],
-      context: "Une direction visuelle pour guider les prochains choix.",
-    },
-  ];
-
-  const takeaways = definitions.flatMap((definition) => {
-    const match = sourceItems.find((item) =>
-      definition.keywords.some((keyword) => item.haystack.includes(normalizeForSearch(keyword))),
-    );
-    const value = match ? cleanSummaryValue(match.highlight.value) : "";
-
-    return isUsableValue(value)
-      ? [{
-          id: definition.id,
-          label: definition.label,
-          value,
-          context: definition.context,
-          icon: definition.icon,
-        } satisfies KeyTakeaway]
-      : [];
-  });
-
-  if (takeaways.length >= 3) {
-    return takeaways.slice(0, 5);
-  }
-
-  const fallback = sourceItems
-    .filter((item) => !takeaways.some((takeaway) => normalizeForSearch(takeaway.value) === normalizeForSearch(cleanSummaryValue(item.highlight.value))))
-    .map((item, index) => ({
-      id: `extra-${item.highlight.label}-${index}`,
-      label: item.highlight.label,
-      value: cleanSummaryValue(item.highlight.value),
-      context: item.submoduleTitle,
-      icon: "spark" as const,
-    }))
-    .filter((item) => isUsableValue(item.value));
-
-  return [...takeaways, ...fallback].slice(0, 5);
 }
 
 function CompletionHero({
@@ -220,7 +95,7 @@ function CompletionHero({
   );
 }
 
-function KeyTakeawayCard({ item }: { item: KeyTakeaway }) {
+function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
   const isLong = item.value.length > 112;
 
   return (
@@ -250,7 +125,7 @@ function KeyTakeawayCard({ item }: { item: KeyTakeaway }) {
 }
 
 function ModuleKeyTakeaways({ summary }: { summary: ModuleSummaryCard }) {
-  const takeaways = getModuleKeyTakeaways(summary);
+  const takeaways = summary.keyTakeaways;
 
   if (takeaways.length === 0) {
     return null;
