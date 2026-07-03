@@ -707,6 +707,79 @@ export async function persistSubmoduleVoiceNote(input: {
   }
 }
 
+export async function persistSubmoduleContent(input: {
+  moduleId: number;
+  submoduleId: number;
+  contentHtml: string;
+  audioUrl?: string;
+  audioTranscript?: string;
+}) {
+  const contentHtml = input.contentHtml.trim();
+
+  if (
+    !contentHtml ||
+    !Number.isFinite(input.moduleId) ||
+    input.moduleId <= 0 ||
+    !Number.isFinite(input.submoduleId)
+  ) {
+    return;
+  }
+
+  const supabase = createSupabaseServerClient();
+  const now = new Date().toISOString();
+  const audioUrl = input.audioUrl?.trim() ?? "";
+  const audioTranscript = input.audioTranscript?.trim() ?? "";
+  const contentWithMetadata = appendAudioMetadataToHtml(
+    contentHtml,
+    audioUrl,
+    audioTranscript,
+  );
+
+  if (input.submoduleId > 0) {
+    const { data: submodule, error: submoduleError } = await supabase
+      .from("brand_submodules")
+      .select("id, position")
+      .eq("id", input.submoduleId)
+      .eq("module_id", input.moduleId)
+      .maybeSingle<{ id: number; position: number }>();
+
+    if (submoduleError) {
+      throw new Error(submoduleError.message);
+    }
+
+    if (submodule) {
+      const { error } = await supabase
+        .from("brand_submodules")
+        .update({
+          content_html: contentWithMetadata,
+          updated_at: now,
+        })
+        .eq("id", input.submoduleId)
+        .eq("module_id", input.moduleId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (submodule.position !== 1) {
+        return;
+      }
+    }
+  }
+
+  const { error: moduleError } = await supabase
+    .from("brand_modules")
+    .update({
+      content_html: contentWithMetadata,
+      updated_at: now,
+    })
+    .eq("id", input.moduleId);
+
+  if (moduleError) {
+    throw new Error(moduleError.message);
+  }
+}
+
 export async function persistExerciseVoiceNote(input: {
   exerciseId: number;
   audioUrl: string;

@@ -15,6 +15,7 @@ import {
 import {
   createAdminVoiceNoteUploadTarget,
   deleteModuleDefinition,
+  persistSubmoduleContent,
   persistExerciseVoiceNote,
   persistSubmoduleVoiceNote,
   saveModuleDefinition,
@@ -336,6 +337,63 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
           ? error.message
           : "La note vocale n'a pas pu etre importee.",
       url: "",
+    };
+  }
+}
+
+export async function saveAdminSubmoduleContent(formData: FormData) {
+  try {
+    await getAuthenticatedAdmin();
+
+    const moduleId = Number(formData.get("moduleId"));
+    const submoduleId = Number(formData.get("submoduleId"));
+    const contentHtml =
+      typeof formData.get("contentHtml") === "string"
+        ? String(formData.get("contentHtml")).trim()
+        : "";
+    const audioUrl =
+      typeof formData.get("audioUrl") === "string"
+        ? String(formData.get("audioUrl")).trim()
+        : "";
+    const audioTranscript =
+      typeof formData.get("audioTranscript") === "string"
+        ? String(formData.get("audioTranscript")).trim()
+        : "";
+
+    if (
+      !Number.isFinite(moduleId) ||
+      moduleId <= 0 ||
+      !Number.isFinite(submoduleId) ||
+      !contentHtml
+    ) {
+      return {
+        status: "error",
+        message: "Le contenu n'a pas pu etre sauvegarde automatiquement.",
+      };
+    }
+
+    await persistSubmoduleContent({
+      moduleId,
+      submoduleId,
+      contentHtml,
+      audioUrl,
+      audioTranscript,
+    });
+
+    revalidatePath("/admin/modules");
+    revalidatePath("/mon-espace");
+
+    return {
+      status: "success",
+      message: "Contenu enregistre automatiquement.",
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Le contenu n'a pas pu etre sauvegarde automatiquement.",
     };
   }
 }

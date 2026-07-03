@@ -9,6 +9,7 @@ import {
   deleteAdminModule,
   persistAdminVoiceNoteUrl,
   saveAdminModule,
+  saveAdminSubmoduleContent,
 } from "../admin/modules/actions";
 import {
   EXERCISE_TYPE_LABELS,
@@ -1372,7 +1373,15 @@ function ModuleForm({
   const formRef = useRef<HTMLFormElement>(null);
   const submodulesInputRef = useRef<HTMLInputElement>(null);
   const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
+  const lastSavedContentBySubmoduleRef = useRef<Record<string, string>>(
+    Object.fromEntries(
+      module.submodules.map((submodule) => [submodule.id, submodule.contentHtml]),
+    ),
+  );
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
+  const [contentAutosaveMessages, setContentAutosaveMessages] = useState<
+    Record<string, string>
+  >({});
   const [submoduleVoiceUploadMessages, setSubmoduleVoiceUploadMessages] = useState<
     Record<string, string>
   >({});
@@ -1461,6 +1470,68 @@ function ModuleForm({
   );
   const resolvedActiveSubmoduleIndex = activeSubmoduleIndex >= 0 ? activeSubmoduleIndex : 0;
   const activeSubmodule = module.submodules[resolvedActiveSubmoduleIndex];
+
+  useEffect(() => {
+    if (!module.id || !activeSubmodule) {
+      return;
+    }
+
+    const submoduleId = Number(activeSubmodule.id);
+
+    if (!Number.isFinite(submoduleId)) {
+      return;
+    }
+
+    const previousSavedContent =
+      lastSavedContentBySubmoduleRef.current[activeSubmodule.id];
+
+    if (previousSavedContent === undefined) {
+      lastSavedContentBySubmoduleRef.current[activeSubmodule.id] =
+        activeSubmodule.contentHtml;
+      return;
+    }
+
+    if (previousSavedContent === activeSubmodule.contentHtml) {
+      return;
+    }
+
+    setContentAutosaveMessages((current) => ({
+      ...current,
+      [activeSubmodule.id]: "Sauvegarde automatique...",
+    }));
+
+    const timeoutId = window.setTimeout(async () => {
+      const formData = new FormData();
+      formData.set("moduleId", String(module.id));
+      formData.set("submoduleId", activeSubmodule.id);
+      formData.set("contentHtml", activeSubmodule.contentHtml);
+      formData.set("audioUrl", activeSubmodule.audioUrl);
+      formData.set("audioTranscript", activeSubmodule.audioTranscript);
+
+      const result = await saveAdminSubmoduleContent(formData);
+
+      if (result.status === "success") {
+        lastSavedContentBySubmoduleRef.current[activeSubmodule.id] =
+          activeSubmodule.contentHtml;
+      }
+
+      setContentAutosaveMessages((current) => ({
+        ...current,
+        [activeSubmodule.id]: result.message,
+      }));
+    }, 900);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    activeSubmodule,
+    activeSubmodule?.audioTranscript,
+    activeSubmodule?.audioUrl,
+    activeSubmodule?.contentHtml,
+    activeSubmodule?.id,
+    module.id,
+  ]);
 
   async function uploadSubmoduleVoiceNote(submoduleId: string, file: File | null) {
     if (!file) {
@@ -1834,15 +1905,11 @@ function ModuleForm({
                         }
                         placeholder="Ajoutez ici le contenu du sous-module."
                       />
-                      <button
-                        type="submit"
-                        onClick={() => {
-                          serializeLatestSubmodulesForSubmit();
-                        }}
-                        className="flex h-11 items-center justify-center rounded-[0.8rem] border border-[#df9b39] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#b5661f] transition hover:bg-[#fff8f1]"
-                      >
-                        Enregistrer ce contenu
-                      </button>
+                      {contentAutosaveMessages[activeSubmodule.id] ? (
+                        <p className="text-sm leading-6 text-[#7b7068]">
+                          {contentAutosaveMessages[activeSubmodule.id]}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="space-y-4 rounded-[1rem] border border-[#f0e6d7] bg-[#fffdf7] p-4">
