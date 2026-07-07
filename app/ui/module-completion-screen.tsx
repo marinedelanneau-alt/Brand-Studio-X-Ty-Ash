@@ -166,6 +166,10 @@ function StorySharePreview({
             <ShareIcon className="h-4 w-4" />
             {isExportingStory ? "Préparation..." : "Partager en story Instagram"}
           </button>
+          <p className="max-w-md text-sm leading-6 text-[#7b7068]">
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
+            Sur mobile, choisis Instagram dans le partage, puis ajoute l'image en story. Si l'option n'apparaît pas, la story sera téléchargée en PNG.
+          </p>
         </div>
       </div>
 
@@ -435,13 +439,24 @@ export default function ModuleCompletionScreen({
       title: `Story Brand Studio - ${shareData.moduleTitle}`,
       text: `${shareData.shareSentence} Je construis ma marque avec Brand Studio.`,
     };
+    const canShareFile =
+      "canShare" in navigator && typeof navigator.canShare === "function"
+        ? navigator.canShare({ files: [file] })
+        : true;
 
-    if ("share" in navigator && (!("canShare" in navigator) || navigator.canShare(sharePayload))) {
+    if ("share" in navigator && canShareFile) {
       try {
+        setStatusMessage("La story est prête. Choisis Instagram, puis Story.");
         await navigator.share(sharePayload);
         setStatusMessage("Choisis Instagram dans le partage, puis ajoute l'image en story.");
         return;
-      } catch {
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          setStatusMessage("Partage annulé. Tu peux réessayer ou télécharger la story.");
+          return;
+        }
+
+        downloadDataUrl(dataUrl, storyFilename);
         setStatusMessage("Partage annulé. Tu peux télécharger la story et l'ajouter sur Instagram.");
         return;
       }
