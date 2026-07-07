@@ -1,8 +1,6 @@
 import type { ModuleSummaryCard } from "@/lib/module-summary";
 import type { WorkspaceModule } from "@/lib/training-types";
 
-export type StoryTemplate = "minimal" | "color" | "moodboard";
-
 export type ModuleShareData = {
   brandName: string;
   moduleKey: string;

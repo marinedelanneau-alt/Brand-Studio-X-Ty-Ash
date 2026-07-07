@@ -260,6 +260,72 @@ export async function saveAdminModule(formData: FormData) {
   }
 }
 
+export async function saveAdminModuleDraft(formData: FormData) {
+  try {
+    await getAuthenticatedAdmin();
+
+    const moduleId = Number(formData.get("moduleId"));
+    const title =
+      typeof formData.get("title") === "string"
+        ? String(formData.get("title")).trim()
+        : "";
+    const position = Number(formData.get("position"));
+    const isPublished = formData.get("isPublished") === "on";
+
+    if (!title || !Number.isFinite(position) || position <= 0) {
+      return {
+        status: "error",
+        message: "Le titre et la position du module sont obligatoires.",
+      };
+    }
+
+    let submodules: EditorSubmodule[] = [];
+
+    try {
+      submodules = parseSubmodules(formData.get("submodulesJson"));
+    } catch (error) {
+      return {
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Le contenu du module n'est pas valide.",
+      };
+    }
+
+    if (submodules.length === 0) {
+      return {
+        status: "error",
+        message: "Ajoute au moins un sous-module avant d'enregistrer.",
+      };
+    }
+
+    await saveModuleDefinition({
+      moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
+      title,
+      position,
+      isPublished,
+      submodules,
+    });
+
+    revalidatePath("/admin/modules");
+    revalidatePath("/mon-espace");
+
+    return {
+      status: "success",
+      message: "Modifications enregistrees.",
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Impossible d'enregistrer le module.",
+    };
+  }
+}
+
 export async function createAdminVoiceNoteUpload() {
   try {
     await getAuthenticatedAdmin();

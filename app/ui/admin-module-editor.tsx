@@ -9,7 +9,7 @@ import {
   deleteAdminModule,
   persistAdminVoiceNoteUrl,
   saveAdminModule,
-  saveAdminSubmoduleContent,
+  saveAdminModuleDraft,
 } from "../admin/modules/actions";
 import {
   EXERCISE_TYPE_LABELS,
@@ -1373,15 +1373,12 @@ function ModuleForm({
   const formRef = useRef<HTMLFormElement>(null);
   const submodulesInputRef = useRef<HTMLInputElement>(null);
   const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
-  const lastSavedContentBySubmoduleRef = useRef<Record<string, string>>(
-    Object.fromEntries(
-      module.submodules.map((submodule) => [submodule.id, submodule.contentHtml]),
-    ),
-  );
+  const initialSaveSignature = `${module.id ?? "new"}:${module.title}:${module.position}:${module.isPublished}:${serializeSubmodules(module)}`;
+  const lastSavedModuleSignatureRef = useRef(initialSaveSignature);
+  const saveRequestIdRef = useRef(0);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
-  const [contentAutosaveMessages, setContentAutosaveMessages] = useState<
-    Record<string, string>
-  >({});
+  const [moduleSaveMessage, setModuleSaveMessage] = useState("");
+  const [isSavingModule, setIsSavingModule] = useState(false);
   const [submoduleVoiceUploadMessages, setSubmoduleVoiceUploadMessages] = useState<
     Record<string, string>
   >({});
@@ -1440,6 +1437,66 @@ function ModuleForm({
     return submodulesPayload;
   }
 
+  function getModuleSaveSignature(currentModule: EditorModule) {
+    return `${currentModule.id ?? "new"}:${currentModule.title}:${currentModule.position}:${currentModule.isPublished}:${serializeSubmodules(currentModule)}`;
+  }
+
+  function getLatestModuleFormData() {
+    const currentModule = getModuleReadyForSubmit();
+    const formData = new FormData();
+
+    if (currentModule.id) {
+      formData.set("moduleId", String(currentModule.id));
+    }
+
+    formData.set("title", currentModule.title);
+    formData.set("position", String(currentModule.position));
+
+    if (currentModule.isPublished) {
+      formData.set("isPublished", "on");
+    }
+
+    formData.set("submodulesJson", serializeSubmodules(currentModule));
+
+    return {
+      currentModule,
+      formData,
+      signature: getModuleSaveSignature(currentModule),
+    };
+  }
+
+  async function saveLatestModule(mode: "auto" | "manual") {
+    const { currentModule, formData, signature } = getLatestModuleFormData();
+
+    if (!currentModule.id) {
+      return;
+    }
+
+    if (mode === "auto" && signature === lastSavedModuleSignatureRef.current) {
+      return;
+    }
+
+    const requestId = saveRequestIdRef.current + 1;
+    saveRequestIdRef.current = requestId;
+    setIsSavingModule(true);
+    setModuleSaveMessage(
+      mode === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
+    );
+
+    const result = await saveAdminModuleDraft(formData);
+
+    if (requestId !== saveRequestIdRef.current) {
+      return;
+    }
+
+    setIsSavingModule(false);
+    setModuleSaveMessage(result.message);
+
+    if (result.status === "success") {
+      lastSavedModuleSignatureRef.current = signature;
+    }
+  }
+
   useEffect(() => {
     const form = formRef.current;
 
@@ -1472,66 +1529,54 @@ function ModuleForm({
   const activeSubmodule = module.submodules[resolvedActiveSubmoduleIndex];
 
   useEffect(() => {
-    if (!module.id || !activeSubmodule) {
+    if (!module.id) {
       return;
     }
 
-    const submoduleId = Number(activeSubmodule.id);
+    const signature = getModuleSaveSignature(module);
 
-    if (!Number.isFinite(submoduleId)) {
+    if (signature === lastSavedModuleSignatureRef.current) {
       return;
     }
 
-    const previousSavedContent =
-      lastSavedContentBySubmoduleRef.current[activeSubmodule.id];
+    setModuleSaveMessage("Modifications en attente...");
 
-    if (previousSavedContent === undefined) {
-      lastSavedContentBySubmoduleRef.current[activeSubmodule.id] =
-        activeSubmodule.contentHtml;
-      return;
-    }
-
-    if (previousSavedContent === activeSubmodule.contentHtml) {
-      return;
-    }
-
-    setContentAutosaveMessages((current) => ({
-      ...current,
-      [activeSubmodule.id]: "Sauvegarde automatique...",
-    }));
-
-    const timeoutId = window.setTimeout(async () => {
+    const timeoutId = window.setTimeout(() => {
+      const requestId = saveRequestIdRef.current + 1;
       const formData = new FormData();
+
+      saveRequestIdRef.current = requestId;
+      setIsSavingModule(true);
+      setModuleSaveMessage("Sauvegarde automatique...");
+
       formData.set("moduleId", String(module.id));
-      formData.set("submoduleId", activeSubmodule.id);
-      formData.set("contentHtml", activeSubmodule.contentHtml);
-      formData.set("audioUrl", activeSubmodule.audioUrl);
-      formData.set("audioTranscript", activeSubmodule.audioTranscript);
+      formData.set("title", module.title);
+      formData.set("position", String(module.position));
 
-      const result = await saveAdminSubmoduleContent(formData);
-
-      if (result.status === "success") {
-        lastSavedContentBySubmoduleRef.current[activeSubmodule.id] =
-          activeSubmodule.contentHtml;
+      if (module.isPublished) {
+        formData.set("isPublished", "on");
       }
 
-      setContentAutosaveMessages((current) => ({
-        ...current,
-        [activeSubmodule.id]: result.message,
-      }));
-    }, 900);
+      formData.set("submodulesJson", serializeSubmodules(module));
+
+      void saveAdminModuleDraft(formData).then((result) => {
+        if (requestId !== saveRequestIdRef.current) {
+          return;
+        }
+
+        setIsSavingModule(false);
+        setModuleSaveMessage(result.message);
+
+        if (result.status === "success") {
+          lastSavedModuleSignatureRef.current = signature;
+        }
+      });
+    }, 650);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [
-    activeSubmodule,
-    activeSubmodule?.audioTranscript,
-    activeSubmodule?.audioUrl,
-    activeSubmodule?.contentHtml,
-    activeSubmodule?.id,
-    module.id,
-  ]);
+  }, [module]);
 
   async function uploadSubmoduleVoiceNote(submoduleId: string, file: File | null) {
     if (!file) {
@@ -1625,6 +1670,18 @@ function ModuleForm({
             onSubmitCapture={() => {
               serializeLatestSubmodulesForSubmit();
             }}
+            onSubmit={(event) => {
+              const submitter = (event.nativeEvent as SubmitEvent).submitter as
+                | HTMLElement
+                | null;
+
+              if (submitter?.dataset.action === "delete" || !module.id) {
+                return;
+              }
+
+              event.preventDefault();
+              void saveLatestModule("manual");
+            }}
             className="mx-auto max-w-6xl space-y-6"
           >
             {module.id ? <input type="hidden" name="moduleId" value={module.id} /> : null}
@@ -1672,6 +1729,12 @@ function ModuleForm({
               />
               <span>Module publie</span>
             </label>
+
+            {module.id && moduleSaveMessage ? (
+              <p className="rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm leading-6 text-[#6b625a]">
+                {moduleSaveMessage}
+              </p>
+            ) : null}
 
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-4">
@@ -1905,11 +1968,6 @@ function ModuleForm({
                         }
                         placeholder="Ajoutez ici le contenu du sous-module."
                       />
-                      {contentAutosaveMessages[activeSubmodule.id] ? (
-                        <p className="text-sm leading-6 text-[#7b7068]">
-                          {contentAutosaveMessages[activeSubmodule.id]}
-                        </p>
-                      ) : null}
                     </div>
 
                     <div className="space-y-4 rounded-[1rem] border border-[#f0e6d7] bg-[#fffdf7] p-4">
@@ -2183,15 +2241,17 @@ function ModuleForm({
             <div className="flex flex-wrap items-center gap-4">
               <button
                 type="submit"
+                disabled={Boolean(module.id && isSavingModule)}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
               >
-                {submitLabel}
+                {module.id && isSavingModule ? "Enregistrement..." : submitLabel}
               </button>
 
               {module.id ? (
                 <button
                   type="submit"
                   formAction={deleteAdminModule}
+                  data-action="delete"
                   className="text-sm font-extrabold uppercase tracking-[0.12em] text-[#b45247]"
                 >
                   Supprimer ce module

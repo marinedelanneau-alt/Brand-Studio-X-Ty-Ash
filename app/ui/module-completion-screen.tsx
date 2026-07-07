@@ -17,7 +17,7 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import type { ModuleKeyTakeaway, ModuleSummaryCard } from "@/lib/module-summary";
-import type { ModuleShareData, StoryTemplate } from "@/lib/get-module-share-data";
+import type { ModuleShareData } from "@/lib/get-module-share-data";
 import { slugifyFilePart } from "@/lib/get-module-share-data";
 import {
   dataUrlToFile,
@@ -25,7 +25,6 @@ import {
   exportStoryAsPng,
 } from "@/lib/export-story-as-png";
 import ShareStoryCard from "./share-story-card";
-import StoryTemplateSelector from "./story-template-selector";
 
 function formatSummaryForClipboard(summary: ModuleSummaryCard) {
   return [
@@ -153,30 +152,26 @@ function ModuleKeyTakeaways({ summary }: { summary: ModuleSummaryCard }) {
 function StorySharePreview({
   storyRef,
   shareData,
-  template,
   showBrandName,
-  onTemplateChange,
   onShowBrandNameChange,
 }: {
   storyRef: React.RefObject<HTMLElement | null>;
   shareData: ModuleShareData;
-  template: StoryTemplate;
   showBrandName: boolean;
-  onTemplateChange: (template: StoryTemplate) => void;
   onShowBrandNameChange: (show: boolean) => void;
 }) {
   return (
-    <section className="grid gap-7 rounded-[1.5rem] border border-[#eadfca] bg-white px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)] lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-center">
+    <section className="grid gap-7 rounded-[1.5rem] border border-[#eadfca] bg-white px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)] lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-center">
       <div className="space-y-5">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.16em] text-[#cf7430]">
-            Partager mon avancee
+            Partager mon avancée
           </p>
           <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
-            Une story simple pour célébrer ton module.
+            Une story minimaliste pour célébrer ton module.
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
-            Crée une story simple et jolie pour partager ton avancée sans dévoiler tes réponses.
+            Partage ton avancée avec une composition sobre, moderne et lisible, sans dévoiler tes réponses.
           </p>
         </div>
 
@@ -190,7 +185,6 @@ function StorySharePreview({
             />
             Afficher le nom de ma marque
           </label>
-          <StoryTemplateSelector value={template} onChange={onTemplateChange} />
         </div>
       </div>
 
@@ -198,7 +192,6 @@ function StorySharePreview({
         <ShareStoryCard
           ref={storyRef}
           data={shareData}
-          template={template}
           showBrandName={showBrandName}
         />
       </div>
@@ -399,7 +392,6 @@ export default function ModuleCompletionScreen({
   nextLabel?: string;
 }) {
   const storyRef = useRef<HTMLElement | null>(null);
-  const [template, setTemplate] = useState<StoryTemplate>("minimal");
   const [showBrandName, setShowBrandName] = useState(true);
   const [isCompleting, setIsCompleting] = useState(false);
   const [isExportingStory, setIsExportingStory] = useState(false);
@@ -501,9 +493,7 @@ export default function ModuleCompletionScreen({
       <StorySharePreview
         storyRef={storyRef}
         shareData={shareData}
-        template={template}
         showBrandName={showBrandName}
-        onTemplateChange={setTemplate}
         onShowBrandNameChange={setShowBrandName}
       />
       <ModuleDetailAccordion summary={summary} />
