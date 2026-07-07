@@ -1378,6 +1378,7 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     function saveBeforeLeaving() {
+      writeBrowserAnswersDraft(module.id, latestAnswersRef.current);
       void persistCurrentDraft();
     }
 

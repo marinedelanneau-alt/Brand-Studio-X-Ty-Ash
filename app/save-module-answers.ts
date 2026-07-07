@@ -5,6 +5,7 @@ import { updateCompletedModuleCookie } from "@/lib/module-completion-fallback";
 import {
   isAnswerableExerciseType,
   parseIndexedAnswerItems,
+  type ExerciseType,
 } from "@/lib/exercise-types";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
@@ -19,6 +20,32 @@ type ModuleState = {
   status: "idle" | "error" | "success";
   message: string;
 };
+
+const STRUCTURED_VALUE_EXERCISE_TYPES = new Set<ExerciseType>([
+  "fill_blank",
+  "table",
+  "group_open",
+  "brand_persona",
+  "spectrum",
+  "color_palette",
+  "editorial_calendar",
+  "moodboard",
+]);
+
+function shouldKeepStructuredAnswerValues(type: ExerciseType) {
+  return STRUCTURED_VALUE_EXERCISE_TYPES.has(type);
+}
+
+function getSubmittedAnswerValues(formData: FormData, fieldName: string, type: ExerciseType) {
+  const values = formData
+    .getAll(fieldName)
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim());
+
+  return shouldKeepStructuredAnswerValues(type)
+    ? values
+    : values.filter(Boolean);
+}
 
 async function persistModuleAnswers(input: {
   accountId: number;
@@ -61,11 +88,11 @@ async function persistModuleAnswers(input: {
       const fieldName = `exercise-${exercise.id}`;
 
       if (exercise.type === "open" || exercise.type === "prompt_open") {
-        const values = input.formData
-          .getAll(fieldName)
-          .filter((item): item is string => typeof item === "string")
-          .map((item) => item.trim())
-          .filter(Boolean);
+        const values = getSubmittedAnswerValues(
+          input.formData,
+          fieldName,
+          exercise.type,
+        );
         const hasIndexedValues = parseIndexedAnswerItems(values).length > 0;
 
         return [{
@@ -82,11 +109,11 @@ async function persistModuleAnswers(input: {
         exercise.type === "boolean" ||
         exercise.type === "color"
       ) {
-        const values = input.formData
-          .getAll(fieldName)
-          .filter((item): item is string => typeof item === "string")
-          .map((item) => item.trim())
-          .filter(Boolean);
+        const values = getSubmittedAnswerValues(
+          input.formData,
+          fieldName,
+          exercise.type,
+        );
         const hasIndexedValues = parseIndexedAnswerItems(values).length > 0;
         const value = values[0] ?? "";
 
@@ -97,11 +124,11 @@ async function persistModuleAnswers(input: {
         }];
       }
 
-      const values = input.formData
-        .getAll(fieldName)
-        .filter((item): item is string => typeof item === "string")
-        .map((item) => item.trim())
-        .filter(Boolean);
+      const values = getSubmittedAnswerValues(
+        input.formData,
+        fieldName,
+        exercise.type,
+      );
 
       return [{
         exerciseId: exercise.id,
