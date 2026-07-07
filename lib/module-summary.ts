@@ -1,5 +1,4 @@
 import {
-  getTableCellCount,
   getPromptOpenLabel,
   isAnswerableExerciseType,
   parseIndexedAnswerItems,
@@ -112,7 +111,7 @@ function buildSubmoduleRecaps(module: WorkspaceModule) {
       title: submodule.title,
       position: submodule.position,
       summary: buildSubmoduleInsightSentence(submodule.title, completedHighlights),
-      highlights: completedHighlights.slice(0, 4),
+      highlights: completedHighlights,
     } satisfies ModuleSubmoduleSummary;
   });
 }
@@ -136,10 +135,6 @@ function buildModuleKeyTakeaways(
     return items.findIndex((candidate) => normalizeForSearch(candidate.value) === normalizedValue) === index;
   });
 
-  if (uniqueTakeaways.length >= 3) {
-    return uniqueTakeaways.slice(0, 5);
-  }
-
   const fallbackTakeaways = submoduleRecaps
     .flatMap((submodule) =>
       submodule.highlights.map((highlight, index) => ({
@@ -157,7 +152,7 @@ function buildModuleKeyTakeaways(
       ),
     );
 
-  return [...uniqueTakeaways, ...fallbackTakeaways].slice(0, 5);
+  return [...uniqueTakeaways, ...fallbackTakeaways];
 }
 
 function buildPersonaTakeaway(module: WorkspaceModule) {
@@ -434,7 +429,7 @@ function buildGenericQuickRecap(module: WorkspaceModule) {
     ];
   }
 
-  return answerableExercises.slice(0, 8).map((exercise) => {
+  return answerableExercises.map((exercise) => {
     const values = module.answers[exercise.id] ?? [];
     const summary = summarizeExerciseAnswer(exercise, values);
 
@@ -471,7 +466,7 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "fill_blank") {
-    return buildHighlight("Phrase clé", buildFillBlankSentence(exercise.question, values));
+    return buildHighlight("Phrase clé", summarizeFillBlankValues(exercise, values));
   }
 
   if (exercise.type === "group_open") {
@@ -507,7 +502,7 @@ function summarizeExerciseAnswer(
     const labels = (keptEntries.length > 0
       ? keptEntries
       : entries.map((entry) => entry.label)
-    ).slice(0, 5);
+    );
 
     return labels.length > 0
       ? buildHighlight("Mots retenus", labels.join(", "))
@@ -525,7 +520,6 @@ function summarizeExerciseAnswer(
     }
 
     const preview = nonEmptyCells
-      .slice(0, Math.min(3, getTableCellCount(tableConfig)))
       .map((entry) => {
         const columnIndex = entry.index % tableConfig.columns;
         const columnLabel =
@@ -590,7 +584,6 @@ function summarizeGenericValues(values: string[]) {
       )
       .map((item) => compactText(item.value))
       .filter(Boolean)
-      .slice(0, 4)
       .join(" | ");
   }
 
@@ -604,8 +597,7 @@ function summarizeGenericValues(values: string[]) {
 
       return value;
     })
-    .filter(Boolean)
-    .slice(0, 4);
+    .filter(Boolean);
 
   return readableValues.join(" | ");
 }
@@ -632,7 +624,6 @@ function summarizeBrandPersonaValues(
       return fieldValues.length > 0 ? `${field.label}: ${fieldValues.join(", ")}` : "";
     })
     .filter(Boolean)
-    .slice(0, 4)
     .join(" | ");
 }
 
@@ -648,8 +639,7 @@ function summarizeIndexedValues(
 
   const questionConfig = parseStoredExerciseQuestionConfig(exercise.type, exercise.options);
   const questionIndexes = [...new Set(indexedAnswers.map((item) => item.questionIndex))]
-    .sort((left, right) => left - right)
-    .slice(0, 4);
+    .sort((left, right) => left - right);
 
   return questionIndexes
     .map((questionIndex) => {
@@ -678,7 +668,6 @@ function summarizeJsonValue(value: string) {
       return parsed
         .map((item) => summarizeUnknownValue(item))
         .filter(Boolean)
-        .slice(0, 4)
         .join(", ");
     }
 
@@ -713,7 +702,6 @@ function summarizeUnknownValue(value: unknown): string {
 
       return [];
     })
-    .slice(0, 4)
     .join(", ");
 }
 
@@ -939,6 +927,37 @@ function isPlaceholderSummaryValue(value: string) {
   const normalized = normalizeForSearch(value);
 
   return normalized === "a completer" || normalized.includes("a completer");
+}
+
+function summarizeFillBlankValues(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+) {
+  const indexedAnswers = parseIndexedAnswerItems(values);
+
+  if (indexedAnswers.length === 0) {
+    return buildFillBlankSentence(exercise.question, values);
+  }
+
+  const questionConfig = parseStoredExerciseQuestionConfig(exercise.type, exercise.options);
+  const prompts =
+    questionConfig.items.length > 0 ? questionConfig.items : [exercise.question];
+
+  return prompts
+    .map((prompt, questionIndex) => {
+      const promptValues = indexedAnswers
+        .filter((item) => item.questionIndex === questionIndex)
+        .sort((left, right) => left.valueIndex - right.valueIndex)
+        .map((item) => item.value);
+
+      if (promptValues.length === 0) {
+        return "";
+      }
+
+      return buildFillBlankSentence(prompt, promptValues);
+    })
+    .filter(Boolean)
+    .join(" | ");
 }
 
 function buildFillBlankSentence(question: string, values: string[]) {
