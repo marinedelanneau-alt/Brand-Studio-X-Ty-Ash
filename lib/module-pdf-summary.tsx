@@ -83,6 +83,22 @@ const styles = StyleSheet.create({
     padding: 12,
     width: "48%",
   },
+  answerRow: {
+    backgroundColor: "#FFFFFF",
+    border: "1 solid #EADFCA",
+    borderRadius: 7,
+    marginBottom: 8,
+    padding: 12,
+  },
+  answerLine: {
+    color: "#5F544A",
+    fontSize: 10.5,
+    lineHeight: 1.55,
+  },
+  answerLabel: {
+    color: "#332D35",
+    fontWeight: 700,
+  },
   bodyText: {
     color: "#5F544A",
     fontSize: 10.5,
@@ -147,15 +163,14 @@ export function ModulePdfSummary({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Synthese automatique</Text>
-          <View style={styles.grid}>
-            {summary.keyTakeaways.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <Text style={styles.label}>{item.label}</Text>
-                <Text style={styles.value}>{item.value}</Text>
-                <Text style={styles.bodyText}>{item.context}</Text>
-              </View>
-            ))}
-          </View>
+          {summary.keyTakeaways.map((item) => (
+            <View key={item.id} style={styles.answerRow}>
+              <Text style={styles.answerLine}>
+                <Text style={styles.answerLabel}>{item.label} : </Text>
+                {item.value}
+              </Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>
