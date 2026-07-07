@@ -8,114 +8,189 @@ import {
 import type { ModuleSummaryCard } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
 
+const colors = {
+  background: "#FBF6ED",
+  paper: "#FFFDF9",
+  card: "#FFFFFF",
+  text: "#332D35",
+  muted: "#6F645B",
+  soft: "#7A7087",
+  border: "#EADFCA",
+  accent: "#CF7430",
+  accentSoft: "#FFF2DF",
+  gold: "#F1CC56",
+};
+
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: "#FBF6ED",
-    color: "#4B4550",
+    backgroundColor: colors.background,
+    color: colors.text,
     fontFamily: "Helvetica",
-    padding: 42,
+    padding: 38,
+  },
+  hero: {
+    backgroundColor: colors.paper,
+    border: `1 solid ${colors.border}`,
+    borderRadius: 16,
+    padding: 22,
   },
   eyebrow: {
-    color: "#CF7430",
+    color: colors.accent,
     fontSize: 9,
     fontWeight: 700,
-    letterSpacing: 2,
+    letterSpacing: 2.4,
     textTransform: "uppercase",
   },
   title: {
-    color: "#332D35",
-    fontSize: 34,
+    color: colors.text,
+    fontSize: 35,
     lineHeight: 1.05,
-    marginTop: 18,
+    marginTop: 16,
   },
   subtitle: {
-    color: "#6F645B",
-    fontSize: 12,
+    color: colors.muted,
+    fontSize: 13,
     lineHeight: 1.5,
-    marginTop: 12,
+    marginTop: 10,
+  },
+  introSentence: {
+    color: colors.muted,
+    fontSize: 11.5,
+    lineHeight: 1.55,
+    marginTop: 16,
+    maxWidth: 430,
   },
   metaRow: {
     flexDirection: "row",
     gap: 10,
-    marginTop: 22,
+    marginTop: 18,
   },
   metaItem: {
-    backgroundColor: "#FFFDF9",
-    border: "1 solid #EADFCA",
-    borderRadius: 8,
+    backgroundColor: colors.card,
+    border: `1 solid ${colors.border}`,
+    borderRadius: 10,
+    padding: 12,
+    width: "32%",
+  },
+  metaItemAccent: {
+    backgroundColor: colors.accentSoft,
+    border: `1 solid ${colors.gold}`,
+    borderRadius: 10,
     padding: 12,
     width: "32%",
   },
   label: {
-    color: "#7A7087",
+    color: colors.soft,
     fontSize: 8,
     fontWeight: 700,
-    letterSpacing: 1.3,
+    letterSpacing: 1.4,
     marginBottom: 6,
     textTransform: "uppercase",
   },
   value: {
-    color: "#4B4550",
+    color: colors.text,
     fontSize: 11,
+    fontWeight: 700,
     lineHeight: 1.45,
   },
   section: {
-    backgroundColor: "#FFFDF9",
-    border: "1 solid #EADFCA",
-    borderRadius: 10,
+    backgroundColor: colors.paper,
+    border: `1 solid ${colors.border}`,
+    borderRadius: 14,
     marginTop: 18,
     padding: 18,
   },
+  sectionEyebrow: {
+    color: colors.accent,
+    fontSize: 8,
+    fontWeight: 700,
+    letterSpacing: 1.8,
+    marginBottom: 5,
+    textTransform: "uppercase",
+  },
   sectionTitle: {
-    color: "#332D35",
-    fontSize: 17,
-    marginBottom: 12,
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    border: "1 solid #EADFCA",
-    borderRadius: 7,
-    padding: 12,
-    width: "48%",
+    color: colors.text,
+    fontSize: 19,
+    fontWeight: 700,
+    marginBottom: 14,
   },
   answerRow: {
-    backgroundColor: "#FFFFFF",
-    border: "1 solid #EADFCA",
-    borderRadius: 7,
-    marginBottom: 8,
-    padding: 12,
-  },
-  answerLine: {
-    color: "#5F544A",
-    fontSize: 10.5,
-    lineHeight: 1.55,
+    backgroundColor: colors.card,
+    border: `1 solid ${colors.border}`,
+    borderLeft: `5 solid ${colors.accent}`,
+    borderRadius: 10,
+    marginBottom: 10,
+    padding: 13,
   },
   answerLabel: {
-    color: "#332D35",
+    color: colors.text,
+    fontSize: 11,
     fontWeight: 700,
+    lineHeight: 1.45,
+    marginBottom: 4,
   },
-  bodyText: {
-    color: "#5F544A",
-    fontSize: 10.5,
+  answerText: {
+    color: colors.muted,
+    fontSize: 10.8,
+    lineHeight: 1.6,
+  },
+  submoduleCard: {
+    backgroundColor: colors.card,
+    border: `1 solid ${colors.border}`,
+    borderRadius: 10,
+    marginBottom: 12,
+    padding: 13,
+  },
+  submoduleHeader: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 9,
+  },
+  submoduleNumber: {
+    backgroundColor: colors.accentSoft,
+    borderRadius: 12,
+    color: colors.accent,
+    fontSize: 9,
+    fontWeight: 700,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  submoduleTitle: {
+    color: colors.text,
+    fontSize: 12.5,
+    fontWeight: 700,
+    lineHeight: 1.35,
+  },
+  detailRow: {
+    borderTop: `1 solid ${colors.border}`,
+    marginTop: 8,
+    paddingTop: 8,
+  },
+  detailLabel: {
+    color: colors.accent,
+    fontSize: 8.5,
+    fontWeight: 700,
+    letterSpacing: 0.6,
+    marginBottom: 3,
+    textTransform: "uppercase",
+  },
+  detailValue: {
+    color: colors.muted,
+    fontSize: 10,
     lineHeight: 1.55,
   },
   conclusion: {
-    color: "#5F544A",
+    color: colors.muted,
     fontSize: 12,
     lineHeight: 1.6,
   },
   footer: {
-    borderTop: "1 solid #EADFCA",
-    color: "#7A7087",
+    borderTop: `1 solid ${colors.border}`,
+    color: colors.soft,
     fontSize: 8,
     letterSpacing: 1.2,
     marginTop: "auto",
-    paddingTop: 16,
+    paddingTop: 14,
     textTransform: "uppercase",
   },
 });
@@ -142,56 +217,62 @@ export function ModulePdfSummary({
       subject="Resume de module Brand Studio"
     >
       <Page size="A4" style={styles.page}>
-        <Text style={styles.eyebrow}>Brand Studio · Resume de module</Text>
-        <Text style={styles.title}>{shareData.moduleTitle}</Text>
-        <Text style={styles.subtitle}>{shareData.brandName}</Text>
+        <View style={styles.hero}>
+          <Text style={styles.eyebrow}>Brand Studio · Resume de module</Text>
+          <Text style={styles.title}>{shareData.moduleTitle}</Text>
+          <Text style={styles.subtitle}>{shareData.brandName}</Text>
+          <Text style={styles.introSentence}>
+            {summary.hero || shareData.shareSentence}
+          </Text>
 
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Text style={styles.label}>Generation</Text>
-            <Text style={styles.value}>{formatDate(shareData.completedAt)}</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.label}>Progression</Text>
-            <Text style={styles.value}>{shareData.progress}%</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.label}>Mots cles</Text>
-            <Text style={styles.value}>{shareData.keywords.join(", ")}</Text>
+          <View style={styles.metaRow}>
+            <View style={styles.metaItem}>
+              <Text style={styles.label}>Generation</Text>
+              <Text style={styles.value}>{formatDate(shareData.completedAt)}</Text>
+            </View>
+            <View style={styles.metaItemAccent}>
+              <Text style={styles.label}>Progression</Text>
+              <Text style={styles.value}>{shareData.progress}%</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Text style={styles.label}>Mots cles</Text>
+              <Text style={styles.value}>{shareData.keywords.join(", ")}</Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Synthese automatique</Text>
+          <Text style={styles.sectionEyebrow}>Reponses principales</Text>
+          <Text style={styles.sectionTitle}>Ce que tu viens de construire</Text>
           {summary.keyTakeaways.map((item) => (
             <View key={item.id} style={styles.answerRow}>
-              <Text style={styles.answerLine}>
-                <Text style={styles.answerLabel}>{item.label} : </Text>
-                {item.value}
-              </Text>
+              <Text style={styles.answerLabel}>{item.label}</Text>
+              <Text style={styles.answerText}>{item.value}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionEyebrow}>Detail</Text>
           <Text style={styles.sectionTitle}>Resume par sous-module</Text>
-          <View style={styles.grid}>
-            {summary.submoduleRecaps.map((submodule) => (
-              <View key={submodule.id} style={styles.card}>
-                <Text style={styles.label}>Sous-module {submodule.position}</Text>
-                <Text style={styles.value}>{submodule.title}</Text>
-                <Text style={styles.bodyText}>{submodule.summary}</Text>
-                {submodule.highlights.slice(0, 3).map((item, index) => (
-                  <Text key={`${item.label}-${index}`} style={styles.bodyText}>
-                    {`${item.label}: ${item.value}`}
-                  </Text>
-                ))}
+          {summary.submoduleRecaps.map((submodule) => (
+            <View key={submodule.id} style={styles.submoduleCard}>
+              <View style={styles.submoduleHeader}>
+                <Text style={styles.submoduleNumber}>{submodule.position}</Text>
+                <Text style={styles.submoduleTitle}>{submodule.title}</Text>
               </View>
-            ))}
-          </View>
+              {submodule.highlights.map((item, index) => (
+                <View key={`${item.label}-${index}`} style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{item.label}</Text>
+                  <Text style={styles.detailValue}>{item.value}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionEyebrow}>Suite</Text>
           <Text style={styles.sectionTitle}>Conclusion</Text>
           <Text style={styles.conclusion}>
             {`${shareData.shareSentence} Tu disposes maintenant d'une base plus claire pour avancer dans la construction de ton identite de marque.`}

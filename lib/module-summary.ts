@@ -1008,9 +1008,6 @@ function normalizeForSearch(value: string) {
 }
 
 function truncateText(value: string, maxLength: number) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, Math.max(maxLength - 1, 1)).trimEnd()}...`;
+  void maxLength;
+  return value;
 }
