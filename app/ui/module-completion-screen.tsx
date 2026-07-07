@@ -121,11 +121,15 @@ function StorySharePreview({
   storyRef,
   shareData,
   showBrandName,
+  isExportingStory,
+  onShareStory,
   onShowBrandNameChange,
 }: {
   storyRef: React.RefObject<HTMLElement | null>;
   shareData: ModuleShareData;
   showBrandName: boolean;
+  isExportingStory: boolean;
+  onShareStory: () => void;
   onShowBrandNameChange: (show: boolean) => void;
 }) {
   return (
@@ -136,7 +140,7 @@ function StorySharePreview({
             Partager mon avancée
           </p>
           <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
-            Une story minimaliste pour célébrer ton module.
+            Une story pour célébrer ton module.
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
             Partage ton avancée avec une composition sobre, moderne et lisible, sans dévoiler tes réponses.
@@ -153,6 +157,15 @@ function StorySharePreview({
             />
             Afficher le nom de ma marque
           </label>
+          <button
+            type="button"
+            onClick={onShareStory}
+            disabled={isExportingStory}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white shadow-[0_14px_28px_rgba(75,69,80,0.16)] disabled:cursor-wait disabled:opacity-70"
+          >
+            <ShareIcon className="h-4 w-4" />
+            {isExportingStory ? "Préparation..." : "Partager en story Instagram"}
+          </button>
         </div>
       </div>
 
@@ -270,7 +283,6 @@ function CompletionActions({
   isExportingStory,
   onNext,
   onDownloadStory,
-  onShareStory,
   onCopySummary,
 }: {
   pdfHref: string;
@@ -281,7 +293,6 @@ function CompletionActions({
   isExportingStory: boolean;
   onNext: (href: string) => void;
   onDownloadStory: () => void;
-  onShareStory: () => void;
   onCopySummary: () => void;
 }) {
   const primaryClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white disabled:cursor-wait disabled:opacity-70 sm:w-auto";
@@ -320,15 +331,6 @@ function CompletionActions({
         >
           <ArrowDownTrayIcon className="h-4 w-4" />
           Télécharger la story
-        </button>
-        <button
-          type="button"
-          onClick={onShareStory}
-          disabled={isExportingStory}
-          className={secondaryClass}
-        >
-          <ShareIcon className="h-4 w-4" />
-          Partager
         </button>
         <button type="button" onClick={onCopySummary} className={secondaryClass}>
           <ClipboardDocumentIcon className="h-4 w-4" />
@@ -462,6 +464,8 @@ export default function ModuleCompletionScreen({
         storyRef={storyRef}
         shareData={shareData}
         showBrandName={showBrandName}
+        isExportingStory={isExportingStory}
+        onShareStory={() => void shareStory()}
         onShowBrandNameChange={setShowBrandName}
       />
       <ModuleDetailAccordion summary={summary} />
@@ -474,7 +478,6 @@ export default function ModuleCompletionScreen({
         isExportingStory={isExportingStory}
         onNext={(href) => void completeAndNavigate(href)}
         onDownloadStory={() => void downloadStory()}
-        onShareStory={() => void shareStory()}
         onCopySummary={() => void copySummary()}
       />
 
