@@ -140,7 +140,7 @@ function StorySharePreview({
             Partager mon avancée
           </p>
           <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
-            Une story pour célébrer ton module.
+            Une story pour célébrer cette belle avancée 🎉
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
             Partage ton avancée avec une composition sobre, moderne et lisible, sans dévoiler tes réponses.
