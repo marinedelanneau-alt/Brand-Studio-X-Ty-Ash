@@ -367,8 +367,7 @@ function cleanTakeawayValue(value: string) {
 }
 
 function sanitizeTakeawayLabel(label: string) {
-  const normalized = compactText(label);
-  return normalized.length > 34 ? `${normalized.slice(0, 31).trimEnd()}...` : normalized;
+  return compactText(label);
 }
 
 function hasUsableTakeawayValue(value: string) {
@@ -957,7 +956,8 @@ function buildFillBlankSentence(question: string, values: string[]) {
   return compactText(sentence);
 }
 
-function buildHighlight(label: string, value: string, maxValueLength = 120) {
+function buildHighlight(label: string, value: string, _maxValueLength = 120) {
+  void _maxValueLength;
   const normalizedValue = compactText(value);
 
   if (!normalizedValue) {
@@ -966,7 +966,7 @@ function buildHighlight(label: string, value: string, maxValueLength = 120) {
 
   return {
     label: truncateText(compactText(label) || "Point clé", 34),
-    value: truncateText(normalizedValue, maxValueLength),
+    value: normalizedValue,
   } satisfies ModuleSummaryHighlight;
 }
 

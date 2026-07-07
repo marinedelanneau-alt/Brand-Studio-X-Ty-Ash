@@ -84,7 +84,7 @@ function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
       <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[#7a7087]">
         {item.label}
       </h3>
-      <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#332d35]">
+      <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#6f645b]">
         {item.value}
       </p>
     </article>
