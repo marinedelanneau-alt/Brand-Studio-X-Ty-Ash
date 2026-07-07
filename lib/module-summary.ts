@@ -120,6 +120,12 @@ function buildModuleKeyTakeaways(
   module: WorkspaceModule,
   submoduleRecaps: ModuleSubmoduleSummary[],
 ): ModuleKeyTakeaway[] {
+  const moduleSpecificTakeaways = buildModuleSpecificKeyTakeaways(module);
+
+  if (moduleSpecificTakeaways) {
+    return moduleSpecificTakeaways;
+  }
+
   const candidates: Array<ModuleKeyTakeaway | null> = [
     buildPersonaTakeaway(module),
     buildToneTakeaway(module, submoduleRecaps),
@@ -395,24 +401,48 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       ),
     },
     {
-      label: "Mission",
-      item: findPromptHighlight(module, "mission", "Mission"),
+      label: "Ta mission",
+      item: findPromptHighlight(module, "mission", "Ta mission"),
     },
     {
-      label: "Vision",
-      item: findPromptHighlight(module, "vision", "Vision"),
+      label: "Ta vision",
+      item: findPromptHighlight(module, "vision", "Ta vision"),
     },
     {
-      label: "Valeurs",
+      label: "Tes valeurs",
       item: findValuesHighlight(module),
     },
     {
-      label: "Promesse",
-      item: findPromptHighlight(module, "promesse", "Promesse"),
+      label: "Ta promesse",
+      item: findPromptHighlight(module, "promesse", "Ta promesse"),
     },
   ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "À compléter"));
 
-  return recap;
+  return recap
+    .filter((item) =>
+      ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].includes(item.label),
+    )
+    .sort(
+      (left, right) =>
+        ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].indexOf(left.label) -
+        ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].indexOf(right.label),
+    );
+}
+
+function buildModuleSpecificKeyTakeaways(module: WorkspaceModule) {
+  const recap = buildModuleSpecificQuickRecap(module);
+
+  if (!recap) {
+    return null;
+  }
+
+  return recap.map((item, index) => ({
+    id: `vision-brand-${index}`,
+    label: item.label,
+    value: item.value,
+    context: "",
+    icon: "spark" as const,
+  }));
 }
 
 function buildGenericQuickRecap(module: WorkspaceModule) {
@@ -794,7 +824,7 @@ function findValuesHighlight(module: WorkspaceModule) {
   }
 
   return {
-    label: "Valeurs",
+    label: "Tes valeurs",
     value: summary.value,
   } satisfies ModuleSummaryHighlight;
 }
