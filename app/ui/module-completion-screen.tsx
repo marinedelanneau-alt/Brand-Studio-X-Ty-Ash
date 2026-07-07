@@ -5,16 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownTrayIcon,
   ArrowRightIcon,
-  ChatBubbleLeftRightIcon,
   ChevronDownIcon,
   ClipboardDocumentIcon,
   DocumentArrowDownIcon,
-  PaintBrushIcon,
-  PencilSquareIcon,
-  PhotoIcon,
   ShareIcon,
-  SparklesIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import type { ModuleKeyTakeaway, ModuleSummaryCard } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
@@ -37,16 +31,6 @@ function formatSummaryForClipboard(summary: ModuleSummaryCard) {
       ...submodule.highlights.map((item) => `- ${item.label}: ${item.value}`),
     ]),
   ].join("\n");
-}
-
-function TakeawayIconMark({ icon }: { icon: ModuleKeyTakeaway["icon"] }) {
-  if (icon === "persona") return <UserCircleIcon className="h-5 w-5" />;
-  if (icon === "tone") return <ChatBubbleLeftRightIcon className="h-5 w-5" />;
-  if (icon === "odor") return <SparklesIcon className="h-5 w-5" />;
-  if (icon === "baseline") return <PencilSquareIcon className="h-5 w-5" />;
-  if (icon === "palette") return <PaintBrushIcon className="h-5 w-5" />;
-  if (icon === "moodboard") return <PhotoIcon className="h-5 w-5" />;
-  return <ChatBubbleLeftRightIcon className="h-5 w-5" />;
 }
 
 function CompletionHero({
@@ -95,30 +79,14 @@ function CompletionHero({
 }
 
 function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
-  const isLong = item.value.length > 112;
-
   return (
-    <article className="rounded-[1.2rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(91,73,57,0.05)]">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fff6e3] text-[#cf7430]">
-          <TakeawayIconMark icon={item.icon} />
-        </span>
-        <div className="min-w-0">
-          <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[#7a7087]">
-            {item.label}
-          </h3>
-          <p className={`mt-2 text-base font-extrabold leading-6 text-[#332d35] ${isLong ? "line-clamp-2" : ""}`}>
-            {item.value}
-          </p>
-        </div>
-      </div>
-      <p className="mt-4 text-sm leading-6 text-[#6f645b]">{item.context}</p>
-      {isLong ? (
-        <details className="mt-3 text-sm leading-6 text-[#5f544a]">
-          <summary className="cursor-pointer font-bold text-[#cf7430]">Voir plus</summary>
-          <p className="mt-2">{item.value}</p>
-        </details>
-      ) : null}
+    <article className="rounded-[1.1rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(91,73,57,0.05)]">
+      <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[#7a7087]">
+        {item.label}
+      </h3>
+      <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#332d35]">
+        {item.value}
+      </p>
     </article>
   );
 }
