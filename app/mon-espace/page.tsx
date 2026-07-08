@@ -19,6 +19,8 @@ import {
   parseStoredTableConfig,
 } from "@/lib/exercise-types";
 
+export const dynamic = "force-dynamic";
+
 function isExerciseAnswered(
   exercise: WorkspaceModule["exercises"][number],
   answers: WorkspaceModule["answers"],

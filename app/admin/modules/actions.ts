@@ -50,6 +50,22 @@ type EditorSubmodule = {
   exerciseGroups: EditorExerciseGroup[];
 };
 
+function revalidateTrainingExperience(moduleId?: number) {
+  revalidatePath("/admin/modules");
+  revalidatePath("/mon-espace");
+  revalidatePath("/brand-guide");
+  revalidatePath("/mon-espace/module/[moduleId]", "page");
+  revalidatePath("/mon-espace/module/[moduleId]/summary-pdf");
+  revalidatePath("/mon-espace/module/[moduleId]/complete");
+  revalidatePath("/brand-guide/download");
+
+  if (moduleId && Number.isFinite(moduleId) && moduleId > 0) {
+    revalidatePath(`/mon-espace/module/${moduleId}`);
+    revalidatePath(`/mon-espace/module/${moduleId}/summary-pdf`);
+    revalidatePath(`/mon-espace/module/${moduleId}/complete`);
+  }
+}
+
 function parseQuestion(rawQuestion: unknown) {
   const item = rawQuestion as Partial<EditorExercise>;
     const clientId =
@@ -251,8 +267,7 @@ export async function saveAdminModule(formData: FormData) {
       submodules,
     });
 
-    revalidatePath("/admin/modules");
-    revalidatePath("/mon-espace");
+    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
     redirect("/admin/modules?status=saved");
   } catch (error) {
     unstable_rethrow(error);
@@ -308,8 +323,7 @@ export async function saveAdminModuleDraft(formData: FormData) {
       submodules,
     });
 
-    revalidatePath("/admin/modules");
-    revalidatePath("/mon-espace");
+    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 
     return {
       status: "success",
@@ -387,8 +401,7 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
       });
     }
 
-    revalidatePath("/admin/modules");
-    revalidatePath("/mon-espace");
+    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 
     return {
       status: "success",
@@ -446,8 +459,7 @@ export async function saveAdminSubmoduleContent(formData: FormData) {
       audioTranscript,
     });
 
-    revalidatePath("/admin/modules");
-    revalidatePath("/mon-espace");
+    revalidateTrainingExperience(moduleId);
 
     return {
       status: "success",
@@ -475,8 +487,7 @@ export async function deleteAdminModule(formData: FormData) {
     }
 
     await deleteModuleDefinition(moduleId);
-    revalidatePath("/admin/modules");
-    revalidatePath("/mon-espace");
+    revalidateTrainingExperience(moduleId);
     redirect("/admin/modules?status=deleted");
   } catch (error) {
     unstable_rethrow(error);

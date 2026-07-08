@@ -5,6 +5,8 @@ import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getProjectByAccountId, setProjectModuleCompletion } from "@/lib/training";
 
+export const dynamic = "force-dynamic";
+
 async function markModuleAsCompleted(moduleId: number) {
   const account = await getAuthenticatedAccount();
   if (!(await hasActiveAccess(account.id))) {

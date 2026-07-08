@@ -10,6 +10,8 @@ import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 
+export const dynamic = "force-dynamic";
+
 export default async function BrandGuidePage() {
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
   let latestGeneratedAt: string | null = null;

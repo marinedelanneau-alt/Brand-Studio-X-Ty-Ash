@@ -11,6 +11,8 @@ import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 
+export const dynamic = "force-dynamic";
+
 export default async function WorkspaceModulePage({
   params,
   searchParams,
