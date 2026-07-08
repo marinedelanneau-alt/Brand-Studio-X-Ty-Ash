@@ -1119,6 +1119,7 @@ export async function getWorkspaceData(accountId: number) {
 export async function replaceModuleAnswers(input: {
   projectId: number;
   moduleId: number;
+  exerciseIds?: number[];
   answers: Array<{
     exerciseId: number;
     answerText: string | null;
@@ -1127,11 +1128,25 @@ export async function replaceModuleAnswers(input: {
 }) {
   const supabase = createSupabaseServerClient();
 
-  const { error: deleteError } = await supabase
+  const submittedExerciseIds = [
+    ...new Set(
+      (input.exerciseIds ?? input.answers.map((answer) => answer.exerciseId)).filter(
+        (exerciseId) => Number.isFinite(exerciseId) && exerciseId > 0,
+      ),
+    ),
+  ];
+
+  let deleteQuery = supabase
     .from("project_exercise_answers")
     .delete()
     .eq("project_id", input.projectId)
     .eq("module_id", input.moduleId);
+
+  if (submittedExerciseIds.length > 0) {
+    deleteQuery = deleteQuery.in("exercise_id", submittedExerciseIds);
+  }
+
+  const { error: deleteError } = await deleteQuery;
 
   if (deleteError) {
     throw new Error(deleteError.message);

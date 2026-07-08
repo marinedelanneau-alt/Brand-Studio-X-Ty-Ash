@@ -714,6 +714,7 @@ function buildSubmissionFormData(
 
     const fieldName = `exercise-${exercise.id}`;
     const values = normalizeSubmissionValues(exercise, answers[exercise.id] ?? []);
+    formData.append("submittedExerciseId", String(exercise.id));
 
     if (exercise.type === "open" || exercise.type === "prompt_open") {
       const hasIndexedValues = parseIndexedAnswerItems(values).length > 0;
@@ -1481,6 +1482,9 @@ export default function ModuleAnswerForm({
         ) {
           event.preventDefault();
         }
+      }}
+      onBlurCapture={() => {
+        void persistCurrentDraft();
       }}
       onSubmit={(event) => {
         event.preventDefault();

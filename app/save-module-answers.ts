@@ -47,6 +47,15 @@ function getSubmittedAnswerValues(formData: FormData, fieldName: string, type: E
     : values.filter(Boolean);
 }
 
+function getSubmittedExerciseIds(formData: FormData) {
+  return new Set(
+    formData
+      .getAll("submittedExerciseId")
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value) && value > 0),
+  );
+}
+
 async function persistModuleAnswers(input: {
   accountId: number;
   formData: FormData;
@@ -80,8 +89,15 @@ async function persistModuleAnswers(input: {
       } satisfies ModuleState;
     }
 
+    const submittedExerciseIds = getSubmittedExerciseIds(input.formData);
+    const hasSubmittedExerciseScope = submittedExerciseIds.size > 0;
+
     const answers = selectedModule.exercises.flatMap((exercise) => {
       if (!isAnswerableExerciseType(exercise.type)) {
+        return [];
+      }
+
+      if (hasSubmittedExerciseScope && !submittedExerciseIds.has(exercise.id)) {
         return [];
       }
 
@@ -141,6 +157,7 @@ async function persistModuleAnswers(input: {
       projectId: workspace.project.id,
       moduleId: selectedModule.id,
       answers,
+      exerciseIds: hasSubmittedExerciseScope ? [...submittedExerciseIds] : undefined,
     });
 
     if (input.markModuleCompleted) {
