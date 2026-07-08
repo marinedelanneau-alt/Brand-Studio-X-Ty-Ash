@@ -8,6 +8,7 @@ import {
   updateCommunicationActionStatus,
   upsertCommunicationAction,
   type ActionStatus,
+  type CommunicationAction,
   type CommunicationActionInput,
 } from "@/lib/communication-actions";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
@@ -54,11 +55,11 @@ function revalidateActionPlan() {
 
 export async function saveCommunicationAction(
   action: CommunicationActionInput,
-): Promise<ActionResult> {
+): Promise<ActionResult<CommunicationAction>> {
   try {
     const { account, project } = await getAuthorizedProject();
 
-    await upsertCommunicationAction({
+    const savedAction = await upsertCommunicationAction({
       accountId: account.id,
       projectId: project.id,
       action,
@@ -68,7 +69,8 @@ export async function saveCommunicationAction(
 
     return {
       status: "success",
-      message: action.id ? "Action mise à jour." : "Action ajoutée à ta feuille de route.",
+      message: action.id ? "Action mise a jour." : "Action ajoutee a ta feuille de route.",
+      data: savedAction,
     };
   } catch (error) {
     return {
@@ -96,10 +98,10 @@ export async function removeCommunicationAction(actionId: string): Promise<Actio
   }
 }
 
-export async function copyCommunicationAction(actionId: string): Promise<ActionResult> {
+export async function copyCommunicationAction(actionId: string): Promise<ActionResult<CommunicationAction>> {
   try {
     const { account, project } = await getAuthorizedProject();
-    await duplicateCommunicationAction({
+    const copiedAction = await duplicateCommunicationAction({
       accountId: account.id,
       projectId: project.id,
       actionId,
@@ -108,7 +110,8 @@ export async function copyCommunicationAction(actionId: string): Promise<ActionR
 
     return {
       status: "success",
-      message: "Action dupliquée.",
+      message: "Action dupliquee.",
+      data: copiedAction,
     };
   } catch (error) {
     return {

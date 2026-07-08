@@ -252,10 +252,11 @@ function CommunicationActionForm({
   action: CommunicationActionInput;
   suggestionsTargets: string[];
   onClose: () => void;
-  onSaved: (message: string) => void;
+  onSaved: (action: CommunicationAction, message: string) => void;
 }) {
   const [draft, setDraft] = useState<CommunicationActionInput>(action);
   const [step, setStep] = useState<FormStep>(0);
+  const [formMessage, setFormMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const priority = calculateActionPriority(draft.impact_level, draft.effort_level);
   const targetOptions = Array.from(new Set([...suggestionsTargets, ...TARGET_OPTIONS])).slice(0, 10);
@@ -268,9 +269,12 @@ function CommunicationActionForm({
         ...draft,
         calculated_priority: priority,
       } as CommunicationActionInput);
-      if (result.status === "success") {
-        onSaved(result.message);
+      if (result.status === "success" && result.data) {
+        onSaved(result.data, result.message);
+        return;
       }
+
+      setFormMessage(result.message);
     });
   }
 
@@ -305,6 +309,12 @@ function CommunicationActionForm({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+          {formMessage ? (
+            <p className="mb-4 rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#9d4e40]">
+              {formMessage}
+            </p>
+          ) : null}
+
           {step === 0 ? (
             <div className="space-y-4">
               <Question title="Qu'est-ce que tu veux mettre en place ?" />
@@ -580,9 +590,17 @@ export default function CommunicationActionPlan({
     })[0];
   const suggestionTargets = Array.from(new Set(suggestions.flatMap((suggestion) => suggestion.target_audience)));
 
-  function refreshAfterMutation(text: string) {
+  function refreshAfterMutation(savedAction: CommunicationAction, text: string) {
+    setActions((current) => {
+      const exists = current.some((action) => action.id === savedAction.id);
+
+      return exists
+        ? current.map((action) => (action.id === savedAction.id ? savedAction : action))
+        : [savedAction, ...current];
+    });
+    setHasSeenIntro(true);
+    setFormAction(null);
     setMessage(text);
-    window.location.reload();
   }
 
   function handleDelete(action: CommunicationAction) {
@@ -599,7 +617,12 @@ export default function CommunicationActionPlan({
   function handleDuplicate(action: CommunicationAction) {
     startTransition(async () => {
       const result = await copyCommunicationAction(action.id);
-      refreshAfterMutation(result.message);
+      if (result.status === "success" && result.data) {
+        refreshAfterMutation(result.data, result.message);
+        return;
+      }
+
+      setMessage(result.message);
     });
   }
 
