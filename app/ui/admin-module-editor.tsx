@@ -1376,6 +1376,8 @@ function ModuleForm({
   const initialSaveSignature = `${module.id ?? "new"}:${module.title}:${module.position}:${module.isPublished}:${serializeSubmodules(module)}`;
   const lastSavedModuleSignatureRef = useRef(initialSaveSignature);
   const saveRequestIdRef = useRef(0);
+  const isSavingModuleRef = useRef(false);
+  const pendingSaveModeRef = useRef<"auto" | "manual" | null>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
   const [moduleSaveMessage, setModuleSaveMessage] = useState("");
   const [isSavingModule, setIsSavingModule] = useState(false);
@@ -1476,8 +1478,20 @@ function ModuleForm({
       return;
     }
 
+    if (isSavingModuleRef.current) {
+      pendingSaveModeRef.current =
+        pendingSaveModeRef.current === "manual" || mode === "manual" ? "manual" : "auto";
+      setModuleSaveMessage(
+        mode === "manual"
+          ? "Enregistrement en attente..."
+          : "Sauvegarde automatique en attente...",
+      );
+      return;
+    }
+
     const requestId = saveRequestIdRef.current + 1;
     saveRequestIdRef.current = requestId;
+    isSavingModuleRef.current = true;
     setIsSavingModule(true);
     setModuleSaveMessage(
       mode === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
@@ -1489,11 +1503,24 @@ function ModuleForm({
       return;
     }
 
+    isSavingModuleRef.current = false;
     setIsSavingModule(false);
     setModuleSaveMessage(result.message);
 
     if (result.status === "success") {
       lastSavedModuleSignatureRef.current = signature;
+    }
+
+    const pendingMode = pendingSaveModeRef.current;
+    pendingSaveModeRef.current = null;
+
+    if (pendingMode) {
+      const nextModule = getModuleReadyForSubmit();
+      const nextSignature = getModuleSaveSignature(nextModule);
+
+      if (nextSignature !== lastSavedModuleSignatureRef.current) {
+        void saveLatestModule(pendingMode);
+      }
     }
   }
 
@@ -1542,40 +1569,14 @@ function ModuleForm({
     setModuleSaveMessage("Modifications en attente...");
 
     const timeoutId = window.setTimeout(() => {
-      const requestId = saveRequestIdRef.current + 1;
-      const formData = new FormData();
-
-      saveRequestIdRef.current = requestId;
-      setIsSavingModule(true);
-      setModuleSaveMessage("Sauvegarde automatique...");
-
-      formData.set("moduleId", String(module.id));
-      formData.set("title", module.title);
-      formData.set("position", String(module.position));
-
-      if (module.isPublished) {
-        formData.set("isPublished", "on");
-      }
-
-      formData.set("submodulesJson", serializeSubmodules(module));
-
-      void saveAdminModuleDraft(formData).then((result) => {
-        if (requestId !== saveRequestIdRef.current) {
-          return;
-        }
-
-        setIsSavingModule(false);
-        setModuleSaveMessage(result.message);
-
-        if (result.status === "success") {
-          lastSavedModuleSignatureRef.current = signature;
-        }
-      });
+      void saveLatestModule("auto");
     }, 650);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
+    // saveLatestModule reads from refs so the delayed autosave always uses the latest editor state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [module]);
 
   async function uploadSubmoduleVoiceNote(submoduleId: string, file: File | null) {
