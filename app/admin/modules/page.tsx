@@ -35,7 +35,9 @@ export default async function AdminModulesPage({
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const status = resolvedSearchParams?.status;
+  const errorMessage = resolvedSearchParams?.message;
   const statusValue = Array.isArray(status) ? status[0] : status;
+  const errorMessageValue = Array.isArray(errorMessage) ? errorMessage[0] : errorMessage;
 
   const message =
     statusValue === "saved"
@@ -45,7 +47,7 @@ export default async function AdminModulesPage({
         : statusValue === "deleted"
           ? "Module supprime du brouillon admin."
           : statusValue === "error"
-            ? "Impossible de traiter cette action."
+            ? errorMessageValue || "Impossible de traiter cette action."
             : "";
 
   return (

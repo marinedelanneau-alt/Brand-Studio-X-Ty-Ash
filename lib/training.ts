@@ -1315,57 +1315,84 @@ function moduleDraftToDefinitionInput(module: DraftModule) {
   };
 }
 
-async function reservePublishedModulePositions() {
+const PUBLISHED_MODULE_STAGING_POSITION_OFFSET = 10000;
+
+async function deleteStagedPublishedModules() {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("brand_modules")
+    .delete()
+    .gte("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function deleteActivePublishedModules() {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("brand_modules")
+    .delete()
+    .lt("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function activateStagedPublishedModules() {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("brand_modules")
     .select("id, position")
+    .gte("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET)
     .returns<Array<{ id: number; position: number }>>();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  const reserveResults = await Promise.all(
+  const updates = await Promise.all(
     (data ?? []).map((moduleItem) =>
       supabase
         .from("brand_modules")
-        .update({ position: moduleItem.position + 10000 })
+        .update({
+          position: moduleItem.position - PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
+        })
         .eq("id", moduleItem.id),
     ),
   );
-  const reserveError = reserveResults.find((result) => result.error)?.error;
+  const updateError = updates.find((result) => result.error)?.error;
 
-  if (reserveError) {
-    throw new Error(reserveError.message);
+  if (updateError) {
+    throw new Error(updateError.message);
   }
 }
 
 export async function publishAdminModuleDraft(accountId: number) {
   const { project, modules, hasDraft } = await getAdminDraftBase(accountId);
 
-  if (!project || !hasDraft) {
-    throw new Error("Aucun brouillon admin a deployer.");
+  if (!project) {
+    throw new Error("Projet admin introuvable.");
   }
 
-  const publishedModules = await getModulesWithExercises({
-    includeUnpublished: true,
-    includeInactiveBrandPersona: true,
-  });
-  const draftPublishedIds = new Set(
-    modules.filter((moduleItem) => moduleItem.id > 0).map((moduleItem) => moduleItem.id),
-  );
+  if (!hasDraft) {
+    return;
+  }
 
-  await Promise.all(
-    publishedModules
-      .filter((moduleItem) => !draftPublishedIds.has(moduleItem.id))
-      .map((moduleItem) => deleteModuleDefinition(moduleItem.id)),
-  );
-  await reservePublishedModulePositions();
+  await deleteStagedPublishedModules();
 
   for (const moduleItem of modules) {
-    await saveModuleDefinition(moduleDraftToDefinitionInput(moduleItem));
+    await saveModuleDefinition({
+      ...moduleDraftToDefinitionInput(moduleItem),
+      moduleId: undefined,
+      position: moduleItem.position + PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
+    });
   }
+
+  await deleteActivePublishedModules();
+  await activateStagedPublishedModules();
 
   const refreshedModules = await getModulesWithExercises({
     includeUnpublished: true,

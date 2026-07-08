@@ -449,6 +449,10 @@ export async function publishAdminDraftToAllUsers() {
     redirect("/admin/modules?status=deployed");
   } catch (error) {
     unstable_rethrow(error);
-    redirect("/admin/modules?status=error");
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Impossible de deployer le brouillon.";
+    redirect(`/admin/modules?status=error&message=${encodeURIComponent(message)}`);
   }
 }
