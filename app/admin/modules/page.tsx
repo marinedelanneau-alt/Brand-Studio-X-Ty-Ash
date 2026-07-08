@@ -1,6 +1,8 @@
+import { publishAdminDraftToAllUsers } from "@/app/admin/modules/actions";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
-import { getModulesWithExercises } from "@/lib/training";
+import { getAuthenticatedAdmin } from "@/lib/session";
+import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
 
@@ -9,14 +11,12 @@ export default async function AdminModulesPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  let modules: Awaited<ReturnType<typeof getModulesWithExercises>> = [];
+  let modules: Awaited<ReturnType<typeof getAdminWorkingModules>> = [];
   let loadError = "";
 
   try {
-    modules = await getModulesWithExercises({
-      includeUnpublished: true,
-      includeInactiveBrandPersona: true,
-    });
+    const account = await getAuthenticatedAdmin();
+    modules = await getAdminWorkingModules(account.id);
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
@@ -25,7 +25,7 @@ export default async function AdminModulesPage({
   if (loadError) {
     return (
       <DatabaseErrorState
-        title="Les modules ne peuvent pas être chargés"
+        title="Les modules ne peuvent pas etre charges"
         message={loadError}
         backHref="/admin"
         backLabel="Retour au dashboard"
@@ -39,12 +39,14 @@ export default async function AdminModulesPage({
 
   const message =
     statusValue === "saved"
-      ? "Module enregistre."
-      : statusValue === "deleted"
-        ? "Module supprime."
-        : statusValue === "error"
-          ? "Impossible de traiter cette action."
-          : "";
+      ? "Brouillon admin enregistre. Tes changements sont visibles dans ton espace Marine Communication uniquement."
+      : statusValue === "deployed"
+        ? "Brouillon deploye a tous les utilisateurs."
+        : statusValue === "deleted"
+          ? "Module supprime du brouillon admin."
+          : statusValue === "error"
+            ? "Impossible de traiter cette action."
+            : "";
 
   return (
     <div className="space-y-6">
@@ -56,9 +58,18 @@ export default async function AdminModulesPage({
           Gestion des modules
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[#7b7068]">
-          Créez, publiez et mettez à jour les modules du parcours. Chaque
-          module compte de facon egale dans la progression totale.
+          Tes modifications sont enregistrees dans une copie de travail visible
+          uniquement dans ton espace Marine Communication. Les autres utilisateurs
+          gardent la version publiee jusqu&apos;au deploiement global.
         </p>
+        <form action={publishAdminDraftToAllUsers} className="mt-5">
+          <button
+            type="submit"
+            className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_32px_rgba(75,69,80,0.18)]"
+          >
+            Deployer a tous les utilisateurs
+          </button>
+        </form>
         {message ? (
           <p className="mt-5 text-sm leading-6 text-[#6b625a]">{message}</p>
         ) : null}

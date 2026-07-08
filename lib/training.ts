@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { findAccountById } from "@/lib/access-codes";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
 import { getCompletedModuleIdsFromCookie } from "@/lib/module-completion-fallback";
@@ -73,6 +74,17 @@ type ProjectModuleStateRecord = {
   updated_at: string;
 };
 
+type DraftModule = BrandModule & {
+  submodules: Array<BrandSubmodule & { exercises: ModuleExercise[] }>;
+  exercises: ModuleExercise[];
+};
+
+type ModuleDraftSnapshot = {
+  version: 1;
+  modules: DraftModule[];
+  updatedAt: string;
+};
+
 export type {
   AdminAccountSummary,
   AdminOverview,
@@ -110,6 +122,7 @@ const AUDIO_TRANSCRIPT_HTML_MARKER_PATTERN =
   /<!--\s*brand-studio-audio-transcript:([^]*?)\s*-->/;
 const ALL_AUDIO_TRANSCRIPT_HTML_MARKERS_PATTERN =
   /<!--\s*brand-studio-audio-transcript:[^]*?\s*-->/g;
+const ADMIN_MODULE_DRAFT_EXPORT_TYPE = "admin_module_draft";
 
 function getStoredAudioUrl(options: string[]) {
   const marker = options.find((option) => option.startsWith(AUDIO_URL_OPTION_PREFIX));
@@ -999,9 +1012,374 @@ export async function getModulesWithExercises({
   }));
 }
 
+function isModuleDraftSnapshot(value: unknown): value is ModuleDraftSnapshot {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const snapshot = value as Partial<ModuleDraftSnapshot>;
+  return snapshot.version === 1 && Array.isArray(snapshot.modules);
+}
+
+function normalizeDraftModule(module: DraftModule): DraftModule {
+  const submodules = [...(module.submodules ?? [])]
+    .sort((left, right) => left.position - right.position)
+    .map((submodule, submoduleIndex) => ({
+      ...submodule,
+      position: submoduleIndex + 1,
+      exercises: [...(submodule.exercises ?? [])].sort(
+        (left, right) => left.position - right.position,
+      ),
+    }));
+
+  return {
+    ...module,
+    position: Math.max(1, Number(module.position) || 1),
+    submodules,
+    exercises: submodules
+      .flatMap((submodule) => submodule.exercises)
+      .sort((left, right) => left.position - right.position),
+  };
+}
+
+function normalizeDraftModules(modules: DraftModule[]) {
+  return modules
+    .map((module) => normalizeDraftModule(module))
+    .sort((left, right) => left.position - right.position)
+    .map((module, index) => ({
+      ...module,
+      position: index + 1,
+    }));
+}
+
+function getNextDraftId(ids: number[]) {
+  const negativeIds = ids.filter((id) => Number.isFinite(id) && id < 0);
+  return negativeIds.length === 0 ? -1 : Math.min(...negativeIds) - 1;
+}
+
+async function getLatestAdminModuleDraftSnapshot(projectId: number) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("brand_exports")
+    .select("guide_snapshot")
+    .eq("project_id", projectId)
+    .eq("export_type", ADMIN_MODULE_DRAFT_EXPORT_TYPE)
+    .order("generated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<{ guide_snapshot: unknown }>();
+
+  if (error) {
+    const message = error.message.toLowerCase();
+    if (message.includes("could not find the table") || message.includes("schema cache")) {
+      return null;
+    }
+
+    throw new Error(error.message);
+  }
+
+  return isModuleDraftSnapshot(data?.guide_snapshot) ? data.guide_snapshot : null;
+}
+
+async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftModule[]) {
+  const supabase = createSupabaseServerClient();
+  const now = new Date().toISOString();
+  const snapshot: ModuleDraftSnapshot = {
+    version: 1,
+    modules: normalizeDraftModules(modules),
+    updatedAt: now,
+  };
+
+  const { error } = await supabase.from("brand_exports").insert({
+    project_id: projectId,
+    export_type: ADMIN_MODULE_DRAFT_EXPORT_TYPE,
+    file_url: null,
+    generated_at: now,
+    guide_snapshot: snapshot,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return snapshot.modules;
+}
+
+async function getAdminDraftBase(accountId: number) {
+  const project = await getProjectByAccountId(accountId);
+
+  if (!project) {
+    return {
+      project,
+      modules: await getModulesWithExercises({
+        includeUnpublished: true,
+        includeInactiveBrandPersona: true,
+      }),
+      hasDraft: false,
+    };
+  }
+
+  const draft = await getLatestAdminModuleDraftSnapshot(project.id);
+
+  if (draft) {
+    return {
+      project,
+      modules: normalizeDraftModules(draft.modules),
+      hasDraft: true,
+    };
+  }
+
+  return {
+    project,
+    modules: await getModulesWithExercises({
+      includeUnpublished: true,
+      includeInactiveBrandPersona: true,
+    }),
+    hasDraft: false,
+  };
+}
+
+export async function getAdminWorkingModules(accountId: number) {
+  const { modules } = await getAdminDraftBase(accountId);
+  return modules;
+}
+
+function buildDraftModuleFromDefinition(
+  input: {
+    moduleId?: number;
+    title: string;
+    position: number;
+    isPublished: boolean;
+    submodules: Array<{
+      title: string;
+      position: number;
+      videoUrl: string;
+      audioUrl: string;
+      audioTranscript: string;
+      contentHtml: string;
+      exerciseGroups: Array<{
+        groupId: string;
+        questions: Array<{
+          type: ExerciseType;
+          explanation: string;
+          answerPlaceholder: string;
+          audioUrl: string;
+          audioTranscript: string;
+          question: string;
+          options: string[];
+          feedbackConfig: SmartFeedbackConfig;
+        }>;
+      }>;
+    }>;
+  },
+  existingModule: DraftModule | undefined,
+  existingModules: DraftModule[],
+) {
+  const now = new Date().toISOString();
+  const moduleId =
+    input.moduleId && Number.isFinite(input.moduleId)
+      ? input.moduleId
+      : getNextDraftId(existingModules.map((module) => module.id));
+  const existingSubmodules = existingModule?.submodules ?? [];
+  const existingExercises = existingModule?.exercises ?? [];
+  let nextSubmoduleId = getNextDraftId(
+    existingModules.flatMap((module) => module.submodules.map((submodule) => submodule.id)),
+  );
+  let nextExerciseId = getNextDraftId(
+    existingModules.flatMap((module) => module.exercises.map((exercise) => exercise.id)),
+  );
+  let globalExercisePosition = 1;
+
+  const submodules = input.submodules.map((submodule, submoduleIndex) => {
+    const existingSubmodule = existingSubmodules[submoduleIndex];
+    const submoduleId = existingSubmodule?.id ?? nextSubmoduleId--;
+    const questions = submodule.exerciseGroups.flatMap((group) =>
+      group.questions.map((question) => {
+        const existingExercise = existingExercises[globalExercisePosition - 1];
+        const exerciseId = existingExercise?.id ?? nextExerciseId--;
+
+        return {
+          id: exerciseId,
+          module_id: moduleId,
+          submodule_id: submoduleId,
+          position: globalExercisePosition++,
+          type: question.type,
+          explanation: question.explanation,
+          answer_placeholder: question.answerPlaceholder,
+          audio_url: question.audioUrl || null,
+          audio_transcript: question.audioTranscript || null,
+          question: question.question,
+          options: [
+            ...question.options,
+            getSerializedSmartFeedbackOption(question.feedbackConfig),
+          ],
+          exercise_group_id: group.groupId,
+          feedback_config: question.feedbackConfig,
+        } satisfies ModuleExercise;
+      }),
+    );
+
+    return {
+      id: submoduleId,
+      module_id: moduleId,
+      title: submodule.title,
+      position: submoduleIndex + 1,
+      video_url: submodule.videoUrl,
+      audio_url: submodule.audioUrl || null,
+      audio_transcript: submodule.audioTranscript || null,
+      content_html: submodule.contentHtml,
+      created_at: existingSubmodule?.created_at ?? now,
+      updated_at: now,
+      exercises: questions,
+    } satisfies BrandSubmodule & { exercises: ModuleExercise[] };
+  });
+
+  return normalizeDraftModule({
+    id: moduleId,
+    title: input.title,
+    position: input.position,
+    video_url: input.submodules[0]?.videoUrl ?? "",
+    audio_url: input.submodules[0]?.audioUrl || null,
+    audio_transcript: input.submodules[0]?.audioTranscript || null,
+    content_html: input.submodules[0]?.contentHtml ?? "",
+    is_published: input.isPublished,
+    created_at: existingModule?.created_at ?? now,
+    updated_at: now,
+    submodules,
+    exercises: submodules.flatMap((submodule) => submodule.exercises),
+  });
+}
+
+export async function saveAdminModuleDefinitionDraft(
+  accountId: number,
+  input: Parameters<typeof saveModuleDefinition>[0],
+) {
+  const { project, modules } = await getAdminDraftBase(accountId);
+
+  if (!project) {
+    throw new Error("Cree d'abord ton projet Marine Communication pour utiliser le brouillon admin.");
+  }
+
+  const existingModule = input.moduleId
+    ? modules.find((module) => module.id === input.moduleId)
+    : undefined;
+  const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
+  const nextModules = existingModule
+    ? modules.map((module) => (module.id === existingModule.id ? nextModule : module))
+    : [...modules, nextModule];
+
+  await saveAdminModuleDraftSnapshot(project.id, nextModules);
+
+  return nextModule;
+}
+
+export async function deleteAdminModuleDefinitionDraft(accountId: number, moduleId: number) {
+  const { project, modules } = await getAdminDraftBase(accountId);
+
+  if (!project) {
+    throw new Error("Projet admin introuvable.");
+  }
+
+  await saveAdminModuleDraftSnapshot(
+    project.id,
+    modules.filter((module) => module.id !== moduleId),
+  );
+}
+
+function moduleDraftToDefinitionInput(module: DraftModule) {
+  return {
+    moduleId: module.id > 0 ? module.id : undefined,
+    title: module.title,
+    position: module.position,
+    isPublished: module.is_published,
+    submodules: module.submodules.map((submodule) => ({
+      title: submodule.title,
+      position: submodule.position,
+      videoUrl: submodule.video_url,
+      audioUrl: submodule.audio_url ?? "",
+      audioTranscript: submodule.audio_transcript ?? "",
+      contentHtml: submodule.content_html,
+      exerciseGroups: groupExercisesByGroupId(submodule.exercises).map((group) => ({
+        groupId: group.id,
+        questions: group.questions.map((exercise) => ({
+          type: exercise.type,
+          explanation: exercise.explanation,
+          answerPlaceholder: exercise.answer_placeholder,
+          audioUrl: exercise.audio_url ?? "",
+          audioTranscript: exercise.audio_transcript ?? "",
+          question: exercise.question,
+          options: exercise.options,
+          feedbackConfig: exercise.feedback_config ?? parseStoredSmartFeedbackConfig(exercise.options),
+        })),
+      })),
+    })),
+  };
+}
+
+async function reservePublishedModulePositions() {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("brand_modules")
+    .select("id, position")
+    .returns<Array<{ id: number; position: number }>>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const reserveResults = await Promise.all(
+    (data ?? []).map((moduleItem) =>
+      supabase
+        .from("brand_modules")
+        .update({ position: moduleItem.position + 10000 })
+        .eq("id", moduleItem.id),
+    ),
+  );
+  const reserveError = reserveResults.find((result) => result.error)?.error;
+
+  if (reserveError) {
+    throw new Error(reserveError.message);
+  }
+}
+
+export async function publishAdminModuleDraft(accountId: number) {
+  const { project, modules, hasDraft } = await getAdminDraftBase(accountId);
+
+  if (!project || !hasDraft) {
+    throw new Error("Aucun brouillon admin a deployer.");
+  }
+
+  const publishedModules = await getModulesWithExercises({
+    includeUnpublished: true,
+    includeInactiveBrandPersona: true,
+  });
+  const draftPublishedIds = new Set(
+    modules.filter((moduleItem) => moduleItem.id > 0).map((moduleItem) => moduleItem.id),
+  );
+
+  await Promise.all(
+    publishedModules
+      .filter((moduleItem) => !draftPublishedIds.has(moduleItem.id))
+      .map((moduleItem) => deleteModuleDefinition(moduleItem.id)),
+  );
+  await reservePublishedModulePositions();
+
+  for (const moduleItem of modules) {
+    await saveModuleDefinition(moduleDraftToDefinitionInput(moduleItem));
+  }
+
+  const refreshedModules = await getModulesWithExercises({
+    includeUnpublished: true,
+    includeInactiveBrandPersona: true,
+  });
+  await saveAdminModuleDraftSnapshot(project.id, refreshedModules);
+}
+
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
-  const modules = await getModulesWithExercises();
+  const account = await findAccountById(accountId);
+  const modules = account?.is_admin
+    ? await getAdminWorkingModules(accountId)
+    : await getModulesWithExercises();
 
   if (!project) {
     return {

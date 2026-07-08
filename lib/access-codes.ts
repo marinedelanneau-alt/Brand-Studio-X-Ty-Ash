@@ -57,6 +57,23 @@ export async function findAccountByEmail(email: string) {
   return data;
 }
 
+export async function findAccountById(accountId: number) {
+  const { tableName } = getTableConfig();
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("*")
+    .eq("id", accountId)
+    .maybeSingle<AccessCodeRecord>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function findAccountByAuthUserId(authUserId: string) {
   const { tableName } = getTableConfig();
   const supabase = createSupabaseServerClient();

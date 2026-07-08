@@ -14,11 +14,9 @@ import {
 } from "@/lib/smart-feedback";
 import {
   createAdminVoiceNoteUploadTarget,
-  deleteModuleDefinition,
-  persistSubmoduleContent,
-  persistExerciseVoiceNote,
-  persistSubmoduleVoiceNote,
-  saveModuleDefinition,
+  deleteAdminModuleDefinitionDraft,
+  publishAdminModuleDraft as publishAdminModuleDraftToUsers,
+  saveAdminModuleDefinitionDraft,
 } from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
 
@@ -233,7 +231,7 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
 
 export async function saveAdminModule(formData: FormData) {
   try {
-    await getAuthenticatedAdmin();
+    const account = await getAuthenticatedAdmin();
 
     const moduleId = Number(formData.get("moduleId"));
     const title =
@@ -259,8 +257,8 @@ export async function saveAdminModule(formData: FormData) {
       redirect("/admin/modules?status=error");
     }
 
-    await saveModuleDefinition({
-      moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
+    await saveAdminModuleDefinitionDraft(account.id, {
+      moduleId: Number.isFinite(moduleId) && moduleId !== 0 ? moduleId : undefined,
       title,
       position,
       isPublished,
@@ -277,7 +275,7 @@ export async function saveAdminModule(formData: FormData) {
 
 export async function saveAdminModuleDraft(formData: FormData) {
   try {
-    await getAuthenticatedAdmin();
+    const account = await getAuthenticatedAdmin();
 
     const moduleId = Number(formData.get("moduleId"));
     const title =
@@ -315,8 +313,8 @@ export async function saveAdminModuleDraft(formData: FormData) {
       };
     }
 
-    await saveModuleDefinition({
-      moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
+    await saveAdminModuleDefinitionDraft(account.id, {
+      moduleId: Number.isFinite(moduleId) && moduleId !== 0 ? moduleId : undefined,
       title,
       position,
       isPublished,
@@ -381,25 +379,7 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
       };
     }
 
-    const target = String(formData.get("target") ?? "");
     const moduleId = Number(formData.get("moduleId"));
-    const submoduleId = Number(formData.get("submoduleId"));
-    const exerciseId = Number(formData.get("exerciseId"));
-
-    if (target === "submodule") {
-      await persistSubmoduleVoiceNote({
-        moduleId,
-        submoduleId,
-        audioUrl: url,
-      });
-    }
-
-    if (target === "question") {
-      await persistExerciseVoiceNote({
-        exerciseId,
-        audioUrl: url,
-      });
-    }
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 
@@ -423,47 +403,12 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
 export async function saveAdminSubmoduleContent(formData: FormData) {
   try {
     await getAuthenticatedAdmin();
-
     const moduleId = Number(formData.get("moduleId"));
-    const submoduleId = Number(formData.get("submoduleId"));
-    const contentHtml =
-      typeof formData.get("contentHtml") === "string"
-        ? String(formData.get("contentHtml")).trim()
-        : "";
-    const audioUrl =
-      typeof formData.get("audioUrl") === "string"
-        ? String(formData.get("audioUrl")).trim()
-        : "";
-    const audioTranscript =
-      typeof formData.get("audioTranscript") === "string"
-        ? String(formData.get("audioTranscript")).trim()
-        : "";
-
-    if (
-      !Number.isFinite(moduleId) ||
-      moduleId <= 0 ||
-      !Number.isFinite(submoduleId) ||
-      !contentHtml
-    ) {
-      return {
-        status: "error",
-        message: "Le contenu n'a pas pu etre sauvegarde automatiquement.",
-      };
-    }
-
-    await persistSubmoduleContent({
-      moduleId,
-      submoduleId,
-      contentHtml,
-      audioUrl,
-      audioTranscript,
-    });
-
     revalidateTrainingExperience(moduleId);
 
     return {
       status: "success",
-      message: "Contenu enregistre automatiquement.",
+      message: "Le brouillon admin sera enregistre avec le module.",
     };
   } catch (error) {
     return {
@@ -478,17 +423,30 @@ export async function saveAdminSubmoduleContent(formData: FormData) {
 
 export async function deleteAdminModule(formData: FormData) {
   try {
-    await getAuthenticatedAdmin();
+    const account = await getAuthenticatedAdmin();
 
     const moduleId = Number(formData.get("moduleId"));
 
-    if (!Number.isFinite(moduleId) || moduleId <= 0) {
+    if (!Number.isFinite(moduleId) || moduleId === 0) {
       redirect("/admin/modules?status=error");
     }
 
-    await deleteModuleDefinition(moduleId);
+    await deleteAdminModuleDefinitionDraft(account.id, moduleId);
     revalidateTrainingExperience(moduleId);
     redirect("/admin/modules?status=deleted");
+  } catch (error) {
+    unstable_rethrow(error);
+    redirect("/admin/modules?status=error");
+  }
+}
+
+export async function publishAdminDraftToAllUsers() {
+  try {
+    const account = await getAuthenticatedAdmin();
+
+    await publishAdminModuleDraftToUsers(account.id);
+    revalidateTrainingExperience();
+    redirect("/admin/modules?status=deployed");
   } catch (error) {
     unstable_rethrow(error);
     redirect("/admin/modules?status=error");
