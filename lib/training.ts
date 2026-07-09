@@ -1072,6 +1072,19 @@ function normalizeDraftModules(modules: DraftModule[]) {
     }));
 }
 
+function reorderDraftModules(modules: DraftModule[], nextModule: DraftModule) {
+  const otherModules = modules.filter((module) => module.id !== nextModule.id);
+  const targetIndex = Math.min(
+    Math.max(nextModule.position - 1, 0),
+    otherModules.length,
+  );
+  const reorderedModules = [...otherModules];
+
+  reorderedModules.splice(targetIndex, 0, nextModule);
+
+  return normalizeDraftModules(reorderedModules);
+}
+
 function getNextDraftId(ids: number[]) {
   const negativeIds = ids.filter((id) => Number.isFinite(id) && id < 0);
   return negativeIds.length === 0 ? -1 : Math.min(...negativeIds) - 1;
@@ -1430,8 +1443,8 @@ export async function saveAdminModuleDefinitionDraft(
     : undefined;
   const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
   const nextModules = existingModule
-    ? modules.map((module) => (module.id === existingModule.id ? nextModule : module))
-    : [...modules, nextModule];
+    ? reorderDraftModules(modules, nextModule)
+    : reorderDraftModules([...modules, nextModule], nextModule);
 
   await saveAdminModuleDraftSnapshot(project.id, nextModules);
 

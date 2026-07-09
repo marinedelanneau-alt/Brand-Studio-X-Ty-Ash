@@ -1739,17 +1739,44 @@ function ModuleForm({
               </label>
               <label className="space-y-2">
                 <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Position</span>
-                <input
-                  name="position"
-                  type="number"
-                  min={1}
-                  required
-                  value={module.position}
-                  onChange={(event) =>
-                    onChange((current) => ({ ...current, position: Math.max(1, Number(event.target.value) || 1) }))
-                  }
-                  className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
-                />
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    name="position"
+                    type="number"
+                    min={1}
+                    required
+                    value={module.position}
+                    onChange={(event) =>
+                      onChange((current) => ({ ...current, position: Math.max(1, Number(event.target.value) || 1) }))
+                    }
+                    className="h-12 min-w-[7rem] flex-1 rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                  />
+                  <button
+                    type="button"
+                    disabled={module.position <= 1}
+                    onClick={() =>
+                      onChange((current) => ({
+                        ...current,
+                        position: Math.max(1, current.position - 1),
+                      }))
+                    }
+                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Monter
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChange((current) => ({
+                        ...current,
+                        position: current.position + 1,
+                      }))
+                    }
+                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                  >
+                    Descendre
+                  </button>
+                </div>
               </label>
             </div>
 
