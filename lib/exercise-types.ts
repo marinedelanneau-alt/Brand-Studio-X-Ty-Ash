@@ -657,7 +657,21 @@ export function parseChecklistEntries(values: string[]) {
         checked: checkedFlag === "1",
       } satisfies ChecklistEntry;
     })
-    .filter((entry) => entry.label.length > 0);
+    .filter((entry) => entry.label.length > 0 && !isTechnicalChecklistLabel(entry.label));
+}
+
+function isTechnicalChecklistLabel(label: string) {
+  const normalizedLabel = label.trim();
+
+  if (/^__[a-z0-9_]+__\s*:/i.test(normalizedLabel)) {
+    return true;
+  }
+
+  try {
+    return /^__[a-z0-9_]+__\s*:/i.test(decodeURIComponent(normalizedLabel));
+  } catch {
+    return false;
+  }
 }
 
 export function getEditorOptionsText(type: ExerciseType, rawOptions: string[]) {
