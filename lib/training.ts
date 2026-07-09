@@ -130,6 +130,8 @@ const ADMIN_WORKSPACE_EMAIL =
   process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
 const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
 const ADMIN_MODULE_DRAFT_STORAGE_BUCKET = "project-assets";
+const ADMIN_MODULE_DRAFT_CANONICAL_STORAGE_PATH =
+  "admin-module-drafts/current.json";
 
 function normalizeAdminWorkspaceLabel(value: string | null | undefined) {
   return (value ?? "")
@@ -1090,8 +1092,11 @@ function getNextDraftId(ids: number[]) {
   return negativeIds.length === 0 ? -1 : Math.min(...negativeIds) - 1;
 }
 
-function getAdminModuleDraftStoragePath(projectId: number) {
-  return `admin-module-drafts/${projectId}.json`;
+function getAdminModuleDraftStoragePaths(projectId: number) {
+  return [
+    ADMIN_MODULE_DRAFT_CANONICAL_STORAGE_PATH,
+    `admin-module-drafts/${projectId}.json`,
+  ];
 }
 
 function isAdminWorkspaceAccount(
@@ -1237,20 +1242,28 @@ async function restoreMissingPublishedModulesInDraft(
 
 async function getAdminModuleDraftSnapshotFromStorage(projectId: number) {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase.storage
-    .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
-    .download(getAdminModuleDraftStoragePath(projectId));
+  const paths = getAdminModuleDraftStoragePaths(projectId);
 
-  if (error) {
-    return null;
+  for (const path of paths) {
+    const { data, error } = await supabase.storage
+      .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
+      .download(path);
+
+    if (error) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(await data.text()) as unknown;
+      if (isModuleDraftSnapshot(parsed)) {
+        return parsed;
+      }
+    } catch {
+      continue;
+    }
   }
 
-  try {
-    const parsed = JSON.parse(await data.text()) as unknown;
-    return isModuleDraftSnapshot(parsed) ? parsed : null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 async function saveAdminModuleDraftSnapshotToStorage(
@@ -1261,12 +1274,17 @@ async function saveAdminModuleDraftSnapshotToStorage(
   const body = new Blob([JSON.stringify(snapshot)], {
     type: "application/json",
   });
-  const { error } = await supabase.storage
-    .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
-    .upload(getAdminModuleDraftStoragePath(projectId), body, {
-      contentType: "application/json",
-      upsert: true,
-    });
+  const uploads = await Promise.all(
+    getAdminModuleDraftStoragePaths(projectId).map((path) =>
+      supabase.storage
+        .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
+        .upload(path, body, {
+          contentType: "application/json",
+          upsert: true,
+        }),
+    ),
+  );
+  const error = uploads.find((result) => result.error)?.error;
 
   if (error) {
     throw new Error(error.message);
