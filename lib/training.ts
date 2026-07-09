@@ -129,6 +129,7 @@ const ADMIN_MODULE_DRAFT_EXPORT_TYPE = "admin_module_draft";
 const ADMIN_WORKSPACE_EMAIL =
   process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
 const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
+const ADMIN_MODULE_DRAFT_STORAGE_BUCKET = "project-assets";
 
 function normalizeAdminWorkspaceLabel(value: string | null | undefined) {
   return (value ?? "")
@@ -1076,6 +1077,10 @@ function getNextDraftId(ids: number[]) {
   return negativeIds.length === 0 ? -1 : Math.min(...negativeIds) - 1;
 }
 
+function getAdminModuleDraftStoragePath(projectId: number) {
+  return `admin-module-drafts/${projectId}.json`;
+}
+
 function isAdminWorkspaceAccount(
   account:
     | {
@@ -1143,13 +1148,17 @@ async function getLatestAdminModuleDraftSnapshot(projectId?: number) {
   if (error) {
     const message = error.message.toLowerCase();
     if (message.includes("could not find the table") || message.includes("schema cache")) {
-      return null;
+      return projectId ? getAdminModuleDraftSnapshotFromStorage(projectId) : null;
     }
 
     throw new Error(error.message);
   }
 
-  return isModuleDraftSnapshot(data?.guide_snapshot) ? data.guide_snapshot : null;
+  if (isModuleDraftSnapshot(data?.guide_snapshot)) {
+    return data.guide_snapshot;
+  }
+
+  return projectId ? getAdminModuleDraftSnapshotFromStorage(projectId) : null;
 }
 
 async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftModule[]) {
@@ -1170,10 +1179,55 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   });
 
   if (error) {
+    const message = error.message.toLowerCase();
+    if (message.includes("could not find the table") || message.includes("schema cache")) {
+      await saveAdminModuleDraftSnapshotToStorage(projectId, snapshot);
+      return snapshot.modules;
+    }
+
     throw new Error(error.message);
   }
 
+  await saveAdminModuleDraftSnapshotToStorage(projectId, snapshot);
   return snapshot.modules;
+}
+
+async function getAdminModuleDraftSnapshotFromStorage(projectId: number) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase.storage
+    .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
+    .download(getAdminModuleDraftStoragePath(projectId));
+
+  if (error) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(await data.text()) as unknown;
+    return isModuleDraftSnapshot(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+async function saveAdminModuleDraftSnapshotToStorage(
+  projectId: number,
+  snapshot: ModuleDraftSnapshot,
+) {
+  const supabase = createSupabaseServerClient();
+  const body = new Blob([JSON.stringify(snapshot)], {
+    type: "application/json",
+  });
+  const { error } = await supabase.storage
+    .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
+    .upload(getAdminModuleDraftStoragePath(projectId), body, {
+      contentType: "application/json",
+      upsert: true,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 async function getAdminDraftBase(accountId: number) {
