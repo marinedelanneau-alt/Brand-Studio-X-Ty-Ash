@@ -782,6 +782,7 @@ function QuestionCard({
   onMoveToSubmodule,
   onDelete,
   onChange,
+  onPersistAfterChange,
 }: {
   question: EditorQuestion;
   questionIndex: number;
@@ -793,6 +794,7 @@ function QuestionCard({
   onMoveToSubmodule: (targetSubmoduleId: string) => void;
   onDelete: () => void;
   onChange: (updater: (question: EditorQuestion) => EditorQuestion) => void;
+  onPersistAfterChange: () => Promise<void>;
 }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(question.question.trim().length === 0);
@@ -839,6 +841,7 @@ function QuestionCard({
 
       if (result.status === "success" && result.url) {
         onChange((current) => ({ ...current, audioUrl: result.url }));
+        await onPersistAfterChange();
       }
 
       setVoiceUploadMessage(result.message);
@@ -1615,6 +1618,7 @@ function ModuleForm({
             item.id === submoduleId ? { ...item, audioUrl: result.url } : item,
           ),
         }));
+        await saveLatestModule("manual");
       }
 
       setSubmoduleVoiceUploadMessages((current) => ({
@@ -2205,6 +2209,7 @@ function ModuleForm({
                                     updateQuestionInModule(current, activeSubmodule.id, group.id, question.id, updater),
                                   )
                                 }
+                                onPersistAfterChange={() => saveLatestModule("manual")}
                               />
                             ))}
                           </div>
