@@ -1102,16 +1102,20 @@ async function getAdminWorkspaceProject(accountId: number) {
   return getProjectByAccountId(workspaceAccount.id);
 }
 
-async function getLatestAdminModuleDraftSnapshot(projectId: number) {
+async function getLatestAdminModuleDraftSnapshot(projectId?: number) {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("brand_exports")
     .select("guide_snapshot")
-    .eq("project_id", projectId)
     .eq("export_type", ADMIN_MODULE_DRAFT_EXPORT_TYPE)
     .order("generated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle<{ guide_snapshot: unknown }>();
+    .limit(1);
+
+  if (projectId) {
+    query = query.eq("project_id", projectId);
+  }
+
+  const { data, error } = await query.maybeSingle<{ guide_snapshot: unknown }>();
 
   if (error) {
     const message = error.message.toLowerCase();
@@ -1163,7 +1167,9 @@ async function getAdminDraftBase(accountId: number) {
     };
   }
 
-  const draft = await getLatestAdminModuleDraftSnapshot(project.id);
+  const draft =
+    (await getLatestAdminModuleDraftSnapshot(project.id)) ??
+    (await getLatestAdminModuleDraftSnapshot());
 
   if (draft) {
     return {
