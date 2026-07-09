@@ -1,4 +1,5 @@
 import {
+  cleanStoredExerciseQuestionText,
   getAnswerPlaceholderItems,
   getFillBlankCount,
   getPromptOpenLabel,
@@ -42,7 +43,7 @@ function getQuestionColumns(exercise: PreviewExercise) {
 }
 
 function getStaticTextHtml(content: string) {
-  const trimmedContent = content.trim();
+  const trimmedContent = cleanStoredExerciseQuestionText(content);
 
   if (!trimmedContent) {
     return "";

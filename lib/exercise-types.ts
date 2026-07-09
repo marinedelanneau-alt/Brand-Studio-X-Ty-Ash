@@ -491,6 +491,12 @@ export function getEditorExerciseQuestion(type: ExerciseType, question: string) 
   return stripStoredExerciseQuestionPrefix(questionWithoutPlaceholder).trim();
 }
 
+export function cleanStoredExerciseQuestionText(question: string) {
+  return stripStoredExerciseQuestionPrefix(
+    stripStoredAnswerPlaceholderFromQuestion(question),
+  ).trim();
+}
+
 export function getPromptOpenLabel(question: string) {
   return getEditorExerciseQuestion("prompt_open", question);
 }

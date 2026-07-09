@@ -43,6 +43,7 @@ import PedagogicalContent from "./pedagogical-content";
 import VoiceNotePlayer from "./voice-note-player";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import {
+  cleanStoredExerciseQuestionText,
   getFillBlankCount,
   getTableCellCount,
   getAnswerPlaceholderItems,
@@ -1056,7 +1057,7 @@ function getModuleSummaryHref(moduleId: number) {
 }
 
 function getStaticTextHtml(content: string) {
-  const trimmedContent = content.trim();
+  const trimmedContent = cleanStoredExerciseQuestionText(content);
 
   if (!trimmedContent) {
     return "";
