@@ -74,6 +74,69 @@ export async function findAccountById(accountId: number) {
   return data;
 }
 
+function normalizeWorkspaceIdentity(value: string | null | undefined) {
+  return value?.trim().toLowerCase() ?? "";
+}
+
+function getWorkspaceIdentityScore(
+  account: AccessCodeRecord,
+  input: {
+    email: string;
+    keywords: string[];
+  },
+) {
+  const email = normalizeWorkspaceIdentity(account.email);
+  const clientName = normalizeWorkspaceIdentity(account.client_name);
+  const companyName = normalizeWorkspaceIdentity(account.company_name);
+  const label = `${clientName} ${companyName}`.trim();
+  const matchesAllKeywords = input.keywords.every((keyword) =>
+    label.includes(keyword.toLowerCase()),
+  );
+
+  if (matchesAllKeywords) {
+    return account.is_admin ? 80 : 100;
+  }
+
+  if (email === input.email.toLowerCase()) {
+    return account.is_admin ? 40 : 60;
+  }
+
+  return 0;
+}
+
+export async function findWorkspaceAccountByIdentity(input: {
+  email: string;
+  keywords: string[];
+}) {
+  const { tableName } = getTableConfig();
+  const supabase = createSupabaseServerClient();
+  const keywordFilters = input.keywords.flatMap((keyword) => {
+    const pattern = `*${keyword}*`;
+
+    return [
+      `client_name.ilike.${pattern}`,
+      `company_name.ilike.${pattern}`,
+    ];
+  });
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("*")
+    .or([`email.ilike.${input.email}`, ...keywordFilters].join(","))
+    .returns<AccessCodeRecord[]>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? [])
+    .map((account) => ({
+      account,
+      score: getWorkspaceIdentityScore(account, input),
+    }))
+    .filter((candidate) => candidate.account.is_active !== false && candidate.score > 0)
+    .sort((left, right) => right.score - left.score)[0]?.account ?? null;
+}
+
 export async function findAccountByAuthUserId(authUserId: string) {
   const { tableName } = getTableConfig();
   const supabase = createSupabaseServerClient();

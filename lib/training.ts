@@ -1,7 +1,10 @@
 import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { findAccountByEmail, findAccountById } from "@/lib/access-codes";
+import {
+  findAccountById,
+  findWorkspaceAccountByIdentity,
+} from "@/lib/access-codes";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
 import { getCompletedModuleIdsFromCookie } from "@/lib/module-completion-fallback";
@@ -125,7 +128,7 @@ const ALL_AUDIO_TRANSCRIPT_HTML_MARKERS_PATTERN =
 const ADMIN_MODULE_DRAFT_EXPORT_TYPE = "admin_module_draft";
 const ADMIN_WORKSPACE_EMAIL =
   process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
-const ADMIN_WORKSPACE_COMPANY_NAME = "marine communication";
+const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
 
 function getStoredAudioUrl(options: string[]) {
   const marker = options.find((option) => option.startsWith(AUDIO_URL_OPTION_PREFIX));
@@ -1073,23 +1076,26 @@ function isAdminWorkspaceAccount(
   const email = account?.email?.trim().toLowerCase() ?? "";
   const clientName = account?.client_name?.trim().toLowerCase() ?? "";
   const companyName = account?.company_name?.trim().toLowerCase() ?? "";
+  const label = `${clientName} ${companyName}`.trim();
 
   return (
     email === ADMIN_WORKSPACE_EMAIL.toLowerCase() ||
-    clientName === ADMIN_WORKSPACE_COMPANY_NAME ||
-    companyName === ADMIN_WORKSPACE_COMPANY_NAME
+    ADMIN_WORKSPACE_KEYWORDS.every((keyword) => label.includes(keyword))
   );
 }
 
 async function findAdminWorkspaceAccount(fallbackAccountId: number) {
   const fallbackAccount = await findAccountById(fallbackAccountId);
+  const configuredAccount = await findWorkspaceAccountByIdentity({
+    email: ADMIN_WORKSPACE_EMAIL,
+    keywords: ADMIN_WORKSPACE_KEYWORDS,
+  });
 
-  if (isAdminWorkspaceAccount(fallbackAccount)) {
-    return fallbackAccount;
+  if (configuredAccount) {
+    return configuredAccount;
   }
 
-  const configuredAccount = await findAccountByEmail(ADMIN_WORKSPACE_EMAIL);
-  return configuredAccount ?? fallbackAccount;
+  return fallbackAccount;
 }
 
 async function getAdminWorkspaceProject(accountId: number) {
@@ -1167,9 +1173,7 @@ async function getAdminDraftBase(accountId: number) {
     };
   }
 
-  const draft =
-    (await getLatestAdminModuleDraftSnapshot(project.id)) ??
-    (await getLatestAdminModuleDraftSnapshot());
+  const draft = await getLatestAdminModuleDraftSnapshot();
 
   if (draft) {
     return {
