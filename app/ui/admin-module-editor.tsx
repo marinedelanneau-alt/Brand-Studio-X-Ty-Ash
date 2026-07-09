@@ -1378,7 +1378,6 @@ function ModuleForm({
   const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
   const initialSaveSignature = `${module.id ?? "new"}:${module.title}:${module.position}:${module.isPublished}:${serializeSubmodules(module)}`;
   const lastSavedModuleSignatureRef = useRef(initialSaveSignature);
-  const saveRequestIdRef = useRef(0);
   const isSavingModuleRef = useRef(false);
   const pendingSaveModeRef = useRef<"auto" | "manual" | null>(null);
   const currentSavePromiseRef = useRef<Promise<void> | null>(null);
@@ -1472,16 +1471,6 @@ function ModuleForm({
   }
 
   async function saveLatestModule(mode: "auto" | "manual") {
-    const { currentModule, formData, signature } = getLatestModuleFormData();
-
-    if (!currentModule.id) {
-      return;
-    }
-
-    if (mode === "auto" && signature === lastSavedModuleSignatureRef.current) {
-      return;
-    }
-
     if (isSavingModuleRef.current) {
       pendingSaveModeRef.current =
         pendingSaveModeRef.current === "manual" || mode === "manual" ? "manual" : "auto";
@@ -1495,25 +1484,40 @@ function ModuleForm({
     }
 
     const saveTask = (async () => {
-      const requestId = saveRequestIdRef.current + 1;
-      saveRequestIdRef.current = requestId;
       isSavingModuleRef.current = true;
       setIsSavingModule(true);
-      setModuleSaveMessage(
-        mode === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
-      );
 
       try {
-        const result = await saveAdminModuleDraft(formData);
+        let nextMode: "auto" | "manual" | null = mode;
 
-        if (requestId !== saveRequestIdRef.current) {
-          return;
-        }
+        while (nextMode) {
+          const modeToRun = nextMode;
+          nextMode = null;
+          pendingSaveModeRef.current = null;
+          const { currentModule, formData, signature } = getLatestModuleFormData();
 
-        setModuleSaveMessage(result.message);
+          if (!currentModule.id) {
+            return;
+          }
 
-        if (result.status === "success") {
+          if (modeToRun === "auto" && signature === lastSavedModuleSignatureRef.current) {
+            nextMode = pendingSaveModeRef.current;
+            continue;
+          }
+
+          setModuleSaveMessage(
+            modeToRun === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
+          );
+
+          const result = await saveAdminModuleDraft(formData);
+          setModuleSaveMessage(result.message);
+
+          if (result.status !== "success") {
+            return;
+          }
+
           lastSavedModuleSignatureRef.current = signature;
+          nextMode = pendingSaveModeRef.current;
         }
       } catch (error) {
         setModuleSaveMessage(
@@ -1522,22 +1526,9 @@ function ModuleForm({
             : "Impossible d'enregistrer le module.",
         );
       } finally {
-        if (requestId === saveRequestIdRef.current) {
-          isSavingModuleRef.current = false;
-          setIsSavingModule(false);
-        }
-      }
-
-      const pendingMode = pendingSaveModeRef.current;
-      pendingSaveModeRef.current = null;
-
-      if (pendingMode) {
-        const nextModule = getModuleReadyForSubmit();
-        const nextSignature = getModuleSaveSignature(nextModule);
-
-        if (nextSignature !== lastSavedModuleSignatureRef.current) {
-          await saveLatestModule(pendingMode);
-        }
+        pendingSaveModeRef.current = null;
+        isSavingModuleRef.current = false;
+        setIsSavingModule(false);
       }
     })();
 
@@ -2283,13 +2274,14 @@ function ModuleForm({
                 </button>
               ) : null}
 
-              <button
-                type="submit"
-                disabled={Boolean(module.id && isSavingModule)}
-                className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
-              >
-                {module.id && isSavingModule ? "Enregistrement..." : submitLabel}
-              </button>
+              {!module.id ? (
+                <button
+                  type="submit"
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+                >
+                  {submitLabel}
+                </button>
+              ) : null}
 
               {module.id ? (
                 <button
