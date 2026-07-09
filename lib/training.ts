@@ -1192,6 +1192,36 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   return snapshot.modules;
 }
 
+async function restoreMissingPublishedModulesInDraft(
+  projectId: number,
+  modules: DraftModule[],
+) {
+  const publishedModules = await getModulesWithExercises({
+    includeUnpublished: true,
+    includeInactiveBrandPersona: true,
+  });
+  const draftModuleIds = new Set(
+    modules
+      .filter((moduleItem) => moduleItem.id > 0)
+      .map((moduleItem) => moduleItem.id),
+  );
+  const missingPublishedModules = publishedModules.filter(
+    (moduleItem) => moduleItem.id > 0 && !draftModuleIds.has(moduleItem.id),
+  );
+
+  if (missingPublishedModules.length === 0) {
+    return normalizeDraftModules(modules);
+  }
+
+  const restoredModules = normalizeDraftModules([
+    ...modules,
+    ...missingPublishedModules,
+  ]);
+
+  await saveAdminModuleDraftSnapshot(projectId, restoredModules);
+  return restoredModules;
+}
+
 async function getAdminModuleDraftSnapshotFromStorage(projectId: number) {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.storage
@@ -1252,10 +1282,14 @@ async function getAdminDraftBase(accountId: number) {
     if (!projectDraft && legacyDraft) {
       await saveAdminModuleDraftSnapshot(project.id, legacyDraft.modules);
     }
+    const modules = await restoreMissingPublishedModulesInDraft(
+      project.id,
+      draft.modules,
+    );
 
     return {
       project,
-      modules: normalizeDraftModules(draft.modules),
+      modules,
       hasDraft: true,
     };
   }
