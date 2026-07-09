@@ -124,13 +124,16 @@ export async function sendPasswordResetLink(
       process.env.NEXT_PUBLIC_FORMATION_URL?.replace(/\/$/, "") ||
       "https://brand-studio-new.vercel.app";
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
+      redirectTo: `${siteUrl}/auth/reset/callback`,
     });
 
     if (error) {
       return {
         status: "error",
-        message: "Impossible d'envoyer le lien de reinitialisation.",
+        message:
+          error.message.toLowerCase().includes("redirect")
+            ? "L'URL de reinitialisation doit etre autorisee dans Supabase."
+            : "Impossible d'envoyer le lien de reinitialisation.",
       };
     }
 
