@@ -2,11 +2,30 @@
 
 import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { headers } from "next/headers";
 
 type LoginState = {
   status: "idle" | "error" | "success";
   message: string;
 };
+
+async function getPublicSiteUrl() {
+  const headerStore = await headers();
+  const forwardedHost = headerStore.get("x-forwarded-host");
+  const host = forwardedHost ?? headerStore.get("host");
+  const forwardedProto = headerStore.get("x-forwarded-proto");
+  const proto = forwardedProto ?? (host?.includes("localhost") ? "http" : "https");
+
+  if (host) {
+    return `${proto}://${host}`.replace(/\/$/, "");
+  }
+
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    process.env.NEXT_PUBLIC_FORMATION_URL?.replace(/\/$/, "") ||
+    "https://brand-studio-new.vercel.app"
+  );
+}
 
 export async function loginWithPassword(
   _prevState: LoginState,
@@ -70,10 +89,7 @@ export async function sendPasswordlessLoginLink(
 
   try {
     const supabase = await createSupabaseAuthServerClient();
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      process.env.NEXT_PUBLIC_FORMATION_URL?.replace(/\/$/, "") ||
-      "https://brand-studio-new.vercel.app";
+    const siteUrl = await getPublicSiteUrl();
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -119,10 +135,7 @@ export async function sendPasswordResetLink(
 
   try {
     const supabase = await createSupabaseAuthServerClient();
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      process.env.NEXT_PUBLIC_FORMATION_URL?.replace(/\/$/, "") ||
-      "https://brand-studio-new.vercel.app";
+    const siteUrl = await getPublicSiteUrl();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${siteUrl}/auth/reset/callback`,
     });
