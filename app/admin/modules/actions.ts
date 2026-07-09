@@ -17,6 +17,7 @@ import {
   deleteAdminModuleDefinitionDraft,
   publishAdminModuleDraft as publishAdminModuleDraftToUsers,
   saveAdminModuleDefinitionDraft,
+  saveAdminVoiceNoteToDraft,
 } from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
 
@@ -365,7 +366,7 @@ export async function createAdminVoiceNoteUpload() {
 
 export async function persistAdminVoiceNoteUrl(formData: FormData) {
   try {
-    await getAuthenticatedAdmin();
+    const account = await getAuthenticatedAdmin();
     const url =
       typeof formData.get("audioUrl") === "string"
         ? String(formData.get("audioUrl")).trim()
@@ -380,6 +381,21 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
     }
 
     const moduleId = Number(formData.get("moduleId"));
+    const target = String(formData.get("target") ?? "");
+    const submoduleId = Number(formData.get("submoduleId"));
+    const exerciseId = Number(formData.get("exerciseId"));
+    const isSubmoduleTarget = target === "submodule" && Number.isFinite(submoduleId);
+    const isQuestionTarget = target === "question" && Number.isFinite(exerciseId);
+
+    if (Number.isFinite(moduleId) && moduleId > 0 && (isSubmoduleTarget || isQuestionTarget)) {
+      await saveAdminVoiceNoteToDraft({
+        accountId: account.id,
+        moduleId,
+        target: isSubmoduleTarget ? "submodule" : "question",
+        targetId: isSubmoduleTarget ? submoduleId : exerciseId,
+        audioUrl: url,
+      });
+    }
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 

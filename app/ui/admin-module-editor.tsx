@@ -773,6 +773,7 @@ function PositionControl({
 
 function QuestionCard({
   question,
+  moduleId,
   questionIndex,
   questionCount,
   availableSubmoduleTargets,
@@ -785,6 +786,7 @@ function QuestionCard({
   onPersistAfterChange,
 }: {
   question: EditorQuestion;
+  moduleId?: number;
   questionIndex: number;
   questionCount: number;
   availableSubmoduleTargets: Array<{ id: string; label: string }>;
@@ -836,6 +838,7 @@ function QuestionCard({
       const formData = new FormData();
       formData.set("audioUrl", uploadResult.url);
       formData.set("target", "question");
+      formData.set("moduleId", String(moduleId ?? 0));
       formData.set("exerciseId", question.id);
       const result = await persistAdminVoiceNoteUrl(formData);
 
@@ -2157,6 +2160,7 @@ function ModuleForm({
                               <QuestionCard
                                 key={question.id}
                                 question={question}
+                                moduleId={module.id}
                                 questionIndex={questionIndex}
                                 questionCount={group.questions.length}
                                 availableSubmoduleTargets={module.submodules

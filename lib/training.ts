@@ -1357,6 +1357,64 @@ export async function deleteAdminModuleDefinitionDraft(accountId: number, module
   );
 }
 
+export async function saveAdminVoiceNoteToDraft(input: {
+  accountId: number;
+  moduleId: number;
+  target: "submodule" | "question";
+  targetId: number;
+  audioUrl: string;
+}) {
+  const { project, modules } = await getAdminDraftBase(input.accountId);
+
+  if (!project) {
+    throw new Error("Projet Marine Communication introuvable.");
+  }
+
+  const nextModules = modules.map((moduleItem) => {
+    if (moduleItem.id !== input.moduleId) {
+      return moduleItem;
+    }
+
+    if (input.target === "submodule") {
+      const submodules = moduleItem.submodules.map((submodule) =>
+        submodule.id === input.targetId
+          ? { ...submodule, audio_url: input.audioUrl }
+          : submodule,
+      );
+
+      return normalizeDraftModule({
+        ...moduleItem,
+        audio_url:
+          submodules[0]?.id === input.targetId
+            ? input.audioUrl
+            : moduleItem.audio_url,
+        submodules,
+      });
+    }
+
+    const submodules = moduleItem.submodules.map((submodule) => {
+      const exercises = submodule.exercises.map((exercise) =>
+        exercise.id === input.targetId
+          ? { ...exercise, audio_url: input.audioUrl }
+          : exercise,
+      );
+
+      return {
+        ...submodule,
+        exercises,
+      };
+    });
+
+    return normalizeDraftModule({
+      ...moduleItem,
+      submodules,
+      exercises: submodules.flatMap((submodule) => submodule.exercises),
+    });
+  });
+
+  await saveAdminModuleDraftSnapshot(project.id, nextModules);
+}
+
 function moduleDraftToDefinitionInput(module: DraftModule) {
   return {
     moduleId: module.id > 0 ? module.id : undefined,
