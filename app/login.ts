@@ -128,12 +128,15 @@ export async function sendPasswordResetLink(
     });
 
     if (error) {
+      const resetErrorMessage = error.message.trim();
+
       return {
         status: "error",
         message:
-          error.message.toLowerCase().includes("redirect")
-            ? "L'URL de reinitialisation doit etre autorisee dans Supabase."
-            : "Impossible d'envoyer le lien de reinitialisation.",
+          resetErrorMessage.toLowerCase().includes("redirect") ||
+          resetErrorMessage.toLowerCase().includes("not allowed")
+            ? "URL de reinitialisation non autorisee dans Supabase. Ajoute https://brand-studio-new.vercel.app/auth/reset/callback dans Authentication > URL Configuration > Redirect URLs."
+            : `Impossible d'envoyer le lien de reinitialisation : ${resetErrorMessage}`,
       };
     }
 
