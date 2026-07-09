@@ -422,8 +422,8 @@ function shouldShowExerciseExplanation(
   return (
     exercise.explanation.trim().length > 0 &&
     !isDuplicateDisplayText(exercise.explanation, [
-      exercise.question,
-      getPromptOpenLabel(exercise.question),
+      cleanStoredExerciseQuestionText(exercise.question),
+      getPromptOpenLabel(cleanStoredExerciseQuestionText(exercise.question)),
       ...displayedTexts,
     ])
   );

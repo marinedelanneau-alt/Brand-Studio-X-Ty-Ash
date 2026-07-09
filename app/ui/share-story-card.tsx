@@ -19,8 +19,12 @@ type ShareStoryCardProps = {
 const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
   function ShareStoryCard({ data, showBrandName }, ref) {
     const title = showBrandName ? data.brandName : "Une marque en construction";
-    const keywordLine = data.keywords.slice(0, 3).join(" / ");
-    const progress = Math.max(0, Math.min(data.progress, 100));
+    const titleClassName =
+      title.length > 28
+        ? "text-[1.48rem] leading-[1.04]"
+        : title.length > 20
+          ? "text-[1.72rem] leading-[1.02]"
+          : "text-[2.05rem] leading-[0.98]";
 
     return (
       <article
@@ -62,7 +66,9 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
           <p className="text-[0.58rem] font-black uppercase leading-4 tracking-[0.18em] text-[#cf7430]">
             {data.moduleTitle} terminé
           </p>
-          <h2 className="mt-4 max-w-full whitespace-normal break-words font-[family:var(--font-cormorant)] text-[2.05rem] leading-[0.98] text-[#2f2a33]">
+          <h2
+            className={`mt-4 max-w-full whitespace-normal break-normal font-[family:var(--font-cormorant)] text-[#2f2a33] [overflow-wrap:normal] ${titleClassName}`}
+          >
             {title}
           </h2>
           <p className="mt-5 max-w-[15.5rem] text-[0.86rem] font-semibold leading-6 text-[#5f544a]">
@@ -76,25 +82,8 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
               Points abordés
             </p>
             <p className="mt-2 text-[0.78rem] font-black uppercase leading-5 tracking-[0.08em] text-[#332d35]">
-              {keywordLine}
+              Mission / Vision / Valeurs
             </p>
-          </div>
-
-          <div>
-            <div className="flex items-end justify-between">
-              <p className="text-[0.54rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
-                Progression
-              </p>
-              <p className="text-[1.85rem] font-black leading-none text-[#332d35]">
-                {progress}%
-              </p>
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/70">
-              <div
-                className="h-full rounded-full bg-[#cf7430]"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
           </div>
 
           <p className="border-t border-[#eadfca]/80 pt-4 text-center text-[0.56rem] font-black uppercase leading-5 tracking-[0.16em] text-[#6f645b]">

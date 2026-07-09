@@ -245,7 +245,7 @@ export function ModulePdfSummary({
           <Text style={styles.sectionEyebrow}>Reponses principales</Text>
           <Text style={styles.sectionTitle}>Ce que tu viens de construire</Text>
           {summary.keyTakeaways.map((item) => (
-            <View key={item.id} style={styles.answerRow}>
+            <View key={item.id} style={styles.answerRow} wrap={false}>
               <Text style={styles.answerLabel}>{item.label}</Text>
               <Text style={styles.answerText}>{item.value}</Text>
             </View>
@@ -262,7 +262,7 @@ export function ModulePdfSummary({
                 <Text style={styles.submoduleTitle}>{submodule.title}</Text>
               </View>
               {submodule.highlights.map((item, index) => (
-                <View key={`${item.label}-${index}`} style={styles.detailRow}>
+                <View key={`${item.label}-${index}`} style={styles.detailRow} wrap={false}>
                   <Text style={styles.detailLabel}>{item.label}</Text>
                   <Text style={styles.detailValue}>{item.value}</Text>
                 </View>
