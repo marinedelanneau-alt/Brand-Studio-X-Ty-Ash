@@ -419,11 +419,13 @@ function shouldShowExerciseExplanation(
   exercise: WorkspaceModule["exercises"][number],
   displayedTexts: Array<string | null | undefined> = [],
 ) {
+  const displayQuestion = cleanStoredExerciseQuestionText(exercise.question);
+
   return (
     exercise.explanation.trim().length > 0 &&
     !isDuplicateDisplayText(exercise.explanation, [
-      cleanStoredExerciseQuestionText(exercise.question),
-      getPromptOpenLabel(cleanStoredExerciseQuestionText(exercise.question)),
+      displayQuestion,
+      getPromptOpenLabel(displayQuestion),
       ...displayedTexts,
     ])
   );
@@ -441,7 +443,13 @@ function getAnswerPlaceholder(
   }
 
   const normalizedPlaceholder = normalizePlaceholderText(placeholder);
-  const duplicateSources = [displayedQuestion, exercise.question, exercise.explanation]
+  const displayQuestion = cleanStoredExerciseQuestionText(exercise.question);
+  const duplicateSources = [
+    displayedQuestion,
+    displayQuestion,
+    getPromptOpenLabel(displayQuestion),
+    exercise.explanation,
+  ]
     .filter((value): value is string => Boolean(value?.trim()));
 
   return isDuplicateDisplayText(normalizedPlaceholder, duplicateSources)
@@ -1582,10 +1590,10 @@ export default function ModuleAnswerForm({
             currentExercise.type !== "color_palette" &&
             currentQuestionPrompts.length === 0 &&
             !isMultiQuestionExerciseGroup &&
-            currentExercise.question.trim().length > 0 ? (
+            cleanStoredExerciseQuestionText(currentExercise.question).length > 0 ? (
               <div className="mt-3 flex items-start gap-3">
                 <p className="min-w-0 flex-1 text-base leading-7 text-[#5f544a]">
-                  {currentExercise.question}
+                  {cleanStoredExerciseQuestionText(currentExercise.question)}
                 </p>
                 <ExerciseAiActions
                   exercise={currentExercise}
@@ -1883,7 +1891,7 @@ export default function ModuleAnswerForm({
                   <div className="mt-4 border-l border-[#eadfca] pl-4">
                     <div className="flex flex-wrap items-center gap-3 text-[#20324a]">
                       <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[#20324a] sm:text-[2.35rem]">
-                        {getPromptOpenLabel(currentExercise.question)}
+                        {getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question))}
                       </span>
                       <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">
                         :
@@ -1906,14 +1914,14 @@ export default function ModuleAnswerForm({
                         className="min-w-32 max-w-full flex-none rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
                         placeholder={getAnswerPlaceholder(
                           currentExercise,
-                          getPromptOpenLabel(currentExercise.question),
+                          getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question)),
                         )}
                         style={{
                           width: getAdaptiveInlineInputWidth(
                             answers[currentExercise.id]?.[0] ?? "",
                             getAnswerPlaceholder(
                               currentExercise,
-                              getPromptOpenLabel(currentExercise.question),
+                              getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question)),
                             ),
                           ),
                         }}
@@ -2618,7 +2626,7 @@ export default function ModuleAnswerForm({
                     </div>
                     <div className="mt-4">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
-                      {splitFillBlankText(currentExercise.question).map((part, index, parts) => (
+                      {splitFillBlankText(cleanStoredExerciseQuestionText(currentExercise.question)).map((part, index, parts) => (
                         <div key={`${currentExercise.id}-${index}`} className="contents">
                           {part ? <span>{part}</span> : null}
                           {index < parts.length - 1 ? (
@@ -2630,7 +2638,7 @@ export default function ModuleAnswerForm({
                                   const currentValues =
                                     current[currentExercise.id] ??
                                     Array.from(
-                                      { length: getFillBlankCount(currentExercise.question) },
+                                      { length: getFillBlankCount(cleanStoredExerciseQuestionText(currentExercise.question)) },
                                       () => "",
                                     );
                                   const nextValues = [...currentValues];
@@ -2645,7 +2653,7 @@ export default function ModuleAnswerForm({
                               className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
                               placeholder={getFillBlankAnswerPlaceholder(
                                 currentExercise,
-                                currentExercise.question,
+                                cleanStoredExerciseQuestionText(currentExercise.question),
                                 index,
                               )}
                               style={{
@@ -2653,7 +2661,7 @@ export default function ModuleAnswerForm({
                                   answers[currentExercise.id]?.[index] ?? "",
                                   getFillBlankAnswerPlaceholder(
                                     currentExercise,
-                                    currentExercise.question,
+                                    cleanStoredExerciseQuestionText(currentExercise.question),
                                     index,
                                   ),
                                 ),
@@ -2960,7 +2968,9 @@ function MultiQuestionOpenExerciseGroup({
           key={question.id}
           className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
         >
-          {shouldShowExerciseExplanation(question, [question.question]) ? (
+          {shouldShowExerciseExplanation(question, [
+            cleanStoredExerciseQuestionText(question.question),
+          ]) ? (
             <PedagogicalContent
               content={question.explanation}
               className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
@@ -2972,7 +2982,7 @@ function MultiQuestionOpenExerciseGroup({
           />
           <span className="flex items-start gap-3">
             <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
-              {question.question}
+              {cleanStoredExerciseQuestionText(question.question)}
             </span>
             {supportsExerciseAi(question) ? (
               <ExerciseAiActions

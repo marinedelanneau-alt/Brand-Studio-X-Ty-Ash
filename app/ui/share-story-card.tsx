@@ -19,12 +19,19 @@ type ShareStoryCardProps = {
 const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
   function ShareStoryCard({ data, showBrandName }, ref) {
     const title = showBrandName ? data.brandName : "Une marque en construction";
+    const keywordLine = data.keywords.slice(0, 3).join(" / ");
     const titleClassName =
       title.length > 28
         ? "text-[1.48rem] leading-[1.04]"
         : title.length > 20
           ? "text-[1.72rem] leading-[1.02]"
           : "text-[2.05rem] leading-[0.98]";
+    const keywordClassName =
+      keywordLine.length > 34
+        ? "text-[0.62rem] leading-4 tracking-[0.04em]"
+        : keywordLine.length > 24
+          ? "text-[0.7rem] leading-[1.15rem] tracking-[0.06em]"
+          : "text-[0.78rem] leading-5 tracking-[0.08em]";
 
     return (
       <article
@@ -81,8 +88,8 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
             <p className="text-[0.54rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
               Points abordés
             </p>
-            <p className="mt-2 text-[0.78rem] font-black uppercase leading-5 tracking-[0.08em] text-[#332d35]">
-              Mission / Vision / Valeurs
+            <p className={`mt-2 max-w-full whitespace-normal break-normal font-black uppercase text-[#332d35] [overflow-wrap:normal] ${keywordClassName}`}>
+              {keywordLine}
             </p>
           </div>
 

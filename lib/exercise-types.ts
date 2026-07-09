@@ -1017,9 +1017,15 @@ function stripStoredExerciseQuestionPrefix(question: string) {
     CHECKLIST_QUESTION_PREFIX,
     TABLE_QUESTION_PREFIX,
   ];
-  const prefix = storedPrefixes.find((storedPrefix) => question.startsWith(storedPrefix));
+  let nextQuestion = question.trim();
+  let prefix = storedPrefixes.find((storedPrefix) => nextQuestion.startsWith(storedPrefix));
 
-  return prefix ? question.slice(prefix.length) : question;
+  while (prefix) {
+    nextQuestion = nextQuestion.slice(prefix.length).trim();
+    prefix = storedPrefixes.find((storedPrefix) => nextQuestion.startsWith(storedPrefix));
+  }
+
+  return nextQuestion.replace(/^__[a-z0-9_]+__\s*:\s*/i, "").trim();
 }
 
 function hasTableConfigOptions(options: string[]) {

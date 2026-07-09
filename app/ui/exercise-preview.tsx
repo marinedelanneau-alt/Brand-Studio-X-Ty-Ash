@@ -755,6 +755,7 @@ function PreviewEditorialCalendar() {
 
 export default function ExercisePreview({ exercise }: { exercise: PreviewExercise }) {
   const prompts = getQuestionPrompts(exercise);
+  const displayQuestion = cleanStoredExerciseQuestionText(exercise.question);
   const showMainQuestion =
     exercise.type !== "prompt_open" &&
     exercise.type !== "brand_persona" &&
@@ -763,7 +764,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
     !isPassiveContentType(exercise.type) &&
     exercise.type !== "fill_blank" &&
     exercise.type !== "group_open" &&
-    exercise.question.trim().length > 0;
+    displayQuestion.length > 0;
 
   return (
     <div className="space-y-4">
@@ -775,7 +776,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
 
       {exercise.explanation &&
       !isPassiveContentType(exercise.type) &&
-      !isDuplicateVisibleText(exercise.explanation, [exercise.question]) ? (
+      !isDuplicateVisibleText(exercise.explanation, [displayQuestion]) ? (
         exercise.type === "color_palette" ? null : (
         <PedagogicalContent
           content={exercise.explanation}
@@ -790,7 +791,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
       />
 
       {showMainQuestion ? (
-        <p className="text-base leading-7 text-[#5f544a]">{exercise.question}</p>
+        <p className="text-base leading-7 text-[#5f544a]">{displayQuestion}</p>
       ) : null}
 
       {exercise.type === "static_text" ? (
@@ -888,7 +889,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
           <div className="border-l border-[#eadfca] pl-4">
             <div className="flex flex-wrap items-center gap-3 text-[#20324a]">
               <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[#20324a] sm:text-[2.35rem]">
-                {getPromptOpenLabel(exercise.question)}
+                {getPromptOpenLabel(displayQuestion)}
               </span>
               <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">:</span>
               <div className="min-w-64 flex-1">
