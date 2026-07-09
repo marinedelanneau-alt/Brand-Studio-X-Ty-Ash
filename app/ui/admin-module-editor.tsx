@@ -774,6 +774,7 @@ function PositionControl({
 function QuestionCard({
   question,
   moduleId,
+  modulePosition,
   questionIndex,
   questionCount,
   availableSubmoduleTargets,
@@ -787,6 +788,7 @@ function QuestionCard({
 }: {
   question: EditorQuestion;
   moduleId?: number;
+  modulePosition: number;
   questionIndex: number;
   questionCount: number;
   availableSubmoduleTargets: Array<{ id: string; label: string }>;
@@ -839,6 +841,7 @@ function QuestionCard({
       formData.set("audioUrl", uploadResult.url);
       formData.set("target", "question");
       formData.set("moduleId", String(moduleId ?? 0));
+      formData.set("modulePosition", String(modulePosition));
       formData.set("exerciseId", question.id);
       const result = await persistAdminVoiceNoteUrl(formData);
 
@@ -1601,7 +1604,11 @@ function ModuleForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [module]);
 
-  async function uploadSubmoduleVoiceNote(submoduleId: string, file: File | null) {
+  async function uploadSubmoduleVoiceNote(
+    submoduleId: string,
+    submodulePosition: number,
+    file: File | null,
+  ) {
     if (!file) {
       return;
     }
@@ -1627,7 +1634,9 @@ function ModuleForm({
       formData.set("audioUrl", uploadResult.url);
       formData.set("target", "submodule");
       formData.set("moduleId", String(module.id ?? 0));
+      formData.set("modulePosition", String(module.position));
       formData.set("submoduleId", submoduleId);
+      formData.set("submodulePosition", String(submodulePosition));
       const result = await persistAdminVoiceNoteUrl(formData);
 
       if (result.status === "success" && result.url) {
@@ -1934,6 +1943,7 @@ function ModuleForm({
                         onChange={(event) => {
                           void uploadSubmoduleVoiceNote(
                             activeSubmodule.id,
+                            resolvedActiveSubmoduleIndex + 1,
                             event.target.files?.[0] ?? null,
                           );
                         }}
@@ -2161,6 +2171,7 @@ function ModuleForm({
                                 key={question.id}
                                 question={question}
                                 moduleId={module.id}
+                                modulePosition={module.position}
                                 questionIndex={questionIndex}
                                 questionCount={group.questions.length}
                                 availableSubmoduleTargets={module.submodules

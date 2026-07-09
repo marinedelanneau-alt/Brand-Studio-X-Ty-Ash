@@ -381,18 +381,27 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
     }
 
     const moduleId = Number(formData.get("moduleId"));
+    const modulePosition = Number(formData.get("modulePosition"));
     const target = String(formData.get("target") ?? "");
     const submoduleId = Number(formData.get("submoduleId"));
+    const submodulePosition = Number(formData.get("submodulePosition"));
     const exerciseId = Number(formData.get("exerciseId"));
-    const isSubmoduleTarget = target === "submodule" && Number.isFinite(submoduleId);
+    const isSubmoduleTarget =
+      target === "submodule" &&
+      (Number.isFinite(submoduleId) || Number.isFinite(submodulePosition));
     const isQuestionTarget = target === "question" && Number.isFinite(exerciseId);
 
     if (Number.isFinite(moduleId) && moduleId > 0 && (isSubmoduleTarget || isQuestionTarget)) {
       await saveAdminVoiceNoteToDraft({
         accountId: account.id,
         moduleId,
+        modulePosition: Number.isFinite(modulePosition) ? modulePosition : undefined,
         target: isSubmoduleTarget ? "submodule" : "question",
         targetId: isSubmoduleTarget ? submoduleId : exerciseId,
+        targetPosition:
+          isSubmoduleTarget && Number.isFinite(submodulePosition)
+            ? submodulePosition
+            : undefined,
         audioUrl: url,
       });
     }

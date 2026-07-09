@@ -1366,8 +1366,10 @@ export async function deleteAdminModuleDefinitionDraft(accountId: number, module
 export async function saveAdminVoiceNoteToDraft(input: {
   accountId: number;
   moduleId: number;
+  modulePosition?: number;
   target: "submodule" | "question";
   targetId: number;
+  targetPosition?: number;
   audioUrl: string;
 }) {
   const { project, modules } = await getAdminDraftBase(input.accountId);
@@ -1376,19 +1378,33 @@ export async function saveAdminVoiceNoteToDraft(input: {
     throw new Error("Projet Marine Communication introuvable.");
   }
 
+  let didUpdate = false;
   const nextModules = modules.map((moduleItem) => {
-    if (moduleItem.id !== input.moduleId) {
+    const isTargetModule =
+      moduleItem.id === input.moduleId ||
+      (Number.isFinite(input.modulePosition) &&
+        moduleItem.position === input.modulePosition);
+
+    if (!isTargetModule) {
       return moduleItem;
     }
 
     if (input.target === "submodule") {
       const submodules = moduleItem.submodules.map((submodule) =>
-        submodule.id === input.targetId
-          ? { ...submodule, audio_url: input.audioUrl }
+        submodule.id === input.targetId ||
+        (Number.isFinite(input.targetPosition) &&
+          submodule.position === input.targetPosition)
+          ? (() => {
+              didUpdate = true;
+              return { ...submodule, audio_url: input.audioUrl };
+            })()
           : submodule,
       );
       const targetIndex = submodules.findIndex(
-        (submodule) => submodule.id === input.targetId,
+        (submodule) =>
+          submodule.id === input.targetId ||
+          (Number.isFinite(input.targetPosition) &&
+            submodule.position === input.targetPosition),
       );
 
       return normalizeDraftModule({
@@ -1401,7 +1417,10 @@ export async function saveAdminVoiceNoteToDraft(input: {
     const submodules = moduleItem.submodules.map((submodule) => {
       const exercises = submodule.exercises.map((exercise) =>
         exercise.id === input.targetId
-          ? { ...exercise, audio_url: input.audioUrl }
+          ? (() => {
+              didUpdate = true;
+              return { ...exercise, audio_url: input.audioUrl };
+            })()
           : exercise,
       );
 
@@ -1417,6 +1436,10 @@ export async function saveAdminVoiceNoteToDraft(input: {
       exercises: submodules.flatMap((submodule) => submodule.exercises),
     });
   });
+
+  if (!didUpdate) {
+    throw new Error("La cible de la note vocale est introuvable dans le brouillon admin.");
+  }
 
   await saveAdminModuleDraftSnapshot(project.id, nextModules);
 }
