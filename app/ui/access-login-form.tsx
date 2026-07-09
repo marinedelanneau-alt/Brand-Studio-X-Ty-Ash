@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loginWithPassword } from "../login";
+import { loginWithPassword, sendPasswordlessLoginLink } from "../login";
 
 type ActionState = {
   status: "idle" | "error" | "success";
@@ -24,6 +24,11 @@ export default function AccessLoginForm() {
     loginWithPassword,
     initialState,
   );
+  const [magicLinkState, magicLinkAction, magicLinkPending] = useActionState(
+    sendPasswordlessLoginLink,
+    initialState,
+  );
+  const visibleState = magicLinkState.message ? magicLinkState : state;
 
   useEffect(() => {
     if (state.status !== "success") {
@@ -82,17 +87,27 @@ export default function AccessLoginForm() {
         {pending ? "Connexion..." : "Entrer"}
       </button>
 
+      <button
+        type="submit"
+        formAction={magicLinkAction}
+        formNoValidate
+        disabled={magicLinkPending}
+        className="flex h-13 w-full max-w-[41rem] items-center justify-center rounded-[1rem] border border-[#eadfca] bg-white px-6 text-[0.82rem] font-extrabold uppercase tracking-[0.12em] text-[#6f645b] shadow-[0_10px_22px_rgba(223,203,171,0.1)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+      >
+        {magicLinkPending ? "Envoi du lien..." : "Recevoir un lien sans mot de passe"}
+      </button>
+
       <div className="min-h-7">
-        {state.message ? (
+        {visibleState.message ? (
           <p
             aria-live="polite"
             className={
-              state.status === "error"
+              visibleState.status === "error"
                 ? "text-sm font-medium leading-6 text-[#b45247]"
                 : "text-sm font-medium leading-6 text-[#5f8d63]"
             }
           >
-            {state.message}
+            {visibleState.message}
           </p>
         ) : null}
       </div>
