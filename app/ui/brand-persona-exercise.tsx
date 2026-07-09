@@ -50,8 +50,7 @@ function setFieldValues(rawValues: string[], fieldIndex: number, nextValues: str
   );
 
   const nextItems = nextValues
-    .map((value) => value.trim())
-    .filter(Boolean)
+    .filter((value) => value.trim().length > 0)
     .map((value, valueIndex) => serializeIndexedAnswerItem(fieldIndex, valueIndex, value));
 
   return [
