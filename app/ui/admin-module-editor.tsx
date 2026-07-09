@@ -1381,6 +1381,7 @@ function ModuleForm({
   const saveRequestIdRef = useRef(0);
   const isSavingModuleRef = useRef(false);
   const pendingSaveModeRef = useRef<"auto" | "manual" | null>(null);
+  const currentSavePromiseRef = useRef<Promise<void> | null>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
   const [moduleSaveMessage, setModuleSaveMessage] = useState("");
   const [isSavingModule, setIsSavingModule] = useState(false);
@@ -1489,40 +1490,64 @@ function ModuleForm({
           ? "Enregistrement en attente..."
           : "Sauvegarde automatique en attente...",
       );
+      await currentSavePromiseRef.current;
       return;
     }
 
-    const requestId = saveRequestIdRef.current + 1;
-    saveRequestIdRef.current = requestId;
-    isSavingModuleRef.current = true;
-    setIsSavingModule(true);
-    setModuleSaveMessage(
-      mode === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
-    );
+    const saveTask = (async () => {
+      const requestId = saveRequestIdRef.current + 1;
+      saveRequestIdRef.current = requestId;
+      isSavingModuleRef.current = true;
+      setIsSavingModule(true);
+      setModuleSaveMessage(
+        mode === "auto" ? "Sauvegarde automatique..." : "Enregistrement...",
+      );
 
-    const result = await saveAdminModuleDraft(formData);
+      try {
+        const result = await saveAdminModuleDraft(formData);
 
-    if (requestId !== saveRequestIdRef.current) {
-      return;
-    }
+        if (requestId !== saveRequestIdRef.current) {
+          return;
+        }
 
-    isSavingModuleRef.current = false;
-    setIsSavingModule(false);
-    setModuleSaveMessage(result.message);
+        setModuleSaveMessage(result.message);
 
-    if (result.status === "success") {
-      lastSavedModuleSignatureRef.current = signature;
-    }
+        if (result.status === "success") {
+          lastSavedModuleSignatureRef.current = signature;
+        }
+      } catch (error) {
+        setModuleSaveMessage(
+          error instanceof Error
+            ? error.message
+            : "Impossible d'enregistrer le module.",
+        );
+      } finally {
+        if (requestId === saveRequestIdRef.current) {
+          isSavingModuleRef.current = false;
+          setIsSavingModule(false);
+        }
+      }
 
-    const pendingMode = pendingSaveModeRef.current;
-    pendingSaveModeRef.current = null;
+      const pendingMode = pendingSaveModeRef.current;
+      pendingSaveModeRef.current = null;
 
-    if (pendingMode) {
-      const nextModule = getModuleReadyForSubmit();
-      const nextSignature = getModuleSaveSignature(nextModule);
+      if (pendingMode) {
+        const nextModule = getModuleReadyForSubmit();
+        const nextSignature = getModuleSaveSignature(nextModule);
 
-      if (nextSignature !== lastSavedModuleSignatureRef.current) {
-        void saveLatestModule(pendingMode);
+        if (nextSignature !== lastSavedModuleSignatureRef.current) {
+          await saveLatestModule(pendingMode);
+        }
+      }
+    })();
+
+    currentSavePromiseRef.current = saveTask;
+
+    try {
+      await saveTask;
+    } finally {
+      if (currentSavePromiseRef.current === saveTask) {
+        currentSavePromiseRef.current = null;
       }
     }
   }
@@ -2245,6 +2270,19 @@ function ModuleForm({
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
+              {module.id ? (
+                <button
+                  type="button"
+                  disabled={isSavingModule}
+                  onClick={() => {
+                    void saveLatestModule("manual");
+                  }}
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#4b4550] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+                >
+                  {isSavingModule ? "Enregistrement..." : "Enregistrer les modifications"}
+                </button>
+              ) : null}
+
               <button
                 type="submit"
                 disabled={Boolean(module.id && isSavingModule)}
