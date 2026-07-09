@@ -323,16 +323,16 @@ function PreviewTable({ exercise }: { exercise: PreviewExercise }) {
                           key={`${exercise.id}-cell-${questionIndex}-${rowIndex}-${columnIndex}`}
                           className="border-b border-[#eadfca] px-3 py-3"
                         >
-                          <input
-                            type="text"
+                          <textarea
                             readOnly
                             value=""
+                            rows={3}
                             placeholder={
                               tablePlaceholders[cellIndex] ||
                               exercise.answer_placeholder ||
                               undefined
                             }
-                            className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 text-sm text-[#5f544a]"
+                            className="min-h-24 w-full resize-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] placeholder:text-[#b6aaa0]"
                           />
                         </td>
                       );

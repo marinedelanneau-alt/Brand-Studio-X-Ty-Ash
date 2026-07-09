@@ -2762,8 +2762,7 @@ export default function ModuleAnswerForm({
                                                 key={`${currentExercise.id}-${questionIndex}-${rowIndex}-${columnIndex}`}
                                                 className="border-t border-[#eadfca] px-3 py-3"
                                               >
-                                                <input
-                                                  type="text"
+                                                <textarea
                                                   value={questionValues[cellIndex] ?? ""}
                                                   onChange={(event) =>
                                                     setAnswers((current) => {
@@ -2797,7 +2796,8 @@ export default function ModuleAnswerForm({
                                                       };
                                                     })
                                                   }
-                                                  className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                                                  rows={3}
+                                                  className="min-h-24 w-full resize-y rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none placeholder:text-[#b6aaa0] focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
                                                   placeholder={
                                                     tablePlaceholders[cellIndex] ||
                                                     getAnswerPlaceholder(currentExercise)
