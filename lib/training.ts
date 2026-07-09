@@ -1164,8 +1164,7 @@ async function getLatestAdminModuleDraftSnapshot(projectId?: number) {
   const { data, error } = await query.maybeSingle<{ guide_snapshot: unknown }>();
 
   if (error) {
-    const message = error.message.toLowerCase();
-    if (message.includes("could not find the table") || message.includes("schema cache")) {
+    if (isMissingDatabaseObject(error)) {
       return projectId ? getAdminModuleDraftSnapshotFromStorage(projectId) : null;
     }
 
@@ -1197,8 +1196,7 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   });
 
   if (error) {
-    const message = error.message.toLowerCase();
-    if (message.includes("could not find the table") || message.includes("schema cache")) {
+    if (isMissingDatabaseObject(error)) {
       await saveAdminModuleDraftSnapshotToStorage(projectId, snapshot);
       return snapshot.modules;
     }

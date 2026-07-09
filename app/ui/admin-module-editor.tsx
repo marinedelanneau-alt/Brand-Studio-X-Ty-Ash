@@ -21,10 +21,12 @@ import {
   getEditorOptionsText,
   getExerciseDefaultOptionsText,
   getFillBlankCount,
+  getSerializedTablePlaceholderOptions,
   normalizeExerciseOptions,
   parseColorOption,
   parseStoredImageUploadConfig,
   parseStoredTableConfig,
+  parseStoredTablePlaceholders,
   type ExerciseType,
 } from "@/lib/exercise-types";
 import {
@@ -80,6 +82,7 @@ type EditorQuestion = {
   tableColumns: number;
   tableRowLabelsText: string;
   tableColumnLabelsText: string;
+  tablePlaceholdersText: string;
   imageUploadMax: number;
   brandPersonaConfig: BrandPersonaConfig;
   spectrumConfig: SpectrumConfig;
@@ -238,6 +241,7 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
     tableColumns: tableConfig.columns,
     tableRowLabelsText: tableConfig.rowLabels.join("\n"),
     tableColumnLabelsText: tableConfig.columnLabels.join("\n"),
+    tablePlaceholdersText: "",
     imageUploadMax: imageUploadConfig.maxImages,
     brandPersonaConfig: getDefaultBrandPersonaConfig(),
     spectrumConfig,
@@ -274,6 +278,11 @@ function createEmptyModule(position: number): EditorModule {
 
 function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): EditorQuestion {
   const tableConfig = parseStoredTableConfig(exercise.options);
+  const tablePlaceholders = parseStoredTablePlaceholders(
+    exercise.options,
+    tableConfig.rows * tableConfig.columns,
+    exercise.answer_placeholder ?? "",
+  );
   const imageUploadConfig = parseStoredImageUploadConfig(exercise.options);
 
   return {
@@ -295,6 +304,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     tableColumns: tableConfig.columns,
     tableRowLabelsText: tableConfig.rowLabels.join("\n"),
     tableColumnLabelsText: tableConfig.columnLabels.join("\n"),
+    tablePlaceholdersText: tablePlaceholders.join("\n"),
     imageUploadMax: imageUploadConfig.maxImages,
     brandPersonaConfig: parseStoredBrandPersonaConfig(exercise.options),
     spectrumConfig: parseStoredSpectrumConfig(exercise.options),
@@ -373,7 +383,7 @@ function supportsExplanationField(type: ExerciseType) {
 }
 
 function supportsPlaceholderField(type: ExerciseType) {
-  return !isPassiveContentType(type) && type !== "image_upload" && type !== "editorial_calendar" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
+  return !isPassiveContentType(type) && type !== "table" && type !== "image_upload" && type !== "editorial_calendar" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
 }
 
 function supportsSmartFeedbackField(type: ExerciseType) {
@@ -439,22 +449,37 @@ function updateFillBlankPlaceholderValue(
   return nextValues.join("\n");
 }
 
+function getTablePlaceholderValues(question: EditorQuestion) {
+  return getAnswerPlaceholderItems(
+    question.tablePlaceholdersText,
+    Math.max(1, question.tableRows) * Math.max(1, question.tableColumns),
+  );
+}
+
 function serializeQuestion(question: EditorQuestion) {
+  const tableRows = Math.max(1, question.tableRows);
+  const tableColumns = Math.max(1, question.tableColumns);
+  const tableCellCount = tableRows * tableColumns;
+  const tablePlaceholders = getAnswerPlaceholderItems(
+    question.tablePlaceholdersText,
+    tableCellCount,
+  );
   const options =
     question.type === "table"
       ? [
-          `__table_rows__:${Math.max(1, question.tableRows)}`,
-          `__table_columns__:${Math.max(1, question.tableColumns)}`,
+          `__table_rows__:${tableRows}`,
+          `__table_columns__:${tableColumns}`,
           ...question.tableRowLabelsText
             .split("\n")
             .map((label) => label.trim())
-            .slice(0, Math.max(1, question.tableRows))
+            .slice(0, tableRows)
             .map((label) => `__table_row__:${label}`),
           ...question.tableColumnLabelsText
             .split("\n")
             .map((label) => label.trim())
-            .slice(0, Math.max(1, question.tableColumns))
+            .slice(0, tableColumns)
             .map((label) => `__table_column__:${label}`),
+          ...getSerializedTablePlaceholderOptions(tablePlaceholders, tableCellCount),
         ]
       : question.type === "image_upload"
         ? [`__image_upload_max__:${Math.max(1, question.imageUploadMax)}`]
@@ -474,7 +499,10 @@ function serializeQuestion(question: EditorQuestion) {
     clientId: question.id,
     type: question.type,
     explanation: question.explanation.trim(),
-    answerPlaceholder: question.answerPlaceholder.trim(),
+    answerPlaceholder:
+      question.type === "table"
+        ? tablePlaceholders.find((placeholder) => placeholder.trim())?.trim() ?? ""
+        : question.answerPlaceholder.trim(),
     audioUrl: question.audioUrl.trim(),
     audioTranscript: question.audioTranscript.trim(),
     question: question.question.trim(),
@@ -1283,6 +1311,46 @@ function QuestionCard({
                   className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
                 />
               </label>
+
+              <div className="space-y-3">
+                <div>
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    Placeholders des reponses du tableau
+                  </span>
+                  <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+                    Une ligne par element de reponse, dans l&apos;ordre des cases du tableau.
+                  </p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {getTablePlaceholderValues(question).map((placeholder, index) => (
+                    <label key={`${question.id}-table-placeholder-${index}`} className="space-y-1">
+                      <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#8a8077]">
+                        Placeholder {index + 1}
+                      </span>
+                      <input
+                        type="text"
+                        value={placeholder}
+                        onChange={(event) =>
+                          onChange((current) => {
+                            const nextValues = getAnswerPlaceholderItems(
+                              current.tablePlaceholdersText,
+                              Math.max(1, current.tableRows) * Math.max(1, current.tableColumns),
+                            );
+                            nextValues[index] = event.target.value;
+
+                            return {
+                              ...current,
+                              tablePlaceholdersText: nextValues.join("\n"),
+                            };
+                          })
+                        }
+                        placeholder={`Ex. reponse ${index + 1}`}
+                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : null}
 

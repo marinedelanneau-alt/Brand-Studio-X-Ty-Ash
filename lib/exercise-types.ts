@@ -52,6 +52,7 @@ const TABLE_ROWS_PREFIX = "__table_rows__:";
 const TABLE_COLUMNS_PREFIX = "__table_columns__:";
 const TABLE_ROW_LABEL_PREFIX = "__table_row__:";
 const TABLE_COLUMN_LABEL_PREFIX = "__table_column__:";
+const TABLE_PLACEHOLDER_PREFIX = "__table_placeholder__:";
 const PROMPT_OPEN_PREFIX = "__prompt_open__:";
 const STATIC_TEXT_PREFIX = "__static_text__:";
 const POPUP_MESSAGE_PREFIX = "__popup_message__:";
@@ -487,7 +488,7 @@ export function getEditorExerciseQuestion(type: ExerciseType, question: string) 
     return questionWithoutPlaceholder.slice(TABLE_QUESTION_PREFIX.length).trim();
   }
 
-  return questionWithoutPlaceholder;
+  return stripStoredExerciseQuestionPrefix(questionWithoutPlaceholder).trim();
 }
 
 export function getPromptOpenLabel(question: string) {
@@ -912,6 +913,38 @@ export function getTableCellCount(config: TableConfig) {
   return config.rows * config.columns;
 }
 
+export function parseStoredTablePlaceholders(
+  rawOptions: string[],
+  count: number,
+  fallbackPlaceholder = "",
+) {
+  const normalizedCount = Math.max(count, 0);
+  const storedPlaceholders = rawOptions
+    .filter((option) => option.startsWith(TABLE_PLACEHOLDER_PREFIX))
+    .map((option) => option.slice(TABLE_PLACEHOLDER_PREFIX.length).trim());
+
+  if (storedPlaceholders.length > 0) {
+    return Array.from(
+      { length: normalizedCount },
+      (_, index) => storedPlaceholders[index] ?? "",
+    );
+  }
+
+  return getAnswerPlaceholderItems(fallbackPlaceholder, normalizedCount);
+}
+
+export function getSerializedTablePlaceholderOptions(
+  placeholders: string[],
+  count: number,
+) {
+  return Array.from(
+    { length: Math.max(count, 0) },
+    (_, index) => placeholders[index]?.trim() ?? "",
+  )
+    .map((placeholder) => `${TABLE_PLACEHOLDER_PREFIX}${placeholder}`)
+    .filter((option) => option.slice(TABLE_PLACEHOLDER_PREFIX.length).trim());
+}
+
 export function getFillBlankCount(text: string) {
   const matches = text.match(/_{3,}/g);
   return matches?.length ?? 0;
@@ -968,6 +1001,19 @@ function isStaticTextQuestion(question: string) {
 
 function isPopupMessageQuestion(question: string) {
   return question.startsWith(POPUP_MESSAGE_PREFIX);
+}
+
+function stripStoredExerciseQuestionPrefix(question: string) {
+  const storedPrefixes = [
+    STATIC_TEXT_PREFIX,
+    POPUP_MESSAGE_PREFIX,
+    PROMPT_OPEN_PREFIX,
+    CHECKLIST_QUESTION_PREFIX,
+    TABLE_QUESTION_PREFIX,
+  ];
+  const prefix = storedPrefixes.find((storedPrefix) => question.startsWith(storedPrefix));
+
+  return prefix ? question.slice(prefix.length) : question;
 }
 
 function hasTableConfigOptions(options: string[]) {

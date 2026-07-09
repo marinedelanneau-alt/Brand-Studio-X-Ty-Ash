@@ -50,6 +50,7 @@ import {
   parseStoredExerciseQuestionConfig,
   parseStoredImageUploadConfig,
   parseStoredTableConfig,
+  parseStoredTablePlaceholders,
   parseChecklistEntries,
   getPromptOpenLabel,
   isAnswerableExerciseType,
@@ -2677,6 +2678,11 @@ export default function ModuleAnswerForm({
                 />
                 {(() => {
                   const tableConfig = parseStoredTableConfig(currentExercise.options);
+                  const tablePlaceholders = parseStoredTablePlaceholders(
+                    currentExercise.options,
+                    getTableCellCount(tableConfig),
+                    getAnswerPlaceholder(currentExercise),
+                  );
                   const rowLabels = Array.from(
                     { length: tableConfig.rows },
                     (_, rowIndex) => tableConfig.rowLabels[rowIndex] ?? "",
@@ -2792,9 +2798,10 @@ export default function ModuleAnswerForm({
                                                     })
                                                   }
                                                   className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
-                                                  placeholder={getAnswerPlaceholder(
-                                                    currentExercise,
-                                                  )}
+                                                  placeholder={
+                                                    tablePlaceholders[cellIndex] ||
+                                                    getAnswerPlaceholder(currentExercise)
+                                                  }
                                                 />
                                               </td>
                                             );

@@ -7,6 +7,7 @@ import {
   parseStoredExerciseQuestionConfig,
   parseStoredImageUploadConfig,
   parseStoredTableConfig,
+  parseStoredTablePlaceholders,
   splitFillBlankText,
   type ExerciseType,
 } from "@/lib/exercise-types";
@@ -264,6 +265,11 @@ function PreviewChecklist({ exercise, prompt }: { exercise: PreviewExercise; pro
 function PreviewTable({ exercise }: { exercise: PreviewExercise }) {
   const prompts = getQuestionPrompts(exercise);
   const tableConfig = parseStoredTableConfig(exercise.options);
+  const tablePlaceholders = parseStoredTablePlaceholders(
+    exercise.options,
+    tableConfig.rows * tableConfig.columns,
+    exercise.answer_placeholder,
+  );
   const rowLabels = Array.from(
     { length: tableConfig.rows },
     (_, rowIndex) => tableConfig.rowLabels[rowIndex] ?? "",
@@ -309,20 +315,28 @@ function PreviewTable({ exercise }: { exercise: PreviewExercise }) {
                     <th className="border-b border-r border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-left text-sm font-semibold text-[#5f544a]">
                       {rowLabel || `Ligne ${rowIndex + 1}`}
                     </th>
-                    {columnLabels.map((_, columnIndex) => (
-                      <td
-                        key={`${exercise.id}-cell-${questionIndex}-${rowIndex}-${columnIndex}`}
-                        className="border-b border-[#eadfca] px-3 py-3"
-                      >
-                        <input
-                          type="text"
-                          readOnly
-                          value=""
-                          placeholder={exercise.answer_placeholder || undefined}
-                          className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 text-sm text-[#5f544a]"
-                        />
-                      </td>
-                    ))}
+                    {columnLabels.map((_, columnIndex) => {
+                      const cellIndex = rowIndex * tableConfig.columns + columnIndex;
+
+                      return (
+                        <td
+                          key={`${exercise.id}-cell-${questionIndex}-${rowIndex}-${columnIndex}`}
+                          className="border-b border-[#eadfca] px-3 py-3"
+                        >
+                          <input
+                            type="text"
+                            readOnly
+                            value=""
+                            placeholder={
+                              tablePlaceholders[cellIndex] ||
+                              exercise.answer_placeholder ||
+                              undefined
+                            }
+                            className="h-11 w-full rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 text-sm text-[#5f544a]"
+                          />
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
