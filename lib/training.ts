@@ -1190,9 +1190,15 @@ async function getAdminDraftBase(accountId: number) {
     };
   }
 
-  const draft = await getLatestAdminModuleDraftSnapshot();
+  const projectDraft = await getLatestAdminModuleDraftSnapshot(project.id);
+  const legacyDraft = projectDraft ? null : await getLatestAdminModuleDraftSnapshot();
+  const draft = projectDraft ?? legacyDraft;
 
   if (draft) {
+    if (!projectDraft && legacyDraft) {
+      await saveAdminModuleDraftSnapshot(project.id, legacyDraft.modules);
+    }
+
     return {
       project,
       modules: normalizeDraftModules(draft.modules),
@@ -1381,13 +1387,13 @@ export async function saveAdminVoiceNoteToDraft(input: {
           ? { ...submodule, audio_url: input.audioUrl }
           : submodule,
       );
+      const targetIndex = submodules.findIndex(
+        (submodule) => submodule.id === input.targetId,
+      );
 
       return normalizeDraftModule({
         ...moduleItem,
-        audio_url:
-          submodules[0]?.id === input.targetId
-            ? input.audioUrl
-            : moduleItem.audio_url,
+        audio_url: targetIndex === 0 ? input.audioUrl : moduleItem.audio_url,
         submodules,
       });
     }
@@ -1989,12 +1995,14 @@ function buildModuleSubmodules(
     ];
   }
 
-  return submodules.map((submodule) => {
+  return submodules.map((submodule, index) => {
     const submoduleAudioUrl =
       submodule.audio_url ??
+      (index === 0 ? module.audio_url : null) ??
       (getStoredAudioUrlFromHtml(submodule.content_html) || null);
     const submoduleAudioTranscript =
       submodule.audio_transcript ??
+      (index === 0 ? module.audio_transcript : null) ??
       (getStoredAudioTranscriptFromHtml(submodule.content_html) || null);
 
     return {
