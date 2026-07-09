@@ -3,7 +3,11 @@
 import { startTransition, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { loginWithPassword, sendPasswordlessLoginLink } from "../login";
+import {
+  loginWithPassword,
+  sendPasswordlessLoginLink,
+  sendPasswordResetLink,
+} from "../login";
 
 type ActionState = {
   status: "idle" | "error" | "success";
@@ -28,7 +32,15 @@ export default function AccessLoginForm() {
     sendPasswordlessLoginLink,
     initialState,
   );
-  const visibleState = magicLinkState.message ? magicLinkState : state;
+  const [resetState, resetAction, resetPending] = useActionState(
+    sendPasswordResetLink,
+    initialState,
+  );
+  const visibleState = resetState.message
+    ? resetState
+    : magicLinkState.message
+      ? magicLinkState
+      : state;
 
   useEffect(() => {
     if (state.status !== "success") {
@@ -95,6 +107,16 @@ export default function AccessLoginForm() {
         className="flex h-13 w-full max-w-[41rem] items-center justify-center rounded-[1rem] border border-[#eadfca] bg-white px-6 text-[0.82rem] font-extrabold uppercase tracking-[0.12em] text-[#6f645b] shadow-[0_10px_22px_rgba(223,203,171,0.1)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {magicLinkPending ? "Envoi du lien..." : "Recevoir un lien sans mot de passe"}
+      </button>
+
+      <button
+        type="submit"
+        formAction={resetAction}
+        formNoValidate
+        disabled={resetPending}
+        className="w-full max-w-[41rem] text-center text-sm font-extrabold uppercase tracking-[0.12em] text-[#cf7430] transition hover:text-[#9f5526] disabled:cursor-wait disabled:opacity-70"
+      >
+        {resetPending ? "Envoi en cours..." : "Mot de passe oublie ?"}
       </button>
 
       <div className="min-h-7">
