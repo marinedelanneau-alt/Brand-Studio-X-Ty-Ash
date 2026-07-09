@@ -130,6 +130,19 @@ const ADMIN_WORKSPACE_EMAIL =
   process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
 const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
 
+function normalizeAdminWorkspaceLabel(value: string | null | undefined) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function hasAdminWorkspaceKeywords(value: string | null | undefined) {
+  const label = normalizeAdminWorkspaceLabel(value);
+  return ADMIN_WORKSPACE_KEYWORDS.every((keyword) => label.includes(keyword));
+}
+
 function getStoredAudioUrl(options: string[]) {
   const marker = options.find((option) => option.startsWith(AUDIO_URL_OPTION_PREFIX));
   return marker?.slice(AUDIO_URL_OPTION_PREFIX.length).trim() || "";
@@ -1073,15 +1086,19 @@ function isAdminWorkspaceAccount(
     | null
     | undefined,
 ) {
-  const email = account?.email?.trim().toLowerCase() ?? "";
-  const clientName = account?.client_name?.trim().toLowerCase() ?? "";
-  const companyName = account?.company_name?.trim().toLowerCase() ?? "";
+  const email = normalizeAdminWorkspaceLabel(account?.email);
+  const clientName = normalizeAdminWorkspaceLabel(account?.client_name);
+  const companyName = normalizeAdminWorkspaceLabel(account?.company_name);
   const label = `${clientName} ${companyName}`.trim();
 
   return (
-    email === ADMIN_WORKSPACE_EMAIL.toLowerCase() ||
-    ADMIN_WORKSPACE_KEYWORDS.every((keyword) => label.includes(keyword))
+    email === normalizeAdminWorkspaceLabel(ADMIN_WORKSPACE_EMAIL) ||
+    hasAdminWorkspaceKeywords(label)
   );
+}
+
+function isAdminWorkspaceProject(project: BrandProject | null | undefined) {
+  return hasAdminWorkspaceKeywords(project?.name);
 }
 
 async function findAdminWorkspaceAccount(fallbackAccountId: number) {
@@ -1459,7 +1476,11 @@ export async function publishAdminModuleDraft(accountId: number) {
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
   const account = await findAccountById(accountId);
-  const modules = account?.is_admin || isAdminWorkspaceAccount(account)
+  const shouldUseAdminDraft =
+    account?.is_admin ||
+    isAdminWorkspaceAccount(account) ||
+    isAdminWorkspaceProject(project);
+  const modules = shouldUseAdminDraft
     ? await getAdminWorkingModules(accountId)
     : await getModulesWithExercises();
 
