@@ -19,13 +19,15 @@ type ShareStoryCardProps = {
 const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
   function ShareStoryCard({ data, showBrandName }, ref) {
     const title = showBrandName ? data.brandName : "Une marque en construction";
-    const keywordLine = data.keywords.slice(0, 3).join(" / ");
+    const keywordLine = data.keywords.slice(0, 4).join(" / ");
     const titleClassName =
-      title.length > 28
-        ? "text-[1.48rem] leading-[1.04]"
-        : title.length > 20
-          ? "text-[1.72rem] leading-[1.02]"
-          : "text-[2.05rem] leading-[0.98]";
+      title.length > 42
+        ? "text-[1.05rem] leading-[1.08]"
+        : title.length > 30
+          ? "text-[1.2rem] leading-[1.07]"
+          : title.length > 18
+            ? "text-[1.42rem] leading-[1.05]"
+            : "text-[1.9rem] leading-[1]";
     const keywordClassName =
       keywordLine.length > 34
         ? "text-[0.62rem] leading-4 tracking-[0.04em]"
@@ -74,7 +76,7 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
             {data.moduleTitle} terminé
           </p>
           <h2
-            className={`mt-4 max-w-full whitespace-normal break-normal font-[family:var(--font-cormorant)] text-[#2f2a33] [overflow-wrap:normal] ${titleClassName}`}
+            className={`mt-4 max-w-full whitespace-normal break-words font-[family:var(--font-cormorant)] text-[#2f2a33] [overflow-wrap:break-word] ${titleClassName}`}
           >
             {title}
           </h2>

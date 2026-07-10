@@ -1,4 +1,5 @@
 import {
+  cleanStoredExerciseQuestionText,
   getPromptOpenLabel,
   isAnswerableExerciseType,
   parseIndexedAnswerItems,
@@ -402,11 +403,19 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
     },
     {
       label: "Ta mission",
-      item: findPromptHighlight(module, "mission", "Ta mission"),
+      item: findSemanticHighlight(
+        module,
+        ["mission", "raison d'etre", "pourquoi ta marque existe"],
+        "Ta mission",
+      ),
     },
     {
       label: "Ta vision",
-      item: findPromptHighlight(module, "vision", "Ta vision"),
+      item: findSemanticHighlight(
+        module,
+        ["vision", "ambition", "dans 5 ans", "dans cinq ans"],
+        "Ta vision",
+      ),
     },
     {
       label: "Tes valeurs",
@@ -414,7 +423,11 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
     },
     {
       label: "Ta promesse",
-      item: findPromptHighlight(module, "promesse", "Ta promesse"),
+      item: findSemanticHighlight(
+        module,
+        ["promesse", "benefice client", "transformation promise"],
+        "Ta promesse",
+      ),
     },
   ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "À compléter"));
 
@@ -540,25 +553,7 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "table") {
-    const tableConfig = parseStoredTableConfig(exercise.options);
-    const nonEmptyCells = values
-      .map((value, index) => ({ value, index }))
-      .filter((entry) => entry.value.trim().length > 0);
-
-    if (nonEmptyCells.length === 0) {
-      return null;
-    }
-
-    const preview = nonEmptyCells
-      .map((entry) => {
-        const columnIndex = entry.index % tableConfig.columns;
-        const columnLabel =
-          tableConfig.columnLabels[columnIndex] || `Colonne ${columnIndex + 1}`;
-
-        return `${columnLabel}: ${entry.value}`;
-      });
-
-    return buildHighlight(exercise.question, preview.join(" | "));
+    return summarizeTableAnswer(exercise, values);
   }
 
   const genericSummary = summarizeGenericValues(values);
@@ -599,7 +594,41 @@ function getExerciseSummaryLabel(exercise: WorkspaceModule["exercises"][number])
     return exercise.question || "Positionnement";
   }
 
-  return exercise.question || "Point cle";
+  return cleanStoredExerciseQuestionText(exercise.question) || "Point cle";
+}
+
+function summarizeTableAnswer(
+  exercise: WorkspaceModule["exercises"][number],
+  values: string[],
+) {
+  const tableConfig = parseStoredTableConfig(exercise.options);
+  const preview = values
+    .map((value, index) => ({ value: compactText(value), index }))
+    .filter((entry) => entry.value.length > 0)
+    .slice(0, 6)
+    .map((entry) => {
+      const columnIndex = entry.index % tableConfig.columns;
+      const rawLabel = tableConfig.columnLabels[columnIndex] ?? "";
+      const columnLabel = cleanStoredExerciseQuestionText(rawLabel)
+        .replace(/[_:]+/g, " ")
+        .trim();
+      const conciseValue = truncateText(entry.value, 150);
+
+      return columnLabel ? `${columnLabel} : ${conciseValue}` : conciseValue;
+    });
+
+  if (preview.length === 0) {
+    return null;
+  }
+
+  const rawQuestion = cleanStoredExerciseQuestionText(exercise.question)
+    .replace(/[_:]+/g, " ")
+    .trim();
+  const label = normalizeForSearch(rawQuestion).includes("valeur")
+    ? "Tes valeurs en pratique"
+    : rawQuestion || "Synthèse du tableau";
+
+  return buildHighlight(label, preview.join(" • "), 420);
 }
 
 function summarizeGenericValues(values: string[]) {
@@ -769,34 +798,72 @@ function findExerciseHighlight(
   } satisfies ModuleSummaryHighlight;
 }
 
-function findPromptHighlight(
+function findSemanticHighlight(
   module: WorkspaceModule,
-  promptLabel: string,
+  keywords: string[],
   label: string,
 ) {
-  const match = module.exercises.find(
-    (exercise) =>
-      exercise.type === "prompt_open" &&
-      normalizeForSearch(getPromptOpenLabel(exercise.question)).includes(
-        normalizeForSearch(promptLabel),
-      ),
-  );
+  const normalizedKeywords = keywords.map(normalizeForSearch);
 
-  if (!match) {
-    return null;
+  for (const exercise of module.exercises) {
+    const values = module.answers[exercise.id] ?? [];
+
+    if (values.length === 0) {
+      continue;
+    }
+
+    const questionConfig = parseStoredExerciseQuestionConfig(
+      exercise.type,
+      exercise.options,
+    );
+    const promptCandidates = questionConfig.items.length > 0
+      ? questionConfig.items
+      : exercise.type === "group_open"
+        ? exercise.options
+        : [];
+    const matchingPromptIndex = promptCandidates.findIndex((prompt) => {
+      const normalizedPrompt = normalizeForSearch(prompt);
+      return normalizedKeywords.some((keyword) => normalizedPrompt.includes(keyword));
+    });
+
+    if (matchingPromptIndex >= 0) {
+      const indexedAnswers = parseIndexedAnswerItems(values)
+        .filter((item) => item.questionIndex === matchingPromptIndex)
+        .sort((left, right) => left.valueIndex - right.valueIndex)
+        .map((item) => compactText(item.value))
+        .filter(Boolean);
+      const matchingValues = indexedAnswers.length > 0
+        ? indexedAnswers
+        : [values[matchingPromptIndex] ?? ""].map(compactText).filter(Boolean);
+
+      if (matchingValues.length > 0) {
+        return {
+          label,
+          value: matchingValues.join(", "),
+        } satisfies ModuleSummaryHighlight;
+      }
+    }
+
+    const sourceLabel = exercise.type === "prompt_open"
+      ? getPromptOpenLabel(exercise.question)
+      : exercise.question;
+    const normalizedSource = normalizeForSearch(sourceLabel);
+
+    if (!normalizedKeywords.some((keyword) => normalizedSource.includes(keyword))) {
+      continue;
+    }
+
+    const summary = summarizeExerciseAnswer(exercise, values);
+
+    if (summary && !isPlaceholderSummaryValue(summary.value)) {
+      return {
+        label,
+        value: summary.value,
+      } satisfies ModuleSummaryHighlight;
+    }
   }
 
-  const values = module.answers[match.id] ?? [];
-  const summary = summarizeExerciseAnswer(match, values);
-
-  if (!summary) {
-    return null;
-  }
-
-  return {
-    label,
-    value: summary.value,
-  } satisfies ModuleSummaryHighlight;
+  return null;
 }
 
 function findValuesHighlight(module: WorkspaceModule) {
@@ -1006,7 +1073,6 @@ function buildFillBlankSentence(question: string, values: string[]) {
 }
 
 function buildHighlight(label: string, value: string, _maxValueLength = 120) {
-  void _maxValueLength;
   const normalizedValue = compactText(value);
 
   if (!normalizedValue) {
@@ -1015,7 +1081,7 @@ function buildHighlight(label: string, value: string, _maxValueLength = 120) {
 
   return {
     label: truncateText(compactText(label) || "Point clé", 34),
-    value: normalizedValue,
+    value: truncateText(normalizedValue, _maxValueLength),
   } satisfies ModuleSummaryHighlight;
 }
 
@@ -1038,6 +1104,15 @@ function normalizeForSearch(value: string) {
 }
 
 function truncateText(value: string, maxLength: number) {
-  void maxLength;
-  return value;
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  const shortened = value.slice(0, Math.max(maxLength - 1, 1));
+  const lastSpaceIndex = shortened.lastIndexOf(" ");
+  const boundary = lastSpaceIndex >= Math.floor(maxLength * 0.7)
+    ? lastSpaceIndex
+    : shortened.length;
+
+  return `${shortened.slice(0, boundary).replace(/[\s,;:.-]+$/, "")}…`;
 }

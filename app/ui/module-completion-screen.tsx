@@ -185,7 +185,9 @@ function StorySharePreview({
 }
 
 function ModuleDetailAccordion({ summary }: { summary: ModuleSummaryCard }) {
-  const recaps = summary.submoduleRecaps;
+  const recaps = summary.submoduleRecaps.filter(
+    (submodule) => submodule.highlights.length > 0,
+  );
   const [openIds, setOpenIds] = useState<Set<number>>(() =>
     new Set(recaps[0] ? [recaps[0].id] : []),
   );

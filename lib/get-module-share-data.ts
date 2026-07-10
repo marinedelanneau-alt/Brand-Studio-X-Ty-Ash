@@ -65,22 +65,13 @@ export function getModuleShareData(input: {
 }
 
 function getKeywords(summary: ModuleSummaryCard, moduleTitle: string) {
-  const fromSummary = summary.focusWords
-    .map((word) => word.trim())
-    .filter(Boolean)
-    .filter((word) => word.length <= 28);
-
-  if (fromSummary.length >= 2) {
-    return [...new Set(fromSummary)].slice(0, 3);
-  }
-
   const normalizedTitle = moduleTitle
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
   if (normalizedTitle.includes("vision")) {
-    return ["Mission", "Vision", "Promesse"];
+    return ["Mission", "Vision", "Promesse", "Valeurs"];
   }
 
   if (normalizedTitle.includes("positionnement")) {
@@ -89,6 +80,15 @@ function getKeywords(summary: ModuleSummaryCard, moduleTitle: string) {
 
   if (normalizedTitle.includes("personnalite") || normalizedTitle.includes("ton")) {
     return ["Persona", "Ton", "Expression"];
+  }
+
+  const fromSummary = summary.focusWords
+    .map((word) => word.trim())
+    .filter(Boolean)
+    .filter((word) => word.length <= 28);
+
+  if (fromSummary.length >= 2) {
+    return [...new Set(fromSummary)].slice(0, 4);
   }
 
   return ["Clarite", "Action", "Communication"];
