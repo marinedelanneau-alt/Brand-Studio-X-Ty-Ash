@@ -357,20 +357,20 @@ export default async function MonEspacePage() {
                     ) : null}
                   </div>
 
-                  <div className="border-b border-[#f0e4d3] pb-6">
-                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                  <div className="border-b border-[#f0e4d3] pb-4">
+                    <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
                       Progression
                     </p>
-                    <p className="mt-4 text-[2.8rem] font-black leading-none text-[#4b4550]">
+                    <p className="mt-2 text-[2.1rem] font-black leading-none text-[#4b4550]">
                       {workspace.progressPercent}%
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-[#7b7068]">
+                    <p className="mt-1.5 text-xs leading-5 text-[#7b7068]">
                       {workspace.completedModulesCount} module
                       {workspace.completedModulesCount > 1 ? "s" : ""} terminé
                       {workspace.completedModulesCount > 1 ? "s" : ""} sur{" "}
                       {workspace.totalModulesCount}
                     </p>
-                    <div className="mt-5 h-3 overflow-hidden rounded-full bg-[#f1ece5]">
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
                       <div
                         className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
                         style={{ width: `${workspace.progressPercent}%` }}
@@ -378,29 +378,29 @@ export default async function MonEspacePage() {
                     </div>
                   </div>
 
-                  <div className="rounded-[1.2rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-4 shadow-[0_10px_24px_rgba(207,116,48,0.08)]">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.8rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
-                        <CalendarDaysIcon className="h-5 w-5" aria-hidden="true" />
+                  <div className="rounded-[1rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-3 shadow-[0_8px_18px_rgba(207,116,48,0.07)]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
+                        <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                        <p className="text-[0.6rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
                           Fin de parcours
                         </p>
-                        <p className="mt-1 text-base font-extrabold text-[#4b4550]">
+                        <p className="mt-0.5 text-sm font-extrabold text-[#4b4550]">
                           Faisons le point ensemble
                         </p>
                       </div>
                     </div>
-                    <p className="mt-2 flex items-center gap-2 text-xs font-bold text-[#5f544a]">
-                      <ClockIcon className="h-4 w-4 text-[#cf7430]" aria-hidden="true" />
+                    <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-bold text-[#5f544a]">
+                      <ClockIcon className="h-3.5 w-3.5 text-[#cf7430]" aria-hidden="true" />
                       45 minutes en visioconférence
                     </p>
                     <a
                       href={END_OF_TRAINING_CALL_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 flex h-11 w-full items-center justify-center rounded-[0.85rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.1em] text-white shadow-[0_10px_20px_rgba(223,155,57,0.18)] transition hover:-translate-y-0.5"
+                      className="mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-white shadow-[0_8px_16px_rgba(223,155,57,0.16)] transition hover:-translate-y-0.5"
                     >
                       Réserver mon rendez-vous
                     </a>
