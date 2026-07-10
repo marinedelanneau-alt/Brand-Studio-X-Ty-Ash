@@ -569,7 +569,7 @@ export default function CommunicationActionPlan({
   pdfHref: string;
 }) {
   const [actions, setActions] = useState(initialActions);
-  const [view, setView] = useState<ActionView>("timeline");
+  const [view, setView] = useState<ActionView>("table");
   const [filters, setFilters] = useState<Filters>({ period: "", type: "", objective: "", priority: "", status: "" });
   const [formAction, setFormAction] = useState<CommunicationActionInput | null>(null);
   const [detailAction, setDetailAction] = useState<CommunicationAction | null>(null);
@@ -577,7 +577,6 @@ export default function CommunicationActionPlan({
   const [hasSeenIntro, setHasSeenIntro] = useState(initialActions.length > 0);
   const [isPending, startTransition] = useTransition();
   const filteredActions = useMemo(() => filterActions(actions, filters), [actions, filters]);
-  const grouped = useMemo(() => groupActionsByPeriod(filteredActions), [filteredActions]);
   const priorityCount = actions.filter((action) => action.calculated_priority === "À lancer en priorité").length;
   const prepCount = actions.filter((action) => action.calculated_priority === "À préparer").length;
   const thisMonthCount = groupActionsByPeriod(actions).thisMonth.length;
@@ -730,14 +729,14 @@ export default function CommunicationActionPlan({
       <section className="rounded-[1.4rem] border border-[#eadfca] bg-white p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
-            {(["timeline", "table", "kanban"] as ActionView[]).map((item) => (
+            {(["table", "kanban"] as ActionView[]).map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => setView(item)}
                 className={cx("h-10 rounded-full border px-4 text-xs font-black uppercase tracking-[0.12em]", view === item ? "border-[#cf7430] bg-[#fff1d5] text-[#cf7430]" : "border-[#eadfca] bg-white text-[#6b625a]")}
               >
-                {item === "timeline" ? "Timeline" : item === "table" ? "Tableau" : "Kanban"}
+                {item === "table" ? "Tableau" : "Kanban"}
               </button>
             ))}
           </div>
@@ -757,15 +756,6 @@ export default function CommunicationActionPlan({
           <h2 className="mt-4 text-xl font-semibold text-[#2f2a36]">Ta feuille de route est prête à être construite.</h2>
           <p className="mt-2 text-sm leading-6 text-[#6f645b]">Ajoute une première action concrète pour savoir exactement par quoi commencer.</p>
         </section>
-      ) : null}
-
-      {view === "timeline" ? (
-        <div className="space-y-5">
-          <TimelineSection title="Maintenant" actions={grouped.now} handlers={{ setFormAction, setDetailAction, handleDelete, handleDuplicate, handleStatus }} />
-          <TimelineSection title="Ce mois-ci" actions={grouped.thisMonth} handlers={{ setFormAction, setDetailAction, handleDelete, handleDuplicate, handleStatus }} />
-          <TimelineSection title="Prochainement" actions={grouped.soon} handlers={{ setFormAction, setDetailAction, handleDelete, handleDuplicate, handleStatus }} />
-          <TimelineSection title="Plus tard" actions={grouped.later} handlers={{ setFormAction, setDetailAction, handleDelete, handleDuplicate, handleStatus }} />
-        </div>
       ) : null}
 
       {view === "table" ? (
@@ -893,43 +883,6 @@ function FilterSelect({
         <option key={`${label}-${optionValue}`} value={optionValue}>{label}</option>
       ))}
     </select>
-  );
-}
-
-function TimelineSection({
-  title,
-  actions,
-  handlers,
-}: {
-  title: string;
-  actions: CommunicationAction[];
-  handlers: {
-    setFormAction: (action: CommunicationAction) => void;
-    setDetailAction: (action: CommunicationAction) => void;
-    handleDelete: (action: CommunicationAction) => void;
-    handleDuplicate: (action: CommunicationAction) => void;
-    handleStatus: (id: string, status: ActionStatus) => void;
-  };
-}) {
-  if (actions.length === 0) return null;
-
-  return (
-    <section>
-      <h2 className="mb-3 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">{title}</h2>
-      <div className="grid gap-4 md:grid-cols-2">
-        {actions.map((action) => (
-          <ActionCard
-            key={action.id}
-            action={action}
-            onEdit={handlers.setFormAction}
-            onOpen={handlers.setDetailAction}
-            onDelete={handlers.handleDelete}
-            onDuplicate={handlers.handleDuplicate}
-            onStatus={handlers.handleStatus}
-          />
-        ))}
-      </div>
-    </section>
   );
 }
 

@@ -52,7 +52,7 @@ export const ACTION_RESOURCES = [
 export type ImpactLevel = "Faible" | "Moyen" | "Fort";
 export type EffortLevel = "Léger" | "Moyen" | "Important";
 export type ActionStatus = (typeof ACTION_STATUSES)[number];
-export type ActionView = "timeline" | "table" | "kanban";
+export type ActionView = "table" | "kanban";
 
 export type CommunicationAction = {
   id: string;
