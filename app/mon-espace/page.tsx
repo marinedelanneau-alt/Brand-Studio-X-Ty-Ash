@@ -294,13 +294,32 @@ export default async function MonEspacePage() {
                       </p>
                     </div>
                     {workspace.modules.length > 0 ? (
-                      <div className="pt-4">
+                      <div className="flex flex-col gap-5 pt-4 sm:flex-row sm:items-end sm:justify-between">
                         <Link
                           href={ctaHref}
                           className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)] transition hover:brightness-[1.02]"
                         >
                           {hasStartedModules ? "Reprendre" : "Commencer"}
                         </Link>
+                        <div className="w-full max-w-[13rem] sm:text-right">
+                          <div className="flex items-end justify-between gap-3 sm:justify-end">
+                            <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                              Progression
+                            </p>
+                            <p className="text-lg font-black leading-none text-[#4b4550]">
+                              {workspace.progressPercent}%
+                            </p>
+                          </div>
+                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#f1ece5]">
+                            <div
+                              className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
+                              style={{ width: `${workspace.progressPercent}%` }}
+                            />
+                          </div>
+                          <p className="mt-1.5 text-[0.65rem] text-[#8a8077]">
+                            {workspace.completedModulesCount}/{workspace.totalModulesCount} modules terminés
+                          </p>
+                        </div>
                       </div>
                     ) : null}
                   </div>
@@ -355,27 +374,6 @@ export default async function MonEspacePage() {
                         projectName={workspaceTitle}
                       />
                     ) : null}
-                  </div>
-
-                  <div className="border-b border-[#f0e4d3] pb-4">
-                    <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
-                      Progression
-                    </p>
-                    <p className="mt-2 text-[2.1rem] font-black leading-none text-[#4b4550]">
-                      {workspace.progressPercent}%
-                    </p>
-                    <p className="mt-1.5 text-xs leading-5 text-[#7b7068]">
-                      {workspace.completedModulesCount} module
-                      {workspace.completedModulesCount > 1 ? "s" : ""} terminé
-                      {workspace.completedModulesCount > 1 ? "s" : ""} sur{" "}
-                      {workspace.totalModulesCount}
-                    </p>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
-                      <div
-                        className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
-                        style={{ width: `${workspace.progressPercent}%` }}
-                      />
-                    </div>
                   </div>
 
                   <div className="rounded-[1rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-3 shadow-[0_8px_18px_rgba(207,116,48,0.07)]">
