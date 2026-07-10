@@ -213,16 +213,27 @@ function sortActions(actions: CommunicationAction[]) {
   });
 }
 
-function getActionMonthIndex(action: CommunicationAction, year: number) {
+function getActionMonthIndices(action: CommunicationAction, year: number) {
   const rawDate = action.start_date ?? action.target_month;
   const match = rawDate?.match(/^(\d{4})-(\d{2})/);
 
-  if (!match || Number(match[1]) !== year) {
-    return -1;
+  if (match) {
+    if (Number(match[1]) !== year) {
+      return [] as number[];
+    }
+
+    const monthIndex = Number(match[2]) - 1;
+    return monthIndex >= 0 && monthIndex < MONTHS.length ? [monthIndex] : [];
   }
 
-  const monthIndex = Number(match[2]) - 1;
-  return monthIndex >= 0 && monthIndex < MONTHS.length ? monthIndex : -1;
+  const quarterMatch = action.target_quarter?.match(/^T([1-4])$/i);
+
+  if (!quarterMatch) {
+    return [] as number[];
+  }
+
+  const firstMonthIndex = (Number(quarterMatch[1]) - 1) * 3;
+  return [firstMonthIndex, firstMonthIndex + 1];
 }
 
 function getPdfPeriodLabel(action: CommunicationAction, year: number) {
@@ -240,6 +251,13 @@ function getPdfPeriodLabel(action: CommunicationAction, year: number) {
   }
 
   if (action.target_quarter) {
+    const quarterMatch = action.target_quarter.match(/^T([1-4])$/i);
+
+    if (quarterMatch) {
+      const firstMonthIndex = (Number(quarterMatch[1]) - 1) * 3;
+      return `${MONTHS[firstMonthIndex]} – ${MONTHS[firstMonthIndex + 1]} ${year}`;
+    }
+
     return `${action.target_quarter} ${year}`;
   }
 
@@ -270,8 +288,9 @@ export async function renderCommunicationActionPdf(input: {
   const year = new Date().getFullYear();
   const monthlyActionCounts = MONTHS.map(
     (_, monthIndex) =>
-      input.actions.filter((action) => getActionMonthIndex(action, year) === monthIndex)
-        .length,
+      input.actions.filter((action) =>
+        getActionMonthIndices(action, year).includes(monthIndex),
+      ).length,
   );
 
   const document = (
