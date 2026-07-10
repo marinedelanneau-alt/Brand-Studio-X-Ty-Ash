@@ -7,92 +7,155 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer";
 import {
+  ACTION_STATUSES,
   getActionPeriodLabel,
+  type ActionStatus,
   type CommunicationAction,
 } from "@/lib/communication-action-shared";
+
+const STATUS_COLORS: Record<ActionStatus, string> = {
+  "Idée": "#F1CC56",
+  "À préparer": "#E8A957",
+  "Planifiée": "#CF7430",
+  "En cours": "#739273",
+  "Terminée": "#56765E",
+  "En pause": "#9A8C9F",
+};
 
 const styles = StyleSheet.create({
   page: {
     backgroundColor: "#FBF6ED",
     color: "#4B4550",
     fontFamily: "Helvetica",
-    padding: 42,
+    padding: 30,
+  },
+  header: {
+    borderBottom: "1 solid #EADFCA",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 16,
   },
   eyebrow: {
     color: "#CF7430",
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 700,
-    letterSpacing: 2,
+    letterSpacing: 1.8,
     textTransform: "uppercase",
   },
   title: {
     color: "#332D35",
-    fontSize: 34,
+    fontSize: 25,
     lineHeight: 1.1,
-    marginTop: 18,
+    marginTop: 8,
   },
   subtitle: {
     color: "#6F645B",
-    fontSize: 12,
-    lineHeight: 1.6,
-    marginTop: 12,
+    fontSize: 9,
+    marginTop: 7,
   },
-  stats: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 24,
-  },
-  stat: {
+  yearBadge: {
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
     border: "1 solid #EADFCA",
-    borderRadius: 8,
-    padding: 12,
-    width: "31%",
+    borderRadius: 10,
+    justifyContent: "center",
+    paddingHorizontal: 18,
   },
-  statValue: {
-    color: "#2F2A36",
-    fontSize: 22,
+  yearLabel: {
+    color: "#7A7087",
+    fontSize: 7,
     fontWeight: 700,
-  },
-  statLabel: {
-    color: "#6F645B",
-    fontSize: 9,
-    marginTop: 4,
-  },
-  section: {
-    marginTop: 24,
-  },
-  sectionTitle: {
-    color: "#CF7430",
-    fontSize: 9,
-    fontWeight: 700,
-    letterSpacing: 1.6,
-    marginBottom: 10,
+    letterSpacing: 1.2,
     textTransform: "uppercase",
   },
-  action: {
+  year: {
+    color: "#CF7430",
+    fontSize: 22,
+    fontWeight: 700,
+    marginTop: 3,
+  },
+  board: {
+    flexDirection: "row",
+    gap: 7,
+    marginTop: 18,
+  },
+  column: {
+    backgroundColor: "#F7F0E6",
+    border: "1 solid #EADFCA",
+    borderRadius: 9,
+    flexGrow: 1,
+    flexBasis: 0,
+    minHeight: 625,
+    padding: 7,
+  },
+  columnHeader: {
+    borderRadius: 6,
+    marginBottom: 7,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
+  },
+  columnTitle: {
+    color: "#FFFFFF",
+    fontSize: 8,
+    fontWeight: 700,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+  },
+  count: {
+    color: "#FFFFFF",
+    fontSize: 7,
+    marginTop: 2,
+  },
+  card: {
     backgroundColor: "#FFFFFF",
     border: "1 solid #EADFCA",
-    borderRadius: 8,
-    marginBottom: 10,
-    padding: 14,
+    borderRadius: 7,
+    marginBottom: 7,
+    padding: 8,
   },
-  actionTitle: {
-    color: "#2F2A36",
-    fontSize: 14,
+  cardPeriod: {
+    color: "#CF7430",
+    fontSize: 6.5,
     fontWeight: 700,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
-  meta: {
+  cardTitle: {
+    color: "#2F2A36",
+    fontSize: 9,
+    fontWeight: 700,
+    lineHeight: 1.25,
+    marginTop: 4,
+  },
+  cardMeta: {
     color: "#7A7087",
-    fontSize: 8.5,
-    lineHeight: 1.5,
-    marginTop: 6,
+    fontSize: 6.5,
+    lineHeight: 1.35,
+    marginTop: 4,
   },
-  text: {
+  cardStep: {
+    backgroundColor: "#FFF8E8",
+    borderRadius: 4,
     color: "#5F544A",
-    fontSize: 10,
-    lineHeight: 1.6,
-    marginTop: 8,
+    fontSize: 6.8,
+    lineHeight: 1.35,
+    marginTop: 6,
+    padding: 5,
+  },
+  empty: {
+    color: "#9A9088",
+    fontSize: 7,
+    padding: 7,
+    textAlign: "center",
+  },
+  footer: {
+    bottom: 14,
+    color: "#9A9088",
+    fontSize: 6.5,
+    left: 30,
+    position: "absolute",
+    right: 30,
+    textAlign: "right",
   },
 });
 
@@ -100,23 +163,23 @@ function sortActions(actions: CommunicationAction[]) {
   return [...actions].sort((left, right) => {
     const leftDate = left.start_date ?? left.target_month ?? left.target_quarter ?? "9999";
     const rightDate = right.start_date ?? right.target_month ?? right.target_quarter ?? "9999";
-    return leftDate.localeCompare(rightDate);
+    return leftDate.localeCompare(rightDate) || left.sort_order - right.sort_order;
   });
 }
 
-function ActionBlock({ action }: { action: CommunicationAction }) {
+function KanbanCard({ action }: { action: CommunicationAction }) {
   return (
-    <View style={styles.action} wrap={false}>
-      <Text style={styles.actionTitle}>{action.title}</Text>
-      <Text style={styles.meta}>
-        {getActionPeriodLabel(action)} · {action.objective || "Objectif à préciser"} ·{" "}
-        {action.action_type || "Type à préciser"} · {action.calculated_priority || "À planifier"} ·{" "}
-        {action.status}
+    <View style={styles.card} wrap={false}>
+      <Text style={styles.cardPeriod}>{getActionPeriodLabel(action)}</Text>
+      <Text style={styles.cardTitle}>{action.title}</Text>
+      <Text style={styles.cardMeta}>
+        {[action.action_type, action.objective, action.calculated_priority]
+          .filter(Boolean)
+          .join(" · ")}
       </Text>
       {action.first_step ? (
-        <Text style={styles.text}>Première étape : {action.first_step}</Text>
+        <Text style={styles.cardStep}>Première étape : {action.first_step}</Text>
       ) : null}
-      {action.description ? <Text style={styles.text}>{action.description}</Text> : null}
     </View>
   );
 }
@@ -125,54 +188,58 @@ export async function renderCommunicationActionPdf(input: {
   brandName: string;
   actions: CommunicationAction[];
 }) {
-  const priorityCount = input.actions.filter(
-    (action) => action.calculated_priority === "À lancer en priorité",
-  ).length;
-  const prepCount = input.actions.filter(
-    (action) => action.calculated_priority === "À préparer",
-  ).length;
-  const completedCount = input.actions.filter((action) => action.status === "Terminée").length;
-  const objectives = Array.from(
-    new Set(input.actions.map((action) => action.objective).filter(Boolean)),
-  ).slice(0, 4);
+  const year = new Date().getFullYear();
 
   const document = (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.eyebrow}>Brand Studio · Plan d&apos;action communication</Text>
-        <Text style={styles.title}>Feuille de route communication de {input.brandName}</Text>
-        <Text style={styles.subtitle}>
-          Actions classées chronologiquement pour faire connaître, activer et développer la marque.
+    <Document title={`Feuille de route annuelle ${year} - ${input.brandName}`}>
+      <Page size="A3" orientation="landscape" style={styles.page}>
+        <View style={styles.header} fixed>
+          <View>
+            <Text style={styles.eyebrow}>Brand Studio · Plan d&apos;action communication</Text>
+            <Text style={styles.title}>Kanban annuel de {input.brandName}</Text>
+            <Text style={styles.subtitle}>
+              Une vue d&apos;ensemble des actions de communication, de l&apos;idée à la réalisation.
+            </Text>
+          </View>
+          <View style={styles.yearBadge}>
+            <Text style={styles.yearLabel}>Feuille de route</Text>
+            <Text style={styles.year}>{year}</Text>
+          </View>
+        </View>
+
+        <View style={styles.board}>
+          {ACTION_STATUSES.map((status) => {
+            const statusActions = sortActions(
+              input.actions.filter((action) => action.status === status),
+            );
+
+            return (
+              <View key={status} style={styles.column}>
+                <View
+                  style={[styles.columnHeader, { backgroundColor: STATUS_COLORS[status] }]}
+                  fixed
+                >
+                  <Text style={styles.columnTitle}>{status}</Text>
+                  <Text style={styles.count}>
+                    {statusActions.length} action{statusActions.length > 1 ? "s" : ""}
+                  </Text>
+                </View>
+                {statusActions.length > 0 ? (
+                  statusActions.map((action) => (
+                    <KanbanCard key={action.id} action={action} />
+                  ))
+                ) : (
+                  <Text style={styles.empty}>Aucune action</Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
+
+        <Text style={styles.footer} fixed>
+          Généré avec Brand Studio · {input.actions.length} action
+          {input.actions.length > 1 ? "s" : ""}
         </Text>
-
-        <View style={styles.stats}>
-          <View style={styles.stat}>
-            <Text style={styles.statValue}>{priorityCount}</Text>
-            <Text style={styles.statLabel}>actions prioritaires</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statValue}>{prepCount}</Text>
-            <Text style={styles.statLabel}>actions à préparer</Text>
-          </View>
-          <View style={styles.stat}>
-            <Text style={styles.statValue}>{completedCount}</Text>
-            <Text style={styles.statLabel}>actions terminées</Text>
-          </View>
-        </View>
-
-        {objectives.length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Objectifs prioritaires</Text>
-            <Text style={styles.text}>{objectives.join(" · ")}</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actions</Text>
-          {sortActions(input.actions).map((action) => (
-            <ActionBlock key={action.id} action={action} />
-          ))}
-        </View>
       </Page>
     </Document>
   );
