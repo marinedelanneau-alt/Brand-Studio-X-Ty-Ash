@@ -333,6 +333,10 @@ export default async function MonEspacePage() {
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
                 />
+                <LogoutButton
+                  iconOnly
+                  className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
+                />
                 <div className="relative space-y-6">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[#f0e4d3] pb-6">
@@ -434,17 +438,16 @@ export default async function MonEspacePage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 sm:col-span-2 lg:col-span-1">
-                {account.is_admin ? (
+              {account.is_admin ? (
+                <div className="sm:col-span-2 lg:col-span-1">
                   <Link
                     href="/admin/modules"
                     className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
                   >
                     Gérer les modules
                   </Link>
-                ) : null}
-                <LogoutButton />
-              </div>
+                </div>
+              ) : null}
             </div>
           </div>
           <div className="mt-8 border-t border-[#eadfca] pt-7">
