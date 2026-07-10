@@ -1,8 +1,9 @@
 "use client";
 
-import { startTransition, useActionState, useEffect } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import {
   loginWithPassword,
   sendPasswordlessLoginLink,
@@ -24,6 +25,7 @@ const inputClassName =
 
 export default function AccessLoginForm() {
   const router = useRouter();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [state, formAction, pending] = useActionState(
     loginWithPassword,
     initialState,
@@ -80,15 +82,48 @@ export default function AccessLoginForm() {
         >
           Mot de passe
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          placeholder="Ton mot de passe"
-          className={`${inputClassName} max-w-[41rem]`}
-        />
+        <div className="relative max-w-[41rem]">
+          <input
+            id="password"
+            name="password"
+            type={isPasswordVisible ? "text" : "password"}
+            required
+            autoComplete="current-password"
+            placeholder="Ton mot de passe"
+            className={`${inputClassName} max-w-[41rem] pr-14`}
+          />
+          <button
+            type="button"
+            aria-label="Maintenir pour afficher le mot de passe"
+            aria-pressed={isPasswordVisible}
+            onPointerDown={(event) => {
+              event.preventDefault();
+              setIsPasswordVisible(true);
+            }}
+            onPointerUp={() => setIsPasswordVisible(false)}
+            onPointerCancel={() => setIsPasswordVisible(false)}
+            onPointerLeave={() => setIsPasswordVisible(false)}
+            onKeyDown={(event) => {
+              if (event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                setIsPasswordVisible(true);
+              }
+            }}
+            onKeyUp={(event) => {
+              if (event.key === " " || event.key === "Enter") {
+                setIsPasswordVisible(false);
+              }
+            }}
+            onBlur={() => setIsPasswordVisible(false)}
+            className="absolute inset-y-0 right-1 flex w-12 touch-none select-none items-center justify-center rounded-[0.8rem] text-[#8b7a70] transition hover:bg-[#f6eddc] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
+          >
+            {isPasswordVisible ? (
+              <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <EyeIcon className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
 
       <button

@@ -9,6 +9,11 @@ type SendAccessCodeEmailInput = {
   companyName?: string | null;
 };
 
+type SendPasswordResetEmailInput = {
+  email: string;
+  resetUrl: string;
+};
+
 function getBrevoConfig() {
   const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = process.env.BREVO_SENDER_EMAIL;
@@ -150,6 +155,60 @@ export async function sendActivationCodeEmail(input: SendAccessCodeEmailInput) {
         name: input.clientName,
       },
     ],
+    replyTo: config.replyToEmail
+      ? {
+          email: config.replyToEmail,
+          name: config.replyToName,
+        }
+      : undefined,
+    htmlContent: html,
+    textContent: text,
+  });
+}
+
+export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput) {
+  const config = getBrevoConfig();
+  const brevo = new BrevoClient({
+    apiKey: config.apiKey,
+    timeoutInSeconds: 30,
+    maxRetries: 2,
+  });
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; background:#f7f1e9; padding:32px;">
+      <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:24px; overflow:hidden; border:1px solid #eadfce;">
+        <div style="height:6px; background:linear-gradient(90deg,#b67d3d,#e4bb72);"></div>
+        <div style="padding:32px;">
+          <p style="margin:0; letter-spacing:0.25em; text-transform:uppercase; font-size:12px; color:#ab7331; font-weight:700;">Brand Studio</p>
+          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:34px; line-height:1.1;">Choisis un nouveau mot de passe</h1>
+          <p style="margin:0 0 22px; color:#5f6882; font-size:16px; line-height:1.7;">
+            Une demande de réinitialisation a été faite pour ton espace Brand Studio. Ce lien est personnel et temporaire.
+          </p>
+          <a href="${input.resetUrl}" style="display:inline-block; padding:16px 26px; border-radius:16px; background:linear-gradient(135deg,#b67d3d,#e4bb72); color:#17130d; text-decoration:none; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; font-size:13px;">
+            Réinitialiser mon mot de passe
+          </a>
+          <p style="margin:22px 0 0; color:#7b8297; font-size:13px; line-height:1.6;">
+            Si tu n'es pas à l'origine de cette demande, tu peux ignorer cet e-mail.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const text = [
+    "Réinitialise ton mot de passe Brand Studio :",
+    input.resetUrl,
+    "",
+    "Si tu n'es pas à l'origine de cette demande, ignore cet e-mail.",
+  ].join("\n");
+
+  await brevo.transactionalEmails.sendTransacEmail({
+    subject: "Réinitialise ton mot de passe Brand Studio",
+    sender: {
+      email: config.senderEmail,
+      name: config.senderName,
+    },
+    to: [{ email: input.email }],
     replyTo: config.replyToEmail
       ? {
           email: config.replyToEmail,

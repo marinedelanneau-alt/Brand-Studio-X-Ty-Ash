@@ -1,7 +1,11 @@
 "use server";
 
-import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseAuthServerClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { sendPasswordResetEmail } from "@/lib/mailer";
 import { headers } from "next/headers";
 
 type LoginState = {
@@ -134,24 +138,28 @@ export async function sendPasswordResetLink(
   }
 
   try {
-    const supabase = await createSupabaseAuthServerClient();
     const siteUrl = await getPublicSiteUrl();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/auth/reset/callback`,
+    const supabase = createSupabaseServerClient();
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: {
+        redirectTo: `${siteUrl}/auth/reset/callback`,
+      },
     });
 
-    if (error) {
-      const resetErrorMessage = error.message.trim();
-
+    if (error || !data.properties?.action_link) {
+      // Keep the response generic so this public form cannot reveal which e-mails exist.
       return {
-        status: "error",
-        message:
-          resetErrorMessage.toLowerCase().includes("redirect") ||
-          resetErrorMessage.toLowerCase().includes("not allowed")
-            ? "URL de reinitialisation non autorisee dans Supabase. Ajoute https://brand-studio-new.vercel.app/auth/reset/callback dans Authentication > URL Configuration > Redirect URLs."
-            : `Impossible d'envoyer le lien de reinitialisation : ${resetErrorMessage}`,
+        status: "success",
+        message: "Si un compte existe pour cet e-mail, le lien de reinitialisation vient d'etre envoye.",
       };
     }
+
+    await sendPasswordResetEmail({
+      email,
+      resetUrl: data.properties.action_link,
+    });
 
     return {
       status: "success",
