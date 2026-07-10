@@ -846,6 +846,24 @@ function writeBrowserAnswersDraft(moduleId: number, answers: AnswersByExercise) 
   }
 }
 
+function clearBrowserAnswersDraft(moduleId: number) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.removeItem(getSessionAnswersDraftKey(moduleId));
+  } catch {
+    // The server copy remains authoritative when browser storage is unavailable.
+  }
+
+  try {
+    window.localStorage.removeItem(getLocalAnswersDraftKey(moduleId));
+  } catch {
+    // The server copy remains authoritative when browser storage is unavailable.
+  }
+}
+
 function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
   const browserDraft = readBrowserAnswersDraft(module.id);
 
@@ -1277,9 +1295,19 @@ export default function ModuleAnswerForm({
     draftSaveQueueRef.current = draftSaveQueueRef.current
       .catch(() => null)
       .then(async () => {
+        const answersToSave = latestAnswersRef.current;
+        const serializedAnswersToSave = JSON.stringify(answersToSave);
         const result = await saveModuleDraft(
-          buildSubmissionFormData(module, latestAnswersRef.current),
+          buildSubmissionFormData(module, answersToSave),
         );
+
+        if (
+          result.status === "success" &&
+          JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave
+        ) {
+          clearBrowserAnswersDraft(module.id);
+        }
+
         setAutoSaveState(result);
 
         return result;
@@ -1386,7 +1414,7 @@ export default function ModuleAnswerForm({
       startAutoSaveTransition(async () => {
         await persistCurrentDraft();
       });
-    }, 700);
+    }, 300);
 
     return () => window.clearTimeout(timeoutId);
   }, [answers, module, persistCurrentDraft]);

@@ -1821,20 +1821,8 @@ export async function replaceModuleAnswers(input: {
     ),
   ];
 
-  let deleteQuery = supabase
-    .from("project_exercise_answers")
-    .delete()
-    .eq("project_id", input.projectId)
-    .eq("module_id", input.moduleId);
-
-  if (submittedExerciseIds.length > 0) {
-    deleteQuery = deleteQuery.in("exercise_id", submittedExerciseIds);
-  }
-
-  const { error: deleteError } = await deleteQuery;
-
-  if (deleteError) {
-    throw new Error(deleteError.message);
+  if (submittedExerciseIds.length === 0) {
+    return;
   }
 
   const now = new Date().toISOString();
@@ -1853,16 +1841,36 @@ export async function replaceModuleAnswers(input: {
       updated_at: now,
     }));
 
-  if (rows.length === 0) {
+  if (rows.length > 0) {
+    const { error: upsertError } = await supabase
+      .from("project_exercise_answers")
+      .upsert(rows, {
+        onConflict: "project_id,exercise_id",
+      });
+
+    if (upsertError) {
+      throw new Error(upsertError.message);
+    }
+  }
+
+  const savedExerciseIds = new Set(rows.map((row) => row.exercise_id));
+  const explicitlyClearedExerciseIds = submittedExerciseIds.filter(
+    (exerciseId) => !savedExerciseIds.has(exerciseId),
+  );
+
+  if (explicitlyClearedExerciseIds.length === 0) {
     return;
   }
 
-  const { error: insertError } = await supabase
+  const { error: deleteError } = await supabase
     .from("project_exercise_answers")
-    .insert(rows);
+    .delete()
+    .eq("project_id", input.projectId)
+    .eq("module_id", input.moduleId)
+    .in("exercise_id", explicitlyClearedExerciseIds);
 
-  if (insertError) {
-    throw new Error(insertError.message);
+  if (deleteError) {
+    throw new Error(deleteError.message);
   }
 }
 
