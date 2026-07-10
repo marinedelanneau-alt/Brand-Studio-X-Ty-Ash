@@ -36,6 +36,7 @@ import {
 import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
 import SpectrumExercise from "./spectrum-exercise";
 import SmartFeedback from "./smart-feedback";
+import { isSmartFeedbackOption } from "@/lib/smart-feedback";
 import ColorPaletteExercise from "./color-palette-exercise";
 import MoodboardExercise from "./moodboard-exercise";
 import EditorialCalendarExercise from "./editorial-calendar-exercise";
@@ -1232,6 +1233,9 @@ export default function ModuleAnswerForm({
   const currentExerciseGroup = visibleExerciseGroups[currentIndex];
   const currentExerciseQuestions = currentExerciseGroup?.questions ?? [];
   const currentExercise = currentExerciseQuestions[0];
+  const currentVisibleOptions = currentExercise
+    ? currentExercise.options.filter((option) => !isSmartFeedbackOption(option))
+    : [];
   const currentQuestionPrompts = currentExercise ? getQuestionPrompts(currentExercise) : [];
   const isMultiQuestionExerciseGroup = currentExerciseQuestions.length > 1;
   const isChecklistExerciseGroup =
@@ -1960,7 +1964,7 @@ export default function ModuleAnswerForm({
                         {prompt}
                       </p>
                       <div className="mt-3 space-y-3">
-                        {currentExercise.options.map((option) => {
+                        {currentVisibleOptions.map((option) => {
                           const questionValues = getQuestionValues(
                             currentExercise,
                             answers[currentExercise.id] ?? [],
@@ -2035,7 +2039,7 @@ export default function ModuleAnswerForm({
                 </div>
               ) : (
                 <div className="mt-4 space-y-3">
-                  {currentExercise.options.map((option) => {
+                  {currentVisibleOptions.map((option) => {
                     const currentValues = answers[currentExercise.id] ?? [];
                     const isOtherOption = isOtherChoiceOption(option);
                     const isChecked = currentValues.includes(option);
@@ -2105,7 +2109,7 @@ export default function ModuleAnswerForm({
                         {prompt}
                       </p>
                       <div className="mt-3 grid gap-3">
-                        {currentExercise.options.map((option) => (
+                        {currentVisibleOptions.map((option) => (
                           <label
                             key={`${questionIndex}-${option}`}
                             className="flex items-center gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm font-semibold leading-6 text-[#5f544a]"
@@ -2142,7 +2146,7 @@ export default function ModuleAnswerForm({
                 </div>
               ) : (
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {currentExercise.options.map((option) => (
+                  {currentVisibleOptions.map((option) => (
                     <label
                       key={option}
                       className="flex items-center gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm font-semibold leading-6 text-[#5f544a]"
@@ -2185,7 +2189,7 @@ export default function ModuleAnswerForm({
                         {prompt}
                       </p>
                       <div className="mt-3 space-y-3">
-                        {currentExercise.options.map((option) => {
+                        {currentVisibleOptions.map((option) => {
                           const questionValues = getQuestionValues(
                             currentExercise,
                             answers[currentExercise.id] ?? [],
@@ -2277,7 +2281,7 @@ export default function ModuleAnswerForm({
                 </div>
               ) : (
                 <div className="mt-4 space-y-3">
-                  {currentExercise.options.map((option) => {
+                  {currentVisibleOptions.map((option) => {
                     const isChecked = (answers[currentExercise.id] ?? []).includes(option);
 
                     const isOtherOption = isOtherChoiceOption(option);
@@ -2374,7 +2378,7 @@ export default function ModuleAnswerForm({
                         {prompt}
                       </p>
                       <div className="mt-3 grid gap-3">
-                        {currentExercise.options.map((option) => {
+                        {currentVisibleOptions.map((option) => {
                           const colorOption = parseColorOption(option);
                           const isChecked =
                             getQuestionValues(
@@ -2429,7 +2433,7 @@ export default function ModuleAnswerForm({
                 </div>
               ) : (
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {currentExercise.options.map((option) => {
+                  {currentVisibleOptions.map((option) => {
                     const colorOption = parseColorOption(option);
                     const isChecked = (answers[currentExercise.id] ?? []).includes(option);
 

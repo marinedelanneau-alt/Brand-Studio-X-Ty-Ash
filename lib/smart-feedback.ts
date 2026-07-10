@@ -175,7 +175,7 @@ export function parseStoredSmartFeedbackConfig(rawOptions: string[]) {
 }
 
 export function isSmartFeedbackOption(value: string) {
-  return value.startsWith(SMART_FEEDBACK_PREFIX);
+  return value.trimStart().toLowerCase().startsWith(SMART_FEEDBACK_PREFIX);
 }
 
 export function evaluateSmartFeedback(
