@@ -22,6 +22,21 @@ const STATUS_COLORS: Record<ActionStatus, string> = {
   "En pause": "#9A8C9F",
 };
 
+const MONTHS = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+] as const;
+
 const styles = StyleSheet.create({
   page: {
     backgroundColor: "#FBF6ED",
@@ -74,10 +89,41 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     marginTop: 3,
   },
+  months: {
+    flexDirection: "row",
+    gap: 5,
+    marginTop: 12,
+  },
+  month: {
+    backgroundColor: "#FFFFFF",
+    border: "1 solid #EADFCA",
+    borderRadius: 6,
+    flexBasis: 0,
+    flexGrow: 1,
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    textAlign: "center",
+  },
+  monthActive: {
+    backgroundColor: "#FFF1D5",
+    border: "1 solid #E8A957",
+  },
+  monthName: {
+    color: "#6F645B",
+    fontSize: 6.5,
+    fontWeight: 700,
+    textTransform: "uppercase",
+  },
+  monthCount: {
+    color: "#CF7430",
+    fontSize: 8,
+    fontWeight: 700,
+    marginTop: 2,
+  },
   board: {
     flexDirection: "row",
     gap: 7,
-    marginTop: 18,
+    marginTop: 12,
   },
   column: {
     backgroundColor: "#F7F0E6",
@@ -85,7 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     flexGrow: 1,
     flexBasis: 0,
-    minHeight: 625,
+    minHeight: 570,
     padding: 7,
   },
   columnHeader: {
@@ -167,10 +213,43 @@ function sortActions(actions: CommunicationAction[]) {
   });
 }
 
-function KanbanCard({ action }: { action: CommunicationAction }) {
+function getActionMonthIndex(action: CommunicationAction, year: number) {
+  const rawDate = action.start_date ?? action.target_month;
+  const match = rawDate?.match(/^(\d{4})-(\d{2})/);
+
+  if (!match || Number(match[1]) !== year) {
+    return -1;
+  }
+
+  const monthIndex = Number(match[2]) - 1;
+  return monthIndex >= 0 && monthIndex < MONTHS.length ? monthIndex : -1;
+}
+
+function getPdfPeriodLabel(action: CommunicationAction, year: number) {
+  if (action.start_date) {
+    return getActionPeriodLabel(action);
+  }
+
+  if (action.target_month) {
+    const match = action.target_month.match(/^(\d{4})-(\d{2})$/);
+    const monthIndex = match ? Number(match[2]) - 1 : -1;
+
+    if (match && monthIndex >= 0 && monthIndex < MONTHS.length) {
+      return `${MONTHS[monthIndex]} ${match[1]}`;
+    }
+  }
+
+  if (action.target_quarter) {
+    return `${action.target_quarter} ${year}`;
+  }
+
+  return "Mois à définir";
+}
+
+function KanbanCard({ action, year }: { action: CommunicationAction; year: number }) {
   return (
     <View style={styles.card} wrap={false}>
-      <Text style={styles.cardPeriod}>{getActionPeriodLabel(action)}</Text>
+      <Text style={styles.cardPeriod}>{getPdfPeriodLabel(action, year)}</Text>
       <Text style={styles.cardTitle}>{action.title}</Text>
       <Text style={styles.cardMeta}>
         {[action.action_type, action.objective, action.calculated_priority]
@@ -189,6 +268,11 @@ export async function renderCommunicationActionPdf(input: {
   actions: CommunicationAction[];
 }) {
   const year = new Date().getFullYear();
+  const monthlyActionCounts = MONTHS.map(
+    (_, monthIndex) =>
+      input.actions.filter((action) => getActionMonthIndex(action, year) === monthIndex)
+        .length,
+  );
 
   const document = (
     <Document title={`Feuille de route annuelle ${year} - ${input.brandName}`}>
@@ -205,6 +289,22 @@ export async function renderCommunicationActionPdf(input: {
             <Text style={styles.yearLabel}>Feuille de route</Text>
             <Text style={styles.year}>{year}</Text>
           </View>
+        </View>
+
+        <View style={styles.months} fixed>
+          {MONTHS.map((month, monthIndex) => {
+            const actionCount = monthlyActionCounts[monthIndex];
+
+            return (
+              <View
+                key={month}
+                style={[styles.month, actionCount > 0 ? styles.monthActive : {}]}
+              >
+                <Text style={styles.monthName}>{month}</Text>
+                <Text style={styles.monthCount}>{actionCount}</Text>
+              </View>
+            );
+          })}
         </View>
 
         <View style={styles.board}>
@@ -226,7 +326,7 @@ export async function renderCommunicationActionPdf(input: {
                 </View>
                 {statusActions.length > 0 ? (
                   statusActions.map((action) => (
-                    <KanbanCard key={action.id} action={action} />
+                    <KanbanCard key={action.id} action={action} year={year} />
                   ))
                 ) : (
                   <Text style={styles.empty}>Aucune action</Text>
