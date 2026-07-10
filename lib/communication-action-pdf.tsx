@@ -7,7 +7,6 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer";
 import {
-  ACTION_STATUSES,
   getActionPeriodLabel,
   type ActionStatus,
   type CommunicationAction,
@@ -37,18 +36,24 @@ const MONTHS = [
   "Décembre",
 ] as const;
 
+type MonthRange = {
+  start: number;
+  end: number;
+};
+
 const styles = StyleSheet.create({
   page: {
     backgroundColor: "#FBF6ED",
     color: "#4B4550",
     fontFamily: "Helvetica",
     padding: 30,
+    paddingBottom: 28,
   },
   header: {
     borderBottom: "1 solid #EADFCA",
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 16,
+    paddingBottom: 14,
   },
   eyebrow: {
     color: "#CF7430",
@@ -91,7 +96,7 @@ const styles = StyleSheet.create({
   },
   months: {
     flexDirection: "row",
-    gap: 5,
+    gap: 4,
     marginTop: 12,
   },
   month: {
@@ -100,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     flexBasis: 0,
     flexGrow: 1,
-    paddingHorizontal: 4,
+    paddingHorizontal: 3,
     paddingVertical: 6,
     textAlign: "center",
   },
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
   },
   monthName: {
     color: "#6F645B",
-    fontSize: 6.5,
+    fontSize: 6.3,
     fontWeight: 700,
     textTransform: "uppercase",
   },
@@ -120,82 +125,97 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     marginTop: 2,
   },
-  board: {
-    flexDirection: "row",
-    gap: 7,
-    marginTop: 12,
-  },
-  column: {
-    backgroundColor: "#F7F0E6",
-    border: "1 solid #EADFCA",
-    borderRadius: 9,
-    flexGrow: 1,
-    flexBasis: 0,
-    minHeight: 570,
-    padding: 7,
-  },
-  columnHeader: {
-    borderRadius: 6,
-    marginBottom: 7,
-    paddingHorizontal: 8,
-    paddingVertical: 7,
-  },
-  columnTitle: {
-    color: "#FFFFFF",
-    fontSize: 8,
+  sectionTitle: {
+    color: "#CF7430",
+    fontSize: 7,
     fontWeight: 700,
-    letterSpacing: 0.8,
+    letterSpacing: 1.3,
+    marginBottom: 7,
+    marginTop: 13,
     textTransform: "uppercase",
   },
-  count: {
-    color: "#FFFFFF",
-    fontSize: 7,
-    marginTop: 2,
+  roadmap: {
+    border: "1 solid #EADFCA",
+    borderRadius: 8,
+    overflow: "hidden",
   },
-  card: {
+  actionRow: {
+    backgroundColor: "#F8F1E7",
+    borderBottom: "1 solid #EADFCA",
+    height: 52,
+    position: "relative",
+  },
+  grid: {
+    bottom: 0,
+    flexDirection: "row",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  gridCell: {
+    borderRight: "1 solid #EADFCA",
+    flexBasis: 0,
+    flexGrow: 1,
+  },
+  actionBar: {
+    borderRadius: 6,
+    bottom: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    position: "absolute",
+    top: 5,
+  },
+  actionTitle: {
+    color: "#FFFFFF",
+    fontSize: 8.2,
+    fontWeight: 700,
+    lineHeight: 1.2,
+  },
+  actionMeta: {
+    color: "#FFFFFF",
+    fontSize: 6.2,
+    lineHeight: 1.2,
+    marginTop: 3,
+    opacity: 0.92,
+  },
+  undatedList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7,
+  },
+  undatedCard: {
     backgroundColor: "#FFFFFF",
     border: "1 solid #EADFCA",
     borderRadius: 7,
-    marginBottom: 7,
     padding: 8,
+    width: "24%",
   },
-  cardPeriod: {
+  undatedLabel: {
     color: "#CF7430",
-    fontSize: 6.5,
+    fontSize: 6.2,
     fontWeight: 700,
-    letterSpacing: 0.5,
     textTransform: "uppercase",
   },
-  cardTitle: {
+  undatedTitle: {
     color: "#2F2A36",
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: 700,
-    lineHeight: 1.25,
     marginTop: 4,
   },
-  cardMeta: {
+  undatedMeta: {
     color: "#7A7087",
-    fontSize: 6.5,
-    lineHeight: 1.35,
+    fontSize: 6.2,
     marginTop: 4,
-  },
-  cardStep: {
-    backgroundColor: "#FFF8E8",
-    borderRadius: 4,
-    color: "#5F544A",
-    fontSize: 6.8,
-    lineHeight: 1.35,
-    marginTop: 6,
-    padding: 5,
   },
   empty: {
     color: "#9A9088",
-    fontSize: 7,
-    padding: 7,
+    fontSize: 8,
+    padding: 18,
     textAlign: "center",
   },
   footer: {
-    bottom: 14,
+    bottom: 12,
     color: "#9A9088",
     fontSize: 6.5,
     left: 30,
@@ -205,78 +225,95 @@ const styles = StyleSheet.create({
   },
 });
 
-function sortActions(actions: CommunicationAction[]) {
-  return [...actions].sort((left, right) => {
-    const leftDate = left.start_date ?? left.target_month ?? left.target_quarter ?? "9999";
-    const rightDate = right.start_date ?? right.target_month ?? right.target_quarter ?? "9999";
-    return leftDate.localeCompare(rightDate) || left.sort_order - right.sort_order;
-  });
-}
-
-function getActionMonthIndices(action: CommunicationAction, year: number) {
+function getActionMonthRange(
+  action: CommunicationAction,
+  year: number,
+): MonthRange | null {
   const rawDate = action.start_date ?? action.target_month;
-  const match = rawDate?.match(/^(\d{4})-(\d{2})/);
+  const dateMatch = rawDate?.match(/^(\d{4})-(\d{2})/);
 
-  if (match) {
-    if (Number(match[1]) !== year) {
-      return [] as number[];
+  if (dateMatch) {
+    if (Number(dateMatch[1]) !== year) {
+      return null;
     }
 
-    const monthIndex = Number(match[2]) - 1;
-    return monthIndex >= 0 && monthIndex < MONTHS.length ? [monthIndex] : [];
+    const monthIndex = Number(dateMatch[2]) - 1;
+    return monthIndex >= 0 && monthIndex < MONTHS.length
+      ? { start: monthIndex, end: monthIndex }
+      : null;
   }
 
   const quarterMatch = action.target_quarter?.match(/^T([1-4])$/i);
 
   if (!quarterMatch) {
-    return [] as number[];
+    return null;
   }
 
   const firstMonthIndex = (Number(quarterMatch[1]) - 1) * 3;
-  return [firstMonthIndex, firstMonthIndex + 1];
+  return { start: firstMonthIndex, end: firstMonthIndex + 2 };
 }
 
-function getPdfPeriodLabel(action: CommunicationAction, year: number) {
+function getPdfPeriodLabel(
+  action: CommunicationAction,
+  year: number,
+  range: MonthRange,
+) {
   if (action.start_date) {
     return getActionPeriodLabel(action);
   }
 
-  if (action.target_month) {
-    const match = action.target_month.match(/^(\d{4})-(\d{2})$/);
-    const monthIndex = match ? Number(match[2]) - 1 : -1;
-
-    if (match && monthIndex >= 0 && monthIndex < MONTHS.length) {
-      return `${MONTHS[monthIndex]} ${match[1]}`;
-    }
+  if (range.start === range.end) {
+    return `${MONTHS[range.start]} ${year}`;
   }
 
-  if (action.target_quarter) {
-    const quarterMatch = action.target_quarter.match(/^T([1-4])$/i);
-
-    if (quarterMatch) {
-      const firstMonthIndex = (Number(quarterMatch[1]) - 1) * 3;
-      return `${MONTHS[firstMonthIndex]} – ${MONTHS[firstMonthIndex + 1]} ${year}`;
-    }
-
-    return `${action.target_quarter} ${year}`;
-  }
-
-  return "Mois à définir";
+  return `${MONTHS[range.start]} – ${MONTHS[range.end]} ${year}`;
 }
 
-function KanbanCard({ action, year }: { action: CommunicationAction; year: number }) {
+function sortScheduledActions(
+  entries: Array<{ action: CommunicationAction; range: MonthRange }>,
+) {
+  return [...entries].sort(
+    (left, right) =>
+      left.range.start - right.range.start ||
+      left.range.end - right.range.end ||
+      left.action.sort_order - right.action.sort_order,
+  );
+}
+
+function RoadmapRow({
+  action,
+  range,
+  year,
+}: {
+  action: CommunicationAction;
+  range: MonthRange;
+  year: number;
+}) {
+  const left = `${(range.start / MONTHS.length) * 100}%`;
+  const width = `${((range.end - range.start + 1) / MONTHS.length) * 100}%`;
+
   return (
-    <View style={styles.card} wrap={false}>
-      <Text style={styles.cardPeriod}>{getPdfPeriodLabel(action, year)}</Text>
-      <Text style={styles.cardTitle}>{action.title}</Text>
-      <Text style={styles.cardMeta}>
-        {[action.action_type, action.objective, action.calculated_priority]
-          .filter(Boolean)
-          .join(" · ")}
-      </Text>
-      {action.first_step ? (
-        <Text style={styles.cardStep}>Première étape : {action.first_step}</Text>
-      ) : null}
+    <View style={styles.actionRow} wrap={false}>
+      <View style={styles.grid}>
+        {MONTHS.map((month) => (
+          <View key={month} style={styles.gridCell} />
+        ))}
+      </View>
+      <View
+        style={[
+          styles.actionBar,
+          {
+            backgroundColor: STATUS_COLORS[action.status],
+            left,
+            width,
+          },
+        ]}
+      >
+        <Text style={styles.actionTitle}>{action.title}</Text>
+        <Text style={styles.actionMeta}>
+          {getPdfPeriodLabel(action, year, range)} · {action.status} · {action.calculated_priority}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -286,10 +323,18 @@ export async function renderCommunicationActionPdf(input: {
   actions: CommunicationAction[];
 }) {
   const year = new Date().getFullYear();
+  const scheduledActions = sortScheduledActions(
+    input.actions.flatMap((action) => {
+      const range = getActionMonthRange(action, year);
+      return range ? [{ action, range }] : [];
+    }),
+  );
+  const scheduledIds = new Set(scheduledActions.map(({ action }) => action.id));
+  const undatedActions = input.actions.filter((action) => !scheduledIds.has(action.id));
   const monthlyActionCounts = MONTHS.map(
     (_, monthIndex) =>
-      input.actions.filter((action) =>
-        getActionMonthIndices(action, year).includes(monthIndex),
+      scheduledActions.filter(
+        ({ range }) => monthIndex >= range.start && monthIndex <= range.end,
       ).length,
   );
 
@@ -301,7 +346,7 @@ export async function renderCommunicationActionPdf(input: {
             <Text style={styles.eyebrow}>Brand Studio · Plan d&apos;action communication</Text>
             <Text style={styles.title}>Kanban annuel de {input.brandName}</Text>
             <Text style={styles.subtitle}>
-              Une vue d&apos;ensemble des actions de communication, de l&apos;idée à la réalisation.
+              Chaque action s&apos;étend visuellement sur tous les mois concernés.
             </Text>
           </View>
           <View style={styles.yearBadge}>
@@ -313,7 +358,6 @@ export async function renderCommunicationActionPdf(input: {
         <View style={styles.months} fixed>
           {MONTHS.map((month, monthIndex) => {
             const actionCount = monthlyActionCounts[monthIndex];
-
             return (
               <View
                 key={month}
@@ -326,34 +370,35 @@ export async function renderCommunicationActionPdf(input: {
           })}
         </View>
 
-        <View style={styles.board}>
-          {ACTION_STATUSES.map((status) => {
-            const statusActions = sortActions(
-              input.actions.filter((action) => action.status === status),
-            );
+        <Text style={styles.sectionTitle}>Planning annuel</Text>
+        <View style={styles.roadmap}>
+          {scheduledActions.length > 0 ? (
+            scheduledActions.map(({ action, range }) => (
+              <RoadmapRow key={action.id} action={action} range={range} year={year} />
+            ))
+          ) : (
+            <Text style={styles.empty}>Aucune action planifiée pour {year}</Text>
+          )}
+        </View>
 
-            return (
-              <View key={status} style={styles.column}>
-                <View
-                  style={[styles.columnHeader, { backgroundColor: STATUS_COLORS[status] }]}
-                  fixed
-                >
-                  <Text style={styles.columnTitle}>{status}</Text>
-                  <Text style={styles.count}>
-                    {statusActions.length} action{statusActions.length > 1 ? "s" : ""}
+        {undatedActions.length > 0 ? (
+          <>
+            <Text style={styles.sectionTitle}>Actions à planifier</Text>
+            <View style={styles.undatedList}>
+              {undatedActions.map((action) => (
+                <View key={action.id} style={styles.undatedCard} wrap={false}>
+                  <Text style={styles.undatedLabel}>{action.status}</Text>
+                  <Text style={styles.undatedTitle}>{action.title}</Text>
+                  <Text style={styles.undatedMeta}>
+                    {[action.action_type, action.objective, action.calculated_priority]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </Text>
                 </View>
-                {statusActions.length > 0 ? (
-                  statusActions.map((action) => (
-                    <KanbanCard key={action.id} action={action} year={year} />
-                  ))
-                ) : (
-                  <Text style={styles.empty}>Aucune action</Text>
-                )}
-              </View>
-            );
-          })}
-        </View>
+              ))}
+            </View>
+          </>
+        ) : null}
 
         <Text style={styles.footer} fixed>
           Généré avec Brand Studio · {input.actions.length} action

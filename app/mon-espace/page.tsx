@@ -392,10 +392,6 @@ export default async function MonEspacePage() {
                         </p>
                       </div>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-[#6f645b]">
-                      Réserve ton échange individuel avec Marine pour faire le bilan et
-                      préparer tes prochaines étapes.
-                    </p>
                     <p className="mt-2 flex items-center gap-2 text-xs font-bold text-[#5f544a]">
                       <ClockIcon className="h-4 w-4 text-[#cf7430]" aria-hidden="true" />
                       45 minutes en visioconférence
