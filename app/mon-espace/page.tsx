@@ -378,6 +378,38 @@ export default async function MonEspacePage() {
                     </div>
                   </div>
 
+                  <div className="rounded-[1.2rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-4 shadow-[0_10px_24px_rgba(207,116,48,0.08)]">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.8rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
+                        <CalendarDaysIcon className="h-5 w-5" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                          Fin de parcours
+                        </p>
+                        <p className="mt-1 text-base font-extrabold text-[#4b4550]">
+                          Faisons le point ensemble
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-[#6f645b]">
+                      Réserve ton échange individuel avec Marine pour faire le bilan et
+                      préparer tes prochaines étapes.
+                    </p>
+                    <p className="mt-2 flex items-center gap-2 text-xs font-bold text-[#5f544a]">
+                      <ClockIcon className="h-4 w-4 text-[#cf7430]" aria-hidden="true" />
+                      45 minutes en visioconférence
+                    </p>
+                    <a
+                      href={END_OF_TRAINING_CALL_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 flex h-11 w-full items-center justify-center rounded-[0.85rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.1em] text-white shadow-[0_10px_20px_rgba(223,155,57,0.18)] transition hover:-translate-y-0.5"
+                    >
+                      Réserver mon rendez-vous
+                    </a>
+                  </div>
+
                   {workspace.project ? (
                     <div>
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
@@ -419,40 +451,6 @@ export default async function MonEspacePage() {
                 ) : null}
                 <LogoutButton />
               </div>
-            </div>
-          </div>
-          <div className="mt-8 overflow-hidden rounded-[2rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff3dc)] p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08)] sm:p-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex max-w-3xl items-start gap-5">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.1rem] bg-white text-[#cf7430] shadow-[0_10px_24px_rgba(207,116,48,0.12)] ring-1 ring-[#efd7b8]">
-                  <CalendarDaysIcon className="h-7 w-7" aria-hidden="true" />
-                </div>
-                <div>
-                  <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
-                    Inclus dans Brand Studio
-                  </p>
-                  <h2 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-tight text-[#4b4550] sm:text-[2.4rem]">
-                    Ton rendez-vous de fin de parcours
-                  </h2>
-                  <p className="mt-3 text-base leading-7 text-[#6f645b]">
-                    Une fois la formation terminée, réserve un échange individuel avec
-                    Marine pour faire le point sur ta marque, tes avancées et tes prochaines
-                    étapes.
-                  </p>
-                  <p className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#5f544a]">
-                    <ClockIcon className="h-5 w-5 text-[#cf7430]" aria-hidden="true" />
-                    45 minutes en visioconférence
-                  </p>
-                </div>
-              </div>
-              <a
-                href={END_OF_TRAINING_CALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-12 shrink-0 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.2)] transition hover:-translate-y-0.5 hover:brightness-[1.02]"
-              >
-                Réserver mon rendez-vous
-              </a>
             </div>
           </div>
           <div className="mt-8 border-t border-[#eadfca] pt-7">
