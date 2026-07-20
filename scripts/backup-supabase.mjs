@@ -18,12 +18,18 @@ const tables = [
   "client_access_codes", "brand_projects", "brand_modules", "brand_submodules",
   "module_exercises", "project_exercise_answers", "project_module_states",
   "brand_exports", "subscriptions", "purchase_activation_codes", "communication_actions",
+  "editorial_modules", "module_versions", "submodule_versions", "exercise_versions",
+  "question_versions", "user_answers", "user_module_progress", "admin_audit_logs",
 ];
 const snapshot = { generated_at: new Date().toISOString(), tables: {} };
 for (const table of tables) {
   const rows = [];
   for (let from = 0; ; from += 1000) {
     const { data, error } = await client.from(table).select("*").range(from, from + 999);
+    if (error?.code === "PGRST205" || error?.message?.includes("schema cache")) {
+      snapshot.tables[table] = [];
+      break;
+    }
     if (error) throw new Error(`${table}: ${error.message}`);
     rows.push(...data);
     if (data.length < 1000) break;
