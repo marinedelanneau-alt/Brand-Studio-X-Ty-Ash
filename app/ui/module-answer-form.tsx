@@ -757,6 +757,14 @@ function getSessionAnswersDraftKey(moduleId: number) {
   return `${MODULE_ANSWERS_SESSION_DRAFT_PREFIX}:${moduleId}`;
 }
 
+function getStableLocalAnswersDraftKey(modulePosition: number) {
+  return `${MODULE_ANSWERS_DRAFT_PREFIX}:position:${modulePosition}`;
+}
+
+function getStableSessionAnswersDraftKey(modulePosition: number) {
+  return `${MODULE_ANSWERS_SESSION_DRAFT_PREFIX}:position:${modulePosition}`;
+}
+
 function parseStoredAnswersDraft(value: string | null): StoredAnswersDraft | null {
   if (!value) {
     return null;
@@ -798,74 +806,102 @@ function parseStoredAnswersDraft(value: string | null): StoredAnswersDraft | nul
   }
 }
 
-function readBrowserAnswersDraft(moduleId: number) {
+function readNewestBrowserDraft(localKey: string, sessionKey: string) {
   if (typeof window === "undefined") {
     return null;
   }
 
-  const localDraft = parseStoredAnswersDraft(
-    window.localStorage.getItem(getLocalAnswersDraftKey(moduleId)),
-  );
-  const sessionDraft = parseStoredAnswersDraft(
-    window.sessionStorage.getItem(getSessionAnswersDraftKey(moduleId)),
-  );
+  const localDraft = parseStoredAnswersDraft(window.localStorage.getItem(localKey));
+  const sessionDraft = parseStoredAnswersDraft(window.sessionStorage.getItem(sessionKey));
 
   if (!localDraft) {
-    return sessionDraft?.answers ?? null;
+    return sessionDraft;
   }
 
   if (!sessionDraft) {
-    return localDraft.answers;
+    return localDraft;
   }
 
   return sessionDraft.updatedAt >= localDraft.updatedAt
-    ? sessionDraft.answers
-    : localDraft.answers;
+    ? sessionDraft
+    : localDraft;
 }
 
-function writeBrowserAnswersDraft(moduleId: number, answers: AnswersByExercise) {
+function readBrowserAnswersDraft(module: WorkspaceModule) {
+  const idDraft = readNewestBrowserDraft(
+    getLocalAnswersDraftKey(module.id),
+    getSessionAnswersDraftKey(module.id),
+  );
+  const stableDraft = readNewestBrowserDraft(
+    getStableLocalAnswersDraftKey(module.position),
+    getStableSessionAnswersDraftKey(module.position),
+  );
+  const exerciseIdByPosition = new Map(
+    module.exercises.map((exercise) => [exercise.position, exercise.id]),
+  );
+  const stableAnswers = stableDraft
+    ? Object.fromEntries(
+        Object.entries(stableDraft.answers).flatMap(([position, values]) => {
+          const exerciseId = exerciseIdByPosition.get(Number(position));
+          return exerciseId ? [[exerciseId, values]] : [];
+        }),
+      ) as AnswersByExercise
+    : null;
+
+  if (!idDraft) {
+    return stableAnswers;
+  }
+
+  if (!stableDraft || idDraft.updatedAt >= stableDraft.updatedAt) {
+    return idDraft.answers;
+  }
+
+  return stableAnswers;
+}
+
+function writeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
   if (typeof window === "undefined") {
     return;
   }
 
+  const updatedAt = Date.now();
   const payload = JSON.stringify({
-    updatedAt: Date.now(),
+    updatedAt,
     answers,
+  });
+  const stablePayload = JSON.stringify({
+    updatedAt,
+    answers: Object.fromEntries(
+      module.exercises.map((exercise) => [
+        exercise.position,
+        answers[exercise.id] ?? [],
+      ]),
+    ),
   });
 
   try {
-    window.sessionStorage.setItem(getSessionAnswersDraftKey(moduleId), payload);
+    window.sessionStorage.setItem(getSessionAnswersDraftKey(module.id), payload);
+    window.sessionStorage.setItem(
+      getStableSessionAnswersDraftKey(module.position),
+      stablePayload,
+    );
   } catch {
     // Session storage is a browser-side convenience; server persistence remains primary.
   }
 
   try {
-    window.localStorage.setItem(getLocalAnswersDraftKey(moduleId), payload);
+    window.localStorage.setItem(getLocalAnswersDraftKey(module.id), payload);
+    window.localStorage.setItem(
+      getStableLocalAnswersDraftKey(module.position),
+      stablePayload,
+    );
   } catch {
-    // Local storage is only a backup; server persistence remains the source of truth.
-  }
-}
-
-function clearBrowserAnswersDraft(moduleId: number) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.sessionStorage.removeItem(getSessionAnswersDraftKey(moduleId));
-  } catch {
-    // The server copy remains authoritative when browser storage is unavailable.
-  }
-
-  try {
-    window.localStorage.removeItem(getLocalAnswersDraftKey(moduleId));
-  } catch {
-    // The server copy remains authoritative when browser storage is unavailable.
+    // Local storage is a durable backup when the network or a deployment interrupts a save.
   }
 }
 
 function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
-  const browserDraft = readBrowserAnswersDraft(module.id);
+  const browserDraft = readBrowserAnswersDraft(module);
 
   if (!browserDraft) {
     return answers;
@@ -1225,7 +1261,7 @@ export default function ModuleAnswerForm({
     createInitialAnswers(module),
   );
   const [checklistDrafts, setChecklistDrafts] = useState<Record<string, string>>({});
-  const [, setAutoSaveState] = useState<ModuleState>(initialState);
+  const [autoSaveState, setAutoSaveState] = useState<ModuleState>(initialState);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [aiAssistStates, setAiAssistStates] = useState<Record<number, AiAssistState>>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -1305,7 +1341,9 @@ export default function ModuleAnswerForm({
           result.status === "success" &&
           JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave
         ) {
-          clearBrowserAnswersDraft(module.id);
+          // Keep the durable browser copy even after Supabase confirms the save. Admin
+          // deployments can replace database IDs, while positions remain stable.
+          writeBrowserAnswersDraft(module, answersToSave);
         }
 
         setAutoSaveState(result);
@@ -1374,8 +1412,8 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     latestAnswersRef.current = answers;
-    writeBrowserAnswersDraft(module.id, answers);
-  }, [answers, module.id]);
+    writeBrowserAnswersDraft(module, answers);
+  }, [answers, module]);
 
   useEffect(() => {
     setCurrentIndex((current) =>
@@ -1421,7 +1459,7 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     function saveBeforeLeaving() {
-      writeBrowserAnswersDraft(module.id, latestAnswersRef.current);
+      writeBrowserAnswersDraft(module, latestAnswersRef.current);
       void persistCurrentDraft();
     }
 
@@ -2974,6 +3012,19 @@ export default function ModuleAnswerForm({
           }
         >
           {state.message}
+        </p>
+      ) : null}
+
+      {!state.message && autoSaveState.message ? (
+        <p
+          role="status"
+          className={
+            autoSaveState.status === "error"
+              ? "rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#b45247]"
+              : "text-sm leading-6 text-[#5f8d63]"
+          }
+        >
+          {autoSaveState.message}
         </p>
       ) : null}
     </form>
