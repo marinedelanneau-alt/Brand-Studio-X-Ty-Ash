@@ -93,6 +93,12 @@ type ModuleDraftSnapshot = {
   updatedAt: string;
 };
 
+type AnswerBackupSnapshot = {
+  version: 1;
+  modules: Record<string, Record<string, string[]>>;
+  updatedAt: string;
+};
+
 export type {
   AdminAccountSummary,
   AdminOverview,
@@ -131,6 +137,7 @@ const AUDIO_TRANSCRIPT_HTML_MARKER_PATTERN =
 const ALL_AUDIO_TRANSCRIPT_HTML_MARKERS_PATTERN =
   /<!--\s*brand-studio-audio-transcript:[^]*?\s*-->/g;
 const ADMIN_MODULE_DRAFT_EXPORT_TYPE = "admin_module_draft";
+const ANSWER_BACKUP_EXPORT_TYPE = "answer_backup";
 const ADMIN_WORKSPACE_EMAIL =
   process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
 const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
@@ -149,6 +156,19 @@ function normalizeAdminWorkspaceLabel(value: string | null | undefined) {
 function hasAdminWorkspaceKeywords(value: string | null | undefined) {
   const label = normalizeAdminWorkspaceLabel(value);
   return ADMIN_WORKSPACE_KEYWORDS.every((keyword) => label.includes(keyword));
+}
+
+function parseAnswerBackupSnapshot(value: unknown): AnswerBackupSnapshot | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const candidate = value as Partial<AnswerBackupSnapshot>;
+  if (candidate.version !== 1 || !candidate.modules || typeof candidate.modules !== "object") {
+    return null;
+  }
+
+  return candidate as AnswerBackupSnapshot;
 }
 
 function getStoredAudioUrl(options: string[]) {
@@ -1825,7 +1845,7 @@ export async function getWorkspaceData(accountId: number) {
   const completedModuleIdsFromCookie = new Set(
     await getCompletedModuleIdsFromCookie(project.id),
   );
-  const [answersResult, moduleStatesResult] = await Promise.all([
+  const [answersResult, moduleStatesResult, backupResult] = await Promise.all([
     supabase
       .from("project_exercise_answers")
       .select("*")
@@ -1836,6 +1856,14 @@ export async function getWorkspaceData(accountId: number) {
       .select("*")
       .eq("project_id", project.id)
       .returns<ProjectModuleStateRecord[]>(),
+    supabase
+      .from("brand_exports")
+      .select("guide_snapshot")
+      .eq("project_id", project.id)
+      .eq("export_type", ANSWER_BACKUP_EXPORT_TYPE)
+      .order("generated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle<{ guide_snapshot: unknown }>(),
   ]);
 
   if (answersResult.error) {
@@ -1849,10 +1877,15 @@ export async function getWorkspaceData(accountId: number) {
     throw new Error(moduleStatesResult.error.message);
   }
 
+  if (backupResult.error && !isMissingDatabaseObject(backupResult.error)) {
+    throw new Error(backupResult.error.message);
+  }
+
   const answers = answersResult.data ?? [];
   const moduleStates = isMissingDatabaseObject(moduleStatesResult.error)
     ? []
     : (moduleStatesResult.data ?? []);
+  const answerBackup = parseAnswerBackupSnapshot(backupResult.data?.guide_snapshot);
 
   const groupedAnswers = new Map<number, ProjectExerciseAnswerRecord[]>();
 
@@ -1869,6 +1902,18 @@ export async function getWorkspaceData(accountId: number) {
   const draftModules = modules.map((module) => {
     const moduleAnswers = groupedAnswers.get(module.id) ?? [];
     const answersMap = computeModuleAnswerMap(module.exercises, moduleAnswers);
+    const backedUpModuleAnswers = answerBackup?.modules[String(module.position)];
+
+    if (backedUpModuleAnswers) {
+      for (const exercise of module.exercises) {
+        const persistedValues = answersMap[exercise.id] ?? [];
+        const backedUpValues = backedUpModuleAnswers[String(exercise.position)];
+
+        if (persistedValues.length === 0 && Array.isArray(backedUpValues)) {
+          answersMap[exercise.id] = backedUpValues;
+        }
+      }
+    }
     const isCompletedFromDatabase = completionStateByModuleId.get(module.id) ?? false;
 
     return {
@@ -1922,6 +1967,66 @@ export async function getWorkspaceData(accountId: number) {
     completedModulesCount,
     totalModulesCount,
   };
+}
+
+export async function backupModuleAnswers(input: {
+  projectId: number;
+  modulePosition: number;
+  answers: Array<{ exercisePosition: number; values: string[] }>;
+}) {
+  if (input.answers.length === 0) {
+    return;
+  }
+
+  const supabase = createSupabaseServerClient();
+  const { data, error: readError } = await supabase
+    .from("brand_exports")
+    .select("id, guide_snapshot")
+    .eq("project_id", input.projectId)
+    .eq("export_type", ANSWER_BACKUP_EXPORT_TYPE)
+    .order("generated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<{ id: number; guide_snapshot: unknown }>();
+
+  if (readError) {
+    throw new Error(readError.message);
+  }
+
+  const now = new Date().toISOString();
+  const snapshot = parseAnswerBackupSnapshot(data?.guide_snapshot) ?? {
+    version: 1 as const,
+    modules: {},
+    updatedAt: now,
+  };
+  const moduleKey = String(input.modulePosition);
+  const moduleAnswers = { ...(snapshot.modules[moduleKey] ?? {}) };
+
+  for (const answer of input.answers) {
+    moduleAnswers[String(answer.exercisePosition)] = [...answer.values];
+  }
+
+  const nextSnapshot: AnswerBackupSnapshot = {
+    ...snapshot,
+    modules: { ...snapshot.modules, [moduleKey]: moduleAnswers },
+    updatedAt: now,
+  };
+
+  const result = data
+    ? await supabase
+        .from("brand_exports")
+        .update({ guide_snapshot: nextSnapshot, generated_at: now })
+        .eq("id", data.id)
+    : await supabase.from("brand_exports").insert({
+        project_id: input.projectId,
+        export_type: ANSWER_BACKUP_EXPORT_TYPE,
+        file_url: null,
+        generated_at: now,
+        guide_snapshot: nextSnapshot,
+      });
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
 }
 
 export async function replaceModuleAnswers(input: {

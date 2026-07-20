@@ -41,6 +41,16 @@ export async function resetCurrentUserAnswers(): Promise<ResetAnswersState> {
       throw new Error(statesResult.error.message);
     }
 
+    const backupResult = await supabase
+      .from("brand_exports")
+      .delete()
+      .eq("project_id", project.id)
+      .eq("export_type", "answer_backup");
+
+    if (backupResult.error && !isMissingDatabaseObject(backupResult.error)) {
+      throw new Error(backupResult.error.message);
+    }
+
     await clearCompletedModulesCookie(project.id);
     revalidatePath("/mon-espace");
 

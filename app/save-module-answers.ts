@@ -10,6 +10,7 @@ import {
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import {
+  backupModuleAnswers,
   getWorkspaceData,
   replaceModuleAnswers,
   setProjectModuleCompletion,
@@ -151,6 +152,26 @@ async function persistModuleAnswers(input: {
         answerText: null,
         selectedOptions: values,
       }];
+    });
+
+    const exerciseById = new Map(
+      selectedModule.exercises.map((exercise) => [exercise.id, exercise]),
+    );
+
+    await backupModuleAnswers({
+      projectId: workspace.project.id,
+      modulePosition: selectedModule.position,
+      answers: answers.flatMap((answer) => {
+        const exercise = exerciseById.get(answer.exerciseId);
+        if (!exercise) {
+          return [];
+        }
+
+        return [{
+          exercisePosition: exercise.position,
+          values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
+        }];
+      }),
     });
 
     await replaceModuleAnswers({

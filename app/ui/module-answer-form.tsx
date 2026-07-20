@@ -1308,6 +1308,8 @@ export default function ModuleAnswerForm({
   const [aiAssistStates, setAiAssistStates] = useState<Record<number, AiAssistState>>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [, startAutoSaveTransition] = useTransition();
+  const moduleRef = useRef(module);
+  moduleRef.current = module;
   const latestAnswersRef = useRef<AnswersByExercise>(answers);
   const persistedAnswersRef = useRef<AnswersByExercise>({});
   const draftSaveQueueRef = useRef<Promise<ModuleState | null>>(Promise.resolve(null));
@@ -1376,9 +1378,10 @@ export default function ModuleAnswerForm({
     draftSaveQueueRef.current = draftSaveQueueRef.current
       .catch(() => null)
       .then(async () => {
+        const activeModule = moduleRef.current;
         const answersToSave = latestAnswersRef.current;
         const changedExerciseIds = new Set(
-          module.exercises
+          activeModule.exercises
             .filter((exercise) => isAnswerableExerciseType(exercise.type))
             .filter(
               (exercise) =>
@@ -1406,7 +1409,7 @@ export default function ModuleAnswerForm({
 
         try {
           result = await saveModuleDraft(
-            buildSubmissionFormData(module, answersToSave, changedExerciseIds),
+            buildSubmissionFormData(activeModule, answersToSave, changedExerciseIds),
           );
         } catch {
           result = {
@@ -1429,7 +1432,7 @@ export default function ModuleAnswerForm({
           // Keep the durable browser copy even after Supabase confirms the save. Admin
           // deployments can replace database IDs, while positions remain stable.
           if (JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave) {
-            writeBrowserAnswersDraft(module, answersToSave);
+            writeBrowserAnswersDraft(activeModule, answersToSave);
           }
 
           setSaveIndicator("saved");
@@ -1452,7 +1455,7 @@ export default function ModuleAnswerForm({
       });
 
     return draftSaveQueueRef.current;
-  }, [module]);
+  }, []);
 
   function goToNextStep() {
     if (currentExercise && currentIndex < visibleExerciseGroups.length - 1) {
@@ -1489,15 +1492,15 @@ export default function ModuleAnswerForm({
     }
 
     hasRestoredBrowserDraftRef.current = true;
-    const restoredAnswers = createInitialAnswers(module);
+    const restoredAnswers = createInitialAnswers(moduleRef.current);
     latestAnswersRef.current = restoredAnswers;
     setAnswers(restoredAnswers);
-  }, [module]);
+  }, []);
 
   useEffect(() => {
     latestAnswersRef.current = answers;
-    writeBrowserAnswersDraft(module, answers);
-  }, [answers, module]);
+    writeBrowserAnswersDraft(moduleRef.current, answers);
+  }, [answers]);
 
   useEffect(() => {
     setCurrentIndex((current) =>
@@ -1510,10 +1513,11 @@ export default function ModuleAnswerForm({
   }, [currentExercise?.id, currentExercise?.type]);
 
   useEffect(() => {
-    const nextInitialAnswers = createInitialAnswers(module);
+    const activeModule = moduleRef.current;
+    const nextInitialAnswers = createInitialAnswers(activeModule);
 
-    if (previousModuleIdRef.current !== module.id) {
-      previousModuleIdRef.current = module.id;
+    if (previousModuleIdRef.current !== activeModule.id) {
+      previousModuleIdRef.current = activeModule.id;
       persistedAnswersRef.current = {};
       setAnswers(nextInitialAnswers);
       setChecklistDrafts({});
@@ -1526,7 +1530,7 @@ export default function ModuleAnswerForm({
     }
 
     setAnswers((currentAnswers) => mergeAnswers(currentAnswers, nextInitialAnswers));
-  }, [module]);
+  }, [module.id]);
 
   useEffect(() => {
     if (!hasMountedRef.current) {
@@ -1541,11 +1545,11 @@ export default function ModuleAnswerForm({
     }, 800);
 
     return () => window.clearTimeout(timeoutId);
-  }, [answers, module, persistCurrentDraft]);
+  }, [answers, persistCurrentDraft]);
 
   useEffect(() => {
     function saveBeforeLeaving() {
-      writeBrowserAnswersDraft(module, latestAnswersRef.current);
+      writeBrowserAnswersDraft(moduleRef.current, latestAnswersRef.current);
       void persistCurrentDraft();
     }
 
@@ -1568,7 +1572,7 @@ export default function ModuleAnswerForm({
       window.removeEventListener("online", handleOnline);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [module, persistCurrentDraft]);
+  }, [persistCurrentDraft]);
 
   useEffect(() => {
     return () => {
