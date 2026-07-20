@@ -1115,8 +1115,10 @@ function getNextStepLabel(input: {
   return "Voir le résumé du module";
 }
 
-function getModuleSummaryHref(moduleId: number) {
-  return `/mon-espace/module/${moduleId}?summary=1#resume-module`;
+function getModuleSummaryHref(module: Pick<WorkspaceModule, "id" | "position">) {
+  return module.position === 4
+    ? "/brand-guide"
+    : `/mon-espace/module/${module.id}?summary=1#resume-module`;
 }
 
 function getStaticTextHtml(content: string) {
@@ -1388,7 +1390,7 @@ export default function ModuleAnswerForm({
       return;
     }
 
-    window.location.assign(getModuleSummaryHref(module.id));
+    window.location.assign(getModuleSummaryHref(module));
   }
 
   async function goToPreviousStep() {
@@ -1499,8 +1501,10 @@ export default function ModuleAnswerForm({
     }
 
     shouldOpenSummaryAfterSaveRef.current = false;
-    window.location.assign(getModuleSummaryHref(module.id));
-  }, [module.id, state.status]);
+    window.location.assign(
+      getModuleSummaryHref({ id: module.id, position: module.position }),
+    );
+  }, [module.id, module.position, state.status]);
 
   async function handleAiAssist(
     exercise: WorkspaceModule["exercises"][number],

@@ -92,6 +92,10 @@ export default async function WorkspaceModulePage({
   const startInExercises = resolvedSearchParams?.mode === "exercises";
   const shouldForceSummary = resolvedSearchParams?.summary === "1";
 
+  if (shouldForceSummary && currentModule.position === 4) {
+    redirect("/brand-guide");
+  }
+
   const showSummary = shouldForceSummary;
   const summaryCard = workspace.project
     ? buildModuleSummaryCard({
