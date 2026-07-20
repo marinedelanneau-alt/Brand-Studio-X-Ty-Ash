@@ -24,6 +24,8 @@
 .DS_Store
 *.pem
 .runtime/
+.supabase-backups/
+/supabase/.temp/
 
 # debug
 npm-debug.log*

@@ -13,6 +13,15 @@ update public.client_access_codes
 set role = 'admin', is_admin = true
 where lower(email) = 'marine.delanneau@gmail.com';
 
+alter table public.brand_modules add column if not exists audio_url text;
+alter table public.brand_modules add column if not exists audio_transcript text;
+alter table public.brand_submodules add column if not exists audio_url text;
+alter table public.brand_submodules add column if not exists audio_transcript text;
+alter table public.module_exercises add column if not exists explanation text not null default '';
+alter table public.module_exercises add column if not exists answer_placeholder text not null default '';
+alter table public.module_exercises add column if not exists audio_url text;
+alter table public.module_exercises add column if not exists audio_transcript text;
+
 create table if not exists public.editorial_modules (
   id uuid primary key default gen_random_uuid(),
   module_key text not null unique,
