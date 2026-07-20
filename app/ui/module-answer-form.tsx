@@ -165,7 +165,27 @@ function normalizeTextEntryValue(
   exercise: WorkspaceModule["exercises"][number],
   value: string,
 ) {
-  const trimmedValue = value.trim();
+  let visibleValue = value;
+
+  if (exercise.type !== "checklist") {
+    const candidates = [value];
+
+    try {
+      candidates.push(decodeURIComponent(value));
+    } catch {
+      // The stored value is not URI encoded.
+    }
+
+    const checklistEntry = candidates
+      .flatMap((candidate) => parseChecklistEntries([candidate]))
+      .find((entry) => entry.label.length > 0);
+
+    if (checklistEntry) {
+      visibleValue = checklistEntry.label;
+    }
+  }
+
+  const trimmedValue = visibleValue.trim();
 
   if (!trimmedValue) {
     return "";
@@ -178,7 +198,7 @@ function normalizeTextEntryValue(
     getPromptOpenLabel(exercise.question),
   ])
     ? ""
-    : value;
+    : visibleValue;
 }
 
 function normalizeTextEntryValues(
@@ -194,6 +214,18 @@ function normalizeTextEntryValues(
     exercise.type !== "table"
   ) {
     return values;
+  }
+
+  const indexedItems = parseIndexedAnswerItems(values);
+
+  if (indexedItems.length > 0) {
+    return indexedItems.map((item) =>
+      serializeIndexedAnswerItem(
+        item.questionIndex,
+        item.valueIndex,
+        normalizeTextEntryValue(exercise, item.value),
+      ),
+    );
   }
 
   return values.map((value) => normalizeTextEntryValue(exercise, value));
