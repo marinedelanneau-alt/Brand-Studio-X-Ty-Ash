@@ -55,7 +55,7 @@ export async function getAuthenticatedAccount() {
 export async function getAuthenticatedAdmin() {
   const account = await getAuthenticatedAccount();
 
-  if (!account.is_admin) {
+  if (account.role !== "admin" && !account.is_admin) {
     redirect("/mon-espace");
   }
 

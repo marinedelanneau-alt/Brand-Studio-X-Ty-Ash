@@ -9,6 +9,9 @@ create table if not exists public.client_access_codes (
   created_at timestamptz not null default now()
 );
 
+-- Le modèle éditorial versionné et sa migration additive sont définis dans
+-- supabase/migrations/20260720190000_editorial_versioning.sql.
+
 alter table public.client_access_codes
   add column if not exists auth_user_id uuid unique;
 

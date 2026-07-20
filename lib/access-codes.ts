@@ -11,6 +11,7 @@ type AccessCodeRecord = {
   company_name: string | null;
   is_active: boolean;
   is_admin: boolean;
+  role?: "user" | "admin";
   created_at: string;
 };
 
