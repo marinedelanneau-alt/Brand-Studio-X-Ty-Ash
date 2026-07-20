@@ -3019,14 +3019,10 @@ export default function ModuleAnswerForm({
         </p>
       ) : null}
 
-      {!state.message && autoSaveState.message ? (
+      {!state.message && autoSaveState.status === "error" && autoSaveState.message ? (
         <p
           role="status"
-          className={
-            autoSaveState.status === "error"
-              ? "rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#b45247]"
-              : "text-sm leading-6 text-[#5f8d63]"
-          }
+          className="rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#b45247]"
         >
           {autoSaveState.message}
         </p>
