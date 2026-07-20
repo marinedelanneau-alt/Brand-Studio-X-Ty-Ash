@@ -714,12 +714,17 @@ function getRenderableExerciseGroups(exercises: ModuleExercise[]) {
 function buildSubmissionFormData(
   module: WorkspaceModule,
   answers: AnswersByExercise,
+  exerciseIds?: Set<number>,
 ) {
   const formData = new FormData();
   formData.set("moduleId", String(module.id));
 
   module.exercises.forEach((exercise) => {
     if (!isAnswerableExerciseType(exercise.type)) {
+      return;
+    }
+
+    if (exerciseIds && !exerciseIds.has(exercise.id)) {
       return;
     }
 
@@ -1269,6 +1274,7 @@ export default function ModuleAnswerForm({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [, startAutoSaveTransition] = useTransition();
   const latestAnswersRef = useRef<AnswersByExercise>(answers);
+  const persistedAnswersRef = useRef<AnswersByExercise>({});
   const draftSaveQueueRef = useRef<Promise<ModuleState | null>>(Promise.resolve(null));
   const hasMountedRef = useRef(false);
   const previousModuleIdRef = useRef(module.id);
@@ -1334,18 +1340,44 @@ export default function ModuleAnswerForm({
       .catch(() => null)
       .then(async () => {
         const answersToSave = latestAnswersRef.current;
-        const serializedAnswersToSave = JSON.stringify(answersToSave);
-        const result = await saveModuleDraft(
-          buildSubmissionFormData(module, answersToSave),
+        const changedExerciseIds = new Set(
+          module.exercises
+            .filter((exercise) => isAnswerableExerciseType(exercise.type))
+            .filter(
+              (exercise) =>
+                JSON.stringify(persistedAnswersRef.current[exercise.id] ?? []) !==
+                JSON.stringify(answersToSave[exercise.id] ?? []),
+            )
+            .map((exercise) => exercise.id),
         );
 
-        if (
-          result.status === "success" &&
-          JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave
-        ) {
+        if (changedExerciseIds.size === 0) {
+          return {
+            status: "success",
+            message: "",
+          } satisfies ModuleState;
+        }
+
+        const serializedAnswersToSave = JSON.stringify(answersToSave);
+        const result = await saveModuleDraft(
+          buildSubmissionFormData(module, answersToSave, changedExerciseIds),
+        );
+
+        if (result.status === "success") {
+          for (const exerciseId of changedExerciseIds) {
+            const savedValues = answersToSave[exerciseId] ?? [];
+            const currentValues = latestAnswersRef.current[exerciseId] ?? [];
+
+            if (JSON.stringify(savedValues) === JSON.stringify(currentValues)) {
+              persistedAnswersRef.current[exerciseId] = [...savedValues];
+            }
+          }
+
           // Keep the durable browser copy even after Supabase confirms the save. Admin
           // deployments can replace database IDs, while positions remain stable.
-          writeBrowserAnswersDraft(module, answersToSave);
+          if (JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave) {
+            writeBrowserAnswersDraft(module, answersToSave);
+          }
         }
 
         setAutoSaveState(result);
@@ -1432,6 +1464,7 @@ export default function ModuleAnswerForm({
 
     if (previousModuleIdRef.current !== module.id) {
       previousModuleIdRef.current = module.id;
+      persistedAnswersRef.current = {};
       setAnswers(nextInitialAnswers);
       setChecklistDrafts({});
       setAutoSaveState(initialState);
