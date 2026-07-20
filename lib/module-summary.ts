@@ -803,6 +803,55 @@ function findSemanticHighlight(
   label: string,
 ) {
   const normalizedKeywords = keywords.map(normalizeForSearch);
+  const matchingSubmodules = module.submodules.filter((submodule) => {
+    const normalizedTitle = normalizeForSearch(submodule.title);
+    return normalizedKeywords.some((keyword) => normalizedTitle.includes(keyword));
+  });
+  const contextualCandidates = matchingSubmodules
+    .flatMap((submodule) => submodule.exercises)
+    .flatMap((exercise) => {
+      const summary = summarizeExerciseAnswer(
+        exercise,
+        module.answers[exercise.id] ?? [],
+      );
+
+      if (!summary || isPlaceholderSummaryValue(summary.value)) {
+        return [];
+      }
+
+      const normalizedQuestion = normalizeForSearch(
+        exercise.type === "prompt_open"
+          ? getPromptOpenLabel(exercise.question)
+          : exercise.question,
+      );
+      const priorityKeywords = [
+        "phrase essentielle",
+        "phrase finale",
+        "version finale",
+        "synthese",
+        ...normalizedKeywords,
+      ];
+      const score = priorityKeywords.reduce(
+        (total, keyword, index) =>
+          normalizedQuestion.includes(keyword)
+            ? total + priorityKeywords.length - index
+            : total,
+        0,
+      );
+
+      return [{ exercise, summary, score }];
+    })
+    .sort(
+      (left, right) =>
+        right.score - left.score || right.exercise.position - left.exercise.position,
+    );
+
+  if (contextualCandidates[0]) {
+    return {
+      label,
+      value: contextualCandidates[0].summary.value,
+    } satisfies ModuleSummaryHighlight;
+  }
 
   for (const exercise of module.exercises) {
     const values = module.answers[exercise.id] ?? [];
