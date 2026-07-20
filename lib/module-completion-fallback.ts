@@ -70,3 +70,17 @@ export async function updateCompletedModuleCookie(input: {
     },
   );
 }
+
+export async function clearCompletedModulesCookie(projectId: number) {
+  const cookieStore = await cookies();
+  const storedValue = cookieStore.get(MODULE_COMPLETION_COOKIE)?.value;
+  const completions = parseStoredModuleCompletions(storedValue);
+
+  delete completions[String(projectId)];
+  cookieStore.set(MODULE_COMPLETION_COOKIE, JSON.stringify(completions), {
+    httpOnly: true,
+    maxAge: MODULE_COMPLETION_COOKIE_MAX_AGE,
+    path: "/",
+    sameSite: "lax",
+  });
+}

@@ -173,8 +173,12 @@ async function persistModuleAnswers(input: {
       });
     }
 
-    revalidatePath("/mon-espace");
-    revalidatePath(`/mon-espace/module/${moduleId}`);
+    // Draft autosaves must not refresh the active React tree: doing so can race with
+    // the user's next keystroke. Completion is the only mutation that needs revalidation.
+    if (input.markModuleCompleted) {
+      revalidatePath("/mon-espace");
+      revalidatePath(`/mon-espace/module/${moduleId}`);
+    }
 
     return {
       status: "success",

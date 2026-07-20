@@ -8,6 +8,7 @@ import CompanyNameForm from "@/app/ui/company-name-form";
 import ProjectNameForm from "@/app/ui/project-name-form";
 import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
+import ResetAnswersButton from "@/app/ui/reset-answers-button";
 import LogoutButton from "../ui/logout-button";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
@@ -435,6 +436,7 @@ export default async function MonEspacePage() {
                       </div>
                     </div>
                   ) : null}
+                  {workspace.project ? <ResetAnswersButton /> : null}
                 </div>
               </div>
 

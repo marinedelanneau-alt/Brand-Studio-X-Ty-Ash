@@ -78,6 +78,7 @@ type AiAssistState = {
   mode: AiAssistMode | null;
   message: string;
 };
+type SaveIndicatorState = "idle" | "saving" | "saved" | "error";
 
 const initialState: ModuleState = {
   status: "idle",
@@ -1302,6 +1303,7 @@ export default function ModuleAnswerForm({
   );
   const [checklistDrafts, setChecklistDrafts] = useState<Record<string, string>>({});
   const [autoSaveState, setAutoSaveState] = useState<ModuleState>(initialState);
+  const [saveIndicator, setSaveIndicator] = useState<SaveIndicatorState>("idle");
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [aiAssistStates, setAiAssistStates] = useState<Record<number, AiAssistState>>({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -1315,6 +1317,7 @@ export default function ModuleAnswerForm({
   const allowExplicitSubmitRef = useRef(false);
   const submitModeRef = useRef<"draft" | "complete" | null>(null);
   const shouldOpenSummaryAfterSaveRef = useRef(false);
+  const saveIndicatorTimerRef = useRef<number | null>(null);
 
   const currentSubmodule = useMemo(
     () =>
@@ -1392,10 +1395,26 @@ export default function ModuleAnswerForm({
           } satisfies ModuleState;
         }
 
+        if (saveIndicatorTimerRef.current !== null) {
+          window.clearTimeout(saveIndicatorTimerRef.current);
+          saveIndicatorTimerRef.current = null;
+        }
+        setSaveIndicator("saving");
+
         const serializedAnswersToSave = JSON.stringify(answersToSave);
-        const result = await saveModuleDraft(
-          buildSubmissionFormData(module, answersToSave, changedExerciseIds),
-        );
+        let result: ModuleState;
+
+        try {
+          result = await saveModuleDraft(
+            buildSubmissionFormData(module, answersToSave, changedExerciseIds),
+          );
+        } catch {
+          result = {
+            status: "error",
+            message:
+              "Connexion interrompue. Ta réponse est conservée sur cet appareil et sera synchronisée automatiquement.",
+          };
+        }
 
         if (result.status === "success") {
           for (const exerciseId of changedExerciseIds) {
@@ -1412,6 +1431,14 @@ export default function ModuleAnswerForm({
           if (JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave) {
             writeBrowserAnswersDraft(module, answersToSave);
           }
+
+          setSaveIndicator("saved");
+          saveIndicatorTimerRef.current = window.setTimeout(() => {
+            setSaveIndicator("idle");
+            saveIndicatorTimerRef.current = null;
+          }, 2000);
+        } else {
+          setSaveIndicator("error");
         }
 
         setAutoSaveState(result);
@@ -1427,23 +1454,7 @@ export default function ModuleAnswerForm({
     return draftSaveQueueRef.current;
   }, [module]);
 
-  async function saveCurrentDraft() {
-    try {
-      const result = await persistCurrentDraft({ showPending: true });
-
-      return result?.status !== "error";
-    } catch {
-      return false;
-    }
-  }
-
-  async function goToNextStep() {
-    const didSave = await saveCurrentDraft();
-
-    if (!didSave) {
-      return;
-    }
-
+  function goToNextStep() {
     if (currentExercise && currentIndex < visibleExerciseGroups.length - 1) {
       setCurrentIndex((current) =>
         Math.min(current + 1, visibleExerciseGroups.length - 1),
@@ -1459,13 +1470,7 @@ export default function ModuleAnswerForm({
     window.location.assign(getModuleSummaryHref(module));
   }
 
-  async function goToPreviousStep() {
-    const didSave = await saveCurrentDraft();
-
-    if (!didSave) {
-      return;
-    }
-
+  function goToPreviousStep() {
     if (currentIndex > 0) {
       setCurrentIndex((current) => Math.max(current - 1, 0));
       return;
@@ -1533,7 +1538,7 @@ export default function ModuleAnswerForm({
       startAutoSaveTransition(async () => {
         await persistCurrentDraft();
       });
-    }, 75);
+    }, 800);
 
     return () => window.clearTimeout(timeoutId);
   }, [answers, module, persistCurrentDraft]);
@@ -1550,14 +1555,28 @@ export default function ModuleAnswerForm({
       }
     }
 
+    function handleOnline() {
+      void persistCurrentDraft();
+    }
+
     window.addEventListener("pagehide", saveBeforeLeaving);
+    window.addEventListener("online", handleOnline);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("pagehide", saveBeforeLeaving);
+      window.removeEventListener("online", handleOnline);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [module, persistCurrentDraft]);
+
+  useEffect(() => {
+    return () => {
+      if (saveIndicatorTimerRef.current !== null) {
+        window.clearTimeout(saveIndicatorTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!isPopupOpen) {
@@ -3016,7 +3035,7 @@ export default function ModuleAnswerForm({
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <button
           type="button"
-          onClick={() => void goToPreviousStep()}
+          onClick={goToPreviousStep}
           disabled={(currentIndex === 0 && isFirstSubmodule) || isSavingDraft || pending}
           className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
         >
@@ -3033,7 +3052,7 @@ export default function ModuleAnswerForm({
               <button
                 type="button"
                 disabled={pending || isSavingDraft}
-                onClick={() => void goToNextStep()}
+                onClick={goToNextStep}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
@@ -3042,7 +3061,7 @@ export default function ModuleAnswerForm({
               <button
                 type="button"
                 disabled={pending || isSavingDraft}
-                onClick={() => void goToNextStep()}
+                onClick={goToNextStep}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
@@ -3054,7 +3073,7 @@ export default function ModuleAnswerForm({
             <button
               type="button"
               disabled={pending || isSavingDraft}
-              onClick={() => void goToNextStep()}
+              onClick={goToNextStep}
               className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
@@ -3063,7 +3082,7 @@ export default function ModuleAnswerForm({
             <button
               type="button"
               disabled={pending || isSavingDraft}
-              onClick={() => void goToNextStep()}
+              onClick={goToNextStep}
               className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
@@ -3098,12 +3117,18 @@ export default function ModuleAnswerForm({
         </p>
       ) : null}
 
-      {!state.message && autoSaveState.status === "error" && autoSaveState.message ? (
+      {saveIndicator !== "idle" ? (
         <p
           role="status"
-          className="rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#b45247]"
+          className={`text-sm leading-6 ${
+            saveIndicator === "error" ? "text-[#b45247]" : "text-[#6f645b]"
+          }`}
         >
-          {autoSaveState.message}
+          {saveIndicator === "saving"
+            ? "⏳ Enregistrement..."
+            : saveIndicator === "saved"
+              ? "✓ Enregistré"
+              : autoSaveState.message || "Sauvegarde interrompue. Nouvelle tentative à la reconnexion."}
         </p>
       ) : null}
     </form>
