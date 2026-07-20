@@ -453,10 +453,11 @@ function shouldShowExerciseExplanation(
   displayedTexts: Array<string | null | undefined> = [],
 ) {
   const displayQuestion = cleanStoredExerciseQuestionText(exercise.question);
+  const visibleExplanation = normalizeVisibleContent(exercise.explanation).trim();
 
   return (
-    exercise.explanation.trim().length > 0 &&
-    !isDuplicateDisplayText(exercise.explanation, [
+    visibleExplanation.length > 0 &&
+    !isDuplicateDisplayText(visibleExplanation, [
       displayQuestion,
       getPromptOpenLabel(displayQuestion),
       ...displayedTexts,
