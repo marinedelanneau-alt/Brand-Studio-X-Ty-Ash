@@ -516,7 +516,7 @@ function summarizeExerciseAnswer(
     const indexedSummary = summarizeIndexedValues(exercise, values);
 
     if (indexedSummary) {
-      return buildHighlight(exercise.question, indexedSummary, 180);
+      return buildHighlight(exercise.question, indexedSummary);
     }
 
     const firstFilledAnswerIndex = values.findIndex((value) => value.trim().length > 0);
@@ -535,7 +535,7 @@ function summarizeExerciseAnswer(
     const personaSummary = summarizeBrandPersonaValues(exercise, values);
 
     return personaSummary
-      ? buildHighlight(exercise.question || "Persona", personaSummary, 220)
+      ? buildHighlight(exercise.question || "Persona", personaSummary)
       : null;
   }
 
@@ -559,7 +559,7 @@ function summarizeExerciseAnswer(
   const genericSummary = summarizeGenericValues(values);
 
   if (genericSummary) {
-    return buildHighlight(getExerciseSummaryLabel(exercise), genericSummary, 180);
+    return buildHighlight(getExerciseSummaryLabel(exercise), genericSummary);
   }
 
   return null;
@@ -605,16 +605,15 @@ function summarizeTableAnswer(
   const preview = values
     .map((value, index) => ({ value: compactText(value), index }))
     .filter((entry) => entry.value.length > 0)
-    .slice(0, 6)
     .map((entry) => {
       const columnIndex = entry.index % tableConfig.columns;
       const rawLabel = tableConfig.columnLabels[columnIndex] ?? "";
       const columnLabel = cleanStoredExerciseQuestionText(rawLabel)
         .replace(/[_:]+/g, " ")
         .trim();
-      const conciseValue = truncateText(entry.value, 150);
+      const completeValue = entry.value;
 
-      return columnLabel ? `${columnLabel} : ${conciseValue}` : conciseValue;
+      return columnLabel ? `${columnLabel} : ${completeValue}` : completeValue;
     });
 
   if (preview.length === 0) {
@@ -628,7 +627,7 @@ function summarizeTableAnswer(
     ? "Tes valeurs en pratique"
     : rawQuestion || "Synthèse du tableau";
 
-  return buildHighlight(label, preview.join(" • "), 420);
+  return buildHighlight(label, preview.join(" • "));
 }
 
 function summarizeGenericValues(values: string[]) {
@@ -928,7 +927,7 @@ function buildTableValuesHighlight(
     return null;
   }
 
-  return buildHighlight("Valeurs", rowSummaries.join(" | "), 280);
+  return buildHighlight("Valeurs", rowSummaries.join(" | "));
 }
 
 function collectFocusWords(module: WorkspaceModule) {
@@ -1072,7 +1071,7 @@ function buildFillBlankSentence(question: string, values: string[]) {
   return compactText(sentence);
 }
 
-function buildHighlight(label: string, value: string, _maxValueLength = 120) {
+function buildHighlight(label: string, value: string) {
   const normalizedValue = compactText(value);
 
   if (!normalizedValue) {
@@ -1080,8 +1079,8 @@ function buildHighlight(label: string, value: string, _maxValueLength = 120) {
   }
 
   return {
-    label: truncateText(compactText(label) || "Point clé", 34),
-    value: truncateText(normalizedValue, _maxValueLength),
+    label: compactText(label) || "Point clé",
+    value: normalizedValue,
   } satisfies ModuleSummaryHighlight;
 }
 
