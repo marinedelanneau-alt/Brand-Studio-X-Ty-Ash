@@ -20,6 +20,8 @@ import {
   saveAdminVoiceNoteToDraft,
 } from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getAdminWorkingModules } from "@/lib/training";
 
 type EditorExercise = {
   clientId: string;
@@ -480,4 +482,34 @@ export async function publishAdminDraftToAllUsers() {
         : "Impossible de deployer le brouillon.";
     redirect(`/admin/modules?status=error&message=${encodeURIComponent(message)}`);
   }
+}
+
+export async function scheduleAdminDraftDeployment(formData: FormData) {
+  const account = await getAuthenticatedAdmin();
+  const value = String(formData.get("scheduledAt") ?? "");
+  const scheduledAt = new Date(value);
+  if (!value || Number.isNaN(scheduledAt.valueOf()) || scheduledAt <= new Date()) {
+    redirect("/admin/modules?status=error&message=Choisis%20une%20date%20future.");
+  }
+  const modules = await getAdminWorkingModules(account.id);
+  const supabase = createSupabaseServerClient();
+  await supabase.from("admin_deployment_schedules").update({ status: "cancelled", updated_at: new Date().toISOString() })
+    .eq("account_id", account.id).eq("status", "scheduled");
+  const { error } = await supabase.from("admin_deployment_schedules").insert({
+    account_id: account.id, scheduled_at: scheduledAt.toISOString(), timezone: "Europe/Paris",
+    notes: String(formData.get("notes") ?? "").trim() || null, draft_snapshot: { version: 1, modules },
+  });
+  if (error) redirect(`/admin/modules?status=error&message=${encodeURIComponent(error.message)}`);
+  revalidatePath("/admin/modules");
+  redirect("/admin/modules?status=scheduled");
+}
+
+export async function cancelAdminDraftDeployment() {
+  const account = await getAuthenticatedAdmin();
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase.from("admin_deployment_schedules")
+    .update({ status: "cancelled", updated_at: new Date().toISOString() })
+    .eq("account_id", account.id).eq("status", "scheduled");
+  if (error) redirect(`/admin/modules?status=error&message=${encodeURIComponent(error.message)}`);
+  revalidatePath("/admin/modules"); redirect("/admin/modules?status=cancelled");
 }

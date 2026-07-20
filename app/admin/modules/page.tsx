@@ -1,10 +1,11 @@
-import { publishAdminDraftToAllUsers } from "@/app/admin/modules/actions";
+import { cancelAdminDraftDeployment, publishAdminDraftToAllUsers, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function AdminModulesPage({
   searchParams,
@@ -13,10 +14,15 @@ export default async function AdminModulesPage({
 }) {
   let modules: Awaited<ReturnType<typeof getAdminWorkingModules>> = [];
   let loadError = "";
+  let activeSchedule: { scheduled_at: string; notes: string | null } | null = null;
 
   try {
     const account = await getAuthenticatedAdmin();
     modules = await getAdminWorkingModules(account.id);
+    const { data } = await createSupabaseServerClient().from("admin_deployment_schedules")
+      .select("scheduled_at,notes").eq("account_id", account.id).eq("status", "scheduled")
+      .order("scheduled_at", { ascending: false }).limit(1).maybeSingle<{ scheduled_at: string; notes: string | null }>();
+    activeSchedule = data;
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
@@ -44,6 +50,10 @@ export default async function AdminModulesPage({
       ? "Brouillon admin enregistre. Tes changements sont visibles dans ton espace Marine Communication uniquement."
       : statusValue === "deployed"
         ? "Brouillon deploye a tous les utilisateurs."
+        : statusValue === "scheduled"
+          ? "Déploiement programmé."
+          : statusValue === "cancelled"
+            ? "Programmation annulée."
         : statusValue === "deleted"
           ? "Module supprime du brouillon admin."
           : statusValue === "error"
@@ -72,6 +82,16 @@ export default async function AdminModulesPage({
             Deployer a tous les utilisateurs
           </button>
         </form>
+        <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 p-5">
+          <h2 className="text-lg font-semibold text-[#4b4550]">Programmer le déploiement</h2>
+          <p className="mt-1 text-sm text-[#7b7068]">La date et l’heure sont interprétées en heure de Paris.</p>
+          {activeSchedule ? <div className="mt-4 rounded-xl bg-[#fff6e3] p-4 text-sm"><strong>Programmé le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date(activeSchedule.scheduled_at))}</strong>{activeSchedule.notes ? <p className="mt-1">{activeSchedule.notes}</p> : null}<form action={cancelAdminDraftDeployment} className="mt-3"><button className="rounded-xl border border-[#cf7430] px-4 py-2 text-[#9b5424]">Annuler la programmation</button></form></div> :
+          <form action={scheduleAdminDraftDeployment} className="mt-4 flex flex-wrap items-end gap-3">
+            <label className="text-sm"><span className="mb-1 block">Date et heure</span><input required name="scheduledAt" type="datetime-local" className="h-11 rounded-xl border border-[#eadfca] bg-white px-3" /></label>
+            <label className="min-w-64 flex-1 text-sm"><span className="mb-1 block">Note facultative</span><input name="notes" className="h-11 w-full rounded-xl border border-[#eadfca] bg-white px-3" placeholder="Contenu de cette publication" /></label>
+            <button className="h-11 rounded-xl bg-[#d98632] px-5 font-bold text-white">Programmer</button>
+          </form>}
+        </div>
         {message ? (
           <p className="mt-5 text-sm leading-6 text-[#6b625a]">{message}</p>
         ) : null}

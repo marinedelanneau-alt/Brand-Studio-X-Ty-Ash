@@ -1825,6 +1825,16 @@ export async function publishAdminModuleDraft(accountId: number) {
   await saveAdminModuleDraftSnapshot(project.id, refreshedModules);
 }
 
+export async function publishScheduledAdminModuleSnapshot(
+  accountId: number,
+  modules: DraftModule[],
+) {
+  const project = await getProjectByAccountId(accountId);
+  if (!project) throw new Error("Projet administrateur introuvable.");
+  await saveAdminModuleDraftSnapshot(project.id, modules.map(normalizeDraftModule));
+  await publishAdminModuleDraft(accountId);
+}
+
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
   // Answers must always target persisted module/exercise IDs. Admin drafts can contain
