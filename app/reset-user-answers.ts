@@ -51,6 +51,13 @@ export async function resetCurrentUserAnswers(): Promise<ResetAnswersState> {
       throw new Error(backupResult.error.message);
     }
 
+    for (const table of ["user_answers", "user_module_progress"]) {
+      const result = await supabase.from(table).delete().eq("project_id", project.id);
+      if (result.error && !isMissingDatabaseObject(result.error)) {
+        throw new Error(result.error.message);
+      }
+    }
+
     await clearCompletedModulesCookie(project.id);
     revalidatePath("/mon-espace");
 

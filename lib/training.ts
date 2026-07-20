@@ -1845,7 +1845,7 @@ export async function getWorkspaceData(accountId: number) {
   const completedModuleIdsFromCookie = new Set(
     await getCompletedModuleIdsFromCookie(project.id),
   );
-  const [answersResult, moduleStatesResult, backupResult] = await Promise.all([
+  const [answersResult, moduleStatesResult, backupResult, stableAnswersResult] = await Promise.all([
     supabase
       .from("project_exercise_answers")
       .select("*")
@@ -1864,6 +1864,9 @@ export async function getWorkspaceData(accountId: number) {
       .order("generated_at", { ascending: false })
       .limit(1)
       .maybeSingle<{ guide_snapshot: unknown }>(),
+    supabase.from("user_answers").select("module_key,question_key,answer_value")
+      .eq("project_id", project.id)
+      .returns<Array<{ module_key: string; question_key: string; answer_value: unknown }>>(),
   ]);
 
   if (answersResult.error) {
@@ -1880,12 +1883,16 @@ export async function getWorkspaceData(accountId: number) {
   if (backupResult.error && !isMissingDatabaseObject(backupResult.error)) {
     throw new Error(backupResult.error.message);
   }
+  if (stableAnswersResult.error && !isMissingDatabaseObject(stableAnswersResult.error)) {
+    throw new Error(stableAnswersResult.error.message);
+  }
 
   const answers = answersResult.data ?? [];
   const moduleStates = isMissingDatabaseObject(moduleStatesResult.error)
     ? []
     : (moduleStatesResult.data ?? []);
   const answerBackup = parseAnswerBackupSnapshot(backupResult.data?.guide_snapshot);
+  const stableAnswers = isMissingDatabaseObject(stableAnswersResult.error) ? [] : (stableAnswersResult.data ?? []);
 
   const groupedAnswers = new Map<number, ProjectExerciseAnswerRecord[]>();
 
@@ -1903,6 +1910,16 @@ export async function getWorkspaceData(accountId: number) {
     const moduleAnswers = groupedAnswers.get(module.id) ?? [];
     const answersMap = computeModuleAnswerMap(module.exercises, moduleAnswers);
     const backedUpModuleAnswers = answerBackup?.modules[String(module.position)];
+    const stableModuleAnswers = stableAnswers.filter((item) => item.module_key === `module_${module.id}`);
+
+    for (const stableAnswer of stableModuleAnswers) {
+      const exerciseId = Number(stableAnswer.question_key.replace(/^question_/, ""));
+      if (!Number.isFinite(exerciseId) || (answersMap[exerciseId]?.length ?? 0) > 0) continue;
+      const value = stableAnswer.answer_value;
+      answersMap[exerciseId] = Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === "string")
+        : typeof value === "string" ? [value] : [];
+    }
 
     if (backedUpModuleAnswers) {
       for (const exercise of module.exercises) {
@@ -2027,6 +2044,38 @@ export async function backupModuleAnswers(input: {
   if (result.error) {
     throw new Error(result.error.message);
   }
+}
+
+export async function upsertStableModuleAnswers(input: {
+  userId: number;
+  projectId: number;
+  moduleId: number;
+  answers: Array<{ exerciseId: number; values: string[] }>;
+}) {
+  if (input.answers.length === 0) return;
+  const supabase = createSupabaseServerClient();
+  const { data: identity, error: identityError } = await supabase
+    .from("editorial_modules")
+    .select("id,module_key,module_versions(id,status)")
+    .eq("legacy_module_id", input.moduleId)
+    .maybeSingle<{ id: string; module_key: string; module_versions: Array<{ id: string; status: string }> }>();
+  if (identityError) {
+    if (isMissingDatabaseObject(identityError)) return;
+    throw new Error(identityError.message);
+  }
+  if (!identity) return;
+  const sourceVersionId = identity.module_versions.find((item) => item.status === "published")?.id ?? null;
+  const now = new Date().toISOString();
+  const rows = input.answers.map((answer) => ({
+    user_id: input.userId, project_id: input.projectId, module_key: identity.module_key,
+    submodule_key: "legacy", exercise_key: `exercise_${answer.exerciseId}`,
+    question_key: `question_${answer.exerciseId}`, field_key: "answer",
+    answer_value: answer.values, source_version_id: sourceVersionId, updated_at: now,
+  }));
+  const { error } = await supabase.from("user_answers").upsert(rows, {
+    onConflict: "user_id,project_id,question_key,field_key",
+  });
+  if (error && !isMissingDatabaseObject(error)) throw new Error(error.message);
 }
 
 export async function replaceModuleAnswers(input: {

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:editorial": "node --test tests/editorial-versioning.test.mjs",
     "app:start": "powershell -ExecutionPolicy Bypass -File ./scripts/start-app.ps1",
     "app:stop": "powershell -ExecutionPolicy Bypass -File ./scripts/stop-app.ps1",
     "app:status": "powershell -ExecutionPolicy Bypass -File ./scripts/status-app.ps1",

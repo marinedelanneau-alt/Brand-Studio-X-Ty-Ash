@@ -253,6 +253,62 @@ $$;
 revoke all on function public.publish_due_module_versions() from public, anon, authenticated;
 grant execute on function public.publish_due_module_versions() to service_role;
 
+create or replace function public.create_module_draft(source_version_id uuid)
+returns uuid language plpgsql security definer set search_path = public
+as $$
+declare source public.module_versions%rowtype; next_id uuid; next_number integer;
+begin
+  if not public.is_current_user_admin() then raise exception 'admin role required'; end if;
+  select * into source from public.module_versions where id = source_version_id;
+  if source.id is null then raise exception 'source version not found'; end if;
+  if exists (select 1 from public.module_versions where module_id = source.module_id and status = 'draft' and created_by = auth.uid()) then
+    raise exception 'a draft already exists';
+  end if;
+  select coalesce(max(version_number), 0) + 1 into next_number from public.module_versions where module_id = source.module_id;
+  insert into public.module_versions(module_id, version_number, status, title, configuration, created_by, based_on_version_id)
+  values(source.module_id, next_number, 'draft', source.title, source.configuration, auth.uid(), source.id) returning id into next_id;
+  insert into public.submodule_versions(module_version_id, submodule_key, title, description, sort_order, configuration)
+    select next_id, submodule_key, title, description, sort_order, configuration from public.submodule_versions where module_version_id = source.id;
+  insert into public.exercise_versions(module_version_id, submodule_key, exercise_key, exercise_type, title, description, sort_order, configuration)
+    select next_id, submodule_key, exercise_key, exercise_type, title, description, sort_order, configuration from public.exercise_versions where module_version_id = source.id;
+  insert into public.question_versions(module_version_id, exercise_key, question_key, field_key, label, helper_text, question_type, configuration, sort_order, is_required)
+    select next_id, exercise_key, question_key, field_key, label, helper_text, question_type, configuration, sort_order, is_required from public.question_versions where module_version_id = source.id;
+  insert into public.admin_audit_logs(admin_user_id, action_type, entity_type, entity_id, version_id, metadata)
+    values(auth.uid(), case when source.status = 'archived' then 'version_restored' else 'draft_created' end,
+      'module_version', next_id::text, next_id, jsonb_build_object('source_version_id', source.id));
+  return next_id;
+end;
+$$;
+
+create or replace function public.schedule_module_version(target_version_id uuid, publish_at timestamptz, timezone_name text, notes text default null)
+returns void language plpgsql security definer set search_path = public
+as $$
+begin
+  if not public.is_current_user_admin() then raise exception 'admin role required'; end if;
+  if publish_at <= now() then raise exception 'scheduled date must be in the future'; end if;
+  update public.module_versions set status = 'scheduled', scheduled_publish_at = publish_at,
+    publication_timezone = coalesce(nullif(timezone_name, ''), 'Europe/Paris'), publication_notes = notes, updated_at = now()
+    where id = target_version_id and status = 'draft';
+  if not found then raise exception 'draft not found'; end if;
+  insert into public.admin_audit_logs(admin_user_id, action_type, entity_type, entity_id, version_id, metadata)
+    values(auth.uid(), 'publication_scheduled', 'module_version', target_version_id::text, target_version_id,
+      jsonb_build_object('scheduled_publish_at', publish_at, 'timezone', timezone_name));
+end;
+$$;
+
+create or replace function public.cancel_scheduled_version(target_version_id uuid)
+returns void language plpgsql security definer set search_path = public
+as $$
+begin
+  if not public.is_current_user_admin() then raise exception 'admin role required'; end if;
+  update public.module_versions set status = 'draft', scheduled_publish_at = null, updated_at = now()
+    where id = target_version_id and status = 'scheduled';
+  if not found then raise exception 'scheduled version not found'; end if;
+  insert into public.admin_audit_logs(admin_user_id, action_type, entity_type, entity_id, version_id)
+    values(auth.uid(), 'publication_cancelled', 'module_version', target_version_id::text, target_version_id);
+end;
+$$;
+
 -- Non-destructive bootstrap: current content becomes version 1, with keys based on
 -- permanent legacy IDs (never on mutable titles or positions).
 insert into public.editorial_modules(module_key, legacy_module_id)

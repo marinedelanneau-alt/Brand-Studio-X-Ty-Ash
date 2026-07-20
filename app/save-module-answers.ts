@@ -14,6 +14,7 @@ import {
   getWorkspaceData,
   replaceModuleAnswers,
   setProjectModuleCompletion,
+  upsertStableModuleAnswers,
 } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 
@@ -157,6 +158,16 @@ async function persistModuleAnswers(input: {
     const exerciseById = new Map(
       selectedModule.exercises.map((exercise) => [exercise.id, exercise]),
     );
+
+    await upsertStableModuleAnswers({
+      userId: workspace.project.account_id,
+      projectId: workspace.project.id,
+      moduleId: selectedModule.id,
+      answers: answers.map((answer) => ({
+        exerciseId: answer.exerciseId,
+        values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
+      })),
+    });
 
     await backupModuleAnswers({
       projectId: workspace.project.id,
