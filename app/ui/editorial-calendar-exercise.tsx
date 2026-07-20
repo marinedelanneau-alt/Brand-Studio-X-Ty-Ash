@@ -3,6 +3,7 @@
 import {
   ArrowTopRightOnSquareIcon,
   CalendarDaysIcon,
+  RectangleGroupIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useMemo } from "react";
@@ -13,6 +14,8 @@ import {
 
 const NOTION_EDITORIAL_CALENDAR_URL =
   "https://app.notion.com/p/Calendrier-ditorial-2026-a78057792efe83fbbceb01081b9458a7";
+const CANVA_TEMPLATES_URL =
+  "https://www.canva.com/design/DAHP2_LsQcU/eJAHoEt6GUN3JoluV9iZ0A/edit?ui=e30";
 
 function getNotionCalendarAnswer() {
   return serializeEditorialCalendarEntries([
@@ -98,6 +101,40 @@ export default function EditorialCalendarExercise({
             Apercu direct de la page Notion. Clique sur l&apos;image ou sur le bouton pour modifier le
             calendrier complet dans Notion.
           </p>
+        </div>
+      </div>
+
+      <div className="border-t border-[#eadfca] bg-[#fffdf7] p-3 sm:p-4">
+        <div className="overflow-hidden rounded-[1.1rem] border border-[#eadfca] bg-white shadow-[0_16px_34px_rgba(126,102,78,0.08)]">
+          <div className="grid gap-5 p-5 sm:p-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f7eadc] text-[#cf7430]">
+                <RectangleGroupIcon className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                  Templates Canva
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-[#4b4550]">
+                  Crée tes contenus plus rapidement
+                </h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6f645b]">
+                  Retrouve les templates prêts à personnaliser pour transformer ton calendrier
+                  éditorial en publications cohérentes avec ta marque.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href={CANVA_TEMPLATES_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#cf7430] px-5 text-xs font-black uppercase tracking-[0.12em] text-white shadow-[0_10px_24px_rgba(207,116,48,0.22)] transition hover:bg-[#b96228]"
+            >
+              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+              Ouvrir les templates
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -67,6 +67,11 @@ type ProjectExerciseAnswerRecord = {
   selected_options: unknown;
 };
 
+type DeployableExerciseAnswerRecord = Omit<ProjectExerciseAnswerRecord, "id"> & {
+  created_at: string;
+  updated_at: string;
+};
+
 type ProjectModuleStateRecord = {
   id: number;
   project_id: number;
@@ -1646,6 +1651,89 @@ async function activateStagedPublishedModules() {
   }
 }
 
+async function snapshotPublishedUserData(moduleIds: number[]) {
+  const supabase = createSupabaseServerClient();
+
+  if (moduleIds.length === 0) {
+    return {
+      answers: [] as DeployableExerciseAnswerRecord[],
+      moduleStates: [] as Array<Omit<ProjectModuleStateRecord, "id">>,
+    };
+  }
+
+  const [answersResult, moduleStatesResult] = await Promise.all([
+    supabase
+      .from("project_exercise_answers")
+      .select(
+        "project_id,module_id,exercise_id,answer_text,selected_options,created_at,updated_at",
+      )
+      .in("module_id", moduleIds)
+      .returns<DeployableExerciseAnswerRecord[]>(),
+    supabase
+      .from("project_module_states")
+      .select(
+        "project_id,module_id,is_completed,completed_at,created_at,updated_at",
+      )
+      .in("module_id", moduleIds)
+      .returns<Array<Omit<ProjectModuleStateRecord, "id">>>(),
+  ]);
+
+  if (answersResult.error) {
+    throw new Error(answersResult.error.message);
+  }
+
+  if (moduleStatesResult.error && !isMissingDatabaseObject(moduleStatesResult.error)) {
+    throw new Error(moduleStatesResult.error.message);
+  }
+
+  return {
+    answers: answersResult.data ?? [],
+    moduleStates: isMissingDatabaseObject(moduleStatesResult.error)
+      ? []
+      : (moduleStatesResult.data ?? []),
+  };
+}
+
+async function restorePublishedUserData(input: {
+  snapshot: Awaited<ReturnType<typeof snapshotPublishedUserData>>;
+  moduleIdMap: Map<number, number>;
+  exerciseIdMap: Map<number, number>;
+}) {
+  const supabase = createSupabaseServerClient();
+  const answers = input.snapshot.answers.flatMap((answer) => {
+    const moduleId = input.moduleIdMap.get(answer.module_id);
+    const exerciseId = input.exerciseIdMap.get(answer.exercise_id);
+
+    return moduleId && exerciseId
+      ? [{ ...answer, module_id: moduleId, exercise_id: exerciseId }]
+      : [];
+  });
+  const moduleStates = input.snapshot.moduleStates.flatMap((state) => {
+    const moduleId = input.moduleIdMap.get(state.module_id);
+    return moduleId ? [{ ...state, module_id: moduleId }] : [];
+  });
+
+  if (answers.length > 0) {
+    const { error } = await supabase.from("project_exercise_answers").upsert(answers, {
+      onConflict: "project_id,exercise_id",
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  if (moduleStates.length > 0) {
+    const { error } = await supabase.from("project_module_states").upsert(moduleStates, {
+      onConflict: "project_id,module_id",
+    });
+
+    if (error && !isMissingDatabaseObject(error)) {
+      throw new Error(error.message);
+    }
+  }
+}
+
 export async function publishAdminModuleDraft(accountId: number) {
   const { project, modules, hasDraft } = await getAdminDraftBase(accountId);
 
@@ -1657,6 +1745,11 @@ export async function publishAdminModuleDraft(accountId: number) {
     throw new Error("Aucun brouillon admin a deployer.");
   }
 
+  const activeModuleIds = modules
+    .map((moduleItem) => moduleItem.id)
+    .filter((moduleId) => moduleId > 0);
+  const userDataSnapshot = await snapshotPublishedUserData(activeModuleIds);
+
   await deleteStagedPublishedModules();
 
   for (const moduleItem of modules) {
@@ -1667,8 +1760,43 @@ export async function publishAdminModuleDraft(accountId: number) {
     });
   }
 
+  const stagedModules = (await getModulesWithExercises({
+    includeUnpublished: true,
+    includeInactiveBrandPersona: true,
+  })).filter((moduleItem) => moduleItem.position >= PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
+  const stagedModuleByPosition = new Map(
+    stagedModules.map((moduleItem) => [
+      moduleItem.position - PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
+      moduleItem,
+    ]),
+  );
+  const moduleIdMap = new Map<number, number>();
+  const exerciseIdMap = new Map<number, number>();
+
+  for (const previousModule of modules) {
+    const stagedModule = stagedModuleByPosition.get(previousModule.position);
+
+    if (!stagedModule || previousModule.id <= 0) {
+      continue;
+    }
+
+    moduleIdMap.set(previousModule.id, stagedModule.id);
+    previousModule.exercises.forEach((exercise, exerciseIndex) => {
+      const stagedExercise = stagedModule.exercises[exerciseIndex];
+
+      if (exercise.id > 0 && stagedExercise) {
+        exerciseIdMap.set(exercise.id, stagedExercise.id);
+      }
+    });
+  }
+
   await deleteActivePublishedModules();
   await activateStagedPublishedModules();
+  await restorePublishedUserData({
+    snapshot: userDataSnapshot,
+    moduleIdMap,
+    exerciseIdMap,
+  });
 
   const refreshedModules = await getModulesWithExercises({
     includeUnpublished: true,

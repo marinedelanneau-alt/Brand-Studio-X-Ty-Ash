@@ -185,6 +185,7 @@ export default async function WorkspaceModulePage({
               nextLabel={
                 nextModule ? "Passer au module suivant" : undefined
               }
+              hideAnswerSummaries={currentModule.position === 4}
             />
           ) : null}
         </article>
