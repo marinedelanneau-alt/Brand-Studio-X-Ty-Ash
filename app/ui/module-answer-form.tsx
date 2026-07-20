@@ -1277,6 +1277,7 @@ export default function ModuleAnswerForm({
   const persistedAnswersRef = useRef<AnswersByExercise>({});
   const draftSaveQueueRef = useRef<Promise<ModuleState | null>>(Promise.resolve(null));
   const hasMountedRef = useRef(false);
+  const hasRestoredBrowserDraftRef = useRef(false);
   const previousModuleIdRef = useRef(module.id);
   const allowExplicitSubmitRef = useRef(false);
   const submitModeRef = useRef<"draft" | "complete" | null>(null);
@@ -1445,6 +1446,17 @@ export default function ModuleAnswerForm({
   }, [activeSubmoduleId, initialExerciseIndex]);
 
   useEffect(() => {
+    if (hasRestoredBrowserDraftRef.current) {
+      return;
+    }
+
+    hasRestoredBrowserDraftRef.current = true;
+    const restoredAnswers = createInitialAnswers(module);
+    latestAnswersRef.current = restoredAnswers;
+    setAnswers(restoredAnswers);
+  }, [module]);
+
+  useEffect(() => {
     latestAnswersRef.current = answers;
     writeBrowserAnswersDraft(module, answers);
   }, [answers, module]);
@@ -1471,6 +1483,7 @@ export default function ModuleAnswerForm({
       setAiAssistStates({});
       shouldOpenSummaryAfterSaveRef.current = false;
       hasMountedRef.current = false;
+      hasRestoredBrowserDraftRef.current = true;
       return;
     }
 
@@ -1487,7 +1500,7 @@ export default function ModuleAnswerForm({
       startAutoSaveTransition(async () => {
         await persistCurrentDraft();
       });
-    }, 300);
+    }, 75);
 
     return () => window.clearTimeout(timeoutId);
   }, [answers, module, persistCurrentDraft]);
