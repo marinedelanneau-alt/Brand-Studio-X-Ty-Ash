@@ -1807,14 +1807,9 @@ export async function publishAdminModuleDraft(accountId: number) {
 
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
-  const account = await findAccountById(accountId);
-  const shouldUseAdminDraft =
-    account?.is_admin ||
-    isAdminWorkspaceAccount(account) ||
-    isAdminWorkspaceProject(project);
-  const modules = shouldUseAdminDraft
-    ? await getAdminWorkingModules(accountId)
-    : await getModulesWithExercises();
+  // Answers must always target persisted module/exercise IDs. Admin drafts can contain
+  // temporary negative IDs and are intentionally restricted to the admin editor.
+  const modules = await getModulesWithExercises();
 
   if (!project) {
     return {
