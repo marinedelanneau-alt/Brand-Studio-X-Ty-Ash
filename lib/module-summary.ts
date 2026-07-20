@@ -492,7 +492,7 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "open" || exercise.type === "prompt_open") {
-    return buildHighlight(exercise.question, values[0]);
+    return buildHighlight(getExerciseSummaryLabel(exercise), values[0]);
   }
 
   if (exercise.type === "single" || exercise.type === "boolean") {
@@ -1064,7 +1064,7 @@ function buildFillBlankSentence(question: string, values: string[]) {
     sentence += parts[index] ?? "";
 
     if (index < values.length) {
-      sentence += values[index] ?? "";
+      sentence += cleanTechnicalAnswerValue(values[index] ?? "");
     }
   }
 
@@ -1072,16 +1072,32 @@ function buildFillBlankSentence(question: string, values: string[]) {
 }
 
 function buildHighlight(label: string, value: string) {
-  const normalizedValue = compactText(value);
+  const normalizedValue = compactText(cleanTechnicalAnswerValue(value));
 
   if (!normalizedValue) {
     return null;
   }
 
   return {
-    label: compactText(label) || "Point clé",
+    label: cleanStoredExerciseQuestionText(label) || "Point clé",
     value: normalizedValue,
   } satisfies ModuleSummaryHighlight;
+}
+
+function cleanTechnicalAnswerValue(value: string) {
+  const candidates = [value];
+
+  try {
+    candidates.push(decodeURIComponent(value));
+  } catch {
+    // The stored answer is not URI encoded.
+  }
+
+  const checklistEntry = candidates
+    .flatMap((candidate) => parseChecklistEntries([candidate]))
+    .find((entry) => entry.label.length > 0);
+
+  return checklistEntry?.label ?? value;
 }
 
 function buildEmptyHighlight(label: string, value: string) {
