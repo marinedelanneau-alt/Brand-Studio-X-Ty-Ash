@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { ArrowDownTrayIcon, ShareIcon } from "@heroicons/react/24/outline";
 import {
   getActiveBrandPersonaSections,
   getBrandPersonaFields,
@@ -13,6 +14,8 @@ import {
   type ExerciseType,
 } from "@/lib/exercise-types";
 import PedagogicalContent from "./pedagogical-content";
+import PersonaStoryCard from "./persona-story-card";
+import { dataUrlToFile, downloadDataUrl, exportStoryAsPng } from "@/lib/export-story-as-png";
 
 type ExerciseLike = {
   id: string | number;
@@ -87,6 +90,9 @@ export default function BrandPersonaExercise({
   const sections = useMemo(() => getActiveBrandPersonaSections(config), [config]);
   const fields = useMemo(() => getBrandPersonaFields(config), [config]);
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
+  const storyRef = useRef<HTMLElement | null>(null);
   const activeSection = sections[activeSectionIndex] ?? sections[0];
   const fieldIndexById = new Map(fields.map((field, index) => [field.id, index]));
   const requiredFields = fields.filter((field) => field.required);
@@ -138,6 +144,46 @@ export default function BrandPersonaExercise({
     quote:
       getFieldValues(answers, fieldIndexById.get("defining_quote") ?? -1)[0] ?? "",
   };
+  const personaFilename = `brand-studio-persona-${(summary.firstName || "ma-marque").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.png`;
+
+  async function createPersonaImage() {
+    if (!storyRef.current || isExporting) return null;
+    setIsExporting(true);
+    setShareMessage("");
+    try {
+      return await exportStoryAsPng(storyRef.current);
+    } catch {
+      setShareMessage("Impossible de préparer l'image. Réessaie dans quelques instants.");
+      return null;
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
+  async function downloadPersona() {
+    const dataUrl = await createPersonaImage();
+    if (!dataUrl) return;
+    downloadDataUrl(dataUrl, personaFilename);
+    setShareMessage("Ta fiche persona a été téléchargée.");
+  }
+
+  async function sharePersona() {
+    const dataUrl = await createPersonaImage();
+    if (!dataUrl) return;
+    const file = await dataUrlToFile(dataUrl, personaFilename);
+    const canShare = typeof navigator.share === "function" && (typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] }));
+    if (canShare) {
+      try {
+        await navigator.share({ files: [file], title: "Mon persona de marque", text: "Voici le persona de ma marque, créé avec Brand Studio." });
+        setShareMessage("Choisis Instagram puis ajoute l'image à ta story.");
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    downloadDataUrl(dataUrl, personaFilename);
+    setShareMessage("Image téléchargée. Ouvre Instagram et sélectionne-la dans ta story.");
+  }
 
   return (
     <div className="mt-4 space-y-5">
@@ -387,6 +433,23 @@ export default function BrandPersonaExercise({
         <div className="mt-5 rounded-[1.2rem] border border-[#f0dfc6] bg-[#fff8f1] px-5 py-4 text-sm leading-7 text-[#6f645b]">
           Quand tu crees du contenu, demande-toi : comment {personaFirstName} communiquerait-elle ce message ?
         </div>
+        {overallCompletion === 100 ? (
+          <div className="mt-6 rounded-[1.4rem] border border-[#eadfca] bg-[#fffaf2] p-5">
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+              <div>
+                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Fiche terminée</p>
+                <h4 className="mt-2 text-xl font-semibold text-[#4b4550]">Télécharge ou partage ton persona</h4>
+                <p className="mt-2 text-sm leading-7 text-[#6f645b]">Le visuel est préparé au format 9:16, prêt pour une story Instagram.</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button type="button" onClick={() => void downloadPersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#d98632] bg-white px-4 text-sm font-bold text-[#9b5424] disabled:opacity-50"><ArrowDownTrayIcon className="size-5" />{isExporting ? "Préparation..." : "Télécharger"}</button>
+                  <button type="button" onClick={() => void sharePersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#d98632] px-4 text-sm font-bold text-white disabled:opacity-50"><ShareIcon className="size-5" />Partager en story</button>
+                </div>
+                {shareMessage ? <p className="mt-3 text-sm text-[#6f645b]" role="status">{shareMessage}</p> : null}
+              </div>
+              <PersonaStoryCard ref={storyRef} summary={summary} />
+            </div>
+          </div>
+        ) : null}
       </section>
     </div>
   );
