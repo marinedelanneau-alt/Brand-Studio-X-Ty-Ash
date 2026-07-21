@@ -16,10 +16,8 @@ const PersonaStoryCard = forwardRef<HTMLElement, { summary: PersonaStorySummary 
   function PersonaStoryCard({ summary }, ref) {
     const items = [
       ["Profil", summary.profile],
-      ["Traits dominants", summary.traits],
-      ["Ton de voix", summary.tone],
-      ["Valeurs incarnées", summary.values],
-      ["Manière d'interagir", summary.interactions],
+      ["Personnalité", [summary.traits, summary.tone].filter(Boolean).join(" • ")],
+      ["Valeurs fortes", summary.values],
     ].filter(([, value]) => value.trim());
 
     return (
@@ -39,7 +37,7 @@ const PersonaStoryCard = forwardRef<HTMLElement, { summary: PersonaStorySummary 
           <h2 className="mt-3 break-words font-[family:var(--font-cormorant)] text-[2rem] leading-none">{summary.firstName || "Mon persona"}</h2>
         </div>
         <div className="relative mt-7 grid gap-2.5">
-          {items.slice(0, 5).map(([label, value]) => (
+          {items.slice(0, 3).map(([label, value]) => (
             <section key={label} className="rounded-xl border border-white/80 bg-white/70 px-3.5 py-3">
               <p className="text-[0.5rem] font-black uppercase tracking-[0.15em] text-[#8a7080]">{label}</p>
               <p className="mt-1 line-clamp-3 text-[0.68rem] font-semibold leading-[1.05rem] text-[#514750]">{value}</p>

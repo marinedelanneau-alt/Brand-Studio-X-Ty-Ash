@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { ArrowDownTrayIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, DocumentArrowDownIcon, ShareIcon } from "@heroicons/react/24/outline";
 import {
   getActiveBrandPersonaSections,
   getBrandPersonaFields,
@@ -439,8 +439,9 @@ export default function BrandPersonaExercise({
               <div>
                 <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Fiche terminée</p>
                 <h4 className="mt-2 text-xl font-semibold text-[#4b4550]">Télécharge ou partage ton persona</h4>
-                <p className="mt-2 text-sm leading-7 text-[#6f645b]">Le visuel est préparé au format 9:16, prêt pour une story Instagram.</p>
+                <p className="mt-2 text-sm leading-7 text-[#6f645b]">Télécharge le CV complet de ton persona en PDF ou partage sa version courte au format Story.</p>
                 <div className="mt-4 flex flex-wrap gap-3">
+                  <a href="/mon-espace/persona/download" className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#4b4550] bg-white px-4 text-sm font-bold text-[#4b4550]"><DocumentArrowDownIcon className="size-5" />PDF complet</a>
                   <button type="button" onClick={() => void downloadPersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#d98632] bg-white px-4 text-sm font-bold text-[#9b5424] disabled:opacity-50"><ArrowDownTrayIcon className="size-5" />{isExporting ? "Préparation..." : "Télécharger"}</button>
                   <button type="button" onClick={() => void sharePersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#d98632] px-4 text-sm font-bold text-white disabled:opacity-50"><ShareIcon className="size-5" />Partager en story</button>
                 </div>
