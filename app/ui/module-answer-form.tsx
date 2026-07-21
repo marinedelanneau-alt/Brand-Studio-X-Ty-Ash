@@ -3121,18 +3121,12 @@ export default function ModuleAnswerForm({
         </p>
       ) : null}
 
-      {saveIndicator !== "idle" ? (
+      {saveIndicator === "error" ? (
         <p
-          role="status"
-          className={`text-sm leading-6 ${
-            saveIndicator === "error" ? "text-[#b45247]" : "text-[#6f645b]"
-          }`}
+          role="alert"
+          className="text-sm leading-6 text-[#b45247]"
         >
-          {saveIndicator === "saving"
-            ? "⏳ Enregistrement..."
-            : saveIndicator === "saved"
-              ? "✓ Enregistré"
-              : autoSaveState.message || "Sauvegarde interrompue. Nouvelle tentative à la reconnexion."}
+          {autoSaveState.message || "Sauvegarde interrompue. Nouvelle tentative à la reconnexion."}
         </p>
       ) : null}
     </form>
