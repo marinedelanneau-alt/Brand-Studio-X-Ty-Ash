@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
 import { getCommunicationActions } from "@/lib/communication-actions";
 import { renderCommunicationActionPdf } from "@/lib/communication-action-pdf";
@@ -10,7 +10,7 @@ import { getWorkspaceData } from "@/lib/training";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const account = await getAuthenticatedAccount();
     if (!(await hasActiveAccess(account.id))) {
@@ -30,8 +30,12 @@ export async function GET() {
 
     const actions = await getCommunicationActions(workspace.project.id);
     const brandName = account.company_name?.trim() || workspace.project.name;
-    const pdfBuffer = await renderCommunicationActionPdf({ brandName, actions });
-    const filename = `feuille-de-route-communication-${slugifyFilePart(brandName)}.pdf`;
+    const requestedYear = Number(request.nextUrl.searchParams.get("year"));
+    const year = Number.isInteger(requestedYear) && requestedYear >= 2000 && requestedYear <= 2100
+      ? requestedYear
+      : new Date().getFullYear();
+    const pdfBuffer = await renderCommunicationActionPdf({ brandName, actions, year });
+    const filename = `feuille-de-route-communication-${year}-${slugifyFilePart(brandName)}.pdf`;
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {

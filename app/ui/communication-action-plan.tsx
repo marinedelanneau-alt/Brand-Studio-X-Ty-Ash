@@ -108,6 +108,12 @@ function filterActions(actions: CommunicationAction[], filters: Filters) {
   });
 }
 
+function getCommunicationActionYear(action: CommunicationAction) {
+  const rawDate = action.start_date ?? action.target_month;
+  const match = rawDate?.match(/^(\d{4})-/);
+  return match ? Number(match[1]) : null;
+}
+
 function ActionCard({
   action,
   onEdit,
@@ -245,11 +251,13 @@ function MultiSelect({
 
 function CommunicationActionForm({
   action,
+  selectedYear,
   suggestionsTargets,
   onClose,
   onSaved,
 }: {
   action: CommunicationActionInput;
+  selectedYear: number;
   suggestionsTargets: string[];
   onClose: () => void;
   onSaved: (action: CommunicationAction, message: string) => void;
@@ -397,6 +405,8 @@ function CommunicationActionForm({
                   Date précise
                   <input
                     type="date"
+                    min={`${selectedYear}-01-01`}
+                    max={`${selectedYear}-12-31`}
                     value={draft.start_date ?? ""}
                     onChange={(event) => setDraft({ ...draft, start_date: event.target.value || null })}
                     className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3"
@@ -406,6 +416,8 @@ function CommunicationActionForm({
                   Mois
                   <input
                     type="month"
+                    min={`${selectedYear}-01`}
+                    max={`${selectedYear}-12`}
                     value={draft.target_month ?? ""}
                     onChange={(event) => setDraft({ ...draft, target_month: event.target.value || null })}
                     className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3"
@@ -573,14 +585,35 @@ export default function CommunicationActionPlan({
   const [filters, setFilters] = useState<Filters>({ period: "", type: "", objective: "", priority: "", status: "" });
   const [formAction, setFormAction] = useState<CommunicationActionInput | null>(null);
   const [detailAction, setDetailAction] = useState<CommunicationAction | null>(null);
+  const [actionToDelete, setActionToDelete] = useState<CommunicationAction | null>(null);
   const [message, setMessage] = useState("");
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [hasSeenIntro, setHasSeenIntro] = useState(initialActions.length > 0);
   const [isPending, startTransition] = useTransition();
-  const filteredActions = useMemo(() => filterActions(actions, filters), [actions, filters]);
-  const priorityCount = actions.filter((action) => action.calculated_priority === "À lancer en priorité").length;
-  const prepCount = actions.filter((action) => action.calculated_priority === "À préparer").length;
-  const thisMonthCount = groupActionsByPeriod(actions).thisMonth.length;
-  const nextAction = actions
+  const yearOptions = useMemo(() => {
+    const years = new Set(Array.from({ length: 7 }, (_, index) => currentYear - 1 + index));
+    actions.forEach((action) => {
+      const actionYear = getCommunicationActionYear(action);
+      if (actionYear) years.add(actionYear);
+    });
+    return [...years].sort((left, right) => left - right);
+  }, [actions, currentYear]);
+  const yearActions = useMemo(
+    () =>
+      actions.filter((action) => {
+        const actionYear = getCommunicationActionYear(action);
+        return actionYear === null || actionYear === selectedYear;
+      }),
+    [actions, selectedYear],
+  );
+  const filteredActions = useMemo(() => filterActions(yearActions, filters), [yearActions, filters]);
+  const priorityCount = yearActions.filter((action) => action.calculated_priority === "À lancer en priorité").length;
+  const prepCount = yearActions.filter((action) => action.calculated_priority === "À préparer").length;
+  const thisMonthCount = selectedYear === currentYear
+    ? groupActionsByPeriod(yearActions).thisMonth.length
+    : 0;
+  const nextAction = yearActions
     .filter((action) => action.status !== "Terminée")
     .sort((left, right) => {
       if (left.calculated_priority === "À lancer en priorité") return -1;
@@ -603,11 +636,17 @@ export default function CommunicationActionPlan({
   }
 
   function handleDelete(action: CommunicationAction) {
-    if (!window.confirm("Supprimer cette action de ta feuille de route ?")) return;
+    setActionToDelete(action);
+  }
+
+  function confirmDelete() {
+    if (!actionToDelete) return;
+    const action = actionToDelete;
     startTransition(async () => {
       const result = await removeCommunicationAction(action.id);
       if (result.status === "success") {
         setActions((current) => current.filter((item) => item.id !== action.id));
+        setActionToDelete(null);
       }
       setMessage(result.message);
     });
@@ -686,7 +725,20 @@ export default function CommunicationActionPlan({
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a href={pdfHref} className="inline-flex h-11 items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+            <label className="flex h-11 items-center gap-2 rounded-full border border-[#eadfca] bg-[#fffdf8] px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+              Année
+              <select
+                value={selectedYear}
+                onChange={(event) => setSelectedYear(Number(event.target.value))}
+                className="bg-transparent text-sm font-extrabold text-[#2f2a36] outline-none"
+                aria-label="Choisir l'année de la feuille de route"
+              >
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </label>
+            <a href={`${pdfHref}?year=${selectedYear}`} className="inline-flex h-11 items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
               <ArrowDownTrayIcon className="h-4 w-4" />
               Télécharger ma feuille de route
             </a>
@@ -703,11 +755,11 @@ export default function CommunicationActionPlan({
         {message ? <p className="mt-4 rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf8] px-4 py-3 text-sm text-[#6f645b]">{message}</p> : null}
       </section>
 
-      {actions.length > 0 ? (
+      {yearActions.length > 0 ? (
         <section className="grid gap-4 md:grid-cols-3">
           <SummaryTile value={priorityCount} label="actions prioritaires" />
           <SummaryTile value={prepCount} label="actions à préparer" />
-          <SummaryTile value={thisMonthCount} label="actions prévues ce mois-ci" />
+          <SummaryTile value={thisMonthCount} label={selectedYear === currentYear ? "actions prévues ce mois-ci" : `actions en ${selectedYear}`} />
         </section>
       ) : null}
 
@@ -750,7 +802,7 @@ export default function CommunicationActionPlan({
         </div>
       </section>
 
-      {actions.length === 0 ? (
+      {yearActions.length === 0 ? (
         <section className="rounded-[1.4rem] border border-dashed border-[#eadfca] bg-white/80 p-8 text-center">
           <ClipboardDocumentListIcon className="mx-auto h-10 w-10 text-[#cf7430]" />
           <h2 className="mt-4 text-xl font-semibold text-[#2f2a36]">Ta feuille de route est prête à être construite.</h2>
@@ -816,6 +868,7 @@ export default function CommunicationActionPlan({
       {formAction ? (
         <CommunicationActionForm
           action={formAction}
+          selectedYear={selectedYear}
           suggestionsTargets={suggestionTargets}
           onClose={() => setFormAction(null)}
           onSaved={refreshAfterMutation}
@@ -849,6 +902,55 @@ export default function CommunicationActionPlan({
             <div className="mt-6 flex flex-wrap gap-3">
               <button type="button" onClick={() => setFormAction(detailAction)} className="h-11 rounded-full bg-[#2f2a36] px-4 text-xs font-black uppercase tracking-[0.12em] text-white">Modifier</button>
               <button type="button" className="h-11 rounded-full border border-[#eadfca] px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">Créer des contenus associés</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {actionToDelete ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2f2a36]/45 px-4 py-6 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isPending) setActionToDelete(null);
+          }}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-action-title"
+            aria-describedby="delete-action-description"
+            className="w-full max-w-md overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf8] shadow-[0_28px_90px_rgba(47,42,54,0.28)]"
+          >
+            <div className="h-2 bg-[linear-gradient(90deg,#df9b39,#f1cc56)]" />
+            <div className="p-6 sm:p-7">
+              <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                Confirmation
+              </p>
+              <h2 id="delete-action-title" className="mt-3 text-2xl font-semibold text-[#2f2a36]">
+                Supprimer cette action ?
+              </h2>
+              <p id="delete-action-description" className="mt-3 text-sm leading-7 text-[#6f645b]">
+                « {actionToDelete.title} » sera retirée de ta feuille de route. Cette action est définitive.
+              </p>
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => setActionToDelete(null)}
+                  className="h-11 rounded-full border border-[#eadfca] bg-white px-5 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-60"
+                >
+                  Conserver
+                </button>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={confirmDelete}
+                  className="h-11 rounded-full bg-[#b85c4d] px-5 text-xs font-black uppercase tracking-[0.12em] text-white shadow-[0_12px_24px_rgba(184,92,77,0.2)] disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isPending ? "Suppression..." : "Supprimer l’action"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

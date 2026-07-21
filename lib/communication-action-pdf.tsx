@@ -321,8 +321,9 @@ function RoadmapRow({
 export async function renderCommunicationActionPdf(input: {
   brandName: string;
   actions: CommunicationAction[];
+  year?: number;
 }) {
-  const year = new Date().getFullYear();
+  const year = input.year ?? new Date().getFullYear();
   const scheduledActions = sortScheduledActions(
     input.actions.flatMap((action) => {
       const range = getActionMonthRange(action, year);
