@@ -1,4 +1,5 @@
-import { cancelAdminDraftDeployment, publishAdminDraftToAllUsers, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
+import { cancelAdminDraftDeployment, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
+import AdminDeploymentButton from "@/app/ui/admin-deployment-button";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import { getAuthenticatedAdmin } from "@/lib/session";
@@ -74,14 +75,7 @@ export default async function AdminModulesPage({
           uniquement dans ton espace Marine Communication. Les autres utilisateurs
           gardent la version publiee jusqu&apos;au deploiement global.
         </p>
-        <form action={publishAdminDraftToAllUsers} className="mt-5">
-          <button
-            type="submit"
-            className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_32px_rgba(75,69,80,0.18)]"
-          >
-            Deployer a tous les utilisateurs
-          </button>
-        </form>
+        <AdminDeploymentButton />
         <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 p-5">
           <h2 className="text-lg font-semibold text-[#4b4550]">Programmer le déploiement</h2>
           <p className="mt-1 text-sm text-[#7b7068]">La date et l’heure sont interprétées en heure de Paris.</p>

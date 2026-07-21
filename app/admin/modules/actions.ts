@@ -467,20 +467,34 @@ export async function deleteAdminModule(formData: FormData) {
   }
 }
 
-export async function publishAdminDraftToAllUsers() {
+export type AdminDeploymentState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  completedAt?: string;
+};
+
+export async function publishAdminDraftToAllUsers(
+  _previousState: AdminDeploymentState,
+): Promise<AdminDeploymentState> {
   try {
     const account = await getAuthenticatedAdmin();
 
     await publishAdminModuleDraftToUsers(account.id);
     revalidateTrainingExperience();
-    redirect("/admin/modules?status=deployed");
+    return {
+      status: "success",
+      message: "Le déploiement est terminé. La nouvelle version est disponible pour tous les utilisateurs.",
+      completedAt: new Date().toISOString(),
+    };
   } catch (error) {
     unstable_rethrow(error);
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Impossible de deployer le brouillon.";
-    redirect(`/admin/modules?status=error&message=${encodeURIComponent(message)}`);
+    return {
+      status: "error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Impossible de déployer le brouillon.",
+    };
   }
 }
 
