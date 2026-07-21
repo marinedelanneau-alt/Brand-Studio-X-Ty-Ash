@@ -920,38 +920,39 @@ export default function CommunicationActionPlan({
             aria-modal="true"
             aria-labelledby="delete-action-title"
             aria-describedby="delete-action-description"
-            className="w-full max-w-md overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf8] shadow-[0_28px_90px_rgba(47,42,54,0.28)]"
+            className="w-full max-w-md rounded-[1.5rem] border border-[#e8ddcc] bg-[#fffdf9] p-6 shadow-[0_24px_70px_rgba(47,42,54,0.22)] sm:p-7"
           >
-            <div className="h-2 bg-[linear-gradient(90deg,#df9b39,#f1cc56)]" />
-            <div className="p-6 sm:p-7">
-              <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
-                Confirmation
-              </p>
-              <h2 id="delete-action-title" className="mt-3 text-2xl font-semibold text-[#2f2a36]">
+            <div className="flex items-start gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f8e9e4] text-[#a94f43]">
+                <TrashIcon className="h-5 w-5" />
+              </span>
+              <div className="min-w-0">
+                <h2 id="delete-action-title" className="text-[1.4rem] font-semibold leading-tight text-[#2f2a36]">
                 Supprimer cette action ?
-              </h2>
-              <p id="delete-action-description" className="mt-3 text-sm leading-7 text-[#6f645b]">
-                « {actionToDelete.title} » sera retirée de ta feuille de route. Cette action est définitive.
-              </p>
-              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                </h2>
+                <p id="delete-action-description" className="mt-2 text-sm leading-6 text-[#746960]">
+                  L’action « {actionToDelete.title} » sera supprimée définitivement de ta feuille de route.
+                </p>
+              </div>
+            </div>
+              <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={() => setActionToDelete(null)}
-                  className="h-11 rounded-full border border-[#eadfca] bg-white px-5 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-60"
+                  className="h-11 rounded-xl border border-[#ddd1bf] bg-white px-5 text-sm font-semibold text-[#5f554d] transition hover:bg-[#faf6ef] disabled:opacity-60"
                 >
-                  Conserver
+                  Annuler
                 </button>
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={confirmDelete}
-                  className="h-11 rounded-full bg-[#b85c4d] px-5 text-xs font-black uppercase tracking-[0.12em] text-white shadow-[0_12px_24px_rgba(184,92,77,0.2)] disabled:cursor-wait disabled:opacity-60"
+                  className="h-11 rounded-xl bg-[#a94f43] px-5 text-sm font-semibold text-white transition hover:bg-[#934238] disabled:cursor-wait disabled:opacity-60"
                 >
-                  {isPending ? "Suppression..." : "Supprimer l’action"}
+                  {isPending ? "Suppression…" : "Supprimer"}
                 </button>
               </div>
-            </div>
           </div>
         </div>
       ) : null}
