@@ -65,6 +65,7 @@ type ProjectExerciseAnswerRecord = {
   exercise_id: number;
   answer_text: string | null;
   selected_options: unknown;
+  updated_at: string;
 };
 
 type DeployableExerciseAnswerRecord = Omit<ProjectExerciseAnswerRecord, "id"> & {
@@ -1887,9 +1888,15 @@ export async function getWorkspaceData(accountId: number) {
       .order("generated_at", { ascending: false })
       .limit(1)
       .maybeSingle<{ guide_snapshot: unknown }>(),
-    supabase.from("user_answers").select("module_key,question_key,answer_value")
+    supabase.from("user_answers").select("module_key,question_key,answer_value,client_updated_at,client_revision")
       .eq("project_id", project.id)
-      .returns<Array<{ module_key: string; question_key: string; answer_value: unknown }>>(),
+      .returns<Array<{
+        module_key: string;
+        question_key: string;
+        answer_value: unknown;
+        client_updated_at: string;
+        client_revision: number;
+      }>>(),
   ]);
 
   if (answersResult.error) {
@@ -1932,6 +1939,12 @@ export async function getWorkspaceData(accountId: number) {
   const draftModules = modules.map((module) => {
     const moduleAnswers = groupedAnswers.get(module.id) ?? [];
     const answersMap = computeModuleAnswerMap(module.exercises, moduleAnswers);
+    const answerVersions = Object.fromEntries(
+      moduleAnswers.map((answer) => [
+        answer.exercise_id,
+        { updatedAt: Date.parse(answer.updated_at) || 0, revision: 0 },
+      ]),
+    ) as WorkspaceModule["answerVersions"];
     const backedUpModuleAnswers = answerBackup?.modules[String(module.position)];
     const stableModuleAnswers = stableAnswers.filter((item) => item.module_key === `module_${module.id}`);
 
@@ -1942,6 +1955,10 @@ export async function getWorkspaceData(accountId: number) {
       answersMap[exerciseId] = Array.isArray(value)
         ? value.filter((item): item is string => typeof item === "string")
         : typeof value === "string" ? [value] : [];
+      answerVersions[exerciseId] = {
+        updatedAt: Date.parse(stableAnswer.client_updated_at) || 0,
+        revision: stableAnswer.client_revision ?? 0,
+      };
     }
 
     if (backedUpModuleAnswers) {
@@ -1959,6 +1976,7 @@ export async function getWorkspaceData(accountId: number) {
     return {
       ...module,
       answers: answersMap,
+      answerVersions,
       isManuallyCompleted:
         isCompletedFromDatabase || completedModuleIdsFromCookie.has(module.id),
     };
@@ -2079,7 +2097,12 @@ export async function upsertStableModuleAnswers(input: {
   userId: number;
   projectId: number;
   moduleId: number;
-  answers: Array<{ exerciseId: number; values: string[]; clientUpdatedAt: number }>;
+  answers: Array<{
+    exerciseId: number;
+    values: string[];
+    clientUpdatedAt: number;
+    revision?: number;
+  }>;
 }) {
   if (input.answers.length === 0) return;
   const supabase = createSupabaseServerClient();
@@ -2106,6 +2129,7 @@ export async function upsertStableModuleAnswers(input: {
         ? answer.clientUpdatedAt
         : Date.now(),
     ).toISOString(),
+    client_revision: answer.revision ?? 0,
     updated_at: now,
   }));
   const { error } = await supabase.rpc("upsert_user_answers_if_newer", {

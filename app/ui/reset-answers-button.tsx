@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { resetCurrentUserAnswers } from "@/app/reset-user-answers";
+import { clearAnswerDatabaseForUser } from "@/lib/persistence/answerDatabase";
 
 const DRAFT_PREFIXES = [
   "brand-studio-module-answers:",
@@ -17,7 +18,7 @@ function clearAnswerCache(storage: Storage) {
   }
 }
 
-export default function ResetAnswersButton() {
+export default function ResetAnswersButton({ userId }: { userId: number }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -33,6 +34,7 @@ export default function ResetAnswersButton() {
 
       clearAnswerCache(window.localStorage);
       clearAnswerCache(window.sessionStorage);
+      await clearAnswerDatabaseForUser(userId);
       window.location.assign("/mon-espace");
     });
   }
