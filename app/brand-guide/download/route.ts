@@ -42,6 +42,7 @@ export async function GET() {
     const guide = generateGuideFromAnswers({
       project: workspace.project,
       modules: workspace.modules,
+      brandName: account.company_name?.trim(),
     });
     const pdfBuffer = await renderBrandGuidePdf(guide);
 

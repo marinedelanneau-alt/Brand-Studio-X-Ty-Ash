@@ -391,6 +391,7 @@ function buildPitch(brandName: string, target: string, problem: string, promise:
 export function generateGuideFromAnswers(input: {
   project: BrandProject;
   modules: WorkspaceModule[];
+  brandName?: string | null;
 }) {
   return generateBrandGuide(input);
 }
@@ -398,9 +399,10 @@ export function generateGuideFromAnswers(input: {
 export function generateBrandGuide(input: {
   project: BrandProject;
   modules: WorkspaceModule[];
+  brandName?: string | null;
 }): GeneratedBrandGuide {
   const sources = collectSources(input.modules);
-  const brandName = compactText(input.project.name) || "Ma marque";
+  const brandName = compactText(input.brandName) || compactText(input.project.name) || "Ma marque";
   const colors = collectColors(sources);
   const moodboard = collectMoodboard(sources);
 
