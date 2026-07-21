@@ -82,6 +82,38 @@ type AiAssistState = {
   mode: AiAssistMode | null;
   message: string;
 };
+
+function AutoGrowingAnswerField({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  className: string;
+}) {
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!field) return;
+    field.style.height = "auto";
+    field.style.height = `${field.scrollHeight}px`;
+  }, [value]);
+
+  return (
+    <textarea
+      ref={fieldRef}
+      rows={1}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      className={`${className} resize-none overflow-hidden whitespace-pre-wrap`}
+    />
+  );
+}
 type SaveIndicatorState = "idle" | "saving" | "saved" | "offline" | "error";
 
 const initialState: ModuleState = {
@@ -2265,8 +2297,7 @@ export default function ModuleAnswerForm({
                           onImprove={() => void handleAiAssist(currentExercise, "improve")}
                         />
                       </div>
-                      <input
-                        type="text"
+                      <AutoGrowingAnswerField
                         value={
                           getQuestionValues(
                             currentExercise,
@@ -2274,29 +2305,19 @@ export default function ModuleAnswerForm({
                             questionIndex,
                           )[0] ?? ""
                         }
-                        onChange={(event) =>
+                        onChange={(nextValue) =>
                           setAnswers((current) => ({
                             ...current,
                             [currentExercise.id]: setQuestionValues(
                               currentExercise,
                               current[currentExercise.id] ?? [],
                               questionIndex,
-                              [event.target.value],
+                              [nextValue],
                             ),
                           }))
                         }
                         className="mt-3 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
                         placeholder={getAnswerPlaceholder(currentExercise, prompt)}
-                        style={{
-                          width: getAdaptiveInlineInputWidth(
-                            getQuestionValues(
-                              currentExercise,
-                              answers[currentExercise.id] ?? [],
-                              questionIndex,
-                            )[0] ?? "",
-                            getAnswerPlaceholder(currentExercise, prompt),
-                          ),
-                        }}
                       />
                       <SmartFeedback
                         value={normalizeTextEntryValue(
@@ -2329,29 +2350,19 @@ export default function ModuleAnswerForm({
                         onSuggest={() => void handleAiAssist(currentExercise, "suggest")}
                         onImprove={() => void handleAiAssist(currentExercise, "improve")}
                       />
-                      <input
-                        type="text"
+                      <AutoGrowingAnswerField
                         value={answers[currentExercise.id]?.[0] ?? ""}
-                        onChange={(event) =>
+                        onChange={(nextValue) =>
                           setAnswers((current) => ({
                             ...current,
-                            [currentExercise.id]: [event.target.value],
+                            [currentExercise.id]: [nextValue],
                           }))
                         }
-                        className="min-w-32 max-w-full flex-none rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                        className="min-h-12 w-full flex-auto rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
                         placeholder={getAnswerPlaceholder(
                           currentExercise,
                           getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question)),
                         )}
-                        style={{
-                          width: getAdaptiveInlineInputWidth(
-                            answers[currentExercise.id]?.[0] ?? "",
-                            getAnswerPlaceholder(
-                              currentExercise,
-                              getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question)),
-                            ),
-                          ),
-                        }}
                       />
                     </div>
                     <SmartFeedback
