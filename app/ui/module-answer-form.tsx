@@ -967,13 +967,25 @@ function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExe
     }),
   ) as AnswersByExercise;
 
-  return {
-    ...answers,
-    ...validLocalEntries,
-  };
+  return Object.fromEntries(
+    module.exercises.map((exercise) => {
+      const serverValues = answers[exercise.id] ?? [];
+      const localValues = validLocalEntries[exercise.id];
+      const serverHasAnswer = serverValues.some((value) => value.trim().length > 0);
+      const localHasAnswer = localValues?.some((value) => value.trim().length > 0) ?? false;
+
+      // A stale or incomplete browser cache must never blank a durable Supabase answer.
+      // Empty values still remain deletable from the live form and are then persisted
+      // explicitly for that field by the scoped autosave.
+      return [
+        exercise.id,
+        localHasAnswer || !serverHasAnswer ? (localValues ?? serverValues) : serverValues,
+      ];
+    }),
+  ) satisfies AnswersByExercise;
 }
 
-function createInitialAnswers(module: WorkspaceModule) {
+function createServerInitialAnswers(module: WorkspaceModule) {
   const answers = module.exercises.reduce<AnswersByExercise>((accumulator, exercise) => {
     const savedAnswers = normalizeTextEntryValues(
       exercise,
@@ -1000,7 +1012,11 @@ function createInitialAnswers(module: WorkspaceModule) {
     return accumulator;
   }, {});
 
-  return mergeBrowserAnswersDraft(module, answers);
+  return answers;
+}
+
+function createInitialAnswers(module: WorkspaceModule) {
+  return mergeBrowserAnswersDraft(module, createServerInitialAnswers(module));
 }
 
 function mergeAnswers(
@@ -1311,9 +1327,8 @@ export default function ModuleAnswerForm({
   const moduleRef = useRef(module);
   moduleRef.current = module;
   const latestAnswersRef = useRef<AnswersByExercise>(answers);
-  const persistedAnswersRef = useRef<AnswersByExercise>({});
+  const persistedAnswersRef = useRef<AnswersByExercise>(createServerInitialAnswers(module));
   const draftSaveQueueRef = useRef<Promise<ModuleState | null>>(Promise.resolve(null));
-  const hasMountedRef = useRef(false);
   const hasRestoredBrowserDraftRef = useRef(false);
   const previousModuleIdRef = useRef(module.id);
   const allowExplicitSubmitRef = useRef(false);
@@ -1460,13 +1475,15 @@ export default function ModuleAnswerForm({
     return draftSaveQueueRef.current;
   }, []);
 
-  function goToNextStep() {
+  async function goToNextStep() {
     if (currentExercise && currentIndex < visibleExerciseGroups.length - 1) {
       setCurrentIndex((current) =>
         Math.min(current + 1, visibleExerciseGroups.length - 1),
       );
       return;
     }
+
+    await persistCurrentDraft({ showPending: true });
 
     if (!isLastSubmodule) {
       onNextSubmodule?.();
@@ -1526,13 +1543,12 @@ export default function ModuleAnswerForm({
 
     if (previousModuleIdRef.current !== activeModule.id) {
       previousModuleIdRef.current = activeModule.id;
-      persistedAnswersRef.current = {};
+      persistedAnswersRef.current = createServerInitialAnswers(activeModule);
       setAnswers(nextInitialAnswers);
       setChecklistDrafts({});
       setAutoSaveState(initialState);
       setAiAssistStates({});
       shouldOpenSummaryAfterSaveRef.current = false;
-      hasMountedRef.current = false;
       hasRestoredBrowserDraftRef.current = true;
       return;
     }
@@ -1541,11 +1557,6 @@ export default function ModuleAnswerForm({
   }, [module.id]);
 
   useEffect(() => {
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      return;
-    }
-
     const timeoutId = window.setTimeout(() => {
       startAutoSaveTransition(async () => {
         await persistCurrentDraft();
@@ -3066,7 +3077,7 @@ export default function ModuleAnswerForm({
               <button
                 type="button"
                 disabled={pending || isSavingDraft}
-                onClick={goToNextStep}
+                onClick={() => void goToNextStep()}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
@@ -3075,7 +3086,7 @@ export default function ModuleAnswerForm({
               <button
                 type="button"
                 disabled={pending || isSavingDraft}
-                onClick={goToNextStep}
+                onClick={() => void goToNextStep()}
                 className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
@@ -3087,7 +3098,7 @@ export default function ModuleAnswerForm({
             <button
               type="button"
               disabled={pending || isSavingDraft}
-              onClick={goToNextStep}
+              onClick={() => void goToNextStep()}
               className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
@@ -3096,7 +3107,7 @@ export default function ModuleAnswerForm({
             <button
               type="button"
               disabled={pending || isSavingDraft}
-              onClick={goToNextStep}
+              onClick={() => void goToNextStep()}
               className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
