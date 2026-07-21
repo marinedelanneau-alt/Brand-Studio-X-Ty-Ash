@@ -6,6 +6,7 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { ModuleSummaryCard } from "@/lib/module-summary";
+import type { ModuleSummaryColor } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
 
 const colors = {
@@ -134,6 +135,51 @@ const styles = StyleSheet.create({
     fontSize: 10.8,
     lineHeight: 1.6,
   },
+  answerContext: {
+    color: colors.soft,
+    fontSize: 8.8,
+    lineHeight: 1.45,
+    marginTop: 6,
+  },
+  palette: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7,
+    marginTop: 5,
+  },
+  paletteItem: {
+    alignItems: "center",
+    border: `1 solid ${colors.border}`,
+    borderRadius: 12,
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+  },
+  swatch: {
+    border: "1 solid #D8CDBC",
+    borderRadius: 8,
+    height: 16,
+    overflow: "hidden",
+    width: 16,
+  },
+  gradientSwatch: {
+    flexDirection: "row",
+  },
+  gradientHalf: {
+    height: 16,
+    width: 8,
+  },
+  paletteName: {
+    color: colors.text,
+    fontSize: 8.5,
+    fontWeight: 700,
+  },
+  paletteValue: {
+    color: colors.soft,
+    fontSize: 7.2,
+    marginTop: 1,
+  },
   submoduleCard: {
     backgroundColor: colors.card,
     border: `1 solid ${colors.border}`,
@@ -185,13 +231,20 @@ const styles = StyleSheet.create({
     lineHeight: 1.6,
   },
   footer: {
+    bottom: 20,
     borderTop: `1 solid ${colors.border}`,
     color: colors.soft,
     fontSize: 8,
     letterSpacing: 1.2,
-    marginTop: "auto",
+    left: 38,
     paddingTop: 14,
+    position: "absolute",
+    right: 38,
     textTransform: "uppercase",
+  },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 
@@ -201,6 +254,36 @@ function formatDate(value: string) {
     month: "long",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function PdfPalette({ colors: paletteColors }: { colors: ModuleSummaryColor[] }) {
+  return (
+    <View style={styles.palette}>
+      {paletteColors.map((color, index) => {
+        const gradientParts = color.value.split("→").map((part) => part.trim());
+        const isGradient = gradientParts.length === 2;
+
+        return (
+          <View key={`${color.name}-${color.value}-${index}`} style={styles.paletteItem}>
+            <View style={[styles.swatch, isGradient ? styles.gradientSwatch : {}]}>
+              {isGradient ? (
+                <>
+                  <View style={[styles.gradientHalf, { backgroundColor: gradientParts[0] }]} />
+                  <View style={[styles.gradientHalf, { backgroundColor: gradientParts[1] }]} />
+                </>
+              ) : (
+                <View style={{ backgroundColor: color.value, height: 16, width: 16 }} />
+              )}
+            </View>
+            <View>
+              <Text style={styles.paletteName}>{color.name}</Text>
+              <Text style={styles.paletteValue}>{color.value}</Text>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
 }
 
 export function ModulePdfSummary({
@@ -247,7 +330,12 @@ export function ModulePdfSummary({
           {summary.keyTakeaways.map((item) => (
             <View key={item.id} style={styles.answerRow} wrap={false}>
               <Text style={styles.answerLabel}>{item.label}</Text>
-              <Text style={styles.answerText}>{item.value}</Text>
+              {item.colors && item.colors.length > 0 ? (
+                <PdfPalette colors={item.colors} />
+              ) : (
+                <Text style={styles.answerText}>{item.value}</Text>
+              )}
+              <Text style={styles.answerContext}>{item.context}</Text>
             </View>
           ))}
         </View>
@@ -264,7 +352,11 @@ export function ModulePdfSummary({
               {submodule.highlights.map((item, index) => (
                 <View key={`${item.label}-${index}`} style={styles.detailRow} wrap={false}>
                   <Text style={styles.detailLabel}>{item.label}</Text>
-                  <Text style={styles.detailValue}>{item.value}</Text>
+                  {item.colors && item.colors.length > 0 ? (
+                    <PdfPalette colors={item.colors} />
+                  ) : (
+                    <Text style={styles.detailValue}>{item.value}</Text>
+                  )}
                 </View>
               ))}
             </View>
@@ -279,9 +371,12 @@ export function ModulePdfSummary({
           </Text>
         </View>
 
-        <Text style={styles.footer}>
-          Brand Studio · Document personnel genere depuis ton espace de travail
-        </Text>
+        <View style={styles.footer} fixed>
+          <View style={styles.footerRow}>
+            <Text>Brand Studio · Document personnel</Text>
+            <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+          </View>
+        </View>
       </Page>
     </Document>
   );
