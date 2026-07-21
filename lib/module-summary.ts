@@ -380,6 +380,10 @@ function hasUsableTakeawayValue(value: string) {
 function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
   const normalizedTitle = normalizeForSearch(module.title);
 
+  if (normalizedTitle.includes("positionnement")) {
+    return buildPositioningQuickRecap(module);
+  }
+
   if (!normalizedTitle.includes("vision") || !normalizedTitle.includes("marque")) {
     return null;
   }
@@ -442,6 +446,57 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
     );
 }
 
+function buildPositioningQuickRecap(module: WorkspaceModule) {
+  const definitions = [
+    {
+      label: "Le moment où ta marque intervient",
+      keywords: ["moment precis", "intervient ma marque", "declencheur"],
+    },
+    {
+      label: "La situation de ton client",
+      keywords: ["situation exacte", "lorsqu il me contacte", "contexte client"],
+    },
+    {
+      label: "Ce qu'il a déjà essayé",
+      keywords: ["deja essaye", "solutions essayees", "tentatives"],
+    },
+    {
+      label: "Ce qu'il refuse désormais",
+      keywords: ["ce qu il refuse", "il refuse", "ne veut plus"],
+    },
+    {
+      label: "Ta cible principale",
+      keywords: ["a qui t adresses", "cible", "client ideal"],
+    },
+    {
+      label: "Ta différence",
+      keywords: ["distingue", "difference", "singularite"],
+    },
+    {
+      label: "Pourquoi te choisir",
+      keywords: ["pourquoi devrait on te choisir", "pourquoi te choisir", "raison de choisir"],
+    },
+    {
+      label: "Tes repères concurrentiels",
+      keywords: ["principaux concurrents", "concurrence"],
+    },
+    {
+      label: "Ce que tu retiens de leur communication",
+      keywords: ["aimes tu", "aime pas", "leur communication"],
+    },
+    {
+      label: "Ton positionnement formulé",
+      keywords: ["positionnement final", "phrase de positionnement", "positionnement en une phrase"],
+    },
+  ];
+
+  return definitions
+    .map(({ label, keywords }) =>
+      findSemanticHighlight(module, keywords, label) ??
+      buildEmptyHighlight(label, "À compléter"),
+    );
+}
+
 function buildModuleSpecificKeyTakeaways(module: WorkspaceModule) {
   const recap = buildModuleSpecificQuickRecap(module);
 
@@ -449,11 +504,25 @@ function buildModuleSpecificKeyTakeaways(module: WorkspaceModule) {
     return null;
   }
 
+  const isPositioning = normalizeForSearch(module.title).includes("positionnement");
+  const positioningContexts: Record<string, string> = {
+    "Le moment où ta marque intervient": "Le déclencheur qui rend ton offre pertinente.",
+    "La situation de ton client": "Le contexte concret dans lequel ton client a besoin de toi.",
+    "Ce qu'il a déjà essayé": "Les solutions qui n'ont pas encore produit le résultat attendu.",
+    "Ce qu'il refuse désormais": "Les limites et frustrations que ton positionnement doit dépasser.",
+    "Ta cible principale": "La personne à qui ton message doit parler en priorité.",
+    "Ta différence": "L'élément distinctif à rendre visible dans ta communication.",
+    "Pourquoi te choisir": "La valeur décisive qui justifie le choix de ta marque.",
+    "Tes repères concurrentiels": "Les acteurs auxquels ton audience peut comparer ta marque.",
+    "Ce que tu retiens de leur communication": "Les codes à reprendre, éviter ou dépasser.",
+    "Ton positionnement formulé": "La formulation synthétique à réutiliser dans tes supports.",
+  };
+
   return recap.map((item, index) => ({
-    id: `vision-brand-${index}`,
+    id: `${isPositioning ? "positioning" : "vision-brand"}-${index}`,
     label: item.label,
     value: item.value,
-    context: "",
+    context: isPositioning ? positioningContexts[item.label] ?? "" : "",
     icon: "spark" as const,
   }));
 }
