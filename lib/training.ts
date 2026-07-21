@@ -1234,6 +1234,15 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   return snapshot.modules;
 }
 
+function getDraftModuleIdentity(title: string) {
+  return title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("fr-FR")
+    .replace(/\s+/g, " ");
+}
+
 async function restoreMissingPublishedModulesInDraft(
   projectId: number,
   modules: DraftModule[],
@@ -1242,21 +1251,42 @@ async function restoreMissingPublishedModulesInDraft(
     includeUnpublished: true,
     includeInactiveBrandPersona: true,
   });
+  const seenTitles = new Set<string>();
+  const cleanedModules = modules.filter((moduleItem) => {
+    const titleKey = getDraftModuleIdentity(moduleItem.title);
+    if (!titleKey || !seenTitles.has(titleKey)) {
+      if (titleKey) seenTitles.add(titleKey);
+      return true;
+    }
+
+    return false;
+  });
   const draftModuleIds = new Set(
-    modules
+    cleanedModules
       .filter((moduleItem) => moduleItem.id > 0)
       .map((moduleItem) => moduleItem.id),
   );
+  const draftPositions = new Set(cleanedModules.map((moduleItem) => moduleItem.position));
+  const draftTitles = new Set(
+    cleanedModules.map((moduleItem) => getDraftModuleIdentity(moduleItem.title)),
+  );
   const missingPublishedModules = publishedModules.filter(
-    (moduleItem) => moduleItem.id > 0 && !draftModuleIds.has(moduleItem.id),
+    (moduleItem) =>
+      moduleItem.id > 0 &&
+      !draftModuleIds.has(moduleItem.id) &&
+      !draftPositions.has(moduleItem.position) &&
+      !draftTitles.has(getDraftModuleIdentity(moduleItem.title)),
   );
 
-  if (missingPublishedModules.length === 0) {
-    return normalizeDraftModules(modules);
+  if (
+    missingPublishedModules.length === 0 &&
+    cleanedModules.length === modules.length
+  ) {
+    return normalizeDraftModules(cleanedModules);
   }
 
   const restoredModules = normalizeDraftModules([
-    ...modules,
+    ...cleanedModules,
     ...missingPublishedModules,
   ]);
 
@@ -1399,8 +1429,10 @@ function buildDraftModuleFromDefinition(
 ) {
   const now = new Date().toISOString();
   const moduleId =
-    input.moduleId && Number.isFinite(input.moduleId)
-      ? input.moduleId
+    existingModule
+      ? existingModule.id
+      : input.moduleId && Number.isFinite(input.moduleId)
+        ? input.moduleId
       : getNextDraftId(existingModules.map((module) => module.id));
   const existingSubmodules = existingModule?.submodules ?? [];
   const existingExercises = existingModule?.exercises ?? [];
@@ -1414,16 +1446,19 @@ function buildDraftModuleFromDefinition(
 
   const submodules = input.submodules.map((submodule, submoduleIndex) => {
     const requestedSubmoduleId = Number(submodule.clientId);
-    const existingSubmodule = Number.isFinite(requestedSubmoduleId)
-      ? existingSubmodules.find((item) => item.id === requestedSubmoduleId)
-      : existingSubmodules[submoduleIndex];
+    const existingSubmodule =
+      (Number.isFinite(requestedSubmoduleId)
+        ? existingSubmodules.find((item) => item.id === requestedSubmoduleId)
+        : undefined) ?? existingSubmodules[submoduleIndex];
     const submoduleId = existingSubmodule?.id ?? nextSubmoduleId--;
     const questions = submodule.exerciseGroups.flatMap((group) =>
       group.questions.map((question) => {
         const requestedExerciseId = Number(question.clientId);
-        const existingExercise = Number.isFinite(requestedExerciseId)
-          ? existingExercises.find((item) => item.id === requestedExerciseId)
-          : undefined;
+        const existingExercise =
+          (Number.isFinite(requestedExerciseId)
+            ? existingExercises.find((item) => item.id === requestedExerciseId)
+            : undefined) ??
+          existingExercises.find((item) => item.position === globalExercisePosition);
         const exerciseId = existingExercise?.id ?? nextExerciseId--;
 
         return {
@@ -1489,7 +1524,8 @@ export async function saveAdminModuleDefinitionDraft(
   }
 
   const existingModule = input.moduleId
-    ? modules.find((module) => module.id === input.moduleId)
+    ? modules.find((module) => module.id === input.moduleId) ??
+      modules.find((module) => module.position === input.position)
     : undefined;
   const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
   const nextModules = existingModule

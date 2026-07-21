@@ -68,3 +68,12 @@ test("les réponses survivent au remplacement des identifiants lors d'un déploi
   );
   assert.doesNotMatch(stablePositionSql, /delete\s+from\s+public\.user_answers/i);
 });
+
+test("un ancien onglet admin ne recrée pas un module après un déploiement", () => {
+  assert.match(
+    training,
+    /modules\.find\(\(module\) => module\.id === input\.moduleId\) \?\?[\s\S]*modules\.find\(\(module\) => module\.position === input\.position\)/,
+  );
+  assert.match(training, /const seenTitles = new Set<string>\(\)/);
+  assert.match(training, /!draftPositions\.has\(moduleItem\.position\)/);
+});
