@@ -1746,15 +1746,6 @@ export default function ModuleAnswerForm({
 
         {currentExercise ? (
           <>
-            {shouldShowExerciseExplanation(currentExercise, currentQuestionPrompts) &&
-            !isPassiveContentType(currentExercise.type) &&
-            currentExercise.type !== "brand_persona" &&
-            currentExercise.type !== "color_palette" ? (
-              <PedagogicalContent
-                content={currentExercise.explanation}
-                className="mt-5 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
-              />
-            ) : null}
             <VoiceNotePlayer
               src={currentExercise.audio_url}
               subtitles={currentExercise.audio_transcript}
@@ -1778,6 +1769,17 @@ export default function ModuleAnswerForm({
                   onImprove={() => void handleAiAssist(currentExercise, "improve")}
                 />
               </div>
+            ) : null}
+            {shouldShowExerciseExplanation(currentExercise, currentQuestionPrompts) &&
+            !isPassiveContentType(currentExercise.type) &&
+            currentExercise.type !== "brand_persona" &&
+            currentExercise.type !== "color_palette" &&
+            currentQuestionPrompts.length === 0 &&
+            !isMultiQuestionExerciseGroup ? (
+              <PedagogicalContent
+                content={currentExercise.explanation}
+                className="mt-3 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
+              />
             ) : null}
 
             {isOpenExerciseGroup ? (
@@ -3153,14 +3155,6 @@ function MultiQuestionOpenExerciseGroup({
           key={question.id}
           className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
         >
-          {shouldShowExerciseExplanation(question, [
-            cleanStoredExerciseQuestionText(question.question),
-          ]) ? (
-            <PedagogicalContent
-              content={question.explanation}
-              className="mb-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
-            />
-          ) : null}
           <VoiceNotePlayer
             src={question.audio_url}
             subtitles={question.audio_transcript}
@@ -3178,6 +3172,14 @@ function MultiQuestionOpenExerciseGroup({
               />
             ) : null}
           </span>
+          {shouldShowExerciseExplanation(question, [
+            cleanStoredExerciseQuestionText(question.question),
+          ]) ? (
+            <PedagogicalContent
+              content={question.explanation}
+              className="mt-3 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+            />
+          ) : null}
           <textarea
             value={answers[question.id]?.[0] ?? ""}
             onChange={(event) => onChange(question.id, [event.target.value])}
