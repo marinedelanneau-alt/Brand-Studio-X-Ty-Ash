@@ -2019,6 +2019,9 @@ export async function backupModuleAnswers(input: {
     .maybeSingle<{ id: number; guide_snapshot: unknown }>();
 
   if (readError) {
+    if (isMissingDatabaseObject(readError)) {
+      return;
+    }
     throw new Error(readError.message);
   }
 
@@ -2055,6 +2058,9 @@ export async function backupModuleAnswers(input: {
       });
 
   if (result.error) {
+    if (isMissingDatabaseObject(result.error)) {
+      return;
+    }
     throw new Error(result.error.message);
   }
 }
