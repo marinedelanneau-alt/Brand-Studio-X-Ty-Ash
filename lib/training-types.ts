@@ -74,6 +74,7 @@ export type WorkspaceModule = BrandModule & {
   >;
   exercises: ModuleExercise[];
   answers: Record<number, string[]>;
+  answerVersions: Record<number, { updatedAt: number; revision: number }>;
   progress: ModuleProgress;
 };
 

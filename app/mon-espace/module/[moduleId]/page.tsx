@@ -168,6 +168,8 @@ export default async function WorkspaceModulePage({
           {!showSummary ? (
             <ModuleLearningSection
               module={currentModule}
+              userId={account.id}
+              projectId={workspace.project.id}
               initialSubmoduleIndex={initialSubmoduleIndex}
               initialExerciseIndex={initialExerciseIndex}
               startInExercises={startInExercises}

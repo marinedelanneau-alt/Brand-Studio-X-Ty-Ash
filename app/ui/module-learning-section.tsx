@@ -7,11 +7,15 @@ import ModuleSubmoduleViewer from "./module-submodule-viewer";
 
 export default function ModuleLearningSection({
   module,
+  userId,
+  projectId,
   initialSubmoduleIndex = 0,
   initialExerciseIndex = 0,
   startInExercises = false,
 }: {
   module: WorkspaceModule;
+  userId: number;
+  projectId: number;
   initialSubmoduleIndex?: number;
   initialExerciseIndex?: number;
   startInExercises?: boolean;
@@ -115,6 +119,7 @@ export default function ModuleLearningSection({
         <div>
           <ModuleAnswerForm
             module={module}
+            persistenceScope={{ userId, projectId, moduleId: module.id }}
             activeSubmoduleId={currentSubmodule?.id}
             initialExerciseIndex={exerciseStartIndex}
             currentSubmoduleIndex={currentSubmoduleIndex}

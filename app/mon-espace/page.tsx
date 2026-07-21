@@ -436,7 +436,7 @@ export default async function MonEspacePage() {
                       </div>
                     </div>
                   ) : null}
-                  {workspace.project ? <ResetAnswersButton /> : null}
+                  {workspace.project ? <ResetAnswersButton userId={account.id} /> : null}
                 </div>
               </div>
 

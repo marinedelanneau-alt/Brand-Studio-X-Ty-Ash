@@ -1,0 +1,161 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { WorkspaceModule } from "@/lib/training-types";
+import {
+  loadLocalModuleAnswers,
+  mergeRemoteModuleAnswers,
+  persistLocalAnswer,
+} from "@/lib/persistence/answerRepository";
+import type { AnswerPersistenceScope, LocalAnswerRecord, RemoteAnswerVersion } from "@/lib/persistence/types";
+import { useAnswerSync } from "./useAnswerSync";
+
+type AnswersByExercise = Record<number, string[]>;
+
+function hasValue(values: string[]) {
+  return values.some((value) => value.trim().length > 0);
+}
+
+export function usePersistentAnswers(input: {
+  module: WorkspaceModule;
+  scope: AnswerPersistenceScope;
+  initialAnswers: AnswersByExercise;
+}) {
+  const [answers, setAnswersState] = useState<AnswersByExercise>(input.initialAnswers);
+  const [hasHydrated, setHasHydrated] = useState(false);
+  const [changeToken, setChangeToken] = useState(0);
+  const userInteractionRef = useRef(false);
+  const answersRef = useRef(answers);
+  const broadcastAnswerRef = useRef<(answer: LocalAnswerRecord) => void>(() => undefined);
+  const { userId, projectId, moduleId } = input.scope;
+  const exercisesRef = useRef(input.module.exercises);
+
+  const remoteVersions = useMemo<RemoteAnswerVersion[]>(
+    () =>
+      input.module.exercises.map((exercise) => ({
+        exerciseId: exercise.id,
+        values: input.module.answers[exercise.id] ?? [],
+        revision: input.module.answerVersions[exercise.id]?.revision ?? 0,
+        updatedAt: input.module.answerVersions[exercise.id]?.updatedAt ?? 0,
+        deleted: (input.module.answers[exercise.id] ?? []).length === 0,
+      })),
+    [input.module],
+  );
+
+  const applyRecords = useCallback((records: LocalAnswerRecord[]) => {
+      const current = answersRef.current;
+      const next = { ...current };
+      let changed = false;
+      for (const record of records) {
+        const values = record.deleted ? [] : record.values;
+        if (JSON.stringify(next[record.exerciseId] ?? []) !== JSON.stringify(values)) {
+          next[record.exerciseId] = [...values];
+          changed = true;
+        }
+      }
+      if (changed) {
+        answersRef.current = next;
+        setAnswersState(next);
+      }
+  }, []);
+
+  const sync = useAnswerSync({
+    scope: { userId, projectId, moduleId },
+    enabled: hasHydrated,
+    changeToken,
+    onRemoteAnswers: applyRecords,
+  });
+  useEffect(() => {
+    broadcastAnswerRef.current = sync.broadcastAnswer;
+  }, [sync.broadcastAnswer]);
+
+  useEffect(() => {
+    exercisesRef.current = input.module.exercises;
+  }, [input.module.exercises]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const scope = { userId, projectId, moduleId };
+      const localFirst = await loadLocalModuleAnswers(scope);
+      if (cancelled) return;
+      applyRecords(localFirst);
+
+      const merged = await mergeRemoteModuleAnswers(scope, remoteVersions);
+      if (cancelled) return;
+      applyRecords(merged);
+      setHasHydrated(true);
+
+      if (process.env.NODE_ENV !== "production") {
+        console.info("[Brand Studio persistence] hydrated", {
+          moduleId,
+          localCount: localFirst.length,
+          mergedCount: merged.length,
+        });
+      }
+    })().catch((error) => {
+      if (!cancelled) {
+        console.error("[Brand Studio persistence] hydration failed", error);
+        setHasHydrated(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applyRecords, moduleId, projectId, remoteVersions, userId]);
+
+  const hasHydratedRef = useRef(hasHydrated);
+  useEffect(() => {
+    hasHydratedRef.current = hasHydrated;
+  }, [hasHydrated]);
+
+  const setAnswers = useCallback(
+    (update: AnswersByExercise | ((current: AnswersByExercise) => AnswersByExercise)) => {
+        const current = answersRef.current;
+        const next = typeof update === "function" ? update(current) : update;
+        answersRef.current = next;
+        setAnswersState(next);
+
+        if (!hasHydratedRef.current) return;
+
+        for (const exercise of exercisesRef.current) {
+          const previousValues = current[exercise.id] ?? [];
+          const nextValues = next[exercise.id] ?? [];
+          if (JSON.stringify(previousValues) === JSON.stringify(nextValues)) continue;
+
+          const explicitDelete =
+            userInteractionRef.current && hasValue(previousValues) && !hasValue(nextValues);
+          if (!hasValue(nextValues) && !explicitDelete) continue;
+
+          void persistLocalAnswer({
+            scope: { userId, projectId, moduleId },
+            exerciseId: exercise.id,
+            values: nextValues,
+            explicitDelete,
+          }).then((record) => {
+            broadcastAnswerRef.current(record);
+            setChangeToken((token) => token + 1);
+          });
+        }
+
+        userInteractionRef.current = false;
+    },
+    [moduleId, projectId, userId],
+  );
+
+  const markUserInteraction = useCallback(() => {
+    userInteractionRef.current = true;
+  }, []);
+
+  return {
+    answers,
+    setAnswers,
+    hasHydrated,
+    markUserInteraction,
+    syncStatus: sync.status,
+    syncError: sync.errorMessage,
+    retrySync: sync.sync,
+  };
+}

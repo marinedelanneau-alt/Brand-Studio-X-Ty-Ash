@@ -43,6 +43,8 @@ import EditorialCalendarExercise from "./editorial-calendar-exercise";
 import PedagogicalContent from "./pedagogical-content";
 import VoiceNotePlayer from "./voice-note-player";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
+import { usePersistentAnswers } from "@/hooks/usePersistentAnswers";
+import type { AnswerPersistenceScope } from "@/lib/persistence/types";
 import {
   cleanStoredExerciseQuestionText,
   getFillBlankCount,
@@ -1343,6 +1345,7 @@ function PopupMessageCard({
 
 export default function ModuleAnswerForm({
   module,
+  persistenceScope,
   activeSubmoduleId,
   initialExerciseIndex = 0,
   currentSubmoduleIndex = 0,
@@ -1352,6 +1355,7 @@ export default function ModuleAnswerForm({
   onComplete,
 }: {
   module: WorkspaceModule;
+  persistenceScope: AnswerPersistenceScope;
   activeSubmoduleId?: number;
   initialExerciseIndex?: number;
   currentSubmoduleIndex?: number;
@@ -1365,9 +1369,19 @@ export default function ModuleAnswerForm({
     initialState,
   );
   const [currentIndex, setCurrentIndex] = useState(initialExerciseIndex);
-  const [answers, setAnswers] = useState<AnswersByExercise>(() =>
-    createInitialAnswers(module),
-  );
+  const {
+    answers,
+    setAnswers,
+    hasHydrated,
+    markUserInteraction,
+    syncStatus,
+    syncError,
+    retrySync,
+  } = usePersistentAnswers({
+    module,
+    scope: persistenceScope,
+    initialAnswers: createServerInitialAnswers(module),
+  });
   const [checklistDrafts, setChecklistDrafts] = useState<Record<string, string>>({});
   const [autoSaveState, setAutoSaveState] = useState<ModuleState>(initialState);
   const [saveIndicator, setSaveIndicator] = useState<SaveIndicatorState>("idle");
@@ -1441,7 +1455,23 @@ export default function ModuleAnswerForm({
     isLastSubmodule,
   });
 
-  const persistCurrentDraft = useCallback(({ showPending = false } = {}) => {
+  const persistCurrentDraft = useCallback(async ({ showPending = false } = {}) => {
+    if (showPending) setIsSavingDraft(true);
+    try {
+      await retrySync();
+      return { status: "success", message: "" } satisfies ModuleState;
+    } catch (error) {
+      return {
+        status: "error",
+        message: error instanceof Error ? error.message : "Synchronisation impossible.",
+      } satisfies ModuleState;
+    } finally {
+      if (showPending) setIsSavingDraft(false);
+    }
+  }, [retrySync]);
+
+  /* Legacy network autosave retained in Git history; IndexedDB + Sync Queue now own persistence.
+  const legacyPersistCurrentDraft = useCallback(({ showPending = false } = {}) => {
     if (showPending) {
       setIsSavingDraft(true);
     }
@@ -1566,6 +1596,7 @@ export default function ModuleAnswerForm({
 
     return draftSaveQueueRef.current;
   }, []);
+  */
 
   async function goToNextStep() {
     if (currentExercise && currentIndex < visibleExerciseGroups.length - 1) {
@@ -1823,6 +1854,8 @@ export default function ModuleAnswerForm({
     <form
       action={formAction}
       className="space-y-6"
+      onInputCapture={markUserInteraction}
+      onPointerDownCapture={markUserInteraction}
       onKeyDown={(event) => {
         if (
           event.key === "Enter" &&
@@ -1837,6 +1870,7 @@ export default function ModuleAnswerForm({
       }}
       onBlurCapture={() => {
         void persistCurrentDraft();
+        void retrySync();
       }}
       onSubmit={(event) => {
         event.preventDefault();
@@ -1860,8 +1894,37 @@ export default function ModuleAnswerForm({
         });
       }}
     >
-      <div className="flex min-h-6 justify-end" aria-live="polite">
-        {saveIndicator !== "idle" ? (
+      <div className="flex min-h-6 items-center justify-end gap-3" aria-live="polite">
+        <span
+          className={`text-xs font-semibold ${
+            syncStatus === "error" || syncStatus === "offline"
+              ? "text-[#a95547]"
+              : "text-[#7a7087]"
+          }`}
+        >
+          {!hasHydrated
+            ? "● Chargement des réponses locales…"
+            : syncStatus === "local"
+              ? "● Enregistrement local…"
+              : syncStatus === "syncing"
+                ? "↻ Synchronisation…"
+                : syncStatus === "synced"
+                  ? "✓ Synchronisé"
+                  : syncStatus === "offline"
+                    ? "⚠ Hors ligne — tes réponses sont enregistrées sur cet appareil."
+                    : "⚠ Erreur de synchronisation"}
+        </span>
+        {syncStatus === "error" ? (
+          <button
+            type="button"
+            onClick={() => void retrySync()}
+            className="text-xs font-bold text-[#a95547] underline underline-offset-2"
+            title={syncError}
+          >
+            Réessayer
+          </button>
+        ) : null}
+        {saveIndicator !== "idle" && syncStatus !== "synced" ? (
           <span
             className={`text-xs font-semibold ${
               saveIndicator === "error" || saveIndicator === "offline"
@@ -3289,11 +3352,11 @@ export default function ModuleAnswerForm({
             </button>
           ) : (
             <button
-              type="submit"
+              type="button"
               disabled={pending || isSavingDraft}
               onClick={() => {
-                allowExplicitSubmitRef.current = true;
-                submitModeRef.current = "complete";
+                onComplete?.(latestAnswersRef.current);
+                void goToNextStep();
               }}
               className="flex h-14 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
