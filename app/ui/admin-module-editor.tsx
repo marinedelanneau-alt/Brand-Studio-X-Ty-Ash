@@ -1520,7 +1520,7 @@ function ModuleForm({
     return `${currentModule.id ?? "new"}:${currentModule.title}:${currentModule.position}:${currentModule.isPublished}:${serializeSubmodules(currentModule)}`;
   }
 
-  function getLatestModuleFormData() {
+  function getLatestModuleFormData(mode: "auto" | "manual") {
     const currentModule = getModuleReadyForSubmit();
     const formData = new FormData();
 
@@ -1530,6 +1530,7 @@ function ModuleForm({
 
     formData.set("title", currentModule.title);
     formData.set("position", String(currentModule.position));
+    formData.set("saveMode", mode);
 
     if (currentModule.isPublished) {
       formData.set("isPublished", "on");
@@ -1568,7 +1569,7 @@ function ModuleForm({
           const modeToRun = nextMode;
           nextMode = null;
           pendingSaveModeRef.current = null;
-          const { currentModule, formData, signature } = getLatestModuleFormData();
+          const { currentModule, formData, signature } = getLatestModuleFormData(modeToRun);
 
           if (!currentModule.id) {
             return;

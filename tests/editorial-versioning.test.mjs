@@ -77,3 +77,9 @@ test("un ancien onglet admin ne recrée pas un module après un déploiement", (
   assert.match(training, /const seenTitles = new Set<string>\(\)/);
   assert.match(training, /!draftPositions\.has\(moduleItem\.position\)/);
 });
+
+test("une autosauvegarde admin incomplète ne supprime pas de questions", () => {
+  assert.match(training, /preserveOmittedContent/);
+  assert.match(training, /submittedExerciseCount < existingModule\.exercises\.length/);
+  assert.match(training, /Sauvegarde automatique interrompue/);
+});

@@ -322,6 +322,8 @@ export async function saveAdminModuleDraft(formData: FormData) {
       position,
       isPublished,
       submodules,
+    }, {
+      preserveOmittedContent: formData.get("saveMode") !== "manual",
     });
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);

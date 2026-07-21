@@ -1516,6 +1516,7 @@ function buildDraftModuleFromDefinition(
 export async function saveAdminModuleDefinitionDraft(
   accountId: number,
   input: Parameters<typeof saveModuleDefinition>[0],
+  options: { preserveOmittedContent?: boolean } = {},
 ) {
   const { project, modules } = await getAdminDraftBase(accountId);
 
@@ -1527,6 +1528,24 @@ export async function saveAdminModuleDefinitionDraft(
     ? modules.find((module) => module.id === input.moduleId) ??
       modules.find((module) => module.position === input.position)
     : undefined;
+  if (options.preserveOmittedContent && existingModule) {
+    const submittedExerciseCount = input.submodules.reduce(
+      (total, submodule) =>
+        total + submodule.exerciseGroups.reduce(
+          (groupTotal, group) => groupTotal + group.questions.length,
+          0,
+        ),
+      0,
+    );
+    if (
+      input.submodules.length < existingModule.submodules.length ||
+      submittedExerciseCount < existingModule.exercises.length
+    ) {
+      throw new Error(
+        "Sauvegarde automatique interrompue : le contenu reçu est incomplet. Utilise Enregistrer pour confirmer une suppression volontaire.",
+      );
+    }
+  }
   const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
   const nextModules = existingModule
     ? reorderDraftModules(modules, nextModule)
