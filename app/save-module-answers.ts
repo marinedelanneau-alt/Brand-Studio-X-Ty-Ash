@@ -166,6 +166,9 @@ async function persistModuleAnswers(input: {
       answers: answers.map((answer) => ({
         exerciseId: answer.exerciseId,
         values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
+        clientUpdatedAt: Number(
+          input.formData.get(`exerciseUpdatedAt-${answer.exerciseId}`),
+        ),
       })),
     });
 

@@ -1937,7 +1937,7 @@ export async function getWorkspaceData(accountId: number) {
 
     for (const stableAnswer of stableModuleAnswers) {
       const exerciseId = Number(stableAnswer.question_key.replace(/^question_/, ""));
-      if (!Number.isFinite(exerciseId) || (answersMap[exerciseId]?.length ?? 0) > 0) continue;
+      if (!Number.isFinite(exerciseId)) continue;
       const value = stableAnswer.answer_value;
       answersMap[exerciseId] = Array.isArray(value)
         ? value.filter((item): item is string => typeof item === "string")
@@ -2079,7 +2079,7 @@ export async function upsertStableModuleAnswers(input: {
   userId: number;
   projectId: number;
   moduleId: number;
-  answers: Array<{ exerciseId: number; values: string[] }>;
+  answers: Array<{ exerciseId: number; values: string[]; clientUpdatedAt: number }>;
 }) {
   if (input.answers.length === 0) return;
   const supabase = createSupabaseServerClient();
@@ -2099,10 +2099,17 @@ export async function upsertStableModuleAnswers(input: {
     user_id: input.userId, project_id: input.projectId, module_key: identity.module_key,
     submodule_key: "legacy", exercise_key: `exercise_${answer.exerciseId}`,
     question_key: `question_${answer.exerciseId}`, field_key: "answer",
-    answer_value: answer.values, source_version_id: sourceVersionId, updated_at: now,
+    answer_value: answer.values,
+    source_version_id: sourceVersionId,
+    client_updated_at: new Date(
+      Number.isFinite(answer.clientUpdatedAt) && answer.clientUpdatedAt > 0
+        ? answer.clientUpdatedAt
+        : Date.now(),
+    ).toISOString(),
+    updated_at: now,
   }));
-  const { error } = await supabase.from("user_answers").upsert(rows, {
-    onConflict: "user_id,project_id,question_key,field_key",
+  const { error } = await supabase.rpc("upsert_user_answers_if_newer", {
+    p_rows: rows,
   });
   if (error && !isMissingDatabaseObject(error)) throw new Error(error.message);
 }

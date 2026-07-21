@@ -71,6 +71,7 @@ type AnswersByExercise = Record<number, string[]>;
 type StoredAnswersDraft = {
   updatedAt: number;
   answers: AnswersByExercise;
+  pendingExerciseIds: number[];
 };
 type AiAssistMode = "suggest" | "improve";
 type AiAssistState = {
@@ -78,7 +79,7 @@ type AiAssistState = {
   mode: AiAssistMode | null;
   message: string;
 };
-type SaveIndicatorState = "idle" | "saving" | "saved" | "error";
+type SaveIndicatorState = "idle" | "saving" | "saved" | "offline" | "error";
 
 const initialState: ModuleState = {
   status: "idle",
@@ -97,6 +98,12 @@ const IMAGE_UPLOAD_MAX_DIMENSION = 1600;
 const MODULE_ANSWERS_DRAFT_PREFIX = "brand-studio-module-answers";
 const MODULE_ANSWERS_SESSION_DRAFT_PREFIX = "brand-studio-session-module-answers";
 const OTHER_CHOICE_VALUE_PREFIX = "__other_choice__:";
+
+function debugPersistence(event: string, details?: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[Brand Studio persistence] ${event}`, details ?? {});
+  }
+}
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
   return (
@@ -749,6 +756,7 @@ function buildSubmissionFormData(
   module: WorkspaceModule,
   answers: AnswersByExercise,
   exerciseIds?: Set<number>,
+  clientUpdatedAt = Date.now(),
 ) {
   const formData = new FormData();
   formData.set("moduleId", String(module.id));
@@ -763,6 +771,7 @@ function buildSubmissionFormData(
     }
 
     const fieldName = `exercise-${exercise.id}`;
+    formData.set(`exerciseUpdatedAt-${exercise.id}`, String(clientUpdatedAt));
     const values = normalizeSubmissionValues(exercise, answers[exercise.id] ?? []);
     formData.append("submittedExerciseId", String(exercise.id));
 
@@ -839,6 +848,12 @@ function parseStoredAnswersDraft(value: string | null): StoredAnswersDraft | nul
     return {
       updatedAt,
       answers,
+      pendingExerciseIds:
+        "pendingExerciseIds" in parsed && Array.isArray(parsed.pendingExerciseIds)
+          ? parsed.pendingExerciseIds
+              .map(Number)
+              .filter((exerciseId) => Number.isFinite(exerciseId))
+          : Object.keys(answers).map(Number),
     };
   } catch {
     return null;
@@ -886,27 +901,57 @@ function readBrowserAnswersDraft(module: WorkspaceModule) {
         }),
       ) as AnswersByExercise
     : null;
+  const stablePendingExerciseIds = stableDraft
+    ? stableDraft.pendingExerciseIds.flatMap((position) => {
+        const exerciseId = exerciseIdByPosition.get(position);
+        return exerciseId ? [exerciseId] : [];
+      })
+    : [];
 
   if (!idDraft) {
-    return stableAnswers;
+    return stableAnswers
+      ? {
+          updatedAt: stableDraft?.updatedAt ?? 0,
+          answers: stableAnswers,
+          pendingExerciseIds: stablePendingExerciseIds,
+        }
+      : null;
   }
 
   if (!stableDraft || idDraft.updatedAt >= stableDraft.updatedAt) {
-    return idDraft.answers;
+    return idDraft;
   }
 
-  return stableAnswers;
+  return stableAnswers
+    ? {
+        updatedAt: stableDraft.updatedAt,
+        answers: stableAnswers,
+        pendingExerciseIds: stablePendingExerciseIds,
+      }
+    : idDraft;
 }
 
-function writeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
+function writeBrowserAnswersDraft(
+  module: WorkspaceModule,
+  answers: AnswersByExercise,
+  persistedAnswers: AnswersByExercise,
+) {
   if (typeof window === "undefined") {
     return;
   }
 
   const updatedAt = Date.now();
+  const pendingExerciseIds = module.exercises
+    .filter(
+      (exercise) =>
+        JSON.stringify(answers[exercise.id] ?? []) !==
+        JSON.stringify(persistedAnswers[exercise.id] ?? []),
+    )
+    .map((exercise) => exercise.id);
   const payload = JSON.stringify({
     updatedAt,
     answers,
+    pendingExerciseIds,
   });
   const stablePayload = JSON.stringify({
     updatedAt,
@@ -916,6 +961,9 @@ function writeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExe
         answers[exercise.id] ?? [],
       ]),
     ),
+    pendingExerciseIds: module.exercises
+      .filter((exercise) => pendingExerciseIds.includes(exercise.id))
+      .map((exercise) => exercise.position),
   });
 
   try {
@@ -948,7 +996,7 @@ function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExe
 
   const exerciseById = new Map(module.exercises.map((exercise) => [exercise.id, exercise]));
   const validLocalEntries = Object.fromEntries(
-    Object.entries(browserDraft).flatMap(([exerciseId, values]) => {
+    Object.entries(browserDraft.answers).flatMap(([exerciseId, values]) => {
       const exercise = exerciseById.get(Number(exerciseId));
 
       if (!exercise || !Array.isArray(values)) {
@@ -966,6 +1014,7 @@ function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExe
       return [[Number(exerciseId), normalizedValues]];
     }),
   ) as AnswersByExercise;
+  const pendingExerciseIds = new Set(browserDraft.pendingExerciseIds);
 
   return Object.fromEntries(
     module.exercises.map((exercise) => {
@@ -979,7 +1028,9 @@ function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExe
       // explicitly for that field by the scoped autosave.
       return [
         exercise.id,
-        localHasAnswer || !serverHasAnswer ? (localValues ?? serverValues) : serverValues,
+        pendingExerciseIds.has(exercise.id) || (!serverHasAnswer && localHasAnswer)
+          ? (localValues ?? serverValues)
+          : serverValues,
       ];
     }),
   ) satisfies AnswersByExercise;
@@ -1335,6 +1386,8 @@ export default function ModuleAnswerForm({
   const submitModeRef = useRef<"draft" | "complete" | null>(null);
   const shouldOpenSummaryAfterSaveRef = useRef(false);
   const saveIndicatorTimerRef = useRef<number | null>(null);
+  const retryTimerRef = useRef<number | null>(null);
+  const retryAttemptRef = useRef(0);
 
   const currentSubmodule = useMemo(
     () =>
@@ -1421,14 +1474,25 @@ export default function ModuleAnswerForm({
           saveIndicatorTimerRef.current = null;
         }
         setSaveIndicator("saving");
+        debugPersistence("save:start", {
+          moduleId: activeModule.id,
+          exerciseIds: [...changedExerciseIds],
+        });
 
         const serializedAnswersToSave = JSON.stringify(answersToSave);
         let result: ModuleState;
 
         try {
-          result = await saveModuleDraft(
-            buildSubmissionFormData(activeModule, answersToSave, changedExerciseIds),
-          );
+          if (!navigator.onLine) {
+            result = {
+              status: "error",
+              message: "Hors ligne. Tes réponses sont conservées sur cet appareil.",
+            };
+          } else {
+            result = await saveModuleDraft(
+              buildSubmissionFormData(activeModule, answersToSave, changedExerciseIds),
+            );
+          }
         } catch {
           result = {
             status: "error",
@@ -1438,6 +1502,11 @@ export default function ModuleAnswerForm({
         }
 
         if (result.status === "success") {
+          retryAttemptRef.current = 0;
+          if (retryTimerRef.current !== null) {
+            window.clearTimeout(retryTimerRef.current);
+            retryTimerRef.current = null;
+          }
           for (const exerciseId of changedExerciseIds) {
             const savedValues = answersToSave[exerciseId] ?? [];
             const currentValues = latestAnswersRef.current[exerciseId] ?? [];
@@ -1450,16 +1519,39 @@ export default function ModuleAnswerForm({
           // Keep the durable browser copy even after Supabase confirms the save. Admin
           // deployments can replace database IDs, while positions remain stable.
           if (JSON.stringify(latestAnswersRef.current) === serializedAnswersToSave) {
-            writeBrowserAnswersDraft(activeModule, answersToSave);
+            writeBrowserAnswersDraft(
+              activeModule,
+              answersToSave,
+              persistedAnswersRef.current,
+            );
           }
 
           setSaveIndicator("saved");
+          debugPersistence("save:success", {
+            moduleId: activeModule.id,
+            exerciseIds: [...changedExerciseIds],
+          });
           saveIndicatorTimerRef.current = window.setTimeout(() => {
             setSaveIndicator("idle");
             saveIndicatorTimerRef.current = null;
           }, 2000);
         } else {
-          setSaveIndicator("error");
+          setSaveIndicator(navigator.onLine ? "error" : "offline");
+          const retryDelay = Math.min(1000 * 2 ** retryAttemptRef.current, 30000);
+          retryAttemptRef.current += 1;
+          if (retryTimerRef.current !== null) {
+            window.clearTimeout(retryTimerRef.current);
+          }
+          retryTimerRef.current = window.setTimeout(() => {
+            retryTimerRef.current = null;
+            void persistCurrentDraft();
+          }, retryDelay);
+          debugPersistence("save:error", {
+            moduleId: activeModule.id,
+            exerciseIds: [...changedExerciseIds],
+            retryDelay,
+            message: result.message,
+          });
         }
 
         setAutoSaveState(result);
@@ -1524,7 +1616,7 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     latestAnswersRef.current = answers;
-    writeBrowserAnswersDraft(moduleRef.current, answers);
+    writeBrowserAnswersDraft(moduleRef.current, answers, persistedAnswersRef.current);
   }, [answers]);
 
   useEffect(() => {
@@ -1568,7 +1660,11 @@ export default function ModuleAnswerForm({
 
   useEffect(() => {
     function saveBeforeLeaving() {
-      writeBrowserAnswersDraft(moduleRef.current, latestAnswersRef.current);
+      writeBrowserAnswersDraft(
+        moduleRef.current,
+        latestAnswersRef.current,
+        persistedAnswersRef.current,
+      );
       void persistCurrentDraft();
     }
 
@@ -1594,9 +1690,60 @@ export default function ModuleAnswerForm({
   }, [persistCurrentDraft]);
 
   useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      const activeModule = moduleRef.current;
+      const relevantKeys = new Set([
+        getLocalAnswersDraftKey(activeModule.id),
+        getStableLocalAnswersDraftKey(activeModule.position),
+      ]);
+
+      if (!event.key || !relevantKeys.has(event.key)) {
+        return;
+      }
+
+      const browserDraft = readBrowserAnswersDraft(activeModule);
+      if (!browserDraft || browserDraft.pendingExerciseIds.length === 0) {
+        return;
+      }
+
+      const pendingIds = new Set(browserDraft.pendingExerciseIds);
+      setAnswers((current) => {
+        const next = { ...current };
+        let changed = false;
+
+        for (const exerciseId of pendingIds) {
+          const incomingValues = browserDraft.answers[exerciseId];
+          if (
+            incomingValues &&
+            JSON.stringify(incomingValues) !== JSON.stringify(current[exerciseId] ?? [])
+          ) {
+            next[exerciseId] = [...incomingValues];
+            changed = true;
+          }
+        }
+
+        if (changed) {
+          debugPersistence("local:restore-from-other-tab", {
+            moduleId: activeModule.id,
+            exerciseIds: [...pendingIds],
+          });
+        }
+
+        return changed ? next : current;
+      });
+    }
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (saveIndicatorTimerRef.current !== null) {
         window.clearTimeout(saveIndicatorTimerRef.current);
+      }
+      if (retryTimerRef.current !== null) {
+        window.clearTimeout(retryTimerRef.current);
       }
     };
   }, []);
@@ -1713,6 +1860,25 @@ export default function ModuleAnswerForm({
         });
       }}
     >
+      <div className="flex min-h-6 justify-end" aria-live="polite">
+        {saveIndicator !== "idle" ? (
+          <span
+            className={`text-xs font-semibold ${
+              saveIndicator === "error" || saveIndicator === "offline"
+                ? "text-[#a95547]"
+                : "text-[#7a7087]"
+            }`}
+          >
+            {saveIndicator === "saving"
+              ? "● Enregistrement…"
+              : saveIndicator === "saved"
+                ? "✓ Toutes les modifications sont enregistrées"
+                : saveIndicator === "offline"
+                  ? "⚠ Hors ligne — sauvegarde locale active"
+                  : "⚠ Erreur de sauvegarde — nouvelle tentative automatique"}
+          </span>
+        ) : null}
+      </div>
       <div className="border-b border-[#eadfca] pb-3">
         {state.status === "error" && state.message ? (
           <div className="mb-4 rounded-[1rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-4 text-sm leading-6 text-[#9d4e40]">

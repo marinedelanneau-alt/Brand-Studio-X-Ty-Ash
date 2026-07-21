@@ -4,6 +4,10 @@ import { readFileSync } from "node:fs";
 
 const sql = readFileSync(new URL("../supabase/migrations/20260720190000_editorial_versioning.sql", import.meta.url), "utf8");
 const training = readFileSync(new URL("../lib/training.ts", import.meta.url), "utf8");
+const conflictProtectionSql = readFileSync(
+  new URL("../supabase/migrations/20260721160000_answer_conflict_protection.sql", import.meta.url),
+  "utf8",
+);
 
 test("les réponses stables ne dépendent pas des versions", () => {
   const table = sql.match(/create table if not exists public\.user_answers \([\s\S]*?\n\);/)?.[0] ?? "";
@@ -39,4 +43,13 @@ test("les questions admin conservent leur identité lors d'un déplacement ou aj
   assert.match(training, /requestedExerciseId = Number\(question\.clientId\)/);
   assert.match(training, /existingExercises\.find\(\(item\) => item\.id === requestedExerciseId\)/);
   assert.match(training, /clientId: String\(exercise\.id\)/);
+});
+
+test("une sauvegarde ancienne ne peut pas écraser une réponse plus récente", () => {
+  assert.match(conflictProtectionSql, /client_updated_at timestamptz not null/);
+  assert.match(conflictProtectionSql, /upsert_user_answers_if_newer/);
+  assert.match(
+    conflictProtectionSql,
+    /user_answers\.client_updated_at <= excluded\.client_updated_at/,
+  );
 });
