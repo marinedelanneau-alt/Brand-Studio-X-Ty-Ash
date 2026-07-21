@@ -7,7 +7,7 @@ import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
 
 const COLOR_SYMBOLISM_RESOURCE = {
-  href: "/symbolique-couleurs-communication.svg",
+  href: "/symbolique-couleurs-communication.png",
   title: "La symbolique des couleurs en communication",
   fileName: "symbolique-couleurs-communication.jpg",
 };
@@ -42,7 +42,7 @@ function ColorSymbolismResource() {
 
     const canvas = document.createElement("canvas");
     canvas.width = 1536;
-    canvas.height = 960;
+    canvas.height = 1024;
 
     const context = canvas.getContext("2d");
     if (!context) {
@@ -76,7 +76,7 @@ function ColorSymbolismResource() {
           src={COLOR_SYMBOLISM_RESOURCE.href}
           alt={COLOR_SYMBOLISM_RESOURCE.title}
           width={1536}
-          height={960}
+          height={1024}
           className="w-full rounded-[0.9rem] border border-[#f0e4d3] bg-white"
         />
         <button
