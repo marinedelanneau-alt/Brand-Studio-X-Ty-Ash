@@ -1837,9 +1837,12 @@ export async function publishScheduledAdminModuleSnapshot(
 
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
-  // Answers must always target persisted module/exercise IDs. Admin drafts can contain
-  // temporary negative IDs and are intentionally restricted to the admin editor.
-  const modules = await getModulesWithExercises();
+  const account = await findAccountById(accountId);
+  // Clients always receive the published content. The administrator's own workspace is
+  // the isolated preview requested by the editor and may display its saved draft.
+  const modules = account?.role === "admin" || account?.is_admin
+    ? await getAdminWorkingModules(accountId)
+    : await getModulesWithExercises();
 
   if (!project) {
     return {
