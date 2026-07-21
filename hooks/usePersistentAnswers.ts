@@ -38,7 +38,7 @@ export function usePersistentAnswers(input: {
         revision: input.module.answerVersions[exercise.id]?.revision ?? 0,
         updatedAt: input.module.answerVersions[exercise.id]?.updatedAt ?? 0,
         deleted: (input.module.answers[exercise.id] ?? []).length === 0,
-      })),
+      })).filter((answer) => answer.updatedAt > 0 || hasValue(answer.values)),
     [input.module],
   );
 
@@ -85,6 +85,24 @@ export function usePersistentAnswers(input: {
       const merged = await mergeRemoteModuleAnswers(scope, remoteVersions);
       if (cancelled) return;
       applyRecords(merged);
+
+      const knownExerciseIds = new Set(
+        [...localFirst, ...merged].map((answer) => answer.exerciseId),
+      );
+      const browserRecovery = answersRef.current;
+      for (const exercise of input.module.exercises) {
+        const recoveredValues = browserRecovery[exercise.id] ?? [];
+        if (!knownExerciseIds.has(exercise.id) && hasValue(recoveredValues)) {
+          const recovered = await persistLocalAnswer({
+            scope,
+            exerciseId: exercise.id,
+            values: recoveredValues,
+            explicitDelete: false,
+          });
+          broadcastAnswerRef.current(recovered);
+          setChangeToken((token) => token + 1);
+        }
+      }
       setHasHydrated(true);
 
       if (process.env.NODE_ENV !== "production") {

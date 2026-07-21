@@ -163,8 +163,10 @@ async function persistModuleAnswers(input: {
       userId: workspace.project.account_id,
       projectId: workspace.project.id,
       moduleId: selectedModule.id,
+      modulePosition: selectedModule.position,
       answers: answers.map((answer) => ({
         exerciseId: answer.exerciseId,
+        exercisePosition: exerciseById.get(answer.exerciseId)?.position ?? answer.exerciseId,
         values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
         clientUpdatedAt: Number(
           input.formData.get(`exerciseUpdatedAt-${answer.exerciseId}`),

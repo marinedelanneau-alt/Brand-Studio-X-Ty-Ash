@@ -64,8 +64,10 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
     userId: account.id,
     projectId: workspace.project.id,
     moduleId,
+    modulePosition: selectedModule.position,
     answers: validMutations.map((mutation) => ({
       exerciseId: mutation.exerciseId,
+      exercisePosition: exerciseById.get(mutation.exerciseId)!.position,
       values: mutation.operation === "delete" ? [] : mutation.values,
       clientUpdatedAt: mutation.updatedAt,
       revision: mutation.revision,

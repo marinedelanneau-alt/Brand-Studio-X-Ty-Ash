@@ -8,6 +8,10 @@ const conflictProtectionSql = readFileSync(
   new URL("../supabase/migrations/20260721160000_answer_conflict_protection.sql", import.meta.url),
   "utf8",
 );
+const stablePositionSql = readFileSync(
+  new URL("../supabase/migrations/20260721170000_stable_position_answers.sql", import.meta.url),
+  "utf8",
+);
 
 test("les réponses stables ne dépendent pas des versions", () => {
   const table = sql.match(/create table if not exists public\.user_answers \([\s\S]*?\n\);/)?.[0] ?? "";
@@ -52,4 +56,15 @@ test("une sauvegarde ancienne ne peut pas écraser une réponse plus récente", 
     conflictProtectionSql,
     /user_answers\.client_updated_at <= excluded\.client_updated_at/,
   );
+});
+
+test("les réponses survivent au remplacement des identifiants lors d'un déploiement", () => {
+  assert.match(training, /module_position_\$\{input\.modulePosition\}/);
+  assert.match(training, /exercise_position_\$\{answer\.exercisePosition\}/);
+  assert.match(stablePositionSql, /'module_position_' \|\| bm\.position/);
+  assert.match(
+    stablePositionSql,
+    /'module_position_' \|\| bm\.position \|\| '_exercise_position_' \|\| me\.position/,
+  );
+  assert.doesNotMatch(stablePositionSql, /delete\s+from\s+public\.user_answers/i);
 });

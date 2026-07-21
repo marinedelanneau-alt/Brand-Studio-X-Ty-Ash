@@ -1946,11 +1946,25 @@ export async function getWorkspaceData(accountId: number) {
       ]),
     ) as WorkspaceModule["answerVersions"];
     const backedUpModuleAnswers = answerBackup?.modules[String(module.position)];
-    const stableModuleAnswers = stableAnswers.filter((item) => item.module_key === `module_${module.id}`);
+    const stableModuleAnswers = stableAnswers
+      .filter(
+        (item) =>
+          item.module_key === `module_position_${module.position}` ||
+          item.module_key === `module_${module.id}`,
+      )
+      .sort((left, right) =>
+        Number(left.module_key.startsWith("module_position_")) -
+        Number(right.module_key.startsWith("module_position_")),
+      );
 
     for (const stableAnswer of stableModuleAnswers) {
-      const exerciseId = Number(stableAnswer.question_key.replace(/^question_/, ""));
-      if (!Number.isFinite(exerciseId)) continue;
+      const positionMatch = stableAnswer.question_key.match(
+        /^module_position_\d+_exercise_position_(\d+)$/,
+      );
+      const exerciseId: number | undefined = positionMatch
+        ? module.exercises.find((exercise) => exercise.position === Number(positionMatch[1]))?.id
+        : Number(stableAnswer.question_key.replace(/^question_/, ""));
+      if (typeof exerciseId !== "number" || !Number.isFinite(exerciseId)) continue;
       const value = stableAnswer.answer_value;
       answersMap[exerciseId] = Array.isArray(value)
         ? value.filter((item): item is string => typeof item === "string")
@@ -2097,8 +2111,10 @@ export async function upsertStableModuleAnswers(input: {
   userId: number;
   projectId: number;
   moduleId: number;
+  modulePosition: number;
   answers: Array<{
     exerciseId: number;
+    exercisePosition: number;
     values: string[];
     clientUpdatedAt: number;
     revision?: number;
@@ -2106,24 +2122,17 @@ export async function upsertStableModuleAnswers(input: {
 }) {
   if (input.answers.length === 0) return;
   const supabase = createSupabaseServerClient();
-  const { data: identity, error: identityError } = await supabase
-    .from("editorial_modules")
-    .select("id,module_key,module_versions(id,status)")
-    .eq("legacy_module_id", input.moduleId)
-    .maybeSingle<{ id: string; module_key: string; module_versions: Array<{ id: string; status: string }> }>();
-  if (identityError) {
-    if (isMissingDatabaseObject(identityError)) return;
-    throw new Error(identityError.message);
-  }
-  if (!identity) return;
-  const sourceVersionId = identity.module_versions.find((item) => item.status === "published")?.id ?? null;
   const now = new Date().toISOString();
   const rows = input.answers.map((answer) => ({
-    user_id: input.userId, project_id: input.projectId, module_key: identity.module_key,
-    submodule_key: "legacy", exercise_key: `exercise_${answer.exerciseId}`,
-    question_key: `question_${answer.exerciseId}`, field_key: "answer",
+    user_id: input.userId,
+    project_id: input.projectId,
+    module_key: `module_position_${input.modulePosition}`,
+    submodule_key: "stable_position",
+    exercise_key: `module_position_${input.modulePosition}_exercise_position_${answer.exercisePosition}`,
+    question_key: `module_position_${input.modulePosition}_exercise_position_${answer.exercisePosition}`,
+    field_key: "answer",
     answer_value: answer.values,
-    source_version_id: sourceVersionId,
+    source_version_id: null,
     client_updated_at: new Date(
       Number.isFinite(answer.clientUpdatedAt) && answer.clientUpdatedAt > 0
         ? answer.clientUpdatedAt
@@ -2135,7 +2144,7 @@ export async function upsertStableModuleAnswers(input: {
   const { error } = await supabase.rpc("upsert_user_answers_if_newer", {
     p_rows: rows,
   });
-  if (error && !isMissingDatabaseObject(error)) throw new Error(error.message);
+  if (error) throw new Error(error.message);
 }
 
 export async function replaceModuleAnswers(input: {
