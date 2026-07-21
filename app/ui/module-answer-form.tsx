@@ -1363,6 +1363,9 @@ export default function ModuleAnswerForm({
   const isFirstSubmodule = currentSubmoduleIndex === 0;
   const isLastSubmodule =
     totalSubmodules === 0 || currentSubmoduleIndex === totalSubmodules - 1;
+  const isEditorialCalendarModule = module.exercises.some(
+    (exercise) => exercise.type === "editorial_calendar",
+  );
   const nextStepLabel = getNextStepLabel({
     currentExercise,
     currentIndex,
@@ -1471,6 +1474,11 @@ export default function ModuleAnswerForm({
     }
 
     window.location.assign(getModuleSummaryHref(module));
+  }
+
+  async function goToCommunicationPlan() {
+    await persistCurrentDraft({ showPending: true });
+    window.location.assign("/mon-espace/plan-action-communication");
   }
 
   function goToPreviousStep() {
@@ -3092,6 +3100,15 @@ export default function ModuleAnswerForm({
               className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
+            </button>
+          ) : isEditorialCalendarModule ? (
+            <button
+              type="button"
+              disabled={pending || isSavingDraft}
+              onClick={() => void goToCommunicationPlan()}
+              className="flex h-14 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+            >
+              {isSavingDraft ? "Enregistrement..." : "Vers mon plan de communication"}
             </button>
           ) : (
             <button
