@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const sql = readFileSync(new URL("../supabase/migrations/20260720190000_editorial_versioning.sql", import.meta.url), "utf8");
+const training = readFileSync(new URL("../lib/training.ts", import.meta.url), "utf8");
 
 test("les réponses stables ne dépendent pas des versions", () => {
   const table = sql.match(/create table if not exists public\.user_answers \([\s\S]*?\n\);/)?.[0] ?? "";
@@ -32,4 +33,10 @@ test("restaurer crée un nouveau brouillon", () => {
 test("aucune action éditoriale ne supprime les réponses", () => {
   assert.doesNotMatch(sql, /delete\s+from\s+public\.user_answers/i);
   assert.doesNotMatch(sql, /drop\s+table\s+(if exists\s+)?public\.project_exercise_answers/i);
+});
+
+test("les questions admin conservent leur identité lors d'un déplacement ou ajout", () => {
+  assert.match(training, /requestedExerciseId = Number\(question\.clientId\)/);
+  assert.match(training, /existingExercises\.find\(\(item\) => item\.id === requestedExerciseId\)/);
+  assert.match(training, /clientId: String\(exercise\.id\)/);
 });

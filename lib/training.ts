@@ -1370,6 +1370,7 @@ function buildDraftModuleFromDefinition(
     position: number;
     isPublished: boolean;
     submodules: Array<{
+      clientId?: string;
       title: string;
       position: number;
       videoUrl: string;
@@ -1379,6 +1380,7 @@ function buildDraftModuleFromDefinition(
       exerciseGroups: Array<{
         groupId: string;
         questions: Array<{
+          clientId?: string;
           type: ExerciseType;
           explanation: string;
           answerPlaceholder: string;
@@ -1410,11 +1412,17 @@ function buildDraftModuleFromDefinition(
   let globalExercisePosition = 1;
 
   const submodules = input.submodules.map((submodule, submoduleIndex) => {
-    const existingSubmodule = existingSubmodules[submoduleIndex];
+    const requestedSubmoduleId = Number(submodule.clientId);
+    const existingSubmodule = Number.isFinite(requestedSubmoduleId)
+      ? existingSubmodules.find((item) => item.id === requestedSubmoduleId)
+      : existingSubmodules[submoduleIndex];
     const submoduleId = existingSubmodule?.id ?? nextSubmoduleId--;
     const questions = submodule.exerciseGroups.flatMap((group) =>
       group.questions.map((question) => {
-        const existingExercise = existingExercises[globalExercisePosition - 1];
+        const requestedExerciseId = Number(question.clientId);
+        const existingExercise = Number.isFinite(requestedExerciseId)
+          ? existingExercises.find((item) => item.id === requestedExerciseId)
+          : undefined;
         const exerciseId = existingExercise?.id ?? nextExerciseId--;
 
         return {
@@ -1593,6 +1601,7 @@ function moduleDraftToDefinitionInput(module: DraftModule) {
     position: module.position,
     isPublished: module.is_published,
     submodules: module.submodules.map((submodule) => ({
+      clientId: String(submodule.id),
       title: submodule.title,
       position: submodule.position,
       videoUrl: submodule.video_url,
@@ -1602,6 +1611,7 @@ function moduleDraftToDefinitionInput(module: DraftModule) {
       exerciseGroups: groupExercisesByGroupId(submodule.exercises).map((group) => ({
         groupId: group.id,
         questions: group.questions.map((exercise) => ({
+          clientId: String(exercise.id),
           type: exercise.type,
           explanation: exercise.explanation,
           answerPlaceholder: exercise.answer_placeholder,
@@ -2205,6 +2215,7 @@ export async function saveModuleDefinition(input: {
   position: number;
   isPublished: boolean;
   submodules: Array<{
+    clientId?: string;
     title: string;
     position: number;
     videoUrl: string;
@@ -2214,6 +2225,7 @@ export async function saveModuleDefinition(input: {
     exerciseGroups: Array<{
       groupId: string;
       questions: Array<{
+        clientId?: string;
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;
