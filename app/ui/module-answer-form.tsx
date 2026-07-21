@@ -45,6 +45,7 @@ import VoiceNotePlayer from "./voice-note-player";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import { usePersistentAnswers } from "@/hooks/usePersistentAnswers";
 import type { AnswerPersistenceScope } from "@/lib/persistence/types";
+import { getModuleHref } from "@/lib/module-routing";
 import {
   cleanStoredExerciseQuestionText,
   getFillBlankCount,
@@ -1226,7 +1227,7 @@ function getNextStepLabel(input: {
 function getModuleSummaryHref(module: Pick<WorkspaceModule, "id" | "position">) {
   return module.position === 4
     ? "/brand-guide"
-    : `/mon-espace/module/${module.id}?summary=1#resume-module`;
+    : `${getModuleHref(module)}?summary=1#resume-module`;
 }
 
 function getStaticTextHtml(content: string) {

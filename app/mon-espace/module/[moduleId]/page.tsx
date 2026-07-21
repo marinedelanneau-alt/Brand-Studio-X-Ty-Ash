@@ -10,6 +10,7 @@ import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { getModuleHref, resolveWorkspaceModule } from "@/lib/module-routing";
 
 export const dynamic = "force-dynamic";
 
@@ -57,17 +58,11 @@ export default async function WorkspaceModulePage({
     );
   }
 
-  const numericModuleId = Number(moduleId);
-
   if (!workspace.project) {
     redirect("/mon-espace");
   }
 
-  if (!Number.isFinite(numericModuleId) || numericModuleId <= 0) {
-    notFound();
-  }
-
-  const currentModule = workspace.modules.find((item) => item.id === numericModuleId);
+  const currentModule = resolveWorkspaceModule(workspace.modules, moduleId);
 
   if (!currentModule) {
     notFound();
@@ -103,8 +98,9 @@ export default async function WorkspaceModulePage({
         module: currentModule,
       })
     : null;
-  const completionHref = `/mon-espace/module/${currentModule.id}/complete`;
-  const pdfHref = `/mon-espace/module/${currentModule.id}/summary-pdf`;
+  const moduleHref = getModuleHref(currentModule);
+  const completionHref = `${moduleHref}/complete`;
+  const pdfHref = `${moduleHref}/summary-pdf`;
   const brandName = account.company_name?.trim() || workspace.project.name;
   const shareData = summaryCard
     ? {
@@ -180,12 +176,12 @@ export default async function WorkspaceModulePage({
             <ModuleCompletionScreen
               summary={summaryCard}
               shareData={shareData}
-              editHref={`/mon-espace/module/${currentModule.id}?mode=exercises`}
+              editHref={`${moduleHref}?mode=exercises`}
               completionHref={completionHref}
               pdfHref={pdfHref}
               nextHref={
                 nextModule
-                  ? `/mon-espace/module/${nextModule.id}`
+                  ? getModuleHref(nextModule)
                   : undefined
               }
               nextLabel={

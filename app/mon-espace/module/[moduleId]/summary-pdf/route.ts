@@ -9,6 +9,7 @@ import { buildModuleSummaryCard } from "@/lib/module-summary";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
+import { resolveWorkspaceModule } from "@/lib/module-routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,11 +28,6 @@ export async function GET(
     }
 
     const { moduleId } = await params;
-    const numericModuleId = Number(moduleId);
-    if (!Number.isFinite(numericModuleId) || numericModuleId <= 0) {
-      return NextResponse.json({ message: "Module introuvable." }, { status: 404 });
-    }
-
     const workspace = await getWorkspaceData(account.id);
     if (!workspace.project) {
       return NextResponse.json(
@@ -40,7 +36,7 @@ export async function GET(
       );
     }
 
-    const currentModule = workspace.modules.find((item) => item.id === numericModuleId);
+    const currentModule = resolveWorkspaceModule(workspace.modules, moduleId);
     if (!currentModule) {
       return NextResponse.json({ message: "Module introuvable." }, { status: 404 });
     }

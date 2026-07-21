@@ -15,6 +15,7 @@ import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { getModuleHref } from "@/lib/module-routing";
 import {
   getTableCellCount,
   isAnswerableExerciseType,
@@ -76,12 +77,12 @@ function getResumeHref(modules: WorkspaceModule[]) {
       const exercise = submodule.exercises[exerciseIndex];
 
       if (isAnswerableExerciseType(exercise.type) && !isExerciseAnswered(exercise, activeModule.answers)) {
-        return `/mon-espace/module/${activeModule.id}?mode=exercises&submodule=${submoduleIndex}&exercise=${exerciseIndex}`;
+        return `${getModuleHref(activeModule)}?mode=exercises&submodule=${submoduleIndex}&exercise=${exerciseIndex}`;
       }
     }
   }
 
-  return `/mon-espace/module/${activeModule.id}`;
+  return getModuleHref(activeModule);
 }
 
 function getAccessLabel(status: string) {
@@ -207,10 +208,9 @@ export default async function MonEspacePage() {
   const hasStartedModules = workspace.modules.some(
     (module) => module.progress.answeredCount > 0 || module.progress.isCompleted,
   );
-  const firstModuleHref =
-    workspace.modules[0]?.id
-      ? `/mon-espace/module/${workspace.modules[0].id}`
-      : "/mon-espace";
+  const firstModuleHref = workspace.modules[0]
+    ? getModuleHref(workspace.modules[0])
+    : "/mon-espace";
   const continueHref = getResumeHref(workspace.modules);
   const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
   const workspaceTitle =
@@ -351,7 +351,7 @@ export default async function MonEspacePage() {
                         {workspace.modules.map((module) => (
                           <Link
                             key={module.id}
-                            href={`/mon-espace/module/${module.id}`}
+                            href={getModuleHref(module)}
                             className={`rounded-full border px-4 py-2 text-sm font-black uppercase tracking-[0.12em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"

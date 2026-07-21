@@ -3,29 +3,32 @@ import { unstable_rethrow } from "next/navigation";
 import { updateCompletedModuleCookie } from "@/lib/module-completion-fallback";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
-import { getProjectByAccountId, setProjectModuleCompletion } from "@/lib/training";
+import { getWorkspaceData, setProjectModuleCompletion } from "@/lib/training";
+import { resolveWorkspaceModule } from "@/lib/module-routing";
 
 export const dynamic = "force-dynamic";
 
-async function markModuleAsCompleted(moduleId: number) {
+async function markModuleAsCompleted(routeKey: string) {
   const account = await getAuthenticatedAccount();
   if (!(await hasActiveAccess(account.id))) {
     return false;
   }
-  const project = await getProjectByAccountId(account.id);
+  const workspace = await getWorkspaceData(account.id);
+  const project = workspace.project;
+  const selectedModule = resolveWorkspaceModule(workspace.modules, routeKey);
 
-  if (!project) {
+  if (!project || !selectedModule) {
     return false;
   }
 
   await setProjectModuleCompletion({
     projectId: project.id,
-    moduleId,
+    moduleId: selectedModule.id,
     isCompleted: true,
   });
   await updateCompletedModuleCookie({
     projectId: project.id,
-    moduleId,
+    moduleId: selectedModule.id,
     isCompleted: true,
   });
 
@@ -48,13 +51,12 @@ export async function POST(
 ) {
   try {
     const { moduleId } = await params;
-    const numericModuleId = Number(moduleId);
-
-    if (!Number.isFinite(numericModuleId) || numericModuleId <= 0) {
+    if (!moduleId) {
       return NextResponse.json({ ok: false }, { status: 400 });
     }
 
-    await markModuleAsCompleted(numericModuleId);
+    const completed = await markModuleAsCompleted(moduleId);
+    if (!completed) return NextResponse.json({ ok: false }, { status: 404 });
     return NextResponse.json({ ok: true });
   } catch (error) {
     unstable_rethrow(error);
@@ -68,11 +70,7 @@ export async function GET(
 ) {
   try {
     const { moduleId } = await params;
-    const numericModuleId = Number(moduleId);
-
-    if (Number.isFinite(numericModuleId) && numericModuleId > 0) {
-      await markModuleAsCompleted(numericModuleId);
-    }
+    if (moduleId) await markModuleAsCompleted(moduleId);
 
     return NextResponse.redirect(new URL(getRedirectTarget(request), request.url));
   } catch (error) {

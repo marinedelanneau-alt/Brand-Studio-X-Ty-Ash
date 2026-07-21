@@ -280,7 +280,7 @@ function findText(sources: AnswerSource[], keywordGroups: string[][], fallback: 
 }
 
 function moduleHref(source: AnswerSource | undefined) {
-  return source ? `/mon-espace/module/${source.module.id}?mode=exercises` : undefined;
+  return source ? `/mon-espace/module/position-${source.module.position}?mode=exercises` : undefined;
 }
 
 function collectPersonaValue(
