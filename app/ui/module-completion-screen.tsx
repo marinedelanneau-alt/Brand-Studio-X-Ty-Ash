@@ -10,7 +10,11 @@ import {
   DocumentArrowDownIcon,
   ShareIcon,
 } from "@heroicons/react/24/outline";
-import type { ModuleKeyTakeaway, ModuleSummaryCard } from "@/lib/module-summary";
+import type {
+  ModuleKeyTakeaway,
+  ModuleSummaryCard,
+  ModuleSummaryColor,
+} from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
 import { slugifyFilePart } from "@/lib/get-module-share-data";
 import {
@@ -78,15 +82,46 @@ function CompletionHero({
   );
 }
 
+function PaletteSummary({ colors }: { colors: ModuleSummaryColor[] }) {
+  return (
+    <div className="mt-3 flex flex-wrap gap-3">
+      {colors.map((color, index) => (
+        <div
+          key={`${color.name}-${color.value}-${index}`}
+          className="flex min-w-[8.5rem] items-center gap-2 rounded-full border border-[#eadfca] bg-[#fffdf8] py-1.5 pl-1.5 pr-3"
+        >
+          <span
+            aria-hidden="true"
+            className="h-8 w-8 shrink-0 rounded-full border border-black/10 shadow-inner"
+            style={{ background: color.background }}
+          />
+          <span className="min-w-0">
+            <span className="block truncate text-xs font-extrabold text-[#4f463f]">
+              {color.name}
+            </span>
+            <span className="block text-[0.68rem] font-semibold text-[#7a7087]">
+              {color.value}
+            </span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
   return (
     <article className="rounded-[1.1rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(91,73,57,0.05)]">
       <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[#7a7087]">
         {item.label}
       </h3>
-      <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#6f645b]">
-        {item.value}
-      </p>
+      {item.colors && item.colors.length > 0 ? (
+        <PaletteSummary colors={item.colors} />
+      ) : (
+        <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#6f645b]">
+          {item.value}
+        </p>
+      )}
     </article>
   );
 }
@@ -260,9 +295,13 @@ function ModuleDetailAccordion({ summary }: { summary: ModuleSummaryCard }) {
                         <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a7087]">
                           {item.label}
                         </p>
-                        <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
-                          {item.value}
-                        </p>
+                        {item.colors && item.colors.length > 0 ? (
+                          <PaletteSummary colors={item.colors} />
+                        ) : (
+                          <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
+                            {item.value}
+                          </p>
+                        )}
                       </div>
                     ))
                   ) : (

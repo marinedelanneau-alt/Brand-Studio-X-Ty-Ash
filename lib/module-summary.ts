@@ -19,6 +19,13 @@ import type { WorkspaceModule } from "@/lib/training-types";
 export type ModuleSummaryHighlight = {
   label: string;
   value: string;
+  colors?: ModuleSummaryColor[];
+};
+
+export type ModuleSummaryColor = {
+  name: string;
+  value: string;
+  background: string;
 };
 
 export type ModuleSubmoduleSummary = {
@@ -35,6 +42,7 @@ export type ModuleKeyTakeaway = {
   value: string;
   context: string;
   icon: "persona" | "tone" | "odor" | "baseline" | "palette" | "moodboard" | "spark";
+  colors?: ModuleSummaryColor[];
 };
 
 export type ModuleSummaryCard = {
@@ -299,6 +307,16 @@ function buildPaletteTakeaway(
         .map((color) => color.name || ("hex" in color ? color.hex : `${color.from} -> ${color.to}`))
         .filter(Boolean)
     : [];
+  const visualColors = paletteAnswer
+    ? [...paletteAnswer.primaryColors, ...paletteAnswer.secondaryColors].map((color) => ({
+        name: color.name || "Couleur",
+        value: color.mode === "solid" ? color.hex : `${color.from} → ${color.to}`,
+        background:
+          color.mode === "solid"
+            ? color.hex
+            : `linear-gradient(135deg, ${color.from}, ${color.to})`,
+      }))
+    : [];
 
   if (paletteColors.length > 0) {
     return {
@@ -307,6 +325,7 @@ function buildPaletteTakeaway(
       value: paletteColors.slice(0, 5).join(" · "),
       context: "Les repères visuels qui posent l'ambiance de ta marque.",
       icon: "palette",
+      colors: visualColors,
     } satisfies ModuleKeyTakeaway;
   }
 
@@ -608,6 +627,28 @@ function summarizeExerciseAnswer(
       : null;
   }
 
+  if (exercise.type === "color_palette") {
+    const palette = parseStoredColorPaletteAnswer(values);
+    const colors = palette
+      ? [...palette.primaryColors, ...palette.secondaryColors].map((color) => ({
+          name: color.name || "Couleur",
+          value: color.mode === "solid" ? color.hex : `${color.from} → ${color.to}`,
+          background:
+            color.mode === "solid"
+              ? color.hex
+              : `linear-gradient(135deg, ${color.from}, ${color.to})`,
+        }))
+      : [];
+
+    return colors.length > 0
+      ? {
+          label: exercise.question || "Palette de couleurs",
+          value: colors.map((color) => `${color.name} (${color.value})`).join(", "),
+          colors,
+        }
+      : null;
+  }
+
   if (exercise.type === "checklist") {
     const entries = parseChecklistEntries(values);
     const keptEntries = entries.filter((entry) => entry.checked).map((entry) => entry.label);
@@ -740,7 +781,15 @@ function summarizeBrandPersonaValues(
     return summarizeGenericValues(values);
   }
 
-  return fields
+  const conciseFieldIds = new Set([
+    "persona_first_name",
+    "persona_age_approx",
+    "persona_symbolic_profession",
+    "persona_summary_sentence",
+  ]);
+  const conciseFields = fields.filter((field) => conciseFieldIds.has(field.id));
+
+  return conciseFields
     .map((field, fieldIndex) => {
       const fieldValues = indexedAnswers
         .filter((item) => item.questionIndex === fieldIndex)
@@ -751,7 +800,8 @@ function summarizeBrandPersonaValues(
       return fieldValues.length > 0 ? `${field.label}: ${fieldValues.join(", ")}` : "";
     })
     .filter(Boolean)
-    .join(" | ");
+    .map((value) => value.replace(/^[^:]{1,80}:\s*/, ""))
+    .join(" · ");
 }
 
 function summarizeIndexedValues(
