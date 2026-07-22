@@ -1,6 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { describe, expect, it } from "vitest";
-import { ModulePdfSummary } from "../lib/module-pdf-summary";
+import { ModulePdfSummary, sanitizePdfText } from "../lib/module-pdf-summary";
 import type { ModuleSummaryCard } from "../lib/module-summary";
 import type { ModuleShareData } from "../lib/get-module-share-data";
 
@@ -62,6 +62,15 @@ const shareData: ModuleShareData = {
 };
 
 describe("module PDF summary", () => {
+  it("removes unsupported pictograms without damaging French text", () => {
+    expect(sanitizePdfText("📝 Baseline : comment je me résume en une phrase")).toBe(
+      "Baseline : comment je me résume en une phrase",
+    );
+    expect(sanitizePdfText("☁️ Une odeur douce · l'authenticité")).toBe(
+      "Une odeur douce · l'authenticité",
+    );
+  });
+
   it("renders long, indivisible answer cards as a valid multi-page PDF", async () => {
     const buffer = await renderToBuffer(
       <ModulePdfSummary summary={summary} shareData={shareData} />,

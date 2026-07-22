@@ -1,5 +1,6 @@
 import {
   Document,
+  Font,
   Page,
   StyleSheet,
   Text,
@@ -11,6 +12,8 @@ import type {
   ModuleSubmoduleSummary,
 } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
+
+Font.registerHyphenationCallback((word) => [word]);
 
 const palette = {
   canvas: "#F7F1E8",
@@ -317,8 +320,16 @@ function formatDate(value: string) {
   }).format(date);
 }
 
+export function sanitizePdfText(value: string) {
+  return value
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F\u200D]/gu, "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function normalizeValue(value: string) {
-  return value.replace(/\s+/g, " ").trim().toLocaleLowerCase("fr-FR");
+  return sanitizePdfText(value).toLocaleLowerCase("fr-FR");
 }
 
 function removeRepeatedHighlights(
@@ -358,8 +369,8 @@ function PdfPalette({ colors }: { colors: ModuleSummaryColor[] }) {
               )}
             </View>
             <View style={styles.colorText}>
-              <Text style={styles.colorName}>{color.name}</Text>
-              <Text style={styles.colorValue}>{color.value}</Text>
+              <Text style={styles.colorName}>{sanitizePdfText(color.name)}</Text>
+              <Text style={styles.colorValue}>{sanitizePdfText(color.value)}</Text>
             </View>
           </View>
         );
@@ -380,8 +391,8 @@ function SectionHeading({
   return (
     <View style={styles.sectionHeading} minPresenceAhead={90}>
       <Text style={styles.sectionIndex}>{index}</Text>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <Text style={styles.sectionIntro}>{intro}</Text>
+      <Text style={styles.sectionTitle}>{sanitizePdfText(title)}</Text>
+      <Text style={styles.sectionIntro}>{sanitizePdfText(intro)}</Text>
     </View>
   );
 }
@@ -397,7 +408,7 @@ export function ModulePdfSummary({
 
   return (
     <Document
-      title={`Résumé ${shareData.moduleTitle} — ${shareData.brandName}`}
+      title={`Résumé ${sanitizePdfText(shareData.moduleTitle)} — ${sanitizePdfText(shareData.brandName)}`}
       author="Brand Studio"
       subject="Synthèse personnelle de fin de module"
       language="fr-FR"
@@ -410,10 +421,10 @@ export function ModulePdfSummary({
 
         <View style={styles.hero} wrap={false}>
           <Text style={styles.eyebrow}>Carnet de marque · Module terminé</Text>
-          <Text style={styles.heroTitle}>{shareData.moduleTitle}</Text>
-          <Text style={styles.brandName}>{shareData.brandName}</Text>
+          <Text style={styles.heroTitle}>{sanitizePdfText(shareData.moduleTitle)}</Text>
+          <Text style={styles.brandName}>{sanitizePdfText(shareData.brandName)}</Text>
           <View style={styles.heroRule} />
-          <Text style={styles.heroStatement}>{summary.hero || shareData.shareSentence}</Text>
+          <Text style={styles.heroStatement}>{sanitizePdfText(summary.hero || shareData.shareSentence)}</Text>
         </View>
 
         <View style={styles.metaRow} wrap={false}>
@@ -427,7 +438,7 @@ export function ModulePdfSummary({
           </View>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Repères</Text>
-            <Text style={styles.metaValue}>{shareData.keywords.join(" · ")}</Text>
+            <Text style={styles.metaValue}>{sanitizePdfText(shareData.keywords.join(" · "))}</Text>
           </View>
         </View>
 
@@ -442,14 +453,16 @@ export function ModulePdfSummary({
               <View key={item.id} style={styles.takeaway} wrap={false}>
                 <View style={styles.takeawayTop} minPresenceAhead={28}>
                   <View style={styles.takeawayMarker} />
-                  <Text style={styles.takeawayLabel}>{item.label}</Text>
+                  <Text style={styles.takeawayLabel}>{sanitizePdfText(item.label)}</Text>
                 </View>
                 {item.colors?.length ? (
                   <PdfPalette colors={item.colors} />
                 ) : (
-                  <Text style={styles.answer}>{item.value}</Text>
+                  <Text style={styles.answer}>{sanitizePdfText(item.value)}</Text>
                 )}
-                {item.context.trim() ? <Text style={styles.context}>{item.context}</Text> : null}
+                {sanitizePdfText(item.context) ? (
+                  <Text style={styles.context}>{sanitizePdfText(item.context)}</Text>
+                ) : null}
               </View>
             ))}
           </View>
@@ -466,15 +479,15 @@ export function ModulePdfSummary({
               <View key={submodule.id} style={styles.chapter}>
                 <View style={styles.chapterHeader} minPresenceAhead={55}>
                   <Text style={styles.chapterNumber}>{String(submodule.position).padStart(2, "0")}</Text>
-                  <Text style={styles.chapterTitle}>{submodule.title}</Text>
+                  <Text style={styles.chapterTitle}>{sanitizePdfText(submodule.title)}</Text>
                 </View>
                 {submodule.highlights.map((item, index) => (
                   <View key={`${item.label}-${index}`} style={styles.detail} wrap={false}>
-                    <Text style={styles.detailLabel} minPresenceAhead={24}>{item.label}</Text>
+                    <Text style={styles.detailLabel} minPresenceAhead={24}>{sanitizePdfText(item.label)}</Text>
                     {item.colors?.length ? (
                       <PdfPalette colors={item.colors} />
                     ) : (
-                      <Text style={styles.detailValue}>{item.value}</Text>
+                      <Text style={styles.detailValue}>{sanitizePdfText(item.value)}</Text>
                     )}
                   </View>
                 ))}
@@ -486,14 +499,14 @@ export function ModulePdfSummary({
         <View style={styles.closing} minPresenceAhead={90}>
           <Text style={styles.closingTitle}>Et maintenant ?</Text>
           <Text style={styles.closingText}>
-            {`${shareData.shareSentence} Garde cette synthèse comme point de repère : elle t'aidera à rester cohérente dans tes prochaines décisions de marque.`}
+            {sanitizePdfText(`${shareData.shareSentence} Garde cette synthèse comme point de repère : elle t'aidera à rester cohérente dans tes prochaines décisions de marque.`)}
           </Text>
         </View>
 
         <View style={styles.footer} fixed>
           <View style={styles.footerLine} />
           <View style={styles.footerRow}>
-            <Text>Document personnel · {shareData.brandName}</Text>
+            <Text>Document personnel · {sanitizePdfText(shareData.brandName)}</Text>
             <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
           </View>
         </View>
