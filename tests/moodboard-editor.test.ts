@@ -44,6 +44,30 @@ describe("personal moodboard data", () => {
     }
   });
 
+  it("removes the old automatic composition but preserves uploaded images", () => {
+    const automaticSvg = "data:image/svg+xml;charset=UTF-8,%3Ctext%3EMOODBOARD%3C%2Ftext%3E";
+    const legacy = `__moodboard__:${JSON.stringify({
+      type: "moodboard",
+      version: 1,
+      layoutStyle: "editorial",
+      ambiance: "Univers automatique",
+      feedback: "",
+      blocks: [
+        { id: "generated", type: "image", imageUrl: automaticSvg, caption: "lumière", x: 2, y: 2, w: 30, h: 20, rotation: 0, zIndex: 1 },
+        { id: "generated-word", type: "keyword", keyword: "créative", x: 35, y: 2, w: 20, h: 12, rotation: 0, zIndex: 2 },
+        { id: "uploaded", type: "image", imageUrl: "https://example.com/my-photo.webp", caption: "Ma photo", x: 2, y: 30, w: 40, h: 25, rotation: 0, zIndex: 3 },
+      ],
+    })}`;
+
+    const restored = parseStoredMoodboardAnswer([legacy]);
+    expect(restored.blocks).toHaveLength(1);
+    expect(restored.blocks[0]).toMatchObject({
+      id: "uploaded",
+      type: "image",
+      imageUrl: "https://example.com/my-photo.webp",
+    });
+  });
+
   it("persists icons and manual coordinates", () => {
     const board: MoodboardAnswer = {
       ...getDefaultMoodboardAnswer("collage"),

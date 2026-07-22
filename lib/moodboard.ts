@@ -538,6 +538,28 @@ export function serializeMoodboardAnswer(answer: MoodboardAnswer) {
   })}`;
 }
 
+function isLegacyGeneratedImage(block: MoodboardBlock) {
+  return block.type === "image" &&
+    block.imageUrl.startsWith("data:image/svg+xml") &&
+    block.imageUrl.includes("MOODBOARD");
+}
+
+function removeLegacyGeneratedComposition(
+  blocks: MoodboardBlock[],
+  storedVersion: number,
+) {
+  if (storedVersion >= 2 || !blocks.some(isLegacyGeneratedImage)) {
+    return blocks;
+  }
+
+  // Version 1 seeded a full decorative composition automatically. Keep only
+  // genuine uploaded images; generated SVGs and their companion cards are not
+  // user choices and should not be carried into the personal editor.
+  return blocks.filter(
+    (block) => block.type === "image" && !isLegacyGeneratedImage(block),
+  );
+}
+
 export function parseStoredMoodboardAnswer(
   rawValues: string[],
   maxImages = 6,
@@ -555,24 +577,35 @@ export function parseStoredMoodboardAnswer(
         parsed.layoutStyle === "bold"
           ? parsed.layoutStyle
           : DEFAULT_STYLE;
-      const blocks = Array.isArray(parsed.blocks)
+      const normalizedBlocks = Array.isArray(parsed.blocks)
         ? parsed.blocks
             .filter((block): block is MoodboardBlock => !!block && typeof block === "object")
             .map((block, index) => normalizeBlock(block, index))
         : [];
+      const storedVersion = Number(parsed.version ?? 1);
+      const migratedGeneratedComposition =
+        storedVersion < 2 && normalizedBlocks.some(isLegacyGeneratedImage);
+      const blocks = removeLegacyGeneratedComposition(
+        normalizedBlocks,
+        storedVersion,
+      );
 
       const answer = {
         type: "moodboard",
         version: 2,
         layoutStyle,
-        ambiance: typeof parsed.ambiance === "string" ? parsed.ambiance : "",
-        feedback: typeof parsed.feedback === "string" ? parsed.feedback : "",
+        ambiance: migratedGeneratedComposition
+          ? ""
+          : typeof parsed.ambiance === "string" ? parsed.ambiance : "",
+        feedback: migratedGeneratedComposition
+          ? ""
+          : typeof parsed.feedback === "string" ? parsed.feedback : "",
         blocks,
       } satisfies MoodboardAnswer;
 
       return {
         ...answer,
-        feedback: answer.feedback || analyzeMoodboard(answer),
+        feedback: answer.feedback || (answer.blocks.length > 0 ? analyzeMoodboard(answer) : ""),
       };
     } catch {
       return getDefaultMoodboardAnswer();
