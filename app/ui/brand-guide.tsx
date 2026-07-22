@@ -119,14 +119,9 @@ export default function BrandGuideLayout({
             </GuideSection>
             <GuideSection kicker="02" title="Positionnement">
               <div className="grid gap-4 md:grid-cols-2">
-                <GuideCard label="Cible principale" value={guide.positioning.target} />
                 <GuideCard label="Contexte client" value={guide.positioning.context} />
-                <GuideCard label="Probleme resolu" value={guide.positioning.problem} />
-                <GuideCard label="Differenciation" value={guide.positioning.differentiation} />
-                <GuideCard label="Concurrents" value={guide.positioning.competitors} />
                 <GuideCard label="Positionnement final" value={guide.positioning.finalPositioning} />
               </div>
-              <GuideCard label="Phrase de pitch" value={guide.positioning.pitch} wide />
             </GuideSection>
             <GuideSection kicker="03" title="Personnalite de marque">
               <div className="grid gap-4 md:grid-cols-2">

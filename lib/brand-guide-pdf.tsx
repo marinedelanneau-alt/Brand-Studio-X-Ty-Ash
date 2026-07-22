@@ -430,12 +430,8 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         </Section>
         <Section eyebrow="02" title="Positionnement" theme={theme}>
           <View style={styles.grid}>
-            <Card label="Cible principale" value={guide.positioning.target} theme={theme} />
             <Card label="Contexte client" value={guide.positioning.context} theme={theme} />
-            <Card label="Probleme resolu" value={guide.positioning.problem} theme={theme} />
-            <Card label="Differenciation" value={guide.positioning.differentiation} theme={theme} />
             <Card label="Positionnement final" value={guide.positioning.finalPositioning} theme={theme} />
-            <Card label="Pitch" value={guide.positioning.pitch} theme={theme} />
           </View>
         </Section>
       </Page>
