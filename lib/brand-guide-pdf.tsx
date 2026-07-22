@@ -1,5 +1,6 @@
 import {
   Document,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -125,6 +126,37 @@ const styles = StyleSheet.create({
   },
   summaryPage: {
     backgroundColor: "#FFFFFF",
+  },
+  moodboardFrame: {
+    backgroundColor: "#F5EEE4",
+    border: "1 solid #EADFCA",
+    borderRadius: 9,
+    height: 225,
+    marginTop: 12,
+    overflow: "hidden",
+    padding: 8,
+    position: "relative",
+  },
+  moodboardItem: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    border: "1 solid rgba(255,255,255,0.8)",
+    borderRadius: 6,
+    justifyContent: "center",
+    overflow: "hidden",
+    position: "absolute",
+  },
+  moodboardImage: {
+    height: "100%",
+    objectFit: "cover",
+    width: "100%",
+  },
+  moodboardText: {
+    color: "#4B4550",
+    fontSize: 8,
+    fontWeight: 700,
+    padding: 8,
+    textAlign: "center",
   },
 });
 
@@ -313,6 +345,45 @@ function Palette({
   );
 }
 
+function MoodboardComposition({ guide }: { guide: GeneratedBrandGuide }) {
+  const items = guide.visualUniverse.moodboard;
+
+  if (items.length === 0) {
+    return <Card wide theme={getPdfTheme(guide)} label="Moodboard" value="Moodboard à compléter." />;
+  }
+
+  return (
+    <View style={styles.moodboardFrame}>
+      {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
+        <View
+          key={item.id}
+          style={[
+            styles.moodboardItem,
+            {
+              left: `${item.x}%`,
+              top: `${item.y}%`,
+              width: `${item.width}%`,
+              height: `${item.height}%`,
+              backgroundColor: item.type === "color" ? item.color : "#FFFFFF",
+              transform: `rotate(${item.rotation}deg)`,
+            },
+          ]}
+        >
+          {item.type === "image" && item.imageUrl ? (
+            // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
+            <Image src={item.imageUrl} style={styles.moodboardImage} />
+          ) : (
+            <Text style={[styles.moodboardText, item.type === "color" ? { color: "#FFFFFF" } : {}]}>
+              {item.type === "icon" ? `${item.description === "circle" ? "○" : item.description === "wave" ? "∿" : "✦"} ` : ""}
+              {item.label}
+            </Text>
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
   const colors = [
     ...guide.visualUniverse.palette.primary,
@@ -386,12 +457,16 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
             <Checklist title="Usages recommandes" items={guide.baselineSection.recommendedUses} theme={theme} />
           </View>
         </Section>
+      </Page>
+
+      <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
         <Section eyebrow="05" title="Univers visuel" theme={theme}>
           <Palette colors={colors} theme={theme} />
           <View style={styles.grid}>
             <Card label="Ambiance generale" value={guide.visualUniverse.ambiance} theme={theme} />
             <Card label="Elements graphiques" value={guide.visualUniverse.graphicElements} theme={theme} />
           </View>
+          <MoodboardComposition guide={guide} />
         </Section>
       </Page>
 

@@ -36,11 +36,19 @@ export type GuideColor = {
 
 export type GuideMoodboardItem = {
   id: string;
-  type: "image" | "color" | "text" | "keyword";
+  type: "image" | "color" | "text" | "keyword" | "icon";
   imageUrl?: string;
   color?: string;
   label: string;
   description: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  zIndex: number;
+  cropX?: number;
+  cropY?: number;
 };
 
 export type GuideCompletionItem = {
@@ -349,19 +357,32 @@ function collectMoodboard(sources: AnswerSource[]) {
 
   return {
     ambiance: answer?.ambiance || answer?.feedback || "",
-    items: (answer?.blocks ?? []).slice(0, 8).map((block) => {
+    items: (answer?.blocks ?? []).slice(0, 16).map((block) => {
+      const frame = {
+        x: block.x,
+        y: block.y,
+        width: block.w,
+        height: block.h,
+        rotation: block.rotation,
+        zIndex: block.zIndex,
+      };
+
       if (block.type === "image") {
         return {
+          ...frame,
           id: block.id,
           type: "image" as const,
           imageUrl: block.imageUrl,
-          label: block.caption || "Inspiration",
-          description: "Reference visuelle du moodboard.",
+          cropX: block.cropX,
+          cropY: block.cropY,
+          label: block.altText || block.caption || "Inspiration",
+          description: block.caption || "Référence visuelle du moodboard.",
         };
       }
 
       if (block.type === "color") {
         return {
+          ...frame,
           id: block.id,
           type: "color" as const,
           color: block.color,
@@ -372,6 +393,7 @@ function collectMoodboard(sources: AnswerSource[]) {
 
       if (block.type === "text") {
         return {
+          ...frame,
           id: block.id,
           type: "text" as const,
           label: block.text || "Note d'ambiance",
@@ -379,7 +401,19 @@ function collectMoodboard(sources: AnswerSource[]) {
         };
       }
 
+      if (block.type === "icon") {
+        return {
+          ...frame,
+          id: block.id,
+          type: "icon" as const,
+          color: block.color,
+          label: block.label || "Pictogramme",
+          description: block.icon,
+        };
+      }
+
       return {
+        ...frame,
         id: block.id,
         type: "keyword" as const,
         label: block.keyword || "Mot-cle",

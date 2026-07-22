@@ -8,12 +8,16 @@ export type MoodboardBlockBase = {
   h: number;
   rotation: number;
   zIndex: number;
+  styleVariant?: string;
 };
 
 export type MoodboardImageBlock = MoodboardBlockBase & {
   type: "image";
   imageUrl: string;
   caption: string;
+  altText: string;
+  cropX: number;
+  cropY: number;
 };
 
 export type MoodboardColorBlock = MoodboardBlockBase & {
@@ -34,15 +38,25 @@ export type MoodboardKeywordBlock = MoodboardBlockBase & {
   keyword: string;
 };
 
+export type MoodboardIconName = "spark" | "star" | "leaf" | "circle" | "wave";
+
+export type MoodboardIconBlock = MoodboardBlockBase & {
+  type: "icon";
+  icon: MoodboardIconName;
+  label: string;
+  color: string;
+};
+
 export type MoodboardBlock =
   | MoodboardImageBlock
   | MoodboardColorBlock
   | MoodboardTextBlock
-  | MoodboardKeywordBlock;
+  | MoodboardKeywordBlock
+  | MoodboardIconBlock;
 
 export type MoodboardAnswer = {
   type: "moodboard";
-  version: 1;
+  version: 2;
   layoutStyle: MoodboardLayoutStyle;
   ambiance: string;
   feedback: string;
@@ -197,7 +211,7 @@ export function createMoodboardFromTemplate(
 
   return {
     type: "moodboard",
-    version: 1,
+    version: 2,
     layoutStyle: template.layoutType,
     ambiance: "",
     feedback: "",
@@ -430,6 +444,9 @@ function createGeneratedImageBlock(input: {
     type: "image",
     imageUrl: toDataUri(buildGeneratedImageSvg(input)),
     caption: input.keyword,
+    altText: input.keyword,
+    cropX: 50,
+    cropY: 50,
     x: 0,
     y: 0,
     w: 0,
@@ -457,6 +474,9 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
       type: "image",
       imageUrl: block.imageUrl,
       caption: block.caption ?? "",
+      altText: block.altText ?? block.caption ?? "",
+      cropX: clamp(block.cropX ?? 50, 0, 100),
+      cropY: clamp(block.cropY ?? 50, 0, 100),
     };
   }
 
@@ -479,6 +499,20 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
     };
   }
 
+  if (block.type === "icon") {
+    const icon = ["spark", "star", "leaf", "circle", "wave"].includes(block.icon)
+      ? block.icon
+      : "spark";
+
+    return {
+      ...base,
+      type: "icon",
+      icon: icon as MoodboardIconName,
+      label: block.label ?? "Pictogramme",
+      color: ensureHexColor(block.color, "#4B4550"),
+    };
+  }
+
   return {
     ...base,
     type: "keyword",
@@ -489,7 +523,7 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
 export function getDefaultMoodboardAnswer(style: MoodboardLayoutStyle = DEFAULT_STYLE): MoodboardAnswer {
   return {
     type: "moodboard",
-    version: 1,
+    version: 2,
     layoutStyle: style,
     ambiance: "",
     feedback: "",
@@ -529,7 +563,7 @@ export function parseStoredMoodboardAnswer(
 
       const answer = {
         type: "moodboard",
-        version: 1,
+        version: 2,
         layoutStyle,
         ambiance: typeof parsed.ambiance === "string" ? parsed.ambiance : "",
         feedback: typeof parsed.feedback === "string" ? parsed.feedback : "",
@@ -565,6 +599,9 @@ export function parseStoredMoodboardAnswer(
       type: "image" as const,
       imageUrl,
       caption: `Inspiration ${index + 1}`,
+      altText: `Inspiration ${index + 1}`,
+      cropX: 50,
+      cropY: 50,
       x: 0,
       y: 0,
       w: 0,
@@ -576,7 +613,7 @@ export function parseStoredMoodboardAnswer(
   );
   const answer = {
     type: "moodboard",
-    version: 1,
+    version: 2,
     layoutStyle: DEFAULT_STYLE,
     ambiance: "",
     feedback: "",
@@ -683,7 +720,7 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
   );
   const answer = {
     type: "moodboard",
-    version: 1,
+    version: 2,
     layoutStyle: style,
     ambiance: inferAmbiance(input),
     feedback: "",

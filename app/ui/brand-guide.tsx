@@ -374,26 +374,40 @@ export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
   }
 
   return (
-    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((item) => (
-        <article key={item.id} className="min-h-40 overflow-hidden rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)]">
-          {item.type === "image" && item.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.imageUrl} alt={item.label} className="h-36 w-full object-cover" />
-          ) : (
-            <div
-              className="flex h-36 items-center justify-center p-4 text-center text-sm font-black uppercase tracking-[0.14em] text-[#4b4550]"
-              style={{ background: item.color ?? "#fff8f1" }}
-            >
-              {item.label}
-            </div>
-          )}
-          <div className="p-4">
-            <p className="text-sm font-black text-[#4b4550]">{item.label}</p>
-            <p className="mt-1 text-xs leading-5 text-[#7b7068]">{item.description}</p>
+    <div className="mx-auto mt-5 w-full max-w-3xl rounded-[1rem] border border-[var(--guide-border)] bg-[#f5eee4] p-3 shadow-[0_18px_44px_rgba(78,58,38,0.1)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[0.8rem] bg-[#fbf7f0]">
+        {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
+          <div
+            key={item.id}
+            className="absolute overflow-hidden rounded-[0.7rem] border border-white/80 bg-white shadow-[0_10px_24px_rgba(62,48,34,0.12)]"
+            style={{
+              left: `${item.x}%`,
+              top: `${item.y}%`,
+              width: `${item.width}%`,
+              height: `${item.height}%`,
+              transform: `rotate(${item.rotation}deg)`,
+              zIndex: item.zIndex,
+              backgroundColor: item.type === "color" ? item.color : undefined,
+            }}
+          >
+            {item.type === "image" && item.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={item.imageUrl} alt={item.label} className="h-full w-full object-cover" style={{ objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }} />
+            ) : item.type === "color" ? (
+              <div className="flex h-full items-end p-3 text-xs font-black uppercase tracking-[0.12em] text-white drop-shadow">{item.label}</div>
+            ) : item.type === "icon" ? (
+              <div className="flex h-full flex-col items-center justify-center p-3 text-center" style={{ color: item.color ?? "#4b4550" }}>
+                <span className="text-4xl leading-none">{item.description === "circle" ? "○" : item.description === "wave" ? "∿" : item.description === "leaf" ? "◒" : "✦"}</span>
+                <span className="mt-2 text-[0.6rem] font-black uppercase tracking-[0.12em]">{item.label}</span>
+              </div>
+            ) : (
+              <div className={`flex h-full items-center justify-center p-3 text-center text-[#4b4550] ${item.type === "text" ? "font-[family:var(--font-cormorant)] text-xl italic" : "text-xs font-black uppercase tracking-[0.14em]"}`}>
+                {item.label}
+              </div>
+            )}
           </div>
-        </article>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

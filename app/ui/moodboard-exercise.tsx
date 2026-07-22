@@ -4,24 +4,23 @@ import {
   ArrowDownTrayIcon,
   ArrowPathIcon,
   ArrowUpTrayIcon,
+  ChatBubbleLeftRightIcon,
+  CursorArrowRaysIcon,
   PhotoIcon,
   PlusIcon,
-  SparklesIcon,
+  StarIcon,
   SwatchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { uploadExerciseImages } from "@/app/upload-exercise-images";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
 import {
   analyzeMoodboard,
   autoArrange,
-  createMoodboardFromTemplate,
-  createSuggestedMoodboardImages,
-  generateMoodboard,
+  getDefaultMoodboardAnswer,
   getMoodboardImageCount,
-  getMoodboardTemplate,
   parseStoredMoodboardAnswer,
   serializeMoodboardAnswer,
   type MoodboardAnswer,
@@ -36,7 +35,6 @@ import {
   parseStoredMoodboardConfig,
   type MoodboardConfig,
 } from "@/lib/exercise-types";
-import PedagogicalContent from "./pedagogical-content";
 
 type ExerciseLike = WorkspaceModule["exercises"][number];
 
@@ -48,6 +46,20 @@ type UploadState = {
 const initialUploadState: UploadState = {
   status: "idle",
   message: "",
+};
+
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+type BoardInteraction = {
+  blockId: string;
+  mode: "move" | "resize";
+  startClientX: number;
+  startClientY: number;
+  initialX: number;
+  initialY: number;
+  initialW: number;
+  initialH: number;
 };
 
 function hexToRgb(hex: string) {
@@ -90,6 +102,94 @@ function fileToDataUrl(file: File) {
 
     reader.readAsDataURL(file);
   });
+}
+
+async function compressMoodboardImage(file: File) {
+  if (!ACCEPTED_IMAGE_TYPES.has(file.type) || file.size > MAX_IMAGE_BYTES) {
+    throw new Error("Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.");
+  }
+
+  const sourceUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await loadImage(sourceUrl);
+    const maxDimension = 2_000;
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("Compression indisponible.");
+    }
+
+    context.drawImage(image, 0, 0, width, height);
+    const outputType = file.type === "image/png" ? "image/png" : "image/webp";
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, outputType, outputType === "image/webp" ? 0.82 : undefined),
+    );
+
+    if (!blob) {
+      throw new Error("Compression impossible.");
+    }
+
+    const extension = outputType === "image/png" ? "png" : "webp";
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "inspiration";
+    return new File([blob], `${baseName}.${extension}`, {
+      type: outputType,
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+function clampPercent(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function MoodboardIconGraphic({ name }: { name: "spark" | "star" | "leaf" | "circle" | "wave" }) {
+  if (name === "circle") {
+    return <span className="block h-16 w-16 rounded-full border-[6px] border-current" />;
+  }
+
+  if (name === "wave") {
+    return <span className="text-6xl font-light leading-none">∿</span>;
+  }
+
+  if (name === "leaf") {
+    return <span className="block h-16 w-10 rotate-45 rounded-[100%_0_100%_0] border-[5px] border-current" />;
+  }
+
+  return <StarIcon className={`h-16 w-16 ${name === "spark" ? "rotate-12" : ""}`} />;
+}
+
+function SafeMoodboardImage({
+  src,
+  alt,
+  className,
+  objectPosition,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+  objectPosition?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed || !src) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-[#f1ebe2] text-[#8a8077]`}>
+        <PhotoIcon className="h-8 w-8" />
+      </div>
+    );
+  }
+
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt={alt} className={className} style={{ objectPosition }} onError={() => setFailed(true)} />;
 }
 
 function getBoardBackground(palette: string[]) {
@@ -191,8 +291,8 @@ async function renderBoardToCanvas(input: {
         const drawHeight = image.height * scale;
         context.drawImage(
           image,
-          (blockWidth - drawWidth) / 2,
-          (blockHeight - drawHeight) / 2,
+          (blockWidth - drawWidth) * (block.cropX / 100),
+          (blockHeight - drawHeight) * (block.cropY / 100),
           drawWidth,
           drawHeight,
         );
@@ -208,6 +308,17 @@ async function renderBoardToCanvas(input: {
       context.fillStyle = "#4B4550";
       context.font = "600 28px Arial";
       context.fillText(block.label || "Couleur", 42, blockHeight - 58);
+    } else if (block.type === "icon") {
+      context.fillStyle = "rgba(255,255,255,0.92)";
+      context.fillRect(0, 0, blockWidth, blockHeight);
+      context.fillStyle = sanitizeHex(block.color, "#4B4550");
+      context.font = `700 ${Math.max(42, Math.min(blockWidth, blockHeight) * 0.42)}px Arial`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      const iconGlyph = block.icon === "circle" ? "○" : block.icon === "wave" ? "∿" : block.icon === "leaf" ? "◒" : "✦";
+      context.fillText(iconGlyph, blockWidth / 2, blockHeight / 2);
+      context.textAlign = "start";
+      context.textBaseline = "alphabetic";
     } else {
       context.fillStyle = "rgba(255,255,255,0.92)";
       context.fillRect(0, 0, blockWidth, blockHeight);
@@ -415,6 +526,9 @@ function createImageBlock(url: string, caption: string): MoodboardBlock {
     type: "image",
     imageUrl: url,
     caption,
+    altText: caption,
+    cropX: 50,
+    cropY: 50,
     x: 0,
     y: 0,
     w: 0,
@@ -469,39 +583,17 @@ export default function MoodboardExercise({
   );
   const incomingBoard = useMemo(() => {
     const storedBoard = parseStoredMoodboardAnswer(answers, config.maxImages);
-
-    if (storedBoard.blocks.length > 0) {
-      return storedBoard;
-    }
-
-    if (exercise.type === "moodboard") {
-      return createMoodboardFromTemplate(
-        getMoodboardTemplate(config.templateId),
-        signals,
-      );
-    }
-
-    return storedBoard;
-  }, [answers, config.maxImages, config.templateId, exercise.type, signals]);
+    return storedBoard.blocks.length > 0
+      ? storedBoard
+      : getDefaultMoodboardAnswer();
+  }, [answers, config.maxImages]);
   const [board, setBoard] = useState<MoodboardAnswer>(incomingBoard);
   const [uploadState, setUploadState] = useState<UploadState>(initialUploadState);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const suggestions = useMemo(
-    () =>
-      createSuggestedMoodboardImages(
-        {
-          palette: signals.palette,
-          keywords: signals.keywords,
-          persona: signals.persona,
-          style: board.layoutStyle,
-          maxImages: config.maxImages,
-        },
-        6,
-      ),
-    [board.layoutStyle, config.maxImages, signals],
-  );
+  const replaceInputRef = useRef<HTMLInputElement | null>(null);
+  const boardCanvasRef = useRef<HTMLDivElement | null>(null);
+  const interactionRef = useRef<BoardInteraction | null>(null);
   const imageCount = getMoodboardImageCount(board);
   const slotsLeft = Math.max(config.maxImages - imageCount, 0);
   const selectedBlock =
@@ -539,28 +631,28 @@ export default function MoodboardExercise({
   }
 
   function addBlock(block: MoodboardBlock) {
-    const nextBlocks = autoArrange(
-      [
-        ...board.blocks,
-        {
-          ...block,
-          zIndex: board.blocks.length + 1,
-        },
-      ],
-      board.layoutStyle,
-    );
+    const offset = board.blocks.length % 7;
+    const defaultSize = block.type === "keyword" || block.type === "icon"
+      ? { w: 24, h: 16 }
+      : block.type === "color"
+        ? { w: 24, h: 20 }
+        : { w: 38, h: 28 };
+    const nextBlock = {
+      ...block,
+      x: 5 + offset * 6,
+      y: 5 + offset * 7,
+      w: block.w > 0 ? block.w : defaultSize.w,
+      h: block.h > 0 ? block.h : defaultSize.h,
+      zIndex: board.blocks.length + 1,
+    };
+    const nextBlocks = [...board.blocks, nextBlock];
 
     updateBlocks(nextBlocks);
     setSelectedBlockId(block.id);
   }
 
   function removeBlock(blockId: string) {
-    updateBlocks(
-      autoArrange(
-        board.blocks.filter((block) => block.id !== blockId),
-        board.layoutStyle,
-      ),
-    );
+    updateBlocks(board.blocks.filter((block) => block.id !== blockId));
   }
 
   function patchSelectedBlock(patch: Partial<MoodboardBlock>) {
@@ -575,25 +667,70 @@ export default function MoodboardExercise({
     );
   }
 
-  async function handleGenerateMoodboard() {
-    const nextBoard = generateMoodboard({
-      palette: signals.palette,
-      keywords: signals.keywords,
-      persona: signals.persona,
-      style: board.layoutStyle,
-      maxImages: config.maxImages,
-    });
-
-    commit(nextBoard);
-    setSelectedBlockId(nextBoard.blocks[0]?.id ?? "");
+  function beginInteraction(
+    event: ReactPointerEvent<HTMLElement>,
+    block: MoodboardBlock,
+    mode: BoardInteraction["mode"],
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setSelectedBlockId(block.id);
+    interactionRef.current = {
+      blockId: block.id,
+      mode,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      initialX: block.x,
+      initialY: block.y,
+      initialW: block.w,
+      initialH: block.h,
+    };
   }
 
-  function handleAddSuggestion(imageUrl: string, caption: string) {
-    if (slotsLeft <= 0) {
-      return;
+  function getInteractedBoard(event: ReactPointerEvent<HTMLElement>) {
+    const interaction = interactionRef.current;
+    const canvas = boardCanvasRef.current;
+
+    if (!interaction || !canvas) {
+      return null;
     }
 
-    addBlock(createImageBlock(imageUrl, caption));
+    const bounds = canvas.getBoundingClientRect();
+    const deltaX = ((event.clientX - interaction.startClientX) / bounds.width) * 100;
+    const deltaY = ((event.clientY - interaction.startClientY) / bounds.height) * 100;
+    const blocks = board.blocks.map((block) => {
+      if (block.id !== interaction.blockId) {
+        return block;
+      }
+
+      if (interaction.mode === "resize") {
+        return {
+          ...block,
+          w: clampPercent(interaction.initialW + deltaX, 12, 96 - block.x),
+          h: clampPercent(interaction.initialH + deltaY, 10, 96 - block.y),
+        };
+      }
+
+      return {
+        ...block,
+        x: clampPercent(interaction.initialX + deltaX, 0, 100 - block.w),
+        y: clampPercent(interaction.initialY + deltaY, 0, 100 - block.h),
+      };
+    });
+
+    return { ...board, blocks };
+  }
+
+  function moveInteraction(event: ReactPointerEvent<HTMLElement>) {
+    const nextBoard = getInteractedBoard(event);
+    if (nextBoard) setBoard(nextBoard);
+  }
+
+  function endInteraction(event: ReactPointerEvent<HTMLElement>) {
+    const nextBoard = getInteractedBoard(event);
+    interactionRef.current = null;
+    if (nextBoard) commit(nextBoard);
   }
 
   async function handleFileUpload(files: FileList | null) {
@@ -606,7 +743,19 @@ export default function MoodboardExercise({
       message: "Import du moodboard en cours...",
     });
 
-    const fileList = Array.from(files).slice(0, slotsLeft);
+    let fileList: File[];
+
+    try {
+      fileList = await Promise.all(
+        Array.from(files).slice(0, slotsLeft).map(compressMoodboardImage),
+      );
+    } catch {
+      setUploadState({
+        status: "error",
+        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+      });
+      return;
+    }
     const formData = new FormData();
     formData.set("moduleId", String(module.id));
     formData.set("exerciseId", String(exercise.id));
@@ -622,7 +771,15 @@ export default function MoodboardExercise({
       const nextImages = result.urls.map((url, index) =>
         createImageBlock(url, `Inspiration ${imageCount + index + 1}`),
       );
-      updateBlocks(autoArrange([...board.blocks, ...nextImages], board.layoutStyle));
+      const arrangedImages = nextImages.map((image, index) => ({
+        ...image,
+        x: 5 + ((board.blocks.length + index) % 3) * 31,
+        y: 5 + (Math.floor((board.blocks.length + index) / 3) % 3) * 28,
+        w: 28,
+        h: 23,
+        zIndex: board.blocks.length + index + 1,
+      }));
+      updateBlocks([...board.blocks, ...arrangedImages]);
       setUploadState(initialUploadState);
       return;
     }
@@ -632,7 +789,15 @@ export default function MoodboardExercise({
       const nextImages = fallbackUrls.map((url, index) =>
         createImageBlock(url, `Inspiration ${imageCount + index + 1}`),
       );
-      updateBlocks(autoArrange([...board.blocks, ...nextImages], board.layoutStyle));
+      const arrangedImages = nextImages.map((image, index) => ({
+        ...image,
+        x: 5 + ((board.blocks.length + index) % 3) * 31,
+        y: 5 + (Math.floor((board.blocks.length + index) / 3) % 3) * 28,
+        w: 28,
+        h: 23,
+        zIndex: board.blocks.length + index + 1,
+      }));
+      updateBlocks([...board.blocks, ...arrangedImages]);
       setUploadState({
         status: "error",
         message: "Images ajoutées localement. L'enregistrement distant n'a pas encore abouti.",
@@ -641,6 +806,40 @@ export default function MoodboardExercise({
       setUploadState({
         status: "error",
         message: result.message,
+      });
+    }
+  }
+
+  async function handleReplaceImage(files: FileList | null) {
+    if (!files?.[0] || selectedBlock?.type !== "image") return;
+
+    const previousImageId = selectedBlock.id;
+    const currentWithoutSelected = Math.max(imageCount - 1, 0);
+    setUploadState({ status: "loading", message: "Remplacement de l’image…" });
+
+    try {
+      const file = await compressMoodboardImage(files[0]);
+      const formData = new FormData();
+      formData.set("moduleId", String(module.id));
+      formData.set("exerciseId", String(exercise.id));
+      formData.set("currentCount", String(currentWithoutSelected));
+      formData.append("images", file);
+      const result = await uploadExerciseImages(formData);
+
+      if (result.status !== "success" || !result.urls[0]) {
+        throw new Error(result.status === "error" ? result.message : "Erreur d’envoi");
+      }
+
+      updateBlocks(board.blocks.map((block) =>
+        block.id === previousImageId && block.type === "image"
+          ? { ...block, imageUrl: result.urls[0] }
+          : block,
+      ));
+      setUploadState(initialUploadState);
+    } catch {
+      setUploadState({
+        status: "error",
+        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
       });
     }
   }
@@ -676,20 +875,16 @@ export default function MoodboardExercise({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
               <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
-                Moodboard intelligent
+                Ton moodboard de marque
               </p>
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
                 Compose ton univers visuel
               </h3>
-              <PedagogicalContent
-                content={
-                  exercise.explanation ||
-                  "Mele images, couleurs, citations et mots-cles pour faire emerger une direction artistique coherente."
-                }
-                className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
-              />
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
-                Génération locale basée sur ta palette, tes réponses et le persona de marque déjà défini dans Brand Studio.
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#5f544a]">
+                Rassemble ici les images, couleurs, mots et détails qui traduisent l’atmosphère de ta marque.
+              </p>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-[#6f645b]">
+                Ce moodboard te servira de repère pour créer tes supports, choisir tes visuels et conserver une vraie cohérence dans ta communication.
               </p>
             </div>
 
@@ -703,22 +898,47 @@ export default function MoodboardExercise({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3" aria-label="Actions du moodboard">
             <button
               type="button"
-              onClick={() => void handleGenerateMoodboard()}
-              className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(223,155,57,0.25)]"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={slotsLeft <= 0 || uploadState.status === "loading"}
+              className="inline-flex items-center gap-2 rounded-full bg-[#cf7430] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(207,116,48,0.22)] disabled:cursor-not-allowed disabled:opacity-55"
             >
-              <SparklesIcon className="h-4 w-4" />
-              Generer un moodboard
+              <ArrowUpTrayIcon className="h-4 w-4" />
+              Ajouter des images
             </button>
             <button
               type="button"
-              onClick={() => setShowSuggestions((current) => !current)}
+              onClick={() => addBlock({ id: `mood-keyword-${crypto.randomUUID()}`, type: "keyword", keyword: "Mot-clé", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
               className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
             >
-              <PhotoIcon className="h-4 w-4" />
-              Suggérer des images
+              <PlusIcon className="h-4 w-4" />
+              Ajouter un mot-clé
+            </button>
+            <button
+              type="button"
+              onClick={() => addBlock({ id: `mood-text-${crypto.randomUUID()}`, type: "text", text: "Une citation qui donne le ton", author: "", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+            >
+              <ChatBubbleLeftRightIcon className="h-4 w-4" />
+              Ajouter une citation
+            </button>
+            <button
+              type="button"
+              onClick={() => addBlock({ id: `mood-color-${crypto.randomUUID()}`, type: "color", color: signals.palette[0] ?? "#E9DDCF", label: "Couleur", usage: "", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+            >
+              <SwatchIcon className="h-4 w-4" />
+              Ajouter une couleur
+            </button>
+            <button
+              type="button"
+              onClick={() => addBlock({ id: `mood-icon-${crypto.randomUUID()}`, type: "icon", icon: "spark", label: "Pictogramme", color: "#4B4550", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+            >
+              <StarIcon className="h-4 w-4" />
+              Ajouter un pictogramme
             </button>
             <button
               type="button"
@@ -726,40 +946,35 @@ export default function MoodboardExercise({
               className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
             >
               <ArrowPathIcon className="h-4 w-4" />
-              Auto-layout
+              Réorganiser
             </button>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={slotsLeft <= 0 || uploadState.status === "loading"}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-55"
-            >
-              <ArrowUpTrayIcon className="h-4 w-4" />
-              Ajouter des images
-            </button>
-            <button
-              type="button"
-              onClick={() => void exportAsPng()}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
-            >
-              <ArrowDownTrayIcon className="h-4 w-4" />
-              Export PNG
-            </button>
-            <button
-              type="button"
-              onClick={() => void exportAsPdf()}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
-            >
-              <ArrowDownTrayIcon className="h-4 w-4" />
-              Export PDF
-            </button>
+            <div className="group relative">
+              <button type="button" className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]">
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                Exporter
+              </button>
+              <div className="invisible absolute right-0 top-full z-30 mt-2 min-w-40 rounded-xl border border-[#eadfca] bg-white p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <button type="button" onClick={() => void exportAsPng()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[#5f544a] hover:bg-[#fff8f1]">PNG</button>
+                <button type="button" onClick={() => void exportAsPdf()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[#5f544a] hover:bg-[#fff8f1]">PDF</button>
+              </div>
+            </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               multiple={slotsLeft > 1}
               onChange={(event) => {
                 void handleFileUpload(event.currentTarget.files);
+                event.currentTarget.value = "";
+              }}
+              className="sr-only"
+            />
+            <input
+              ref={replaceInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => {
+                void handleReplaceImage(event.currentTarget.files);
                 event.currentTarget.value = "";
               }}
               className="sr-only"
@@ -796,59 +1011,6 @@ export default function MoodboardExercise({
           ) : null}
         </div>
 
-        {showSuggestions ? (
-          <div className="border-b border-[#f0e1cb] px-5 py-5 sm:px-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
-                  Suggestions d&apos;images
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#7b7068]">
-                  Propositions construites à partir de tes mots-clés, de ta palette et du ton déjà émergé.
-                </p>
-              </div>
-              <p className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#7a7087]">
-                {slotsLeft} slot{slotsLeft > 1 ? "s" : ""} libre{slotsLeft > 1 ? "s" : ""}
-              </p>
-            </div>
-
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={suggestion.id}
-                  className="overflow-hidden rounded-[1.2rem] border border-[#eadfca] bg-white shadow-[0_16px_34px_rgba(210,189,152,0.12)]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={suggestion.imageUrl}
-                    alt={suggestion.caption || `Suggestion ${index + 1}`}
-                    className="aspect-[4/5] w-full object-cover"
-                  />
-                  <div className="flex items-center justify-between gap-3 px-4 py-4">
-                    <div>
-                      <p className="text-sm font-semibold leading-6 text-[#5f544a]">
-                        {suggestion.caption || `Suggestion ${index + 1}`}
-                      </p>
-                      <p className="text-xs uppercase tracking-[0.14em] text-[#8a8077]">
-                        Cohérence éditoriale
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      disabled={slotsLeft <= 0}
-                      onClick={() => handleAddSuggestion(suggestion.imageUrl, suggestion.caption)}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-[#fff8f1] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
-                      aria-label="Ajouter cette suggestion"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
         <div className="grid gap-5 px-5 py-6 sm:px-6 xl:grid-cols-[minmax(0,1.6fr)_20rem]">
           <div className="space-y-4">
             <div
@@ -856,10 +1018,21 @@ export default function MoodboardExercise({
               style={{ background: getBoardBackground(signals.palette) }}
             >
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.42),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.2),transparent_36%)]" />
-              <div className="relative aspect-[4/5] w-full rounded-[1.4rem] border border-white/60 bg-white/20 p-2 backdrop-blur-[1.5px]">
+              <div
+                ref={boardCanvasRef}
+                className="relative aspect-[4/5] w-full touch-none rounded-[1.4rem] border border-white/60 bg-white/20 p-2 backdrop-blur-[1.5px]"
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "copy";
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  void handleFileUpload(event.dataTransfer.files);
+                }}
+              >
                 {board.blocks.length === 0 ? (
                   <div className="flex h-full items-center justify-center rounded-[1.2rem] border border-dashed border-white/70 bg-white/30 px-6 text-center text-sm leading-7 text-[#5f544a]">
-                    Lance une generation, ajoute des images ou compose ton moodboard bloc par bloc.
+                    Glisse tes images ici ou utilise les actions ci-dessus pour commencer ta composition.
                   </div>
                 ) : null}
 
@@ -867,11 +1040,17 @@ export default function MoodboardExercise({
                   .slice()
                   .sort((left, right) => left.zIndex - right.zIndex)
                   .map((block) => (
-                    <button
+                    <div
                       key={block.id}
-                      type="button"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Sélectionner ${block.type === "image" ? block.altText || block.caption || "l’image" : "ce bloc"}`}
                       onClick={() => setSelectedBlockId(block.id)}
-                      className={`absolute overflow-hidden rounded-[1.15rem] border text-left transition ${
+                      onPointerDown={(event) => beginInteraction(event, block, "move")}
+                      onPointerMove={moveInteraction}
+                      onPointerUp={endInteraction}
+                      onPointerCancel={endInteraction}
+                      className={`group/block absolute cursor-move overflow-hidden rounded-[1.15rem] border text-left transition ${
                         selectedBlock?.id === block.id
                           ? "border-[#cf7430] ring-2 ring-[#cf7430]/25"
                           : "border-white/70"
@@ -894,11 +1073,11 @@ export default function MoodboardExercise({
                     >
                       {block.type === "image" ? (
                         <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <SafeMoodboardImage
                             src={block.imageUrl}
-                            alt={block.caption || "Inspiration"}
+                            alt={block.altText || block.caption || "Inspiration visuelle"}
                             className="h-full w-full object-cover"
+                            objectPosition={`${block.cropX}% ${block.cropY}%`}
                           />
                           {block.caption ? (
                             <span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgba(47,36,24,0.62))] px-3 py-3 text-xs font-semibold tracking-[0.08em] text-white">
@@ -937,76 +1116,32 @@ export default function MoodboardExercise({
                           </span>
                         </div>
                       ) : null}
-                    </button>
+
+                      {block.type === "icon" ? (
+                        <div className="flex h-full flex-col items-center justify-center gap-2 bg-white/90 px-3 py-3" style={{ color: sanitizeHex(block.color, "#4B4550") }}>
+                          <MoodboardIconGraphic name={block.icon} />
+                          {block.label ? <span className="text-center text-[0.65rem] font-bold uppercase tracking-[0.14em]">{block.label}</span> : null}
+                        </div>
+                      ) : null}
+
+                      {selectedBlock?.id === block.id ? (
+                        <span
+                          role="button"
+                          aria-label="Redimensionner ce bloc"
+                          onPointerDown={(event) => beginInteraction(event, block, "resize")}
+                          onPointerMove={moveInteraction}
+                          onPointerUp={endInteraction}
+                          onPointerCancel={endInteraction}
+                          className="absolute bottom-1 right-1 z-20 flex h-8 w-8 cursor-se-resize items-center justify-center rounded-full bg-white text-[#cf7430] shadow-md"
+                        >
+                          <CursorArrowRaysIcon className="h-4 w-4 rotate-90" />
+                        </span>
+                      ) : null}
+                    </div>
                   ))}
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() =>
-                  addBlock({
-                    id: `mood-text-${crypto.randomUUID()}`,
-                    type: "text",
-                    text: "Une citation qui donne le ton",
-                    author: "Brand Studio",
-                    x: 0,
-                    y: 0,
-                    w: 0,
-                    h: 0,
-                    rotation: 0,
-                    zIndex: 1,
-                  })
-                }
-                className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
-              >
-                <PlusIcon className="h-4 w-4" />
-                Ajouter une citation
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  addBlock({
-                    id: `mood-keyword-${crypto.randomUUID()}`,
-                    type: "keyword",
-                    keyword: signals.keywords[0] ?? "Presence",
-                    x: 0,
-                    y: 0,
-                    w: 0,
-                    h: 0,
-                    rotation: 0,
-                    zIndex: 1,
-                  })
-                }
-                className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
-              >
-                <PlusIcon className="h-4 w-4" />
-                Ajouter un mot-clé
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  addBlock({
-                    id: `mood-color-${crypto.randomUUID()}`,
-                    type: "color",
-                    color: signals.palette[0] ?? "#E9DDCF",
-                    label: "Couleur",
-                    usage: "Accent",
-                    x: 0,
-                    y: 0,
-                    w: 0,
-                    h: 0,
-                    rotation: 0,
-                    zIndex: 1,
-                  })
-                }
-                className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
-              >
-                <SwatchIcon className="h-4 w-4" />
-                Ajouter une couleur
-              </button>
-            </div>
           </div>
 
           <aside className="space-y-4">
@@ -1042,6 +1177,36 @@ export default function MoodboardExercise({
                           className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
                         />
                       </label>
+                      <label className="block space-y-2">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                          Texte alternatif
+                        </span>
+                        <textarea
+                          value={selectedBlock.altText}
+                          onChange={(event) => patchSelectedBlock({ altText: event.target.value })}
+                          placeholder="Décris brièvement l’image"
+                          className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]"
+                        />
+                      </label>
+                      <div className="rounded-xl border border-[#eadfca] bg-[#fffdf7] p-3">
+                        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Recadrage</p>
+                        <label className="mt-3 block text-xs text-[#7b7068]">
+                          Horizontal
+                          <input type="range" min="0" max="100" value={selectedBlock.cropX} onChange={(event) => patchSelectedBlock({ cropX: Number(event.target.value) })} className="mt-1 w-full accent-[#cf7430]" />
+                        </label>
+                        <label className="mt-2 block text-xs text-[#7b7068]">
+                          Vertical
+                          <input type="range" min="0" max="100" value={selectedBlock.cropY} onChange={(event) => patchSelectedBlock({ cropY: Number(event.target.value) })} className="mt-1 w-full accent-[#cf7430]" />
+                        </label>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => replaceInputRef.current?.click()}
+                        className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+                      >
+                        <ArrowUpTrayIcon className="h-4 w-4" />
+                        Remplacer l’image
+                      </button>
                     </>
                   ) : null}
 
@@ -1123,6 +1288,48 @@ export default function MoodboardExercise({
                       />
                     </label>
                   ) : null}
+
+                  {selectedBlock.type === "icon" ? (
+                    <>
+                      <label className="block space-y-2">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Pictogramme</span>
+                        <select
+                          value={selectedBlock.icon}
+                          onChange={(event) => patchSelectedBlock({ icon: event.target.value as typeof selectedBlock.icon })}
+                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+                        >
+                          <option value="spark">Étincelle</option>
+                          <option value="star">Étoile</option>
+                          <option value="leaf">Feuille</option>
+                          <option value="circle">Cercle</option>
+                          <option value="wave">Vague</option>
+                        </select>
+                      </label>
+                      <label className="block space-y-2">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Légende</span>
+                        <input type="text" value={selectedBlock.label} onChange={(event) => patchSelectedBlock({ label: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]" />
+                      </label>
+                      <label className="block space-y-2">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Couleur</span>
+                        <input type="color" value={sanitizeHex(selectedBlock.color, "#4B4550")} onChange={(event) => patchSelectedBlock({ color: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-2" />
+                      </label>
+                    </>
+                  ) : null}
+
+                  <label className="block space-y-2">
+                    <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                      Rotation <span>{selectedBlock.rotation}°</span>
+                    </span>
+                    <input
+                      type="range"
+                      min="-7"
+                      max="7"
+                      step="1"
+                      value={selectedBlock.rotation}
+                      onChange={(event) => patchSelectedBlock({ rotation: Number(event.target.value) })}
+                      className="w-full accent-[#cf7430]"
+                    />
+                  </label>
 
                   <button
                     type="button"

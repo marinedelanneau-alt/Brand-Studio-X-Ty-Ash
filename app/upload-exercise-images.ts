@@ -9,6 +9,7 @@ import {
   parseStoredImageUploadConfig,
   parseStoredMoodboardConfig,
 } from "@/lib/exercise-types";
+import { getMoodboardImageCount, parseStoredMoodboardAnswer } from "@/lib/moodboard";
 
 type UploadExerciseImagesResult =
   | {
@@ -20,8 +21,9 @@ type UploadExerciseImagesResult =
       message: string;
     };
 
-const MAX_IMAGE_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_IMAGE_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_DATA_URL_SIZE = 1.4 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function isImageUploadValue(value: string) {
   const trimmedValue = value.trim();
@@ -71,10 +73,10 @@ export async function uploadExerciseImages(
       };
     }
 
-    if (files.some((file) => !file.type.startsWith("image/"))) {
+    if (files.some((file) => !ACCEPTED_IMAGE_TYPES.has(file.type))) {
       return {
         status: "error",
-        message: "Tous les fichiers doivent être des images.",
+        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
       };
     }
 
@@ -82,7 +84,7 @@ export async function uploadExerciseImages(
       return {
         status: "error",
         message:
-          "Une image est encore trop lourde. Essaie une image plus légère ou une capture réduite.",
+          "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
       };
     }
 
@@ -112,7 +114,9 @@ export async function uploadExerciseImages(
     const persistedCount =
       exercise.type === "image_upload"
         ? (targetModule.answers[exercise.id] ?? []).filter(isImageUploadValue).length
-        : targetModule.answers[exercise.id]?.length ?? 0;
+        : getMoodboardImageCount(
+            parseStoredMoodboardAnswer(targetModule.answers[exercise.id] ?? []),
+          );
     const remainingSlots = Math.max(
       config.maxImages - Math.max(currentCount, persistedCount),
       0,
