@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
 import { createBrandGuideData, hasMeaningfulContent, validateBrandGuideConsistency } from "../lib/brand-guide-pdf-data";
 import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-pdf";
+import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
 
 function makeGuide(): GeneratedBrandGuide {
   return {
@@ -55,6 +56,24 @@ function makeGuide(): GeneratedBrandGuide {
 }
 
 describe("editorial brand guide PDF", () => {
+  it("selects editorial layouts from content density", () => {
+    expect(selectEditorialLayout([{ label: "Promesse", value: "Une marque claire." }])).toBe("manifesto");
+    expect(selectEditorialLayout([{ label: "Contexte", value: "x".repeat(750) }])).toBe("profile");
+    expect(calculatePageDensity([{ label: "Contexte", value: "x".repeat(1500) }])).toBeGreaterThan(0.9);
+  });
+
+  it("computes accessible palette contrast", () => {
+    expect(getAccessibleTextColor("#FAF6EF")).toBe("#29242C");
+    expect(getAccessibleTextColor("#29242C")).toBe("#FFFFFF");
+  });
+
+  it("recomposes moodboard assets without editor coordinates or dead zones", () => {
+    const source = makeGuide().visualUniverse.moodboard[0];
+    const items = composeMoodboard([source, { ...source, id: "second", x: 90, y: 90 }]);
+    expect(items[0]).toMatchObject({ x: 0, y: 0, width: 63, height: 100 });
+    expect(items[1]).toMatchObject({ x: 65, y: 0, width: 35, height: 100 });
+  });
+
   it("adapts the cover title to short, medium and long brand names", () => {
     expect(getCoverTitleFontSize("Éclat")).toBe(48);
     expect(getCoverTitleFontSize("Marine Communication")).toBe(40);

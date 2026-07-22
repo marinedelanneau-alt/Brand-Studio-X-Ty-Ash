@@ -1,4 +1,5 @@
 import type { GeneratedBrandGuide, GuideColor, GuideMoodboardItem } from "@/lib/brand-guide";
+import { calculatePageDensity } from "./brand-guide-editorial-layout";
 
 export type PdfField = { label: string; value: string };
 
@@ -122,7 +123,7 @@ function isGenericMoodboardLabel(value: string) {
   return !label || label === "couleur" || /^inspiration\s+\d+$/.test(label) || label === "mot-cle" || label === "pictogramme";
 }
 
-export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
+export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
   const values = parseBrandValues(guide.dna.values);
   const foundations = fields([
     field("Activité", guide.dna.activity),
@@ -180,7 +181,7 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
     field("Palette", palette.map((color) => `${color.name} ${color.hex}`).join(" · ")),
   ]);
   const combinePositioningAndMessages = positioning.length > 0 && messages.length > 0 &&
-    [...positioning, ...messages].reduce((total, item) => total + item.value.length, 0) < 1_600;
+    calculatePageDensity([...positioning, ...messages], 0.12) <= 0.9;
   const pageDefinitions = [
     { id: "foundations", title: "Fondations", fields: [...foundations, ...values.map((value) => ({ label: "Valeur", value: value.name }))] },
     { id: "positioning", title: "Positionnement", fields: positioning },
@@ -217,6 +218,22 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
     moodboard,
     summary,
     combinePositioningAndMessages,
+  };
+}
+
+export const createBrandGuideData = normalizeBrandGuideData;
+export const filterEditorialContent = filterMeaningfulContent;
+
+export function validateBrandGuideData(data: BrandGuideData) {
+  const consistency = validateBrandGuideConsistency(data);
+  return {
+    ...consistency,
+    valid: consistency.valid && hasMeaningfulContent(data.brandName) && data.chapters.length > 0,
+    warnings: [
+      ...consistency.warnings,
+      ...(!hasMeaningfulContent(data.brandName) ? ["Nom de marque manquant"] : []),
+      ...(data.chapters.length === 0 ? ["Aucune section éditoriale exploitable"] : []),
+    ],
   };
 }
 

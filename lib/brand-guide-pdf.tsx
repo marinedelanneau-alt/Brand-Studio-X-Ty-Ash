@@ -1,6 +1,7 @@
 import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { GeneratedBrandGuide, GuideMoodboardItem } from "./brand-guide";
-import { createBrandGuideData, validateBrandGuideConsistency, type BrandGuideData, type BrandValueData, type PdfField } from "./brand-guide-pdf-data";
+import { createBrandGuideData, validateBrandGuideData, type BrandGuideData, type BrandValueData, type PdfField } from "./brand-guide-pdf-data";
+import { composeMoodboard, getAccessibleTextColor, selectEditorialLayout } from "./brand-guide-editorial-layout";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -67,10 +68,10 @@ const S = StyleSheet.create({
   languageSymbol: { color: BRAND.orange, fontSize: 10, width: 12 },
   quote: { paddingVertical: 34, paddingHorizontal: 30, borderTop: `1 solid ${BRAND.line}`, borderBottom: `1 solid ${BRAND.line}` },
   quoteText: { color: BRAND.ink, fontSize: 22, lineHeight: 1.3, textAlign: "center" },
-  paletteRow: { flexDirection: "row", flexWrap: "wrap", gap: 14 },
-  colorCard: { width: "31%", backgroundColor: BRAND.white, borderRadius: 4, overflow: "hidden", marginBottom: 6 },
-  colorSwatch: { height: 92 },
-  colorBody: { padding: 12 },
+  paletteRow: { flexDirection: "row", height: 225, marginTop: 12 },
+  colorCard: { flexGrow: 1, minWidth: 82, overflow: "hidden" },
+  colorSwatch: { height: 150 },
+  colorBody: { paddingTop: 12, paddingRight: 8 },
   colorName: { fontSize: 11, color: BRAND.ink, fontWeight: 700, marginBottom: 5 },
   colorMeta: { fontSize: 8.5, color: BRAND.muted, lineHeight: 1.45 },
   moodboard: { height: 375, position: "relative", overflow: "hidden", borderRadius: 5 },
@@ -114,6 +115,12 @@ function Field({ item, statement = false }: { item: PdfField; statement?: boolea
   return <View wrap={false} style={S.field}><Text style={S.fieldLabel}>{item.label}</Text><Text style={S.body}>{item.value}</Text></View>;
 }
 
+function EditorialFields({ items }: { items: PdfField[] }) {
+  const layout = selectEditorialLayout(items);
+  if (layout === "manifesto") return <Field item={items[0]} statement/>;
+  return <View style={S.grid}>{items.map((item, index) => <View key={item.label} wrap={false} style={layout === "profile" && index === 0 ? { width: "100%", marginBottom: 20 } : S.column}><Field item={item}/></View>)}</View>;
+}
+
 function PdfBrandValue({ value }: { value: BrandValueData }) {
   const details = [
     ["Ce que cette valeur signifie", value.meaning],
@@ -124,10 +131,7 @@ function PdfBrandValue({ value }: { value: BrandValueData }) {
 }
 
 function contrastFor(hex: string) {
-  const value = hex.replace("#", "");
-  const channels = [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16));
-  const luminance = (channels[0] * 299 + channels[1] * 587 + channels[2] * 114) / 1000;
-  return luminance > 145 ? "Texte sombre conseillé" : "Texte clair conseillé";
+  return getAccessibleTextColor(hex) === BRAND.ink ? "Texte sombre conseillé" : "Texte clair conseillé";
 }
 
 function PalettePage({ data, number }: { data: BrandGuideData; number: string }) {
@@ -143,21 +147,23 @@ function MoodboardItem({ item }: { item: GuideMoodboardItem }) {
 }
 
 function MoodboardPage({ data, number }: { data: BrandGuideData; number: string }) {
-  return <Page size="A4" orientation="landscape" style={S.page}><PageChrome data={data} chapter="Moodboard"/><ChapterHeading number={number} title="Planche d’inspiration"/><View style={[S.moodboard, { backgroundColor: data.moodboardBackground }]}>{data.moodboard.slice().sort((a,b) => a.zIndex - b.zIndex).map((item) => <MoodboardItem key={item.id} item={item}/>)}</View></Page>;
+  const composition = composeMoodboard(data.moodboard);
+  return <Page size="A4" orientation="landscape" style={S.page}><PageChrome data={data} chapter="Moodboard"/><ChapterHeading number={number} title="Planche d’inspiration"/><View style={[S.moodboard, { backgroundColor: data.moodboardBackground }]}>{composition.map((item) => <MoodboardItem key={item.id} item={item}/>)}</View></Page>;
 }
 
 function BrandGuideDocument({ data }: { data: BrandGuideData }) {
   const palette = data.palette.slice(0, 5);
+  const coverImage = data.moodboard.find((item) => item.type === "image" && item.imageUrl)?.imageUrl;
   const chapterNo = (id: string) => data.chapters.find((chapter) => chapter.id === id)?.number || "";
   return <Document title={`Guide de marque — ${data.brandName}`} author="Brand Studio" subject={`Guide de marque de ${data.brandName}`} language="fr-FR">
     <Page size="A4" style={[S.cover]}>
       <View style={S.coverTop}><Text style={S.brandMark}>BRAND STUDIO</Text><View style={S.coverRule}/></View>
-      <View style={S.coverBody}><Text style={S.coverKicker}>GUIDE DE MARQUE</Text><Text style={[S.coverTitle, { fontSize: getCoverTitleFontSize(data.brandName) }]}>{data.brandName}</Text>{data.baseline ? <Text style={S.coverBaseline}>{data.baseline}</Text> : null}<View style={S.coverShape}/><View style={S.coverCircle}/><View style={S.coverPalette}>{palette.map((color) => <View key={color.id} style={[S.coverSwatch, { backgroundColor: color.hex }]}/>)}</View></View>
+      <View style={S.coverBody}><Text style={S.coverKicker}>GUIDE DE MARQUE</Text><Text style={[S.coverTitle, { fontSize: getCoverTitleFontSize(data.brandName) }]}>{data.brandName}</Text>{data.baseline ? <Text style={S.coverBaseline}>{data.baseline}</Text> : null}{coverImage ? <Image src={coverImage} style={S.coverImage}/> : <View style={S.coverShape}/>}<View style={S.coverPalette}>{palette.map((color) => <View key={color.id} style={[S.coverSwatch, { backgroundColor: color.hex }]}/>)}</View></View>
       <View style={S.coverFooter}><Text style={S.small}>{formatDate(data.generatedAt)}</Text><Text style={S.small}>Créé avec Brand Studio</Text></View>
     </Page>
     <Page size="A4" style={S.page}><PageChrome data={data} chapter="Sommaire"/><Text style={S.tocTitle}>Sommaire</Text><Text style={S.intro}>Ce guide rassemble les décisions stratégiques, verbales et visuelles de {data.brandName}. Utilise-le comme référence avant toute création de contenu ou de support.</Text>{data.chapters.map((chapter) => <View key={chapter.id} style={S.tocRow}><Text style={S.tocNo}>{chapter.number}</Text><Text style={S.tocName}>{chapter.title}</Text><View style={S.tocDots}/><Text style={S.tocPage}>{chapter.page}</Text></View>)}</Page>
     {(data.foundations.length || data.values.length) ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Fondations"/><ChapterHeading number={chapterNo("foundations")} title="Fondations" intro="Les repères essentiels qui donnent du sens et une direction durable à la marque."/><View style={S.grid}>{data.foundations.map((item, index) => <View key={item.label} style={S.column}><Field item={item} statement={item.label === "Mission" && index > 0}/></View>)}</View>{data.values.length ? <><Text style={[S.chapterNo, { marginTop: 8 }]}>VALEURS INCARNÉES</Text><View style={S.grid}>{data.values.map((value) => <PdfBrandValue key={value.name} value={value}/>)}</View></> : null}</Page> : null}
-    {data.positioning.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter={data.combinePositioningAndMessages ? "Positionnement & messages" : "Positionnement"}/><ChapterHeading number={chapterNo("positioning")} title="Positionnement" intro="La place que la marque choisit d’occuper dans l’esprit de ses clients."/>{data.positioning.map((item, index) => <Field key={item.label} item={item} statement={index === data.positioning.length - 1}/>)}{data.combinePositioningAndMessages ? <View><Text style={[S.chapterTitle, { fontSize: 20, marginTop: 8, marginBottom: 14 }]}>Messages essentiels</Text>{data.messages.map((item) => <Field key={item.label} item={item}/>)}</View> : null}</Page> : null}
+    {data.positioning.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter={data.combinePositioningAndMessages ? "Positionnement & messages" : "Positionnement"}/><ChapterHeading number={chapterNo("positioning")} title="Positionnement" intro="La place que la marque choisit d’occuper dans l’esprit de ses clients."/><EditorialFields items={data.positioning}/>{data.combinePositioningAndMessages ? <View wrap={false}><Text style={[S.chapterTitle, { fontSize: 20, marginTop: 8, marginBottom: 14 }]}>Messages essentiels</Text><EditorialFields items={data.messages}/></View> : null}</Page> : null}
     {(data.personality.length || data.language.use.length || data.language.avoid.length) ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Personnalité & langage"/><ChapterHeading number={chapterNo("voice")} title="Personnalité & langage" intro="Une identité claire et des repères concrets pour prendre la parole."/><View style={S.grid}>{data.personality.map((item) => <View key={item.label} style={S.column}><Field item={item}/></View>)}</View>{(data.language.use.length || data.language.avoid.length) ? <View style={[S.grid, { marginTop: 8 }]}><View style={S.languageColumn}><Text style={S.fieldLabel}>À privilégier</Text>{data.language.use.map((word) => <View key={word} style={S.languageItem}><Text style={S.languageSymbol}>+</Text><Text style={S.body}>{word}</Text></View>)}</View><View style={[S.languageColumn, S.languageAvoid]}><Text style={S.fieldLabel}>À éviter</Text>{data.language.avoid.map((word) => <View key={word} style={S.languageItem}><Text style={S.languageSymbol}>−</Text><Text style={S.body}>{word}</Text></View>)}</View></View> : null}</Page> : null}
     {data.messages.length && !data.combinePositioningAndMessages ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Messages"/><ChapterHeading number={chapterNo("messages")} title="Messages" intro="Les formulations centrales à préserver sur tous les points de contact."/>{data.messages.map((item, index) => index === 0 ? <View key={item.label} style={S.quote}><Text style={S.fieldLabel}>{item.label}</Text><Text style={S.quoteText}>{item.value}</Text></View> : <Field key={item.label} item={item} statement/>)}</Page> : null}
     {data.palette.length || data.ambiance ? <PalettePage data={data} number={chapterNo("visual")}/> : null}
@@ -166,7 +172,7 @@ function BrandGuideDocument({ data }: { data: BrandGuideData }) {
   </Document>;
 }
 
-async function preloadMoodboardImages(data: BrandGuideData) {
+export async function prepareMoodboardAssets(data: BrandGuideData) {
   const moodboard = await Promise.all(data.moodboard.map(async (item) => {
     if (!item.imageUrl || item.imageUrl.startsWith("data:")) return item;
     try {
@@ -183,8 +189,8 @@ async function preloadMoodboardImages(data: BrandGuideData) {
 }
 
 export async function renderBrandGuidePdf(guide: GeneratedBrandGuide) {
-  const data = await preloadMoodboardImages(createBrandGuideData(guide));
-  const consistency = validateBrandGuideConsistency(data);
+  const data = await prepareMoodboardAssets(createBrandGuideData(guide));
+  const consistency = validateBrandGuideData(data);
   if (!consistency.valid) {
     if (process.env.NODE_ENV !== "production") console.error("Brand guide identity conflict", consistency);
     throw new Error(`Brand guide identity conflict: ${consistency.conflicts.join(", ")}`);
