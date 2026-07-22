@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
-import { createBrandGuideData } from "../lib/brand-guide-pdf-data";
-import { renderBrandGuidePdf } from "../lib/brand-guide-pdf";
+import { createBrandGuideData, hasMeaningfulContent, validateBrandGuideConsistency } from "../lib/brand-guide-pdf-data";
+import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-pdf";
 
 function makeGuide(): GeneratedBrandGuide {
   return {
@@ -55,16 +55,62 @@ function makeGuide(): GeneratedBrandGuide {
 }
 
 describe("editorial brand guide PDF", () => {
+  it("adapts the cover title to short, medium and long brand names", () => {
+    expect(getCoverTitleFontSize("Éclat")).toBe(48);
+    expect(getCoverTitleFontSize("Marine Communication")).toBe(40);
+    expect(getCoverTitleFontSize("Une marque au nom particulièrement long et exigeant")).toBe(30);
+  });
   it("removes placeholders and keeps only populated chapters", () => {
     const data = createBrandGuideData(makeGuide());
     expect(data.positioning.map((item) => item.label)).toEqual(["Contexte client", "Positionnement final"]);
     expect(JSON.stringify(data)).not.toContain("À compléter");
     expect(data.chapters.at(-1)?.title).toBe("Synthèse");
+    expect(data.chapters.every((chapter) => chapter.page >= 3)).toBe(true);
+    expect(data.chapters.find((chapter) => chapter.id === "positioning")?.page).toBe(
+      data.chapters.find((chapter) => chapter.id === "messages")?.page,
+    );
+  });
+
+  it("maps technical value rows into editorial value records", () => {
+    const guide = makeGuide();
+    guide.dna.values = [
+      "1 · Valeur: Écoute · Cela signifie que je: prends le temps de comprendre · Dans la pratique: je questionne et je construis · Dans la communication: un discours humain et attentif",
+    ];
+    expect(createBrandGuideData(guide).values).toEqual([
+      {
+        name: "Écoute",
+        meaning: "prends le temps de comprendre",
+        concreteApplication: "je questionne et je construis",
+        communicationExpression: "un discours humain et attentif",
+      },
+    ]);
+  });
+
+  it("rejects generic moodboard blocks and meaningless content", () => {
+    const guide = makeGuide();
+    guide.visualUniverse.moodboard = [
+      { id: "generic", type: "color", color: "#CF7430", label: "Couleur", description: "", x: 0, y: 0, width: 20, height: 20, rotation: 0, zIndex: 1 },
+    ];
+    expect(createBrandGuideData(guide).moodboard).toEqual([]);
+    expect(hasMeaningfulContent("Inspiration 1")).toBe(false);
+  });
+
+  it("blocks an export when two brand identities are detected", () => {
+    const guide = makeGuide();
+    guide.brandName = "Marine Communication";
+    guide.personality.persona = "Lumière Studio incarne une présence douce.";
+    const result = validateBrandGuideConsistency(createBrandGuideData(guide));
+    expect(result.valid).toBe(false);
+    expect(result.conflicts).toContain("Lumière Studio");
   });
 
   it("renders a selectable A4 PDF with accents and a long brand name", async () => {
-    const buffer = await renderBrandGuidePdf(makeGuide());
+    const guide = makeGuide();
+    const buffer = await renderBrandGuidePdf(guide);
     expect(buffer.subarray(0, 4).toString()).toBe("%PDF");
     expect(buffer.length).toBeGreaterThan(8_000);
+    const pageCount = (buffer.toString("latin1").match(/\/Type\s*\/Page\b/g) ?? []).length;
+    const plannedPageCount = Math.max(...createBrandGuideData(guide).chapters.map((chapter) => chapter.page));
+    expect(pageCount).toBe(plannedPageCount);
   });
 });

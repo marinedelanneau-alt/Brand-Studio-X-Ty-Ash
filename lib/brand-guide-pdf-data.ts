@@ -6,7 +6,15 @@ export type BrandGuideChapter = {
   id: string;
   number: string;
   title: string;
+  page: number;
   fields: PdfField[];
+};
+
+export type BrandValueData = {
+  name: string;
+  meaning?: string;
+  concreteApplication?: string;
+  communicationExpression?: string;
 };
 
 export type BrandGuideData = {
@@ -15,6 +23,7 @@ export type BrandGuideData = {
   generatedAt: string;
   chapters: BrandGuideChapter[];
   foundations: PdfField[];
+  values: BrandValueData[];
   positioning: PdfField[];
   personality: PdfField[];
   language: { use: string[]; avoid: string[] };
@@ -24,6 +33,7 @@ export type BrandGuideData = {
   moodboardBackground: string;
   moodboard: GuideMoodboardItem[];
   summary: PdfField[];
+  combinePositioningAndMessages: boolean;
 };
 
 const EMPTY_MARKERS = [
@@ -36,6 +46,10 @@ const EMPTY_MARKERS = [
   "champ vide",
   "placeholder",
   "aucune reponse",
+  "inspiration 1",
+  "inspiration 2",
+  "donnee de demonstration",
+  "exemple",
 ];
 
 function compact(value: unknown) {
@@ -46,11 +60,19 @@ function normalized(value: string) {
   return compact(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-export function isPdfContent(value: unknown) {
+export function hasMeaningfulContent(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasMeaningfulContent);
+  if (value && typeof value === "object") return Object.values(value).some(hasMeaningfulContent);
   const text = compact(value);
   if (!text) return false;
   const search = normalized(text);
   return !EMPTY_MARKERS.some((marker) => search.includes(marker));
+}
+
+export const isPdfContent = hasMeaningfulContent;
+
+export function filterMeaningfulContent<T>(values: T[]) {
+  return values.filter(hasMeaningfulContent);
 }
 
 function field(label: string, value: unknown): PdfField | null {
@@ -62,16 +84,51 @@ function fields(values: Array<PdfField | null>) {
 }
 
 function cleanList(values: string[]) {
-  return values.map(compact).filter(isPdfContent);
+  return values.map(compact).filter(hasMeaningfulContent);
+}
+
+function parseBrandValues(values: string[]): BrandValueData[] {
+  const source = values.join(" · ");
+  const labels = "Valeur|Cela signifie que je|Ce que cette valeur signifie|Dans la pratique|Concrètement|Dans ma communication|Dans la communication";
+  const matches = [...source.matchAll(new RegExp(`(?:^|\\s*·\\s*)(?:\\d+\\s*·\\s*)?(${labels})\\s*:\\s*(.*?)(?=\\s*·\\s*(?:\\d+\\s*·\\s*)?(?:${labels})\\s*:|$)`, "gi"))];
+  const result: BrandValueData[] = [];
+  let current: BrandValueData | null = null;
+
+  for (const match of matches) {
+    const key = normalized(match[1]);
+    const value = compact(match[2]);
+    if (!hasMeaningfulContent(value)) continue;
+    if (key === "valeur") {
+      current = { name: value };
+      result.push(current);
+    } else if (current && (key.includes("signifie") || key.includes("meaning"))) {
+      current.meaning = value;
+    } else if (current && (key.includes("pratique") || key.includes("concret"))) {
+      current.concreteApplication = value;
+    } else if (current && key.includes("communication")) {
+      current.communicationExpression = value;
+    }
+  }
+
+  if (result.length > 0) return result.slice(0, 6);
+  return cleanList(values)
+    .filter((value) => !value.includes(":"))
+    .slice(0, 6)
+    .map((name) => ({ name }));
+}
+
+function isGenericMoodboardLabel(value: string) {
+  const label = normalized(value);
+  return !label || label === "couleur" || /^inspiration\s+\d+$/.test(label) || label === "mot-cle" || label === "pictogramme";
 }
 
 export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
+  const values = parseBrandValues(guide.dna.values);
   const foundations = fields([
     field("Activité", guide.dna.activity),
     field("Raison d’être", guide.dna.essence),
     field("Mission", guide.dna.mission),
     field("Vision", guide.dna.vision),
-    field("Valeurs", cleanList(guide.dna.values).join(" · ")),
   ]);
   const positioning = fields([
     field("Contexte client", guide.positioning.context),
@@ -94,11 +151,16 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
   const palette = [...guide.visualUniverse.palette.primary, ...guide.visualUniverse.palette.secondary]
     .filter((color) => isPdfContent(color.name) && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
   const ambiance = isPdfContent(guide.visualUniverse.ambiance) ? compact(guide.visualUniverse.ambiance) : "";
-  const moodboard = guide.visualUniverse.moodboard.filter((item) =>
-    item.type === "color" || isPdfContent(item.label) || Boolean(item.imageUrl),
-  );
+  const moodboard = guide.visualUniverse.moodboard
+    .filter((item) => {
+      if (item.type === "image") return Boolean(item.imageUrl);
+      if (item.type === "color") return Boolean(item.color && /^#[0-9A-Fa-f]{6}$/.test(item.color) && !isGenericMoodboardLabel(item.label));
+      if (item.type === "icon") return Boolean(item.imageUrl) || !isGenericMoodboardLabel(item.label);
+      return hasMeaningfulContent(item.label) && !isGenericMoodboardLabel(item.label);
+    })
+    .map((item) => isGenericMoodboardLabel(item.label) ? { ...item, label: "" } : item);
 
-  const definitions: Array<Omit<BrandGuideChapter, "number">> = [
+  const definitions: Array<Omit<BrandGuideChapter, "number" | "page">> = [
     { id: "foundations", title: "Fondations", fields: foundations },
     { id: "positioning", title: "Positionnement", fields: positioning },
     { id: "personality", title: "Personnalité", fields: personality },
@@ -117,12 +179,26 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
     field("Mots-clés", language.use.slice(0, 5).join(" · ")),
     field("Palette", palette.map((color) => `${color.name} ${color.hex}`).join(" · ")),
   ]);
-  const chapters = [
-    ...definitions,
+  const combinePositioningAndMessages = positioning.length > 0 && messages.length > 0 &&
+    [...positioning, ...messages].reduce((total, item) => total + item.value.length, 0) < 1_600;
+  const pageDefinitions = [
+    { id: "foundations", title: "Fondations", fields: [...foundations, ...values.map((value) => ({ label: "Valeur", value: value.name }))] },
+    { id: "positioning", title: "Positionnement", fields: positioning },
+    { id: "messages", title: "Messages", fields: messages },
+    { id: "voice", title: "Personnalité & langage", fields: [...personality, ...definitions.find((item) => item.id === "language")!.fields] },
+    { id: "visual", title: "Univers visuel", fields: definitions.find((item) => item.id === "visual")!.fields },
+    { id: "moodboard", title: "Moodboard", fields: definitions.find((item) => item.id === "moodboard")!.fields },
     { id: "summary", title: "Synthèse", fields: summary },
-  ]
-    .filter((chapter) => chapter.fields.length > 0)
-    .map((chapter, index) => ({ ...chapter, number: String(index + 1).padStart(2, "0") }));
+  ].filter((chapter) => chapter.fields.length > 0);
+  let nextPage = 3;
+  let positioningPage = 0;
+  const chapters = pageDefinitions.map((chapter, index) => {
+    const page = chapter.id === "messages" && combinePositioningAndMessages
+      ? positioningPage
+      : nextPage++;
+    if (chapter.id === "positioning") positioningPage = page;
+    return { ...chapter, number: String(index + 1).padStart(2, "0"), page };
+  });
 
   return {
     brandName: compact(guide.brandName) || "Ma marque",
@@ -130,6 +206,7 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
     generatedAt: guide.generatedAt,
     chapters,
     foundations,
+    values,
     positioning,
     personality,
     language,
@@ -139,5 +216,21 @@ export function createBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData
     moodboardBackground: guide.visualUniverse.moodboardBackground || "#F5E8C8",
     moodboard,
     summary,
+    combinePositioningAndMessages,
+  };
+}
+
+export function validateBrandGuideConsistency(data: BrandGuideData) {
+  const serialized = JSON.stringify(data);
+  const candidates = [...serialized.matchAll(/\b([A-ZÀ-Ý][A-Za-zÀ-ÿ'’-]+(?:\s+[A-ZÀ-Ý][A-Za-zÀ-ÿ'’-]+)*\s+(?:Studio|Communication))\b/g)]
+    .map((match) => compact(match[1]));
+  const detectedBrandNames = Array.from(new Set([data.brandName, ...candidates]));
+  const expected = normalized(data.brandName);
+  const conflicts = detectedBrandNames.filter((name) => normalized(name) !== expected);
+  return {
+    valid: conflicts.length === 0,
+    detectedBrandNames,
+    conflicts,
+    warnings: conflicts.map((name) => `Identité incohérente détectée : ${name}`),
   };
 }
