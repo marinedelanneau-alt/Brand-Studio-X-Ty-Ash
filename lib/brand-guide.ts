@@ -1,5 +1,6 @@
 import "server-only";
 
+import { findFinalAnswerCandidate } from "@/lib/brand-guide-final-answers";
 import { parseStoredBrandPersonaConfig, getBrandPersonaFields } from "@/lib/brand-persona";
 import {
   getPaletteColorCss,
@@ -279,6 +280,19 @@ function findText(sources: AnswerSource[], keywordGroups: string[][], fallback: 
   return findSource(sources, keywordGroups)?.text || fallback;
 }
 
+function findFinalAnswerSource(
+  sources: AnswerSource[],
+  concept: "promise" | "positioning",
+) {
+  return findFinalAnswerCandidate(
+    sources.map((source) => ({
+      ...source,
+      type: source.exercise.type,
+    })),
+    concept,
+  );
+}
+
 function moduleHref(source: AnswerSource | undefined) {
   return source ? `/mon-espace/module/position-${source.module.position}?mode=exercises` : undefined;
 }
@@ -407,8 +421,8 @@ export function generateBrandGuide(input: {
   const moodboard = collectMoodboard(sources);
 
   const missionSource = findSource(sources, [["mission"]]);
-  const positioningSource = findSource(sources, [["positionnement"], ["positioning"]]);
-  const promiseSource = findSource(sources, [["promesse"], ["promise"]]);
+  const positioningSource = findFinalAnswerSource(sources, "positioning");
+  const promiseSource = findFinalAnswerSource(sources, "promise");
   const toneSource = findSource(sources, [["ton"], ["voix"]]);
   const paletteSource = sources.find((item) => item.exercise.type === "color_palette");
 
@@ -416,12 +430,12 @@ export function generateBrandGuide(input: {
   const essence = findText(sources, [["adn"], ["raison", "etre"], ["essence"]], MISSING.essence);
   const mission = findText(sources, [["mission"]], MISSING.mission);
   const vision = findText(sources, [["vision"]], MISSING.vision);
-  const promise = findText(sources, [["promesse"], ["promise"]], MISSING.promise);
+  const promise = promiseSource?.text || MISSING.promise;
   const target = findText(sources, [["cible"], ["audience"], ["client", "ideal"]], "Cible principale à compléter dans le module Positionnement.");
   const problem = findText(sources, [["probleme"], ["frustration"], ["douleur"]], "Problème client à compléter dans le module Positionnement.");
   const differentiation = findText(sources, [["differenciation"], ["different"], ["singulier"]], "Différenciation à compléter dans le module Positionnement.");
   const competitors = findText(sources, [["concurrent"]], "Concurrents à renseigner si utile.");
-  const finalPositioning = findText(sources, [["positionnement", "final"], ["positionnement"]], MISSING.positioning);
+  const finalPositioning = positioningSource?.text || MISSING.positioning;
   const baseline = findText(sources, [["baseline"], ["slogan"], ["signature"]], "Baseline à compléter dans le module Baseline.");
   const traitsText =
     collectPersonaValue(sources, ["dominant_traits", "traits dominants"]) ||
