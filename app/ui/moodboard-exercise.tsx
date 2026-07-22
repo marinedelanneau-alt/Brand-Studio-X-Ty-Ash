@@ -309,16 +309,29 @@ async function renderBoardToCanvas(input: {
       context.font = "600 28px Arial";
       context.fillText(block.label || "Couleur", 42, blockHeight - 58);
     } else if (block.type === "icon") {
-      context.fillStyle = "rgba(255,255,255,0.92)";
-      context.fillRect(0, 0, blockWidth, blockHeight);
-      context.fillStyle = sanitizeHex(block.color, "#4B4550");
-      context.font = `700 ${Math.max(42, Math.min(blockWidth, blockHeight) * 0.42)}px Arial`;
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      const iconGlyph = block.icon === "circle" ? "○" : block.icon === "wave" ? "∿" : block.icon === "leaf" ? "◒" : "✦";
-      context.fillText(iconGlyph, blockWidth / 2, blockHeight / 2);
-      context.textAlign = "start";
-      context.textBaseline = "alphabetic";
+      if (block.imageUrl) {
+        try {
+          const image = await loadImage(block.imageUrl);
+          const scale = Math.min(blockWidth / image.width, blockHeight / image.height);
+          const drawWidth = image.width * scale;
+          const drawHeight = image.height * scale;
+          context.drawImage(image, (blockWidth - drawWidth) / 2, (blockHeight - drawHeight) / 2, drawWidth, drawHeight);
+        } catch {
+          context.fillStyle = "rgba(255,255,255,0.65)";
+          context.fillRect(0, 0, blockWidth, blockHeight);
+        }
+      } else {
+        context.fillStyle = "rgba(255,255,255,0.92)";
+        context.fillRect(0, 0, blockWidth, blockHeight);
+        context.fillStyle = sanitizeHex(block.color, "#4B4550");
+        context.font = `700 ${Math.max(42, Math.min(blockWidth, blockHeight) * 0.42)}px Arial`;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        const iconGlyph = block.icon === "circle" ? "○" : block.icon === "wave" ? "∿" : block.icon === "leaf" ? "◒" : "✦";
+        context.fillText(iconGlyph, blockWidth / 2, blockHeight / 2);
+        context.textAlign = "start";
+        context.textBaseline = "alphabetic";
+      }
     } else {
       context.fillStyle = "rgba(255,255,255,0.92)";
       context.fillRect(0, 0, blockWidth, blockHeight);
@@ -592,6 +605,7 @@ export default function MoodboardExercise({
   const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const replaceInputRef = useRef<HTMLInputElement | null>(null);
+  const iconInputRef = useRef<HTMLInputElement | null>(null);
   const boardCanvasRef = useRef<HTMLDivElement | null>(null);
   const interactionRef = useRef<BoardInteraction | null>(null);
   const imageCount = getMoodboardImageCount(board);
@@ -844,6 +858,52 @@ export default function MoodboardExercise({
     }
   }
 
+  async function handleIconUpload(files: FileList | null) {
+    const sourceFile = files?.[0];
+    if (!sourceFile) return;
+
+    if (sourceFile.type !== "image/png" || sourceFile.size > MAX_IMAGE_BYTES) {
+      setUploadState({ status: "error", message: "Le pictogramme doit être un fichier PNG de moins de 8 Mo." });
+      return;
+    }
+
+    setUploadState({ status: "loading", message: "Ajout du pictogramme…" });
+
+    try {
+      const file = await compressMoodboardImage(sourceFile);
+      const formData = new FormData();
+      formData.set("moduleId", String(module.id));
+      formData.set("exerciseId", String(exercise.id));
+      formData.set("currentCount", String(imageCount));
+      formData.set("assetKind", "pictogram");
+      formData.append("images", file);
+      const result = await uploadExerciseImages(formData);
+
+      if (result.status !== "success" || !result.urls[0]) {
+        throw new Error(result.status === "error" ? result.message : "Erreur d’envoi");
+      }
+
+      addBlock({
+        id: `mood-icon-${crypto.randomUUID()}`,
+        type: "icon",
+        icon: "spark",
+        label: sourceFile.name.replace(/\.png$/i, ""),
+        altText: sourceFile.name.replace(/\.png$/i, ""),
+        imageUrl: result.urls[0],
+        color: "#4B4550",
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        rotation: 0,
+        zIndex: 1,
+      });
+      setUploadState(initialUploadState);
+    } catch {
+      setUploadState({ status: "error", message: "Ce pictogramme n’a pas pu être ajouté. Vérifie son format ou son poids." });
+    }
+  }
+
   async function exportAsPng() {
     const canvas = await renderBoardToCanvas({
       board,
@@ -934,7 +994,7 @@ export default function MoodboardExercise({
             </button>
             <button
               type="button"
-              onClick={() => addBlock({ id: `mood-icon-${crypto.randomUUID()}`, type: "icon", icon: "spark", label: "Pictogramme", color: "#4B4550", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              onClick={() => iconInputRef.current?.click()}
               className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
             >
               <StarIcon className="h-4 w-4" />
@@ -979,10 +1039,20 @@ export default function MoodboardExercise({
               }}
               className="sr-only"
             />
+            <input
+              ref={iconInputRef}
+              type="file"
+              accept="image/png"
+              onChange={(event) => {
+                void handleIconUpload(event.currentTarget.files);
+                event.currentTarget.value = "";
+              }}
+              className="sr-only"
+            />
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            {(["editorial", "minimal", "collage", "grid", "bold"] as MoodboardLayoutStyle[]).map(
+            {(["editorial", "bold"] as MoodboardLayoutStyle[]).map(
               (style) => (
                 <button
                   key={style}
@@ -1118,10 +1188,14 @@ export default function MoodboardExercise({
                       ) : null}
 
                       {block.type === "icon" ? (
-                        <div className="flex h-full flex-col items-center justify-center gap-2 bg-white/90 px-3 py-3" style={{ color: sanitizeHex(block.color, "#4B4550") }}>
-                          <MoodboardIconGraphic name={block.icon} />
-                          {block.label ? <span className="text-center text-[0.65rem] font-bold uppercase tracking-[0.14em]">{block.label}</span> : null}
-                        </div>
+                        block.imageUrl ? (
+                          <SafeMoodboardImage src={block.imageUrl} alt={block.altText || block.label || "Pictogramme"} className="h-full w-full bg-transparent object-contain p-2" />
+                        ) : (
+                          <div className="flex h-full flex-col items-center justify-center gap-2 bg-white/90 px-3 py-3" style={{ color: sanitizeHex(block.color, "#4B4550") }}>
+                            <MoodboardIconGraphic name={block.icon} />
+                            {block.label ? <span className="text-center text-[0.65rem] font-bold uppercase tracking-[0.14em]">{block.label}</span> : null}
+                          </div>
+                        )
                       ) : null}
 
                       {selectedBlock?.id === block.id ? (
@@ -1291,28 +1365,27 @@ export default function MoodboardExercise({
 
                   {selectedBlock.type === "icon" ? (
                     <>
-                      <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Pictogramme</span>
-                        <select
-                          value={selectedBlock.icon}
-                          onChange={(event) => patchSelectedBlock({ icon: event.target.value as typeof selectedBlock.icon })}
-                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
-                        >
-                          <option value="spark">Étincelle</option>
-                          <option value="star">Étoile</option>
-                          <option value="leaf">Feuille</option>
-                          <option value="circle">Cercle</option>
-                          <option value="wave">Vague</option>
-                        </select>
-                      </label>
+                      {!selectedBlock.imageUrl ? (
+                        <label className="block space-y-2">
+                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Pictogramme</span>
+                          <select value={selectedBlock.icon} onChange={(event) => patchSelectedBlock({ icon: event.target.value as typeof selectedBlock.icon })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]">
+                            <option value="spark">Étincelle</option><option value="star">Étoile</option><option value="leaf">Feuille</option><option value="circle">Cercle</option><option value="wave">Vague</option>
+                          </select>
+                        </label>
+                      ) : null}
                       <label className="block space-y-2">
                         <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Légende</span>
                         <input type="text" value={selectedBlock.label} onChange={(event) => patchSelectedBlock({ label: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]" />
                       </label>
-                      <label className="block space-y-2">
+                      {selectedBlock.imageUrl ? (
+                        <label className="block space-y-2">
+                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Texte alternatif</span>
+                          <textarea value={selectedBlock.altText ?? ""} onChange={(event) => patchSelectedBlock({ altText: event.target.value })} className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]" />
+                        </label>
+                      ) : <label className="block space-y-2">
                         <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Couleur</span>
                         <input type="color" value={sanitizeHex(selectedBlock.color, "#4B4550")} onChange={(event) => patchSelectedBlock({ color: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-2" />
-                      </label>
+                      </label>}
                     </>
                   ) : null}
 

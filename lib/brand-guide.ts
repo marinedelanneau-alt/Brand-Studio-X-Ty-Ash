@@ -407,7 +407,8 @@ function collectMoodboard(sources: AnswerSource[]) {
           id: block.id,
           type: "icon" as const,
           color: block.color,
-          label: block.label || "Pictogramme",
+          imageUrl: block.imageUrl,
+          label: block.altText || block.label || "Pictogramme",
           description: block.icon,
         };
       }

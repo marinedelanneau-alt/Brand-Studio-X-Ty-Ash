@@ -397,8 +397,12 @@ export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
               <div className="flex h-full items-end p-3 text-xs font-black uppercase tracking-[0.12em] text-white drop-shadow">{item.label}</div>
             ) : item.type === "icon" ? (
               <div className="flex h-full flex-col items-center justify-center p-3 text-center" style={{ color: item.color ?? "#4b4550" }}>
-                <span className="text-4xl leading-none">{item.description === "circle" ? "○" : item.description === "wave" ? "∿" : item.description === "leaf" ? "◒" : "✦"}</span>
-                <span className="mt-2 text-[0.6rem] font-black uppercase tracking-[0.12em]">{item.label}</span>
+                {item.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={item.imageUrl} alt={item.label} className="h-full w-full object-contain" />
+                ) : (
+                  <><span className="text-4xl leading-none">{item.description === "circle" ? "○" : item.description === "wave" ? "∿" : item.description === "leaf" ? "◒" : "✦"}</span><span className="mt-2 text-[0.6rem] font-black uppercase tracking-[0.12em]">{item.label}</span></>
+                )}
               </div>
             ) : (
               <div className={`flex h-full items-center justify-center p-3 text-center text-[#4b4550] ${item.type === "text" ? "font-[family:var(--font-cormorant)] text-xl italic" : "text-xs font-black uppercase tracking-[0.14em]"}`}>

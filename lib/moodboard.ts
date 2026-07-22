@@ -45,6 +45,8 @@ export type MoodboardIconBlock = MoodboardBlockBase & {
   icon: MoodboardIconName;
   label: string;
   color: string;
+  imageUrl?: string;
+  altText?: string;
 };
 
 export type MoodboardBlock =
@@ -510,6 +512,8 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
       icon: icon as MoodboardIconName,
       label: block.label ?? "Pictogramme",
       color: ensureHexColor(block.color, "#4B4550"),
+      imageUrl: block.imageUrl ?? "",
+      altText: block.altText ?? block.label ?? "Pictogramme",
     };
   }
 

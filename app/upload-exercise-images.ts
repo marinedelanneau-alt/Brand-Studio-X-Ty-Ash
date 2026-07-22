@@ -55,6 +55,7 @@ export async function uploadExerciseImages(
     const moduleId = Number(formData.get("moduleId"));
     const exerciseId = Number(formData.get("exerciseId"));
     const currentCount = Math.max(Number(formData.get("currentCount")) || 0, 0);
+    const isPictogram = formData.get("assetKind") === "pictogram";
     const files = formData
       .getAll("images")
       .filter((item): item is File => item instanceof File && item.size > 0);
@@ -77,6 +78,13 @@ export async function uploadExerciseImages(
       return {
         status: "error",
         message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+      };
+    }
+
+    if (isPictogram && files.some((file) => file.type !== "image/png")) {
+      return {
+        status: "error",
+        message: "Le pictogramme doit être un fichier PNG.",
       };
     }
 
@@ -117,10 +125,9 @@ export async function uploadExerciseImages(
         : getMoodboardImageCount(
             parseStoredMoodboardAnswer(targetModule.answers[exercise.id] ?? []),
           );
-    const remainingSlots = Math.max(
-      config.maxImages - Math.max(currentCount, persistedCount),
-      0,
-    );
+    const remainingSlots = isPictogram
+      ? 1
+      : Math.max(config.maxImages - Math.max(currentCount, persistedCount), 0);
 
     if (remainingSlots <= 0) {
       return {

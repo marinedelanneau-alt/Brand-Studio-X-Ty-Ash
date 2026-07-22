@@ -77,6 +77,8 @@ describe("personal moodboard data", () => {
           type: "icon",
           icon: "leaf",
           label: "Nature",
+          imageUrl: "https://example.com/icon.png",
+          altText: "Feuille dessinée",
           color: "#557A5B",
           x: 17,
           y: 23,
@@ -93,6 +95,8 @@ describe("personal moodboard data", () => {
     expect(restored.blocks[0]).toMatchObject({
       type: "icon",
       icon: "leaf",
+      imageUrl: "https://example.com/icon.png",
+      altText: "Feuille dessinée",
       x: 17,
       y: 23,
       w: 24,

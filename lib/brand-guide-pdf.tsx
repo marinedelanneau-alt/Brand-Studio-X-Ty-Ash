@@ -369,7 +369,7 @@ function MoodboardComposition({ guide }: { guide: GeneratedBrandGuide }) {
             },
           ]}
         >
-          {item.type === "image" && item.imageUrl ? (
+          {(item.type === "image" || item.type === "icon") && item.imageUrl ? (
             // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
             <Image src={item.imageUrl} style={styles.moodboardImage} />
           ) : (
