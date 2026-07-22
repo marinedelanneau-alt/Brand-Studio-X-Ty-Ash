@@ -384,20 +384,24 @@ function getLayoutDescriptor(style: MoodboardLayoutStyle) {
 }
 
 export function analyzeMoodboard(answer: MoodboardAnswer) {
-  const imageCount = answer.blocks.filter((block) => block.type === "image").length;
-  const hasColorBlock = answer.blocks.some((block) => block.type === "color");
-  const hasTextualBlock = answer.blocks.some(
-    (block) => block.type === "text" || block.type === "keyword",
-  );
   const descriptor = getLayoutDescriptor(answer.layoutStyle);
-  const diversity =
-    imageCount >= 4 && hasColorBlock && hasTextualBlock
-      ? "avec une belle diversite visuelle"
-      : imageCount >= 3
-        ? "avec une base visuelle déjà solide"
-        : "avec une intention encore à enrichir";
+  const keywords = answer.blocks
+    .flatMap((block) => {
+      if (block.type === "keyword") return [block.keyword];
+      if (block.type === "image") return [block.caption];
+      if (block.type === "icon") return [block.label];
+      return [];
+    })
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .filter((value, index, values) => values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index)
+    .slice(0, 3);
+  const references = keywords.length > 0 ? `, guidée par ${keywords.join(", ")}` : "";
+  const recommendation = answer.layoutStyle === "bold"
+    ? "Privilégier les contrastes francs et des messages courts."
+    : "Privilégier les compositions aérées et une typographie élégante.";
 
-  return `Ton moodboard evoque une marque ${descriptor}, ${diversity}.`;
+  return `Direction ${descriptor}${references}. ${recommendation}`;
 }
 
 function buildGeneratedImageSvg(input: {

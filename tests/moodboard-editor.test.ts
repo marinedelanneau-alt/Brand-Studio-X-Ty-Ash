@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeMoodboard,
   autoArrange,
   getDefaultMoodboardAnswer,
   parseStoredMoodboardAnswer,
@@ -8,6 +9,31 @@ import {
 } from "../lib/moodboard";
 
 describe("personal moodboard data", () => {
+  it("writes a concise and actionable ambiance summary", () => {
+    const board: MoodboardAnswer = {
+      ...getDefaultMoodboardAnswer("editorial"),
+      blocks: [
+        {
+          id: "keyword-ambiance",
+          type: "keyword",
+          keyword: "Lumière",
+          textColor: "#4B4550",
+          fontSize: 18,
+          x: 5,
+          y: 5,
+          w: 20,
+          h: 12,
+          rotation: 0,
+          zIndex: 1,
+        },
+      ],
+    };
+
+    expect(analyzeMoodboard(board)).toContain("guidée par Lumière");
+    expect(analyzeMoodboard(board)).toContain("Privilégier les compositions aérées");
+    expect(analyzeMoodboard(board)).not.toContain("à enrichir");
+  });
+
   it("starts empty instead of generating decorative blocks", () => {
     expect(getDefaultMoodboardAnswer().blocks).toEqual([]);
   });

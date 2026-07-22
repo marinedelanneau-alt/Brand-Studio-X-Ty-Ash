@@ -13,7 +13,7 @@ import {
   parseIndexedAnswerItems,
   parseStoredTableConfig,
 } from "@/lib/exercise-types";
-import { parseStoredMoodboardAnswer, type MoodboardAnswer } from "@/lib/moodboard";
+import { analyzeMoodboard, parseStoredMoodboardAnswer, type MoodboardAnswer } from "@/lib/moodboard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BrandProject, ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 
@@ -359,7 +359,7 @@ function collectMoodboard(sources: AnswerSource[]) {
   const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
 
   return {
-    ambiance: answer?.ambiance || answer?.feedback || "",
+    ambiance: answer?.ambiance || (answer ? analyzeMoodboard(answer) : ""),
     backgroundColor: answer?.backgroundColor || "#F5E8C8",
     items: (answer?.blocks ?? []).slice(0, 16).map((block) => {
       const frame = {

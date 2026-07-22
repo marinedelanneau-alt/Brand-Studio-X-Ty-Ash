@@ -147,10 +147,7 @@ export default function BrandGuideLayout({
                 primary={guide.visualUniverse.palette.primary}
                 secondary={guide.visualUniverse.palette.secondary}
               />
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <GuideCard label="Ambiance generale" value={guide.visualUniverse.ambiance} />
-                <GuideCard label="Elements graphiques" value={guide.visualUniverse.graphicElements} />
-              </div>
+              <GuideCard label="Ambiance generale" value={guide.visualUniverse.ambiance} wide />
               <GuideMoodboard items={guide.visualUniverse.moodboard} backgroundColor={guide.visualUniverse.moodboardBackground} />
             </GuideSection>
             <GuideSection kicker="06" title="Regles d'application">

@@ -458,10 +458,7 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
       <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
         <Section eyebrow="05" title="Univers visuel" theme={theme}>
           <Palette colors={colors} theme={theme} />
-          <View style={styles.grid}>
-            <Card label="Ambiance generale" value={guide.visualUniverse.ambiance} theme={theme} />
-            <Card label="Elements graphiques" value={guide.visualUniverse.graphicElements} theme={theme} />
-          </View>
+          <Card wide label="Ambiance generale" value={guide.visualUniverse.ambiance} theme={theme} />
           <MoodboardComposition guide={guide} />
         </Section>
       </Page>
