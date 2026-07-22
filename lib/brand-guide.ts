@@ -424,6 +424,20 @@ function collectMoodboard(sources: AnswerSource[]) {
   };
 }
 
+export function describeMoodboardElements(items: GuideMoodboardItem[]) {
+  const labels = items
+    .map((item) => compactText(item.label))
+    .filter(Boolean)
+    .filter((label, index, allLabels) =>
+      allLabels.findIndex((candidate) => normalizeForSearch(candidate) === normalizeForSearch(label)) === index,
+    )
+    .slice(0, 12);
+
+  return labels.length > 0
+    ? labels.join(", ")
+    : "Moodboard à compléter dans le module Univers visuel.";
+}
+
 function listFromText(text: string, fallback: string[]) {
   const items = splitList(text).slice(0, 8);
   return items.length > 0 ? items : fallback;
@@ -587,7 +601,7 @@ export function generateBrandGuide(input: {
     visualUniverse: {
       palette: colors,
       ambiance: visualAmbiance,
-      graphicElements: findText(sources, [["element", "graphique"], ["codes", "visuels"]], "Éléments graphiques à préciser dans le module Univers visuel."),
+      graphicElements: describeMoodboardElements(moodboard.items),
       prioritySupports: supports,
       moodboard: moodboard.items,
     },
