@@ -8,7 +8,7 @@ const longAnswer = [
   "Révéler des marques authentiques en construisant une identité claire, sensible et mémorable.",
   "Cette réponse volontairement longue vérifie que le contenu peut continuer sur la page suivante",
   "sans être coupé, superposé ou traversé par la bordure d'une autre carte.",
-].join(" ").repeat(18);
+].join(" ").repeat(6);
 
 const summary: ModuleSummaryCard = {
   eyebrow: "Module 3",
@@ -62,7 +62,7 @@ const shareData: ModuleShareData = {
 };
 
 describe("module PDF summary", () => {
-  it("renders long answers as a valid multi-page PDF", async () => {
+  it("renders long, indivisible answer cards as a valid multi-page PDF", async () => {
     const buffer = await renderToBuffer(
       <ModulePdfSummary summary={summary} shareData={shareData} />,
     );

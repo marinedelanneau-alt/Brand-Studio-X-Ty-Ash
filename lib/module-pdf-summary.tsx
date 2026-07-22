@@ -439,7 +439,7 @@ export function ModulePdfSummary({
               intro="Une lecture rapide des éléments qui structurent désormais ta marque."
             />
             {summary.keyTakeaways.map((item) => (
-              <View key={item.id} style={styles.takeaway}>
+              <View key={item.id} style={styles.takeaway} wrap={false}>
                 <View style={styles.takeawayTop} minPresenceAhead={28}>
                   <View style={styles.takeawayMarker} />
                   <Text style={styles.takeawayLabel}>{item.label}</Text>
@@ -469,7 +469,7 @@ export function ModulePdfSummary({
                   <Text style={styles.chapterTitle}>{submodule.title}</Text>
                 </View>
                 {submodule.highlights.map((item, index) => (
-                  <View key={`${item.label}-${index}`} style={styles.detail}>
+                  <View key={`${item.label}-${index}`} style={styles.detail} wrap={false}>
                     <Text style={styles.detailLabel} minPresenceAhead={24}>{item.label}</Text>
                     {item.colors?.length ? (
                       <PdfPalette colors={item.colors} />
