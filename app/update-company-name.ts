@@ -5,6 +5,7 @@ import { unstable_rethrow } from "next/navigation";
 import { updateAccountCompanyName } from "@/lib/access-codes";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { getAuthenticatedAccount } from "@/lib/session";
+import { updateProjectNameForAccount } from "@/lib/training";
 
 type CompanyNameState = {
   status: "idle" | "error" | "success";
@@ -40,6 +41,7 @@ export async function updateCompanyName(
       accountId: account.id,
       companyName,
     });
+    await updateProjectNameForAccount({ accountId: account.id, name: companyName });
   } catch (error) {
     unstable_rethrow(error);
 

@@ -1234,6 +1234,19 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   return snapshot.modules;
 }
 
+export async function updateProjectNameForAccount(input: {
+  accountId: number;
+  name: string;
+}) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("brand_projects")
+    .update({ name: input.name, updated_at: new Date().toISOString() })
+    .eq("account_id", input.accountId);
+
+  if (error) throw new Error(error.message);
+}
+
 function getDraftModuleIdentity(title: string) {
   return title
     .normalize("NFD")

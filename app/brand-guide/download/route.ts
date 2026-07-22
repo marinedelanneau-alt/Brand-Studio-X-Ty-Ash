@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     const guide = generateGuideFromAnswers({
       project: workspace.project,
       modules: workspace.modules,
-      brandName: workspace.project.name,
+      brandName: account.company_name?.trim() || workspace.project.name,
     });
     const pdfBuffer = await renderBrandGuidePdf(guide);
 

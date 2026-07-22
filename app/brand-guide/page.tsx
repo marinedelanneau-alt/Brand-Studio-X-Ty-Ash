@@ -15,10 +15,12 @@ export const dynamic = "force-dynamic";
 export default async function BrandGuidePage() {
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
   let latestGeneratedAt: string | null = null;
+  let accountBrandName = "";
   let loadError = "";
 
   try {
     const account = await getAuthenticatedAccount();
+    accountBrandName = account.company_name?.trim() ?? "";
     if (!(await hasActiveAccess(account.id))) {
       redirect("/pricing");
     }
@@ -51,7 +53,7 @@ export default async function BrandGuidePage() {
   const guide = generateGuideFromAnswers({
     project: workspace.project,
     modules: workspace.modules,
-    brandName: workspace.project.name,
+    brandName: accountBrandName || workspace.project.name,
   });
 
   return <BrandGuideLayout guide={guide} latestGeneratedAt={latestGeneratedAt} />;
