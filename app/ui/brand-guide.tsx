@@ -151,7 +151,7 @@ export default function BrandGuideLayout({
                 <GuideCard label="Ambiance generale" value={guide.visualUniverse.ambiance} />
                 <GuideCard label="Elements graphiques" value={guide.visualUniverse.graphicElements} />
               </div>
-              <GuideMoodboard items={guide.visualUniverse.moodboard} />
+              <GuideMoodboard items={guide.visualUniverse.moodboard} backgroundColor={guide.visualUniverse.moodboardBackground} />
             </GuideSection>
             <GuideSection kicker="06" title="Regles d'application">
               <div className="grid gap-4 md:grid-cols-2">
@@ -363,14 +363,14 @@ export function GuideColorPalette({
   );
 }
 
-export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
+export function GuideMoodboard({ items, backgroundColor }: { items: GuideMoodboardItem[]; backgroundColor: string }) {
   if (items.length === 0) {
     return <GuideCard label="Moodboard" value="Moodboard à compléter pour enrichir l'univers visuel." wide />;
   }
 
   return (
     <div className="mx-auto mt-5 w-full max-w-3xl rounded-[1rem] border border-[var(--guide-border)] bg-[#f5eee4] p-3 shadow-[0_18px_44px_rgba(78,58,38,0.1)]">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[0.8rem] bg-[#fbf7f0]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[0.8rem]" style={{ backgroundColor }}>
         {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
           <div
             key={item.id}
@@ -400,7 +400,10 @@ export function GuideMoodboard({ items }: { items: GuideMoodboardItem[] }) {
                 )}
               </div>
             ) : (
-              <div className={`flex h-full items-center justify-center p-3 text-center text-[#4b4550] ${item.type === "text" ? "font-[family:var(--font-cormorant)] text-xl italic" : "text-xs font-black uppercase tracking-[0.14em]"}`}>
+              <div
+                className={`flex h-full items-center justify-center p-3 text-center ${item.type === "text" ? "font-[family:var(--font-cormorant)] italic" : "font-black uppercase tracking-[0.14em]"}`}
+                style={{ color: item.textColor ?? "#4b4550", fontSize: `${item.fontSize ?? (item.type === "text" ? 20 : 12)}px` }}
+              >
                 {item.label}
               </div>
             )}

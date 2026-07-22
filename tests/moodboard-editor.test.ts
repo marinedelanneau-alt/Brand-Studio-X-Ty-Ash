@@ -113,6 +113,8 @@ describe("personal moodboard data", () => {
             id: "keyword-1",
             type: "keyword",
             keyword: "Sensible",
+            textColor: "#4B4550",
+            fontSize: 18,
             x: 51,
             y: 47,
             w: 22,

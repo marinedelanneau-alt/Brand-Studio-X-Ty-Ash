@@ -141,7 +141,6 @@ function buildModuleKeyTakeaways(
     buildOdorTakeaway(submoduleRecaps),
     buildBaselineTakeaway(submoduleRecaps),
     buildPaletteTakeaway(module, submoduleRecaps),
-    buildMoodboardTakeaway(submoduleRecaps),
   ];
   const takeaways = candidates.filter((item): item is ModuleKeyTakeaway => item !== null);
 
@@ -160,7 +159,7 @@ function buildModuleKeyTakeaways(
         icon: "spark" as const,
       })),
     )
-    .filter((item) => hasUsableTakeawayValue(item.value))
+    .filter((item) => hasUsableTakeawayValue(item.value) && !isMoodboardPayload(item.value))
     .filter((item) =>
       !uniqueTakeaways.some(
         (takeaway) => normalizeForSearch(takeaway.value) === normalizeForSearch(item.value),
@@ -341,24 +340,6 @@ function buildPaletteTakeaway(
     : null;
 }
 
-function buildMoodboardTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
-  const match = findHighlightByKeywords(submoduleRecaps, [
-    "moodboard",
-    "ambiance",
-    "univers visuel",
-    "direction artistique",
-  ]);
-  if (!match) return null;
-
-  return {
-    id: "moodboard",
-    label: "Univers / Moodboard",
-    value: cleanTakeawayValue(match.value),
-    context: "Une direction visuelle pour guider tes prochains choix.",
-    icon: "moodboard",
-  } satisfies ModuleKeyTakeaway;
-}
-
 function findHighlightByKeywords(
   submoduleRecaps: ModuleSubmoduleSummary[],
   keywords: string[],
@@ -394,6 +375,11 @@ function sanitizeTakeawayLabel(label: string) {
 function hasUsableTakeawayValue(value: string) {
   const normalized = normalizeForSearch(value);
   return Boolean(value.trim()) && !normalized.includes("a completer") && normalized !== "undefined";
+}
+
+function isMoodboardPayload(value: string) {
+  const compact = value.trim().replace(/^__moodboard__:/, "");
+  return compact.startsWith('{"type":"moodboard"');
 }
 
 function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
@@ -657,8 +643,15 @@ function summarizeExerciseAnswer(
       : entries.map((entry) => entry.label)
     );
 
+    const checklistQuestion = normalizeForSearch(exercise.question || "");
+    const label = checklistQuestion.includes("eviter") || checklistQuestion.includes("interdit")
+      ? "Mots à éviter"
+      : checklistQuestion.includes("utiliser") || checklistQuestion.includes("privilegier")
+        ? "Mots à utiliser"
+        : "Éléments retenus";
+
     return labels.length > 0
-      ? buildHighlight("Mots retenus", labels.join(", "))
+      ? buildHighlight(label, labels.join(", "))
       : null;
   }
 

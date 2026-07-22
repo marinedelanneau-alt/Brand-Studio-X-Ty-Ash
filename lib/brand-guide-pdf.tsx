@@ -353,7 +353,7 @@ function MoodboardComposition({ guide }: { guide: GeneratedBrandGuide }) {
   }
 
   return (
-    <View style={styles.moodboardFrame}>
+    <View style={[styles.moodboardFrame, { backgroundColor: guide.visualUniverse.moodboardBackground }]}>
       {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
         <View
           key={item.id}
@@ -373,7 +373,7 @@ function MoodboardComposition({ guide }: { guide: GeneratedBrandGuide }) {
             // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
             <Image src={item.imageUrl} style={styles.moodboardImage} />
           ) : (
-            <Text style={[styles.moodboardText, item.type === "color" ? { color: "#FFFFFF" } : {}]}>
+            <Text style={[styles.moodboardText, item.type === "color" ? { color: "#FFFFFF" } : { color: item.textColor ?? "#4B4550", fontSize: item.fontSize ?? 12 }]}>
               {item.type === "icon" ? `${item.description === "circle" ? "○" : item.description === "wave" ? "∿" : "✦"} ` : ""}
               {item.label}
             </Text>

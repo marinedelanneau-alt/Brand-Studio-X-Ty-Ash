@@ -62,25 +62,9 @@ type BoardInteraction = {
   initialH: number;
 };
 
-function hexToRgb(hex: string) {
-  const normalized = hex.replace("#", "");
-  const value = Number.parseInt(normalized, 16);
-
-  return {
-    r: (value >> 16) & 255,
-    g: (value >> 8) & 255,
-    b: value & 255,
-  };
-}
-
 function sanitizeHex(value: string, fallback = "#E9DDCF") {
   const normalized = value.trim().toUpperCase();
   return /^#[0-9A-F]{6}$/.test(normalized) ? normalized : fallback;
-}
-
-function colorToRgba(hex: string, alpha: number) {
-  const { r, g, b } = hexToRgb(sanitizeHex(hex));
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function fileToDataUrl(file: File) {
@@ -192,15 +176,8 @@ function SafeMoodboardImage({
   return <img src={src} alt={alt} className={className} style={{ objectPosition }} onError={() => setFailed(true)} />;
 }
 
-function getBoardBackground(palette: string[]) {
-  const base = sanitizeHex(palette[0] ?? "#FBF5EC");
-  const accent = sanitizeHex(palette[1] ?? "#E3C79D");
-  const contrast = sanitizeHex(palette[2] ?? "#556274");
-
-  return `linear-gradient(145deg, ${colorToRgba(base, 0.9)}, ${colorToRgba(
-    accent,
-    0.55,
-  )} 52%, ${colorToRgba(contrast, 0.28)} 100%)`;
+function getBoardBackground(backgroundColor: string) {
+  return sanitizeHex(backgroundColor, "#F5E8C8");
 }
 
 function getBlockShadow(style: MoodboardLayoutStyle) {
@@ -238,16 +215,7 @@ async function renderBoardToCanvas(input: {
     throw new Error("Canvas indisponible sur ce navigateur.");
   }
 
-  const background = context.createLinearGradient(0, 0, width, height);
-  const colors = [
-    sanitizeHex(input.palette[0] ?? "#FBF5EC"),
-    sanitizeHex(input.palette[1] ?? "#E3C79D"),
-    sanitizeHex(input.palette[2] ?? "#556274"),
-  ];
-  background.addColorStop(0, colors[0]);
-  background.addColorStop(0.52, colors[1]);
-  background.addColorStop(1, colors[2]);
-  context.fillStyle = background;
+  context.fillStyle = sanitizeHex(input.board.backgroundColor, "#F5E8C8");
   context.fillRect(0, 0, width, height);
 
   const orderedBlocks = input.board.blocks.slice().sort((left, right) => left.zIndex - right.zIndex);
@@ -335,8 +303,10 @@ async function renderBoardToCanvas(input: {
     } else {
       context.fillStyle = "rgba(255,255,255,0.92)";
       context.fillRect(0, 0, blockWidth, blockHeight);
-      context.fillStyle = "#4B4550";
-      context.font = block.type === "text" ? "italic 600 38px Georgia" : "700 42px Arial";
+      context.fillStyle = sanitizeHex(block.textColor, "#4B4550");
+      context.font = block.type === "text"
+        ? `italic 600 ${block.fontSize}px Georgia`
+        : `700 ${block.fontSize}px Arial`;
       const text = block.type === "text" ? block.text : block.keyword;
       const words = text.split(/\s+/);
       let line = "";
@@ -360,8 +330,8 @@ async function renderBoardToCanvas(input: {
       }
 
       if (block.type === "text" && block.author) {
-        context.font = "500 22px Arial";
-        context.fillStyle = "#7B7068";
+        context.font = `500 ${Math.max(12, Math.round(block.fontSize * 0.58))}px Arial`;
+        context.fillStyle = sanitizeHex(block.textColor, "#4B4550");
         context.fillText(block.author, 36, Math.min(blockHeight - 36, lineY + 72));
       }
     }
@@ -970,7 +940,7 @@ export default function MoodboardExercise({
             </button>
             <button
               type="button"
-              onClick={() => addBlock({ id: `mood-keyword-${crypto.randomUUID()}`, type: "keyword", keyword: "Mot-clé", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              onClick={() => addBlock({ id: `mood-keyword-${crypto.randomUUID()}`, type: "keyword", keyword: "Mot-clé", textColor: "#4B4550", fontSize: 18, x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
               className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
             >
               <PlusIcon className="h-4 w-4" />
@@ -978,7 +948,7 @@ export default function MoodboardExercise({
             </button>
             <button
               type="button"
-              onClick={() => addBlock({ id: `mood-text-${crypto.randomUUID()}`, type: "text", text: "Une citation qui donne le ton", author: "", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
+              onClick={() => addBlock({ id: `mood-text-${crypto.randomUUID()}`, type: "text", text: "Une citation qui donne le ton", author: "", textColor: "#4B4550", fontSize: 28, x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
               className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
             >
               <ChatBubbleLeftRightIcon className="h-4 w-4" />
@@ -1068,6 +1038,16 @@ export default function MoodboardExercise({
                 </button>
               ),
             )}
+            <label className="flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.15em] text-[#6b625a]">
+              Fond
+              <input
+                type="color"
+                value={sanitizeHex(board.backgroundColor, "#F5E8C8")}
+                onChange={(event) => commit({ ...board, backgroundColor: event.target.value })}
+                className="h-6 w-8 cursor-pointer border-0 bg-transparent p-0"
+                aria-label="Couleur de fond du moodboard"
+              />
+            </label>
           </div>
 
           {uploadState.message ? (
@@ -1085,7 +1065,7 @@ export default function MoodboardExercise({
           <div className="space-y-4">
             <div
               className="relative overflow-hidden rounded-[1.8rem] border border-[#eadfca] p-4 shadow-[0_20px_44px_rgba(210,189,152,0.14)]"
-              style={{ background: getBoardBackground(signals.palette) }}
+              style={{ background: getBoardBackground(board.backgroundColor) }}
             >
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.42),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.2),transparent_36%)]" />
               <div
@@ -1167,12 +1147,12 @@ export default function MoodboardExercise({
                       ) : null}
 
                       {block.type === "text" ? (
-                        <div className="flex h-full flex-col justify-between px-4 py-4 text-[#4b4550]">
-                          <span className="font-[family:var(--font-cormorant)] text-[1.55rem] italic leading-[1.05]">
+                        <div className="flex h-full flex-col justify-between px-4 py-4" style={{ color: sanitizeHex(block.textColor, "#4B4550") }}>
+                          <span className="font-[family:var(--font-cormorant)] italic leading-[1.05]" style={{ fontSize: `${block.fontSize}px` }}>
                             {block.text}
                           </span>
                           {block.author ? (
-                            <span className="text-xs uppercase tracking-[0.16em] text-[#8a8077]">
+                            <span className="uppercase tracking-[0.16em] opacity-70" style={{ fontSize: `${Math.max(10, block.fontSize * 0.45)}px` }}>
                               {block.author}
                             </span>
                           ) : null}
@@ -1181,7 +1161,7 @@ export default function MoodboardExercise({
 
                       {block.type === "keyword" ? (
                         <div className="flex h-full items-center justify-center px-4 py-4">
-                          <span className="text-center text-lg font-black uppercase tracking-[0.18em] text-[#4b4550]">
+                          <span className="text-center font-black uppercase tracking-[0.18em]" style={{ color: sanitizeHex(block.textColor, "#4B4550"), fontSize: `${block.fontSize}px` }}>
                             {block.keyword}
                           </span>
                         </div>
@@ -1361,6 +1341,34 @@ export default function MoodboardExercise({
                         className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
                       />
                     </label>
+                  ) : null}
+
+                  {selectedBlock.type === "text" || selectedBlock.type === "keyword" ? (
+                    <div className="grid grid-cols-[1fr_5rem] gap-3 rounded-xl border border-[#eadfca] bg-[#fffdf7] p-3">
+                      <label className="block space-y-2">
+                        <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                          Taille <span>{selectedBlock.fontSize}px</span>
+                        </span>
+                        <input
+                          type="range"
+                          min="12"
+                          max="72"
+                          step="1"
+                          value={selectedBlock.fontSize}
+                          onChange={(event) => patchSelectedBlock({ fontSize: Number(event.target.value) })}
+                          className="w-full accent-[#cf7430]"
+                        />
+                      </label>
+                      <label className="block space-y-2">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Couleur</span>
+                        <input
+                          type="color"
+                          value={sanitizeHex(selectedBlock.textColor, "#4B4550")}
+                          onChange={(event) => patchSelectedBlock({ textColor: event.target.value })}
+                          className="h-9 w-full cursor-pointer rounded-lg border border-[#eadfca] bg-white p-1"
+                        />
+                      </label>
+                    </div>
                   ) : null}
 
                   {selectedBlock.type === "icon" ? (

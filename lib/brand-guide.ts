@@ -49,6 +49,8 @@ export type GuideMoodboardItem = {
   zIndex: number;
   cropX?: number;
   cropY?: number;
+  textColor?: string;
+  fontSize?: number;
 };
 
 export type GuideCompletionItem = {
@@ -110,6 +112,7 @@ export type GeneratedBrandGuide = {
     };
     ambiance: string;
     graphicElements: string;
+    moodboardBackground: string;
     prioritySupports: string[];
     moodboard: GuideMoodboardItem[];
   };
@@ -357,6 +360,7 @@ function collectMoodboard(sources: AnswerSource[]) {
 
   return {
     ambiance: answer?.ambiance || answer?.feedback || "",
+    backgroundColor: answer?.backgroundColor || "#F5E8C8",
     items: (answer?.blocks ?? []).slice(0, 16).map((block) => {
       const frame = {
         x: block.x,
@@ -398,6 +402,8 @@ function collectMoodboard(sources: AnswerSource[]) {
           type: "text" as const,
           label: block.text || "Note d'ambiance",
           description: block.author || "Moodboard",
+          textColor: block.textColor,
+          fontSize: block.fontSize,
         };
       }
 
@@ -419,6 +425,8 @@ function collectMoodboard(sources: AnswerSource[]) {
         type: "keyword" as const,
         label: block.keyword || "Mot-cle",
         description: "Mot d'ambiance.",
+        textColor: block.textColor,
+        fontSize: block.fontSize,
       };
     }),
   };
@@ -602,6 +610,7 @@ export function generateBrandGuide(input: {
       palette: colors,
       ambiance: visualAmbiance,
       graphicElements: describeMoodboardElements(moodboard.items),
+      moodboardBackground: moodboard.backgroundColor,
       prioritySupports: supports,
       moodboard: moodboard.items,
     },

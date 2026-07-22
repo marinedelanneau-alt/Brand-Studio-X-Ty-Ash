@@ -31,11 +31,15 @@ export type MoodboardTextBlock = MoodboardBlockBase & {
   type: "text";
   text: string;
   author: string;
+  textColor: string;
+  fontSize: number;
 };
 
 export type MoodboardKeywordBlock = MoodboardBlockBase & {
   type: "keyword";
   keyword: string;
+  textColor: string;
+  fontSize: number;
 };
 
 export type MoodboardIconName = "spark" | "star" | "leaf" | "circle" | "wave";
@@ -60,6 +64,7 @@ export type MoodboardAnswer = {
   type: "moodboard";
   version: 2;
   layoutStyle: MoodboardLayoutStyle;
+  backgroundColor: string;
   ambiance: string;
   feedback: string;
   blocks: MoodboardBlock[];
@@ -202,6 +207,8 @@ export function createMoodboardFromTemplate(
       type: "text",
       text: slot.defaultText ?? signals.keywords[index % Math.max(signals.keywords.length, 1)] ?? "Ton univers",
       author: signals.persona || "Brand Studio",
+      textColor: "#4B4550",
+      fontSize: 28,
       x: slot.x,
       y: slot.y,
       w: slot.width,
@@ -215,6 +222,7 @@ export function createMoodboardFromTemplate(
     type: "moodboard",
     version: 2,
     layoutStyle: template.layoutType,
+    backgroundColor: template.background.value,
     ambiance: "",
     feedback: "",
     blocks,
@@ -498,6 +506,8 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
       type: "text",
       text: block.text ?? "",
       author: block.author ?? "",
+      textColor: ensureHexColor(block.textColor ?? "#4B4550", "#4B4550"),
+      fontSize: clamp(block.fontSize ?? 28, 12, 72),
     };
   }
 
@@ -521,6 +531,8 @@ function normalizeBlock(block: MoodboardBlock, index: number): MoodboardBlock {
     ...base,
     type: "keyword",
     keyword: block.keyword ?? "",
+    textColor: ensureHexColor(block.textColor ?? "#4B4550", "#4B4550"),
+    fontSize: clamp(block.fontSize ?? 18, 12, 72),
   };
 }
 
@@ -529,6 +541,7 @@ export function getDefaultMoodboardAnswer(style: MoodboardLayoutStyle = DEFAULT_
     type: "moodboard",
     version: 2,
     layoutStyle: style,
+    backgroundColor: "#F5E8C8",
     ambiance: "",
     feedback: "",
     blocks: [],
@@ -589,6 +602,7 @@ export function parseStoredMoodboardAnswer(
         type: "moodboard",
         version: 2,
         layoutStyle,
+        backgroundColor: ensureHexColor(parsed.backgroundColor ?? "#F5E8C8", "#F5E8C8"),
         ambiance: migratedGeneratedComposition
           ? ""
           : typeof parsed.ambiance === "string" ? parsed.ambiance : "",
@@ -643,6 +657,7 @@ export function parseStoredMoodboardAnswer(
     type: "moodboard",
     version: 2,
     layoutStyle: DEFAULT_STYLE,
+    backgroundColor: "#F5E8C8",
     ambiance: "",
     feedback: "",
     blocks,
@@ -722,6 +737,8 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
         id: createBlockId("mood-keyword"),
         type: "keyword" as const,
         keyword: seededKeywords[0] ?? "présence",
+        textColor: "#4B4550",
+        fontSize: 18,
         x: 0,
         y: 0,
         w: 0,
@@ -736,6 +753,8 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
           input.quote?.trim() ||
           `Une direction ${seededKeywords[0] ?? "éditoriale"} portée par ${secondaryColor}.`,
         author: input.persona || "Brand Studio",
+        textColor: "#4B4550",
+        fontSize: 28,
         x: 0,
         y: 0,
         w: 0,
@@ -750,6 +769,7 @@ export function generateMoodboard(input: MoodboardGenerationInput): MoodboardAns
     type: "moodboard",
     version: 2,
     layoutStyle: style,
+    backgroundColor: "#F5E8C8",
     ambiance: inferAmbiance(input),
     feedback: "",
     blocks,
