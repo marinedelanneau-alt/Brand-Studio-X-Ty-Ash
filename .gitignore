@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/artifacts/brand-guide-preview/*
 
 # next.js
 /.next/

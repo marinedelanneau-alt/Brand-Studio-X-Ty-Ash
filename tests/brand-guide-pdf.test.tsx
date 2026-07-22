@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
 import { createBrandGuideData, hasMeaningfulContent, validateBrandGuideConsistency } from "../lib/brand-guide-pdf-data";
 import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-pdf";
-import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
+import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectCoverLayout, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
 
 function makeGuide(): GeneratedBrandGuide {
   return {
     brandName: "Maison Éditoriale au nom volontairement très long",
+    brandAssets: { logoOwner: "Maison Éditoriale au nom volontairement très long" },
     baseline: "Créer du sens, durablement.",
     generatedAt: "2026-07-22T09:00:00.000Z",
     completion: { hasAnyData: true, warning: "", items: [] },
@@ -65,6 +66,12 @@ describe("editorial brand guide PDF", () => {
   it("computes accessible palette contrast", () => {
     expect(getAccessibleTextColor("#FAF6EF")).toBe("#29242C");
     expect(getAccessibleTextColor("#29242C")).toBe("#FFFFFF");
+  });
+
+  it("selects a cover from real assets without inventing a logo", () => {
+    const data = createBrandGuideData(makeGuide());
+    expect(selectCoverLayout(data)).toBe("palette-graphic");
+    expect(data.logoUrl).toBeUndefined();
   });
 
   it("recomposes moodboard assets without editor coordinates or dead zones", () => {

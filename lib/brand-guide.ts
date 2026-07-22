@@ -62,6 +62,13 @@ export type GuideCompletionItem = {
 
 export type GeneratedBrandGuide = {
   brandName: string;
+  brandAssets: {
+    logoUrl?: string;
+    logoStoragePath?: string;
+    logoAlt?: string;
+    logoAspectRatio?: number;
+    logoOwner: string;
+  };
   baseline: string;
   generatedAt: string;
   completion: {
@@ -554,6 +561,12 @@ export function generateBrandGuide(input: {
 
   return {
     brandName,
+    brandAssets: {
+      logoUrl: input.project.logo_url || undefined,
+      logoStoragePath: input.project.logo_url?.match(/\/project-assets\/(.+)$/)?.[1],
+      logoAlt: input.project.logo_url ? `Logo de ${brandName}` : undefined,
+      logoOwner: brandName,
+    },
     baseline,
     generatedAt: new Date().toISOString(),
     completion: {

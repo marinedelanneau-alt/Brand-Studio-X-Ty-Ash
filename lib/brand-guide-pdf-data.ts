@@ -20,6 +20,11 @@ export type BrandValueData = {
 
 export type BrandGuideData = {
   brandName: string;
+  logoUrl?: string;
+  logoStoragePath?: string;
+  logoAlt?: string;
+  logoAspectRatio?: number;
+  logoOwner: string;
   baseline: string;
   generatedAt: string;
   chapters: BrandGuideChapter[];
@@ -88,7 +93,7 @@ function cleanList(values: string[]) {
   return values.map(compact).filter(hasMeaningfulContent);
 }
 
-function parseBrandValues(values: string[]): BrandValueData[] {
+export function mapValueAnswers(values: string[]): BrandValueData[] {
   const source = values.join(" · ");
   const labels = "Valeur|Cela signifie que je|Ce que cette valeur signifie|Dans la pratique|Concrètement|Dans ma communication|Dans la communication";
   const matches = [...source.matchAll(new RegExp(`(?:^|\\s*·\\s*)(?:\\d+\\s*·\\s*)?(${labels})\\s*:\\s*(.*?)(?=\\s*·\\s*(?:\\d+\\s*·\\s*)?(?:${labels})\\s*:|$)`, "gi"))];
@@ -124,7 +129,7 @@ function isGenericMoodboardLabel(value: string) {
 }
 
 export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
-  const values = parseBrandValues(guide.dna.values);
+  const values = mapValueAnswers(guide.dna.values);
   const foundations = fields([
     field("Activité", guide.dna.activity),
     field("Raison d’être", guide.dna.essence),
@@ -183,7 +188,8 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
   const combinePositioningAndMessages = positioning.length > 0 && messages.length > 0 &&
     calculatePageDensity([...positioning, ...messages], 0.12) <= 0.9;
   const pageDefinitions = [
-    { id: "foundations", title: "Fondations", fields: [...foundations, ...values.map((value) => ({ label: "Valeur", value: value.name }))] },
+    { id: "foundations", title: "Fondations", fields: foundations },
+    { id: "values", title: "Valeurs", fields: values.map((value) => ({ label: "Valeur", value: [value.name, value.meaning, value.concreteApplication, value.communicationExpression].filter(Boolean).join(" ") })) },
     { id: "positioning", title: "Positionnement", fields: positioning },
     { id: "messages", title: "Messages", fields: messages },
     { id: "voice", title: "Personnalité & langage", fields: [...personality, ...definitions.find((item) => item.id === "language")!.fields] },
@@ -203,6 +209,11 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
 
   return {
     brandName: compact(guide.brandName) || "Ma marque",
+    logoUrl: guide.brandAssets?.logoUrl,
+    logoStoragePath: guide.brandAssets?.logoStoragePath,
+    logoAlt: guide.brandAssets?.logoAlt,
+    logoAspectRatio: guide.brandAssets?.logoAspectRatio,
+    logoOwner: compact(guide.brandAssets?.logoOwner) || compact(guide.brandName),
     baseline: isPdfContent(guide.baseline) ? compact(guide.baseline) : "",
     generatedAt: guide.generatedAt,
     chapters,
@@ -244,6 +255,7 @@ export function validateBrandGuideConsistency(data: BrandGuideData) {
   const detectedBrandNames = Array.from(new Set([data.brandName, ...candidates]));
   const expected = normalized(data.brandName);
   const conflicts = detectedBrandNames.filter((name) => normalized(name) !== expected);
+  if (data.logoUrl && normalized(data.logoOwner) !== expected) conflicts.push(`Logo (${data.logoOwner})`);
   return {
     valid: conflicts.length === 0,
     detectedBrandNames,

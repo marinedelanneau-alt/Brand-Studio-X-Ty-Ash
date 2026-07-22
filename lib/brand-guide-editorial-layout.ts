@@ -11,11 +11,25 @@ export const PDF_GRID = {
 } as const;
 
 export type EditorialLayout = "manifesto" | "two-columns" | "profile" | "quote" | "compact-list";
+export type CoverLayout = "logo-image" | "logo-typographic" | "palette-graphic";
 
 export function calculatePageDensity(fields: PdfField[], extras = 0) {
   const characters = fields.reduce((sum, field) => sum + field.label.length + field.value.length, 0);
   const paragraphs = fields.reduce((sum, field) => sum + Math.max(1, field.value.split(/\n+/).length), 0);
   return Math.min(2, (characters / 1_650) + (paragraphs * 0.035) + extras);
+}
+
+export const calculatePageContentScore = calculatePageDensity;
+
+export function hasVisibleEditorialContent(fields: PdfField[]) {
+  return fields.some((field) => field.value.trim().length > 0);
+}
+
+export function selectCoverLayout(data: { logoUrl?: string; logoAspectRatio?: number; brandName: string; moodboard: GuideMoodboardItem[] }) : CoverLayout {
+  const hasImage = data.moodboard.some((item) => item.type === "image" && item.imageUrl);
+  if (data.logoUrl && hasImage && (data.logoAspectRatio ?? 1) >= 1.2) return "logo-image";
+  if (data.logoUrl) return "logo-typographic";
+  return "palette-graphic";
 }
 
 export function selectEditorialLayout(fields: PdfField[]): EditorialLayout {
