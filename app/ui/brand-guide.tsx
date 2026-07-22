@@ -22,6 +22,7 @@ export default function BrandGuideLayout({
 }: BrandGuideProps) {
   const [mode, setMode] = useState<"complete" | "express">("complete");
   const [message, setMessage] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const guideText = useMemo(() => buildCopyText(guide), [guide]);
   const theme = useMemo(() => getGuideTheme(guide), [guide]);
@@ -45,6 +46,27 @@ export default function BrandGuideLayout({
   async function copyGuide() {
     await navigator.clipboard.writeText(guideText);
     setMessage("Le contenu du guide est copié.");
+  }
+
+  async function exportPdf() {
+    setIsExporting(true);
+    setMessage("Génération du PDF en cours…");
+    try {
+      const response = await fetch("/brand-guide/download");
+      if (!response.ok) throw new Error("export-failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+      setMessage("Le Guide de Marque a été téléchargé.");
+    } catch {
+      setMessage("L’export n’a pas abouti. Réessaie dans quelques instants.");
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   return (
@@ -80,9 +102,12 @@ export default function BrandGuideLayout({
             <button type="button" onClick={copyGuide} className={secondaryButtonClass}>
               Copier le contenu
             </button>
-            <Link href="/brand-guide/download" className={primaryButtonClass}>
-              Exporter mon Guide de Marque
+            <Link href="/brand-guide/download?preview=1" target="_blank" className={secondaryButtonClass}>
+              Prévisualiser le PDF
             </Link>
+            <button type="button" onClick={exportPdf} disabled={isExporting} className={`${primaryButtonClass} disabled:cursor-wait disabled:opacity-60`}>
+              {isExporting ? "Génération…" : "Exporter mon Guide de Marque"}
+            </button>
           </div>
         </header>
 

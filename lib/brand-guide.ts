@@ -279,7 +279,7 @@ function collectSources(modules: WorkspaceModule[]) {
 function findSource(sources: AnswerSource[], keywordGroups: string[][]) {
   return sources.find((source) => {
     const haystack = normalizeForSearch(
-      `${source.module.title} ${source.label} ${source.text}`,
+      `${source.module.title} ${source.label}`,
     );
     return keywordGroups.some((group) =>
       group.every((keyword) => haystack.includes(normalizeForSearch(keyword))),

@@ -22,7 +22,7 @@ function slugify(value: string) {
     .slice(0, 80) || "marque";
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const account = await getAuthenticatedAccount();
     if (!(await hasActiveAccess(account.id))) {
@@ -52,11 +52,12 @@ export async function GET() {
     }).catch(() => undefined);
 
     const filename = `guide-de-marque-${slugify(guide.brandName)}.pdf`;
+    const preview = new URL(request.url).searchParams.get("preview") === "1";
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": `${preview ? "inline" : "attachment"}; filename="${filename}"`,
         "Cache-Control": "no-store",
       },
     });
