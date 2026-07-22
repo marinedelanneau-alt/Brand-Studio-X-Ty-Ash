@@ -48,7 +48,7 @@ describe("personal moodboard data", () => {
     const automaticSvg = "data:image/svg+xml;charset=UTF-8,%3Ctext%3EMOODBOARD%3C%2Ftext%3E";
     const legacy = `__moodboard__:${JSON.stringify({
       type: "moodboard",
-      version: 1,
+      version: 2,
       layoutStyle: "editorial",
       ambiance: "Univers automatique",
       feedback: "",

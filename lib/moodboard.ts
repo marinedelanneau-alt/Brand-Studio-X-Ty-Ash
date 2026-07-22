@@ -540,15 +540,11 @@ export function serializeMoodboardAnswer(answer: MoodboardAnswer) {
 
 function isLegacyGeneratedImage(block: MoodboardBlock) {
   return block.type === "image" &&
-    block.imageUrl.startsWith("data:image/svg+xml") &&
-    block.imageUrl.includes("MOODBOARD");
+    block.imageUrl.startsWith("data:image/svg+xml");
 }
 
-function removeLegacyGeneratedComposition(
-  blocks: MoodboardBlock[],
-  storedVersion: number,
-) {
-  if (storedVersion >= 2 || !blocks.some(isLegacyGeneratedImage)) {
+function removeLegacyGeneratedComposition(blocks: MoodboardBlock[]) {
+  if (!blocks.some(isLegacyGeneratedImage)) {
     return blocks;
   }
 
@@ -582,13 +578,8 @@ export function parseStoredMoodboardAnswer(
             .filter((block): block is MoodboardBlock => !!block && typeof block === "object")
             .map((block, index) => normalizeBlock(block, index))
         : [];
-      const storedVersion = Number(parsed.version ?? 1);
-      const migratedGeneratedComposition =
-        storedVersion < 2 && normalizedBlocks.some(isLegacyGeneratedImage);
-      const blocks = removeLegacyGeneratedComposition(
-        normalizedBlocks,
-        storedVersion,
-      );
+      const migratedGeneratedComposition = normalizedBlocks.some(isLegacyGeneratedImage);
+      const blocks = removeLegacyGeneratedComposition(normalizedBlocks);
 
       const answer = {
         type: "moodboard",
