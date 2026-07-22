@@ -257,6 +257,7 @@ function Card({
         wide ? styles.cardWide : styles.card,
         { backgroundColor: theme.card, borderColor: theme.border },
       ]}
+      wrap={false}
     >
       <Text style={[styles.label, { color: theme.accent }]}>{label}</Text>
       <Text style={[styles.text, { color: theme.text }]}>{value}</Text>
@@ -281,7 +282,6 @@ function Section({
         styles.section,
         { backgroundColor: theme.surface, borderColor: theme.border },
       ]}
-      wrap={false}
     >
       <Text style={[styles.eyebrow, { color: theme.accent }]}>{eyebrow}</Text>
       <Text style={[styles.sectionTitle, { color: theme.text }]}>{title}</Text>
@@ -300,7 +300,7 @@ function Checklist({
   theme: ReturnType<typeof getPdfTheme>;
 }) {
   return (
-    <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+    <View wrap={false} style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
       <Text style={[styles.label, { color: theme.accent }]}>{title}</Text>
       {items.map((item) => (
         <Text key={item} style={[styles.checklistItem, { color: theme.text }]}>
@@ -353,7 +353,7 @@ function MoodboardComposition({ guide }: { guide: GeneratedBrandGuide }) {
   }
 
   return (
-    <View style={[styles.moodboardFrame, { backgroundColor: guide.visualUniverse.moodboardBackground }]}>
+    <View wrap={false} style={[styles.moodboardFrame, { backgroundColor: guide.visualUniverse.moodboardBackground }]}>
       {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
         <View
           key={item.id}
@@ -459,6 +459,11 @@ function BrandGuidePdfDocument({ guide }: { guide: GeneratedBrandGuide }) {
         <Section eyebrow="05" title="Univers visuel" theme={theme}>
           <Palette colors={colors} theme={theme} />
           <Card wide label="Ambiance generale" value={guide.visualUniverse.ambiance} theme={theme} />
+        </Section>
+      </Page>
+
+      <Page size="A4" orientation="landscape" style={[styles.page, { backgroundColor: theme.background, color: theme.text }]}>
+        <Section eyebrow="05" title="Moodboard" theme={theme}>
           <MoodboardComposition guide={guide} />
         </Section>
       </Page>

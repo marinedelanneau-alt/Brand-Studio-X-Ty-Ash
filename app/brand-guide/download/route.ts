@@ -62,6 +62,7 @@ export async function GET() {
     });
   } catch (error) {
     unstable_rethrow(error);
+    console.error("Brand guide PDF generation failed", error);
     return NextResponse.json(
       { message: "Le PDF n'a pas pu être généré." },
       { status: 500 },
