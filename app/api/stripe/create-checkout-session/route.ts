@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { getCurrentAccount } from "@/lib/session";
 import { findStripeCustomerId, upsertSubscription } from "@/lib/subscriptions";
 import { getStripe, getStripeCheckoutMode } from "@/lib/stripe";
+import { createStripeReturnUrl } from "@/lib/stripe-return-url";
 
 export const runtime = "nodejs";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const account = await getCurrentAccount();
 
     const priceId = process.env.STRIPE_PRICE_ID;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-    if (!priceId || !siteUrl) {
+    if (!priceId) {
       return NextResponse.json(
         { error: "Stripe checkout is not configured" },
         { status: 500 },
@@ -21,6 +21,11 @@ export async function POST() {
 
     const stripe = getStripe();
     const mode = getStripeCheckoutMode();
+    const successUrl = createStripeReturnUrl(request.url, "/?payment=success");
+    const cancelUrl = createStripeReturnUrl(
+      request.url,
+      "/pricing?payment=cancelled",
+    );
     let customerId = account ? await findStripeCustomerId(account.id) : null;
 
     if (account && !customerId) {
@@ -48,8 +53,8 @@ export async function POST() {
       customer: customerId ?? undefined,
       customer_creation: !account && mode === "payment" ? "always" : undefined,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${siteUrl}/?payment=success`,
-      cancel_url: `${siteUrl}/pricing?payment=cancelled`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: {
         user_id: account ? String(account.id) : "",
         product: "brand_studio",
@@ -73,6 +78,13 @@ export async function POST() {
             }
           : undefined,
     });
+
+    if (!session.url) {
+      return NextResponse.json(
+        { error: "Stripe n'a pas retourné d'URL de paiement" },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

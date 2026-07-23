@@ -74,11 +74,15 @@ describe("editorial brand guide PDF", () => {
     expect(data.logoUrl).toBeUndefined();
   });
 
-  it("recomposes moodboard assets without editor coordinates or dead zones", () => {
+  it("preserves the original moodboard composition and stacking order", () => {
     const source = makeGuide().visualUniverse.moodboard[0];
-    const items = composeMoodboard([source, { ...source, id: "second", x: 90, y: 90 }]);
-    expect(items[0]).toMatchObject({ x: 0, y: 0, width: 63, height: 100 });
-    expect(items[1]).toMatchObject({ x: 65, y: 0, width: 35, height: 100 });
+    const items = composeMoodboard([
+      { ...source, id: "front", x: 90, y: 80, width: 8, height: 12, rotation: 4, zIndex: 9 },
+      { ...source, id: "back", x: 6, y: 8, width: 34, height: 30, rotation: -3, zIndex: 2 },
+    ]);
+    expect(items.map((item) => item.id)).toEqual(["back", "front"]);
+    expect(items[0]).toMatchObject({ x: 6, y: 8, width: 34, height: 30, rotation: -3, zIndex: 2 });
+    expect(items[1]).toMatchObject({ x: 90, y: 80, width: 8, height: 12, rotation: 4, zIndex: 9 });
   });
 
   it("adapts the cover title to short, medium and long brand names", () => {

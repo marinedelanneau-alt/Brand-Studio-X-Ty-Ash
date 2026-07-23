@@ -48,19 +48,6 @@ export function getAccessibleTextColor(hex: string) {
   return luminance > 0.42 ? "#29242C" : "#FFFFFF";
 }
 
-type MoodboardFrame = Pick<GuideMoodboardItem, "x" | "y" | "width" | "height" | "rotation">;
-
-const MOODBOARD_FRAMES: Record<number, MoodboardFrame[]> = {
-  1: [{ x: 0, y: 0, width: 100, height: 100, rotation: 0 }],
-  2: [{ x: 0, y: 0, width: 63, height: 100, rotation: 0 }, { x: 65, y: 0, width: 35, height: 100, rotation: 0 }],
-  3: [{ x: 0, y: 0, width: 58, height: 100, rotation: 0 }, { x: 60, y: 0, width: 40, height: 48, rotation: 0 }, { x: 60, y: 51, width: 40, height: 49, rotation: 0 }],
-  4: [{ x: 0, y: 0, width: 60, height: 62, rotation: 0 }, { x: 62, y: 0, width: 38, height: 62, rotation: 0 }, { x: 0, y: 65, width: 38, height: 35, rotation: 0 }, { x: 40, y: 65, width: 60, height: 35, rotation: 0 }],
-  5: [{ x: 0, y: 0, width: 50, height: 65, rotation: 0 }, { x: 52, y: 0, width: 48, height: 38, rotation: 0 }, { x: 52, y: 41, width: 23, height: 59, rotation: 0 }, { x: 77, y: 41, width: 23, height: 28, rotation: 0 }, { x: 77, y: 72, width: 23, height: 28, rotation: 0 }],
-  6: [{ x: 0, y: 0, width: 48, height: 62, rotation: 0 }, { x: 50, y: 0, width: 25, height: 36, rotation: 0 }, { x: 77, y: 0, width: 23, height: 36, rotation: 0 }, { x: 50, y: 39, width: 50, height: 61, rotation: 0 }, { x: 0, y: 65, width: 23, height: 35, rotation: 0 }, { x: 25, y: 65, width: 23, height: 35, rotation: 0 }],
-};
-
 export function composeMoodboard(items: GuideMoodboardItem[]) {
-  const selected = items.slice(0, 6);
-  const frames = MOODBOARD_FRAMES[selected.length] ?? [];
-  return selected.map((item, index) => ({ ...item, ...frames[index], zIndex: index + 1 }));
+  return items.slice().sort((left, right) => left.zIndex - right.zIndex);
 }

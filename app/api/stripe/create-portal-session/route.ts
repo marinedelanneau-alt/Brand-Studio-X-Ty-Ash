@@ -2,24 +2,16 @@ import { NextResponse } from "next/server";
 import { getCurrentAccount } from "@/lib/session";
 import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
+import { createStripeReturnUrl } from "@/lib/stripe-return-url";
 
 export const runtime = "nodejs";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const account = await getCurrentAccount();
 
     if (!account) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
-    if (!siteUrl) {
-      return NextResponse.json(
-        { error: "NEXT_PUBLIC_SITE_URL is not configured" },
-        { status: 500 },
-      );
     }
 
     const subscription = await getSubscriptionAccessStatus(account.id);
@@ -34,7 +26,7 @@ export async function POST() {
     const stripe = getStripe();
     const session = await stripe.billingPortal.sessions.create({
       customer: subscription.stripeCustomerId,
-      return_url: `${siteUrl}/dashboard`,
+      return_url: createStripeReturnUrl(request.url, "/dashboard"),
     });
 
     return NextResponse.json({ url: session.url });

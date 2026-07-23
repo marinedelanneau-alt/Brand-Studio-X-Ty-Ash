@@ -20,7 +20,11 @@ export default function CheckoutButton() {
         throw new Error(data.error ?? "Impossible d'ouvrir le paiement");
       }
 
-      window.location.href = data.url;
+      const checkoutUrl = new URL(data.url);
+      if (checkoutUrl.protocol !== "https:") {
+        throw new Error("L'adresse de paiement retournée est invalide");
+      }
+      window.location.assign(checkoutUrl.toString());
     } catch (checkoutError) {
       setError(
         checkoutError instanceof Error

@@ -80,8 +80,8 @@ const S = StyleSheet.create({
   quote: { paddingVertical: 34, paddingHorizontal: 30, borderTop: `1 solid ${BRAND.line}`, borderBottom: `1 solid ${BRAND.line}` },
   quoteText: { ...THEME.typography.quote, color: BRAND.ink, textAlign: "center" },
   lockup: { flexDirection: "row", alignItems: "center" },
-  lockupLogoLarge: { width: 72, height: 54, objectFit: "contain", marginRight: 16 },
-  lockupLogoMedium: { width: 44, height: 34, objectFit: "contain", marginRight: 11 },
+  lockupLogoLarge: { width: 120, height: 90, objectFit: "contain", marginRight: 22 },
+  lockupLogoMedium: { width: 72, height: 54, objectFit: "contain", marginRight: 14 },
   lockupLogoSmall: { width: 18, height: 14, objectFit: "contain", marginRight: 7 },
   lockupNameLarge: { fontFamily: "Source Serif 4", fontWeight: 600, lineHeight: 1.02, maxWidth: 300 },
   lockupNameMedium: { fontFamily: "Source Serif 4", fontSize: 25, fontWeight: 600 },
@@ -92,7 +92,7 @@ const S = StyleSheet.create({
   colorBody: { paddingTop: 12, paddingRight: 8 },
   colorName: { fontSize: 11, color: BRAND.ink, fontWeight: 700, marginBottom: 5 },
   colorMeta: { fontSize: 8.5, color: BRAND.muted, lineHeight: 1.45 },
-  moodboard: { height: 375, position: "relative", overflow: "hidden", borderRadius: 5 },
+  moodboard: { width: "100%", height: 614, position: "relative", overflow: "hidden", borderRadius: 5 },
   moodItem: { position: "absolute", overflow: "hidden", borderRadius: 4, backgroundColor: BRAND.white },
   moodImage: { width: "100%", height: "100%", objectFit: "cover" },
   moodText: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", padding: 10 },
@@ -172,13 +172,13 @@ function MoodboardItem({ item }: { item: GuideMoodboardItem }) {
   const style = { left: `${item.x}%`, top: `${item.y}%`, width: `${item.width}%`, height: `${item.height}%`, transform: `rotate(${item.rotation}deg)`, backgroundColor: item.type === "color" ? item.color : BRAND.white };
   return <View style={[S.moodItem, style]}>{item.imageUrl && (item.type === "image" || item.type === "icon") ? (
     // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
-    <Image src={item.imageUrl} style={S.moodImage}/>
+    <Image src={item.imageUrl} style={[S.moodImage, { objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }]}/>
   ) : <View style={S.moodText}><Text style={[S.moodLabel, { color: item.type === "color" ? BRAND.white : item.textColor || BRAND.ink, fontSize: Math.min(item.fontSize || 10, 22) }]}>{item.label}</Text></View>}</View>;
 }
 
 function MoodboardPage({ data, number }: { data: BrandGuideData; number: string }) {
   const composition = composeMoodboard(data.moodboard);
-  return <Page size="A4" orientation="landscape" style={S.page}><PageChrome data={data} chapter="Moodboard"/><ChapterHeading number={number} title="Planche d’inspiration"/><View style={[S.moodboard, { backgroundColor: data.moodboardBackground }]}>{composition.map((item) => <MoodboardItem key={item.id} item={item}/>)}</View></Page>;
+  return <Page size="A4" style={S.page}><PageChrome data={data} chapter="Moodboard"/><ChapterHeading number={number} title="Planche d’inspiration"/><View style={[S.moodboard, { backgroundColor: data.moodboardBackground }]}>{composition.map((item) => <MoodboardItem key={item.id} item={item}/>)}</View></Page>;
 }
 
 function BrandGuideDocument({ data }: { data: BrandGuideData }) {
