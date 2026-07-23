@@ -16,7 +16,13 @@ const initialState: RegisterState = {
 const inputClassName =
   "h-16 w-full rounded-[1.15rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-base text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(223,203,171,0.12)] outline-none transition duration-200 placeholder:text-[#aa9d91] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20";
 
-export default function RegisterForm() {
+export default function RegisterForm({
+  activationToken,
+  email,
+}: {
+  activationToken?: string;
+  email?: string;
+}) {
   const [state, formAction, pending] = useActionState(
     registerAccount,
     initialState,
@@ -25,6 +31,9 @@ export default function RegisterForm() {
   return (
     <form action={formAction} className="space-y-5">
       <div className="grid gap-5">
+        {activationToken ? (
+          <input name="activationCode" type="hidden" value={activationToken} />
+        ) : (
         <div className="space-y-2">
           <label
             htmlFor="activationCode"
@@ -42,6 +51,7 @@ export default function RegisterForm() {
             className={`${inputClassName} uppercase tracking-[0.12em]`}
           />
         </div>
+        )}
 
         <div className="space-y-2">
           <label
@@ -56,8 +66,10 @@ export default function RegisterForm() {
             type="email"
             required
             autoComplete="email"
+            defaultValue={email}
+            readOnly={Boolean(email)}
             placeholder="hello@brandstudio.fr"
-            className={inputClassName}
+            className={`${inputClassName} ${email ? "cursor-not-allowed opacity-75" : ""}`}
           />
         </div>
 
@@ -122,8 +134,8 @@ export default function RegisterForm() {
           Ce que tu obtiens
         </p>
         <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Le code reçu après paiement sert uniquement à activer ton compte.
-          Ensuite, la connexion se fait avec ton e-mail et ton mot de passe.
+          Ce lien sert uniquement à activer ton compte. Ensuite, la connexion
+          se fait avec ton e-mail et ton mot de passe.
         </p>
       </div>
 

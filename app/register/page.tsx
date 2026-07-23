@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import RegisterForm from "../ui/register-form";
+import { findUsableActivationCodeByToken } from "@/lib/activation-codes";
 
 const values = [
   "Code d'activation reçu après paiement",
@@ -8,7 +9,18 @@ const values = [
   "Connexion ensuite par e-mail et mot de passe",
 ];
 
-export default function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ activation?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  const activationToken =
+    typeof query.activation === "string" ? query.activation : "";
+  const activation = activationToken
+    ? await findUsableActivationCodeByToken(activationToken)
+    : null;
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(184,171,152,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(184,171,152,0.18)_1px,transparent_1px)] [background-size:34px_34px]" />
@@ -97,18 +109,22 @@ export default function RegisterPage() {
                     Activation
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Code envoyé après paiement
+                    Lien envoyé après paiement
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
-                Renseigne le code reçu par e-mail, puis choisis ton mot de
-                passe pour activer ton accès.
+                {activation
+                  ? "Choisis ton mot de passe pour activer ton accès. Ton adresse e-mail est celle utilisée lors du paiement."
+                  : "Ouvre le lien d'activation reçu par e-mail après ton paiement pour créer ton compte."}
               </p>
 
               <div className="mt-7">
-                <RegisterForm />
+                <RegisterForm
+                  activationToken={activation?.code}
+                  email={activation?.email}
+                />
               </div>
             </div>
           </div>

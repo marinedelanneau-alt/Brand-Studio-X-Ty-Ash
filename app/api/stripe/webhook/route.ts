@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createActivationCode } from "@/lib/activation-codes";
-import { sendActivationCodeEmail } from "@/lib/mailer";
+import { sendAccountActivationEmail } from "@/lib/mailer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
@@ -78,10 +78,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       priceId: process.env.STRIPE_PRICE_ID ?? null,
     });
 
-    await sendActivationCodeEmail({
+    await sendAccountActivationEmail({
       email,
       clientName: email,
-      accessCode: activation.code,
+      activationToken: activation.code,
     });
 
     return;

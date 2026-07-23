@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type ActivationCodeRecord = {
@@ -17,7 +17,7 @@ export type ActivationCodeRecord = {
 };
 
 export function generateActivationCode() {
-  return `BRAND-${randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+  return randomBytes(32).toString("hex").toUpperCase();
 }
 
 export async function createActivationCode(input: {
@@ -75,6 +75,29 @@ export async function findUsableActivationCode(input: {
   }
 
   if (data.expires_at && new Date(data.expires_at).getTime() < Date.now()) {
+    return null;
+  }
+
+  return data;
+}
+
+export async function findUsableActivationCodeByToken(token: string) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("purchase_activation_codes")
+    .select("*")
+    .eq("code", token)
+    .is("consumed_at", null)
+    .maybeSingle<ActivationCodeRecord>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (
+    !data ||
+    (data.expires_at && new Date(data.expires_at).getTime() < Date.now())
+  ) {
     return null;
   }
 
