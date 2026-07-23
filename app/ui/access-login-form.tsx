@@ -174,7 +174,7 @@ export default function AccessLoginForm() {
           Nouveau client
         </p>
         <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Le paiement declenche l&apos;envoi d&apos;un code d&apos;activation.
+          Le paiement déclenche l&apos;envoi d&apos;un lien d&apos;activation.
           Tu pourras ensuite créer ton compte et choisir ton mot de passe.
         </p>
         <Link

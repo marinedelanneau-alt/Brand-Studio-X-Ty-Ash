@@ -1,9 +1,14 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import {
   createSupabaseAuthServerClient,
   createSupabaseServerClient,
 } from "@/lib/supabase/server";
+import {
+  attachAuthUserToAccount,
+  findAccountByEmail,
+} from "@/lib/access-codes";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { sendPasswordResetEmail } from "@/lib/mailer";
 import { headers } from "next/headers";
@@ -140,7 +145,8 @@ export async function sendPasswordResetLink(
   try {
     const siteUrl = await getPublicSiteUrl();
     const supabase = createSupabaseServerClient();
-    const { data, error } = await supabase.auth.admin.generateLink({
+    const account = await findAccountByEmail(email);
+    let { data, error } = await supabase.auth.admin.generateLink({
       type: "recovery",
       email,
       options: {
@@ -148,7 +154,56 @@ export async function sendPasswordResetLink(
       },
     });
 
+    if (
+      account &&
+      account.is_active !== false &&
+      !account.auth_user_id &&
+      error
+    ) {
+      const temporaryPassword = randomBytes(32).toString("base64url");
+      const { data: createdAuth, error: createError } =
+        await supabase.auth.admin.createUser({
+          email,
+          password: temporaryPassword,
+          email_confirm: true,
+          user_metadata: {
+            client_name: account.client_name,
+            company_name: account.company_name,
+          },
+        });
+
+      if (!createError && createdAuth.user) {
+        await attachAuthUserToAccount({
+          accountId: account.id,
+          authUserId: createdAuth.user.id,
+        });
+
+        ({ data, error } = await supabase.auth.admin.generateLink({
+          type: "recovery",
+          email,
+          options: {
+            redirectTo: `${siteUrl}/auth/reset/callback`,
+          },
+        }));
+      }
+    } else if (
+      account &&
+      account.is_active !== false &&
+      !account.auth_user_id &&
+      data.user
+    ) {
+      await attachAuthUserToAccount({
+        accountId: account.id,
+        authUserId: data.user.id,
+      });
+    }
+
     if (error || !data.properties?.action_link) {
+      console.error("Password reset link generation failed", {
+        hasAccount: Boolean(account),
+        hasAuthUser: Boolean(account?.auth_user_id),
+        reason: error?.message ?? "Missing action link",
+      });
       // Keep the response generic so this public form cannot reveal which e-mails exist.
       return {
         status: "success",
