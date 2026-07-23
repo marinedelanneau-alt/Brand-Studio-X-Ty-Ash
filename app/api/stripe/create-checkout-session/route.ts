@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       customer: customerId ?? undefined,
       customer_creation: !account && mode === "payment" ? "always" : undefined,
       line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
