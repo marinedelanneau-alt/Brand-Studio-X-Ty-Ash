@@ -10,7 +10,6 @@ import {
   findAccountByEmail,
 } from "@/lib/access-codes";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
-import { sendPasswordResetEmail } from "@/lib/mailer";
 import { headers } from "next/headers";
 
 type LoginState = {
@@ -211,14 +210,28 @@ export async function sendPasswordResetLink(
       };
     }
 
-    await sendPasswordResetEmail({
+    const { error: sendError } = await supabase.auth.resetPasswordForEmail(
       email,
-      resetUrl: data.properties.action_link,
-    });
+      {
+        redirectTo: `${siteUrl}/auth/reset/callback`,
+      },
+    );
+
+    if (sendError) {
+      console.error("Password reset email delivery failed", {
+        reason: sendError.message,
+      });
+      return {
+        status: "error",
+        message:
+          "Le lien n'a pas pu être envoyé pour le moment. Réessaie dans quelques minutes.",
+      };
+    }
 
     return {
       status: "success",
-      message: "Lien de reinitialisation envoye. Ouvre ta boite mail pour choisir un nouveau mot de passe.",
+      message:
+        "Lien de réinitialisation envoyé. Ouvre ta boîte mail pour choisir un nouveau mot de passe.",
     };
   } catch (error) {
     return {

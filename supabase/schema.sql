@@ -178,6 +178,7 @@ create index if not exists brand_exports_project_type_generated_idx
 create table if not exists public.subscriptions (
   id bigint generated always as identity primary key,
   user_id bigint not null references public.client_access_codes(id) on delete cascade,
+  provider text not null default 'stripe',
   stripe_customer_id text,
   stripe_subscription_id text,
   stripe_checkout_session_id text,
@@ -192,6 +193,9 @@ create table if not exists public.subscriptions (
 
 alter table public.subscriptions
   add column if not exists user_id bigint references public.client_access_codes(id) on delete cascade;
+
+alter table public.subscriptions
+  add column if not exists provider text not null default 'stripe';
 
 alter table public.subscriptions
   add column if not exists stripe_customer_id text;

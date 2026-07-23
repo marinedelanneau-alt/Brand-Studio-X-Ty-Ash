@@ -115,6 +115,7 @@ export async function upsertSubscription(input: {
 
   const payload = {
     user_id: input.userId,
+    provider: "stripe",
     stripe_customer_id: input.stripeCustomerId ?? null,
     stripe_subscription_id: input.stripeSubscriptionId ?? null,
     stripe_checkout_session_id: input.stripeCheckoutSessionId ?? null,
