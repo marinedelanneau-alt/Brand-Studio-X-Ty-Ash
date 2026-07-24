@@ -1,6 +1,12 @@
 import ResetPasswordForm from "@/app/ui/reset-password-form";
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
   return (
     <main className="min-h-screen bg-[#fbf6ee] px-4 py-10 text-[#4b4550]">
       <section className="mx-auto max-w-xl rounded-[1.6rem] border border-[#eadfca] bg-[#fffdf7] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.12)] sm:p-8">
@@ -14,7 +20,7 @@ export default function ResetPasswordPage() {
           Saisis ton nouveau mot de passe pour retrouver ton espace Brand Studio.
         </p>
         <div className="mt-6">
-          <ResetPasswordForm />
+          <ResetPasswordForm hasCallbackError={Boolean(error)} />
         </div>
       </section>
     </main>
