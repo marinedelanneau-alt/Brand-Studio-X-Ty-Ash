@@ -148,9 +148,9 @@ function CoverPage({ context, plan }: { context: RenderContext; plan: EditorialP
         style={{
           position: "absolute",
           left: 0,
-          right: 0,
           top: plan.variant === "minimal-premium" ? 248 : 198,
-          minHeight: 300,
+          width: A4.width,
+          height: 300,
           paddingHorizontal: 48,
           paddingVertical: 28,
           backgroundColor: "#FFFFFF",
