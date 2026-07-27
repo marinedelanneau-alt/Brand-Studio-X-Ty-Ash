@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AccessLoginForm from "./ui/access-login-form";
 import { getCurrentAccount } from "@/lib/session";
+import PaymentSuccessPopup from "./ui/payment-success-popup";
 
 const studioNotes = [
   "Accès immédiat à ton espace de formation",
@@ -9,13 +10,20 @@ const studioNotes = [
   "Interface éditoriale inspirée de Brand Studio",
 ];
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  const paymentSucceeded = query.payment === "success";
   const account = await getCurrentAccount();
   const hasAccess = Boolean(account);
   const homeTitle = account?.company_name?.trim() || "Brand Studio";
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+      {paymentSucceeded ? <PaymentSuccessPopup /> : null}
       <section className="relative mx-auto w-full max-w-[84rem] overflow-hidden rounded-[2rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] shadow-[0_16px_44px_rgba(210,189,152,0.09)]">
         <div className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,rgba(243,198,35,0),rgba(243,198,35,0.72),rgba(246,178,107,0.42),rgba(243,198,35,0))]" />
 
