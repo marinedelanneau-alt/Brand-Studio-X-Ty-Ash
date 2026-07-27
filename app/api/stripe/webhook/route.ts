@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createActivationCode } from "@/lib/activation-codes";
+import {
+  createActivationCode,
+  findActivationCodeByCheckoutSession,
+  markActivationEmailSent,
+} from "@/lib/activation-codes";
 import { sendAccountActivationEmail } from "@/lib/mailer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { upsertSubscription } from "@/lib/subscriptions";
@@ -70,19 +74,28 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       throw new Error("Missing checkout customer email");
     }
 
-    const activation = await createActivationCode({
-      email,
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscriptionId,
-      stripeCheckoutSessionId: session.id,
-      priceId: process.env.STRIPE_PRICE_ID ?? null,
-    });
+    const existingActivation =
+      await findActivationCodeByCheckoutSession(session.id);
+    const activation =
+      existingActivation ??
+      (await createActivationCode({
+        email,
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscriptionId,
+        stripeCheckoutSessionId: session.id,
+        priceId: process.env.STRIPE_PRICE_ID ?? null,
+      }));
+
+    if (activation.status === "email_sent" || activation.consumed_at) {
+      return;
+    }
 
     await sendAccountActivationEmail({
       email,
       clientName: email,
       activationToken: activation.code,
     });
+    await markActivationEmailSent(activation.id);
 
     return;
   }

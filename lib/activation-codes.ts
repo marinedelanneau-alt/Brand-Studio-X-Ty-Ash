@@ -53,6 +53,37 @@ export async function createActivationCode(input: {
   return data;
 }
 
+export async function findActivationCodeByCheckoutSession(
+  stripeCheckoutSessionId: string,
+) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("purchase_activation_codes")
+    .select("*")
+    .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle<ActivationCodeRecord>();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function markActivationEmailSent(id: number) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("purchase_activation_codes")
+    .update({ status: "email_sent" })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function findUsableActivationCode(input: {
   code: string;
   email: string;

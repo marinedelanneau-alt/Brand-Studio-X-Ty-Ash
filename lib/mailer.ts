@@ -137,36 +137,57 @@ export async function sendAccountActivationEmail(
   });
   const registerUrl = new URL("/register", getPublicFormationUrl());
   registerUrl.searchParams.set("activation", input.activationToken);
+  const logoUrl = new URL("/logo.png", getPublicFormationUrl()).toString();
   const html = `
-    <div style="font-family: Arial, sans-serif; background:#f7f1e9; padding:32px;">
-      <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:24px; overflow:hidden; border:1px solid #eadfce;">
-        <div style="height:6px; background:linear-gradient(90deg,#b67d3d,#e4bb72);"></div>
-        <div style="padding:32px;">
-          <p style="margin:0; letter-spacing:0.25em; text-transform:uppercase; font-size:12px; color:#ab7331; font-weight:700;">Brand Studio</p>
-          <h1 style="margin:18px 0 12px; color:#1d2740; font-size:34px; line-height:1.1;">Active ton compte</h1>
-          <p style="margin:0 0 20px; color:#5f6882; font-size:16px; line-height:1.7;">
-            Ton paiement est confirmé. Clique sur le bouton ci-dessous pour activer ton espace Brand Studio et choisir ton mot de passe.
+    <div style="margin:0; padding:40px 16px; background:#fffaf2; font-family:Arial,Helvetica,sans-serif;">
+      <div style="max-width:620px; margin:0 auto; overflow:hidden; border:1px solid #eadfca; border-radius:28px; background:#ffffff; box-shadow:0 18px 46px rgba(126,102,78,0.10);">
+        <div style="height:8px; background:linear-gradient(90deg,#cf7430 0%,#f0cf55 100%);"></div>
+        <div style="padding:36px 38px 40px;">
+          <img src="${logoUrl}" width="132" alt="Brand Studio" style="display:block; width:132px; height:auto; margin:0 0 30px;">
+          <p style="margin:0; color:#cf7430; font-size:12px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase;">Ton aventure commence ici</p>
+          <h1 style="margin:14px 0 18px; color:#4b4550; font-family:Georgia,'Times New Roman',serif; font-size:40px; font-weight:500; line-height:1.05;">Bienvenue dans ton Brand Studio&nbsp;!</h1>
+          <p style="margin:0 0 16px; color:#6f645b; font-size:16px; line-height:1.75;">
+            Ton inscription est confirmée et ton espace est prêt. Tu vas pouvoir poser les fondations de ta marque, affirmer ce qui la rend unique et construire une identité qui te ressemble vraiment.
           </p>
-          <a href="${registerUrl.toString()}" style="display:inline-block; padding:16px 26px; border-radius:16px; background:linear-gradient(135deg,#b67d3d,#e4bb72); color:#17130d; text-decoration:none; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; font-size:13px;">
-            Activer mon compte
+          <p style="margin:0 0 28px; color:#6f645b; font-size:16px; line-height:1.75;">
+            Crée maintenant ton compte et choisis ton mot de passe pour ouvrir les portes de ton studio et commencer ton parcours.
+          </p>
+          <a href="${registerUrl.toString()}" style="display:inline-block; padding:17px 26px; border-radius:16px; background:linear-gradient(135deg,#df9b39,#f1cc56); color:#ffffff; text-decoration:none; font-size:13px; font-weight:800; letter-spacing:0.10em; text-transform:uppercase; box-shadow:0 12px 26px rgba(223,155,57,0.22);">
+            Créer mon espace
           </a>
-          <p style="margin:22px 0 0; color:#7b8297; font-size:13px; line-height:1.6;">Ce lien est personnel, utilisable une seule fois et valable 30 jours.</p>
+          <div style="margin-top:30px; padding:18px 20px; border:1px solid #f0e4d3; border-radius:16px; background:#fffdf8;">
+            <p style="margin:0; color:#7b7068; font-size:13px; line-height:1.65;">
+              Ce lien est personnel, utilisable une seule fois et valable 30 jours.
+            </p>
+          </div>
+          <p style="margin:30px 0 0; color:#4b4550; font-size:15px; line-height:1.7;">
+            À tout de suite dans le studio,<br>
+            <strong style="color:#cf7430;">L&apos;équipe Brand Studio</strong>
+          </p>
         </div>
       </div>
+      <p style="margin:20px auto 0; max-width:620px; color:#9a8f86; font-size:11px; line-height:1.6; text-align:center;">
+        Brand Studio — construis une marque forte, cohérente et profondément singulière.
+      </p>
     </div>
   `;
 
   const text = [
-    "Ton paiement Brand Studio est confirmé.",
+    "Bienvenue dans ton Brand Studio !",
     "",
-    "Active ton compte et choisis ton mot de passe ici :",
+    "Ton inscription est confirmée et ton espace est prêt.",
+    "",
+    "Crée ton compte et choisis ton mot de passe pour commencer ton parcours :",
     registerUrl.toString(),
     "",
     "Ce lien est personnel, utilisable une seule fois et valable 30 jours.",
+    "",
+    "À tout de suite dans le studio,",
+    "L'équipe Brand Studio",
   ].join("\n");
 
   await brevo.transactionalEmails.sendTransacEmail({
-    subject: "Active ton compte Brand Studio",
+    subject: "Bienvenue dans ton Brand Studio ✨",
     sender: {
       email: config.senderEmail,
       name: config.senderName,
