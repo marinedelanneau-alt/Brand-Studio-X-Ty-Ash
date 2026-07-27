@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
 import { createBrandGuideData, hasMeaningfulContent, validateBrandGuideConsistency } from "../lib/brand-guide-pdf-data";
 import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-pdf";
+import { composeEditorialPages } from "../lib/brand-guide-editorial-composer";
+import { buildBrandVisualIdentity, createBrandGuideTheme } from "../lib/brand-visual-identity";
 import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectCoverLayout, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
 
 function makeGuide(): GeneratedBrandGuide {
@@ -140,7 +142,10 @@ describe("editorial brand guide PDF", () => {
     expect(buffer.subarray(0, 4).toString()).toBe("%PDF");
     expect(buffer.length).toBeGreaterThan(8_000);
     const pageCount = (buffer.toString("latin1").match(/\/Type\s*\/Page\b/g) ?? []).length;
-    const plannedPageCount = Math.max(...createBrandGuideData(guide).chapters.map((chapter) => chapter.page));
+    const data = createBrandGuideData(guide);
+    const identity = buildBrandVisualIdentity(guide);
+    const theme = createBrandGuideTheme(identity);
+    const plannedPageCount = composeEditorialPages({ data, identity, direction: theme.direction }).pages.length;
     expect(pageCount).toBe(plannedPageCount);
   });
 });

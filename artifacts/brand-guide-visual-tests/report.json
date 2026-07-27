@@ -1,0 +1,1090 @@
+{
+  "douce-naturelle": {
+    "direction": "organic-brand",
+    "palette": [
+      "#476B55",
+      "#DCE6D6",
+      "#C79D72",
+      "#FBF8F1"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 27,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 116,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 85,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 90,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29,
+        "sampledColors": 255,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 73,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.73,
+        "sampledColors": 68,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 470,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 94,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\douce-naturelle\\page-12.png"
+      }
+    ]
+  },
+  "premium-minimaliste": {
+    "direction": "premium-editorial",
+    "palette": [
+      "#171719",
+      "#EAE5DC",
+      "#A68A60"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 25,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 127,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 96,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 101,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2942105263157895,
+        "sampledColors": 313,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 77,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 75,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 572,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 93,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 81,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\premium-minimaliste\\page-12.png"
+      }
+    ]
+  },
+  "creative-coloree": {
+    "direction": "bold",
+    "palette": [
+      "#5B2EFF",
+      "#FF695D",
+      "#FFD84D",
+      "#E6FFF7"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 164,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 106,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 81,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 61,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 93,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 71,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2963157894736842,
+        "sampledColors": 276,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 80,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.73,
+        "sampledColors": 76,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 457,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 86,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 88,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\creative-coloree\\page-12.png"
+      }
+    ]
+  },
+  "structuree": {
+    "direction": "organic-brand",
+    "palette": [
+      "#17324D",
+      "#D7E2EA",
+      "#E6532F"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 26,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 112,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 81,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 85,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 78,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29526315789473684,
+        "sampledColors": 285,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 71,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 67,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 578,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 74,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 87,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\structuree\\page-12.png"
+      }
+    ]
+  },
+  "sans-logo": {
+    "direction": "organic-brand",
+    "palette": [
+      "#3D4A42",
+      "#ECE5D8",
+      "#B46E4F"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 18,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 116,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 86,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 67,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 92,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29105263157894734,
+        "sampledColors": 271,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 71,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 61,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 518,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 92,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 89,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\sans-logo\\page-12.png"
+      }
+    ]
+  },
+  "logo-horizontal": {
+    "direction": "organic-brand",
+    "palette": [
+      "#273B47",
+      "#EEF1EC",
+      "#DB755E"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 24,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 120,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 80,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 79,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29105263157894734,
+        "sampledColors": 311,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 70,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 63,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 526,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 74,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 86,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-horizontal\\page-12.png"
+      }
+    ]
+  },
+  "logo-vertical": {
+    "direction": "premium-editorial",
+    "palette": [
+      "#6B243D",
+      "#F4DDD9",
+      "#DFAF55"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 17,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 127,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 94,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 67,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 101,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2942105263157895,
+        "sampledColors": 267,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 82,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 489,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 92,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 81,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\logo-vertical\\page-12.png"
+      }
+    ]
+  },
+  "palette-trois": {
+    "direction": "organic-brand",
+    "palette": [
+      "#223129",
+      "#E7DEC8",
+      "#CB633D"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 26,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 120,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 88,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 67,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 92,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2789473684210526,
+        "sampledColors": 295,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 75,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 70,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 526,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 94,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 84,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-trois\\page-12.png"
+      }
+    ]
+  },
+  "palette-huit": {
+    "direction": "bold",
+    "palette": [
+      "#3320A8",
+      "#FF5C82",
+      "#FFB52E",
+      "#28B6A1",
+      "#3320A8",
+      "#FF5C82",
+      "#FFB52E",
+      "#28B6A1"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 128,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 113,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 62,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 93,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29105263157894734,
+        "sampledColors": 254,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 79,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.9,
+        "sampledColors": 93,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 489,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 91,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\palette-huit\\page-12.png"
+      }
+    ]
+  },
+  "moodboard-dense": {
+    "direction": "creative-studio",
+    "palette": [
+      "#263238",
+      "#F2C94C",
+      "#EB5757",
+      "#F4F1EA"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 30,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 116,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 62,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 97,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2831578947368421,
+        "sampledColors": 276,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 77,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.73,
+        "sampledColors": 80,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 496,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 86,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 85,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-dense\\page-12.png"
+      }
+    ]
+  },
+  "moodboard-minimal": {
+    "direction": "premium-editorial",
+    "palette": [
+      "#20201F",
+      "#F5F2EC",
+      "#B5A58B"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 20,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 128,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 97,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 99,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 71,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.2831578947368421,
+        "sampledColors": 314,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 81,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 71,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 563,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 89,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 80,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\moodboard-minimal\\page-12.png"
+      }
+    ]
+  },
+  "guide-incomplet": {
+    "direction": "organic-brand",
+    "palette": [
+      "#315E68",
+      "#EDF2F0",
+      "#D89B6A"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 22,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 111,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.27789473684210525,
+        "sampledColors": 75,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 80,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 79,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.26789473684210524,
+        "sampledColors": 274,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 73,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.66,
+        "sampledColors": 54,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 525,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 74,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 83,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-incomplet\\page-12.png"
+      }
+    ]
+  },
+  "guide-complet": {
+    "direction": "organic-brand",
+    "palette": [
+      "#4E3832",
+      "#F0E3D4",
+      "#D17A4B",
+      "#738575"
+    ],
+    "pdf": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "expectedDensity": 0.76,
+        "sampledColors": 30,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-01.png"
+      },
+      {
+        "page": 2,
+        "expectedDensity": 0.88,
+        "sampledColors": 104,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-02.png"
+      },
+      {
+        "page": 3,
+        "expectedDensity": 0.3121052631578947,
+        "sampledColors": 84,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-03.png"
+      },
+      {
+        "page": 4,
+        "expectedDensity": 0.66,
+        "sampledColors": 67,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-04.png"
+      },
+      {
+        "page": 5,
+        "expectedDensity": 0.3326315789473684,
+        "sampledColors": 92,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-05.png"
+      },
+      {
+        "page": 6,
+        "expectedDensity": 0.25473684210526315,
+        "sampledColors": 66,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-06.png"
+      },
+      {
+        "page": 7,
+        "expectedDensity": 0.29947368421052634,
+        "sampledColors": 244,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-07.png"
+      },
+      {
+        "page": 8,
+        "expectedDensity": 0.23368421052631577,
+        "sampledColors": 73,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-08.png"
+      },
+      {
+        "page": 9,
+        "expectedDensity": 0.73,
+        "sampledColors": 72,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-09.png"
+      },
+      {
+        "page": 10,
+        "expectedDensity": 0.82,
+        "sampledColors": 359,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-10.png"
+      },
+      {
+        "page": 11,
+        "expectedDensity": 0.72,
+        "sampledColors": 94,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-11.png"
+      },
+      {
+        "page": 12,
+        "expectedDensity": 0.8,
+        "sampledColors": 95,
+        "image": "C:\\projet dev\\Brand-Studio-New-ce1677868fac2555f69086cfead9ac8acbc43018\\artifacts\\brand-guide-visual-tests\\guide-complet\\page-12.png"
+      }
+    ]
+  }
+}

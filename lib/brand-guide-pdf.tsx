@@ -1,9 +1,16 @@
 import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import path from "node:path";
 import type { GeneratedBrandGuide, GuideMoodboardItem } from "./brand-guide";
-import { createBrandGuideData, validateBrandGuideData, type BrandGuideData, type BrandValueData, type PdfField } from "./brand-guide-pdf-data";
-import { composeMoodboard, getAccessibleTextColor, selectCoverLayout, selectEditorialLayout } from "./brand-guide-editorial-layout";
-import { brandGuidePdfTheme as THEME } from "./brand-guide-pdf-theme";
+import { createBrandGuideData, validateBrandGuideData, type BrandGuideData, type BrandValueData } from "./brand-guide-pdf-data";
+import { composeEditorialPages, type EditorialComposition, type EditorialPagePlan } from "./brand-guide-editorial-composer";
+import {
+  buildBrandVisualIdentity,
+  createBrandGuideTheme,
+  getAccessibleTextColor,
+  generateTint,
+  type BrandGuideTheme,
+  type BrandVisualIdentity,
+} from "./brand-visual-identity";
 
 Font.registerHyphenationCallback((word) => [word]);
 const fontFile = (name: string) => path.join(process.cwd(), "public", "fonts", name);
@@ -16,97 +23,40 @@ Font.register({ family: "Source Serif 4", fonts: [
   { src: fontFile("source-serif-4-600.woff"), fontWeight: 600 },
 ] });
 
-const BRAND = {
-  ink: "#29242C",
-  text: "#544B45",
-  muted: "#81756B",
-  paper: "#FAF6EF",
-  white: "#FFFFFF",
-  line: "#DDD2C4",
-  orange: "#CF7430",
-  peach: "#EDC8AA",
-  butter: "#F1CC56",
+const A4 = { width: 595.28, height: 841.89, margin: 48, content: 499.28 };
+
+function createStyles(theme: BrandGuideTheme) {
+  const { colors, typography, layout } = theme;
+  return StyleSheet.create({
+    page: { backgroundColor: colors.background, color: colors.text, fontFamily: typography.bodyFont, padding: A4.margin },
+    pageDark: { backgroundColor: colors.primary, color: getAccessibleTextColor(colors.primary), fontFamily: typography.bodyFont, padding: A4.margin },
+    pageAccent: { backgroundColor: colors.accent, color: getAccessibleTextColor(colors.accent), fontFamily: typography.bodyFont, padding: A4.margin },
+    tiny: { fontSize: 7, letterSpacing: 1.4, textTransform: "uppercase" },
+    label: { fontSize: 7.5, fontWeight: 600, letterSpacing: 1.8, textTransform: "uppercase" },
+    body: { fontSize: 10.5, lineHeight: 1.58 },
+    small: { fontSize: 8.5, lineHeight: 1.45 },
+    display: { fontFamily: typography.displayFont, fontSize: 52 * typography.displayScale, fontWeight: typography.headingWeight, lineHeight: 0.96 },
+    h1: { fontFamily: typography.headingFont, fontSize: 34 * typography.displayScale, fontWeight: typography.headingWeight, lineHeight: 1.02 },
+    h2: { fontFamily: typography.headingFont, fontSize: 22, fontWeight: typography.headingWeight, lineHeight: 1.08 },
+    quote: { fontFamily: typography.displayFont, fontSize: 27 * typography.displayScale, lineHeight: 1.18 },
+    rule: { height: layout.lineWidth, backgroundColor: colors.accent },
+    footer: { position: "absolute", bottom: 24, left: A4.margin, right: A4.margin, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+    logoSmall: { width: 28, height: 20, objectFit: "contain" },
+    logoMedium: { width: 112, height: 76, objectFit: "contain" },
+    logoLarge: { width: 160, height: 110, objectFit: "contain" },
+  });
+}
+
+type RenderContext = {
+  data: BrandGuideData;
+  identity: BrandVisualIdentity;
+  theme: BrandGuideTheme;
+  composition: EditorialComposition;
+  styles: ReturnType<typeof createStyles>;
 };
 
-const S = StyleSheet.create({
-  page: { backgroundColor: THEME.colors.background, color: THEME.colors.text, fontFamily: "Inter", paddingTop: THEME.page.marginTop, paddingRight: THEME.page.marginRight, paddingBottom: THEME.page.marginBottom, paddingLeft: THEME.page.marginLeft },
-  cover: { padding: 0, backgroundColor: BRAND.paper },
-  coverTop: { paddingTop: 48, paddingHorizontal: 52 },
-  brandMark: { fontSize: 9, fontWeight: 700, letterSpacing: 3.2, color: BRAND.ink },
-  coverRule: { height: 1, backgroundColor: BRAND.line, marginTop: 18 },
-  coverBody: { flexGrow: 1, paddingHorizontal: 52, paddingTop: 66, position: "relative" },
-  coverKicker: { color: BRAND.orange, fontSize: 10, fontWeight: 700, letterSpacing: 2.4, marginBottom: 22 },
-  coverTitle: { fontFamily: "Source Serif 4", fontWeight: 600, color: BRAND.ink, lineHeight: 1.02, maxWidth: 315 },
-  coverBaseline: { color: BRAND.text, fontSize: 17, lineHeight: 1.35, marginTop: 24, maxWidth: 390 },
-  coverShape: { position: "absolute", right: 0, bottom: 0, width: 185, height: 250, backgroundColor: BRAND.peach, borderTopLeftRadius: 96 },
-  coverCircle: { position: "absolute", right: 82, bottom: 64, width: 92, height: 92, borderRadius: 46, backgroundColor: BRAND.butter },
-  coverImage: { position: "absolute", right: 42, top: 52, width: 190, height: 225, objectFit: "cover", borderRadius: 4 },
-  coverPalette: { position: "absolute", right: 52, bottom: 40, flexDirection: "row", gap: 6 },
-  coverSwatch: { width: 28, height: 28, borderRadius: 14 },
-  coverFooter: { height: 64, paddingHorizontal: 52, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTop: `1 solid ${BRAND.line}` },
-  small: { color: BRAND.muted, fontSize: 8.5, letterSpacing: 0.4 },
-  header: { position: "absolute", top: 24, left: 52, right: 52, flexDirection: "row", justifyContent: "space-between", borderBottom: `1 solid ${BRAND.line}`, paddingBottom: 9 },
-  headerText: { color: BRAND.muted, fontSize: 7.5, letterSpacing: 1.1, textTransform: "uppercase" },
-  footer: { position: "absolute", bottom: 22, left: 52, right: 52, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  footerText: { color: BRAND.muted, fontSize: 7.5, letterSpacing: 0.7 },
-  pageNumber: { color: BRAND.orange, fontSize: 8, fontWeight: 700 },
-  chapterNo: { color: BRAND.orange, fontSize: 9, fontWeight: 700, letterSpacing: 2.2, marginBottom: 10 },
-  chapterTitle: { ...THEME.typography.h1, color: BRAND.ink, marginBottom: 24 },
-  intro: { color: BRAND.text, fontSize: 12, lineHeight: 1.55, maxWidth: 420, marginBottom: 22 },
-  tocTitle: { fontSize: 34, color: BRAND.ink, marginBottom: 34 },
-  tocRow: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
-  tocNo: { width: 34, color: BRAND.orange, fontSize: 9, fontWeight: 700 },
-  tocName: { color: BRAND.ink, fontSize: 14 },
-  tocPage: { width: 22, textAlign: "right", color: BRAND.muted, fontSize: 9 },
-  tocDots: { flexGrow: 1, marginHorizontal: 10, borderBottom: `1 dotted ${BRAND.line}` },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 16 },
-  column: { width: "48%" },
-  field: { borderTop: `1 solid ${BRAND.line}`, paddingTop: 11, marginBottom: 18 },
-  fieldLabel: { color: BRAND.orange, fontSize: 7.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 7 },
-  body: { color: BRAND.text, fontSize: 10.5, lineHeight: 1.55 },
-  statement: { backgroundColor: BRAND.white, borderLeft: `4 solid ${BRAND.orange}`, padding: 22, marginBottom: 18 },
-  statementText: { fontFamily: "Source Serif 4", color: BRAND.ink, fontSize: 19, lineHeight: 1.35 },
-  valueCard: { width: "48%", borderTop: `3 solid ${BRAND.orange}`, paddingTop: 12, marginBottom: 18 },
-  valueName: { color: BRAND.ink, fontSize: 16, fontWeight: 700, marginBottom: 10 },
-  valueSection: { marginBottom: 8 },
-  valueLabel: { color: BRAND.muted, fontSize: 7, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 3 },
-  pillRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 6 },
-  pill: { border: `1 solid ${BRAND.line}`, borderRadius: 14, paddingVertical: 7, paddingHorizontal: 11 },
-  pillText: { color: BRAND.text, fontSize: 9 },
-  languageColumn: { width: "48%", paddingTop: 16, borderTop: `3 solid ${BRAND.orange}` },
-  languageAvoid: { borderTopColor: BRAND.ink },
-  languageItem: { flexDirection: "row", gap: 8, marginBottom: 9 },
-  languageSymbol: { color: BRAND.orange, fontSize: 10, width: 12 },
-  quote: { paddingVertical: 34, paddingHorizontal: 30, borderTop: `1 solid ${BRAND.line}`, borderBottom: `1 solid ${BRAND.line}` },
-  quoteText: { ...THEME.typography.quote, color: BRAND.ink, textAlign: "center" },
-  lockup: { flexDirection: "row", alignItems: "center" },
-  lockupLogoLarge: { width: 120, height: 90, objectFit: "contain", marginRight: 22 },
-  lockupLogoMedium: { width: 72, height: 54, objectFit: "contain", marginRight: 14 },
-  lockupLogoSmall: { width: 18, height: 14, objectFit: "contain", marginRight: 7 },
-  lockupNameLarge: { fontFamily: "Source Serif 4", fontWeight: 600, lineHeight: 1.02, maxWidth: 300 },
-  lockupNameMedium: { fontFamily: "Source Serif 4", fontSize: 25, fontWeight: 600 },
-  lockupNameSmall: { fontFamily: "Inter", fontSize: 7.5, fontWeight: 600, letterSpacing: 0.5 },
-  paletteRow: { flexDirection: "row", height: 225, marginTop: 12 },
-  colorCard: { flexGrow: 1, minWidth: 82, overflow: "hidden" },
-  colorSwatch: { height: 150 },
-  colorBody: { paddingTop: 12, paddingRight: 8 },
-  colorName: { fontSize: 11, color: BRAND.ink, fontWeight: 700, marginBottom: 5 },
-  colorMeta: { fontSize: 8.5, color: BRAND.muted, lineHeight: 1.45 },
-  moodboard: { width: "100%", height: 614, position: "relative", overflow: "hidden", borderRadius: 5 },
-  moodItem: { position: "absolute", overflow: "hidden", borderRadius: 4, backgroundColor: BRAND.white },
-  moodImage: { width: "100%", height: "100%", objectFit: "cover" },
-  moodText: { width: "100%", height: "100%", justifyContent: "center", alignItems: "center", padding: 10 },
-  moodLabel: { fontSize: 10, fontWeight: 700, textAlign: "center" },
-  checklist: { width: "48%", backgroundColor: BRAND.white, borderRadius: 5, padding: 16 },
-  checkRow: { flexDirection: "row", gap: 9, marginBottom: 9 },
-  checkBox: { width: 10, height: 10, border: `1 solid ${BRAND.orange}`, marginTop: 2 },
-  summaryHero: { borderTop: `4 solid ${BRAND.orange}`, paddingTop: 18, paddingBottom: 24, marginBottom: 18 },
-  summaryName: { fontSize: 26, marginBottom: 7 },
-  summaryBaseline: { fontSize: 12, color: BRAND.peach, lineHeight: 1.4 },
-});
-
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date(value));
 }
 
 export function getCoverTitleFontSize(name: string) {
@@ -117,99 +67,398 @@ export function getCoverTitleFontSize(name: string) {
   return 48;
 }
 
-function PageChrome({ data, chapter }: { data: BrandGuideData; chapter: string }) {
-  return <>
-    <View fixed style={S.header}><PdfBrandLockup data={data} size="small"/><Text style={S.headerText}>{chapter}</Text></View>
-    <View fixed style={S.footer}><Text style={S.footerText}>Guide de Marque · Brand Studio</Text><Text style={S.pageNumber} render={({ pageNumber }) => String(pageNumber).padStart(2, "0")} /></View>
-  </>;
+function BrandLockup({ context, size = "medium", light = false, baseline = false }: {
+  context: RenderContext;
+  size?: "small" | "medium" | "large";
+  light?: boolean;
+  baseline?: boolean;
+}) {
+  const { data, styles, theme } = context;
+  const imageStyle = size === "large" ? styles.logoLarge : size === "medium" ? styles.logoMedium : styles.logoSmall;
+  const nameSize = size === "large" ? getCoverTitleFontSize(data.brandName) : size === "medium" ? 22 : 8;
+  return (
+    <View style={{ flexDirection: size === "small" ? "row" : "column", alignItems: size === "small" ? "center" : "flex-start" }}>
+      {data.logoUrl ? (
+        <View wrap={false} style={[imageStyle, { overflow: "hidden", backgroundColor: "#FFFFFF", padding: size === "small" ? 2 : 6 }, size === "small" ? { marginRight: 8 } : { marginBottom: 18 }]}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          <Image src={data.logoUrl} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+        </View>
+      ) : null}
+      <View>
+        <Text style={{ fontFamily: context.theme.typography.displayFont, fontSize: nameSize, lineHeight: 0.98, color: light ? "#FFFFFF" : theme.colors.text }}>
+          {data.brandName}
+        </Text>
+        {baseline && data.baseline ? <Text style={[styles.small, { marginTop: 10, color: light ? "#FFFFFF" : theme.colors.mutedText }]}>{data.baseline}</Text> : null}
+      </View>
+    </View>
+  );
 }
 
-function ChapterHeading({ number, title, intro }: { number: string; title: string; intro?: string }) {
-  return <View wrap={false}><Text style={S.chapterNo}>{number}</Text><Text style={S.chapterTitle}>{title}</Text>{intro ? <Text style={S.intro}>{intro}</Text> : null}</View>;
+function PageFooter({ context, plan, light = false }: { context: RenderContext; plan: EditorialPagePlan; light?: boolean }) {
+  const { styles, theme } = context;
+  const color = light ? "#FFFFFF" : theme.colors.mutedText;
+  return (
+    <View fixed style={styles.footer}>
+      <Text style={[styles.tiny, { color }]}>Brand Studio · Guide de marque</Text>
+      <Text style={[styles.tiny, { color }]}>{String(plan.page).padStart(2, "0")}</Text>
+    </View>
+  );
 }
 
-function Field({ item, statement = false }: { item: PdfField; statement?: boolean }) {
-  if (statement) return <View wrap={false} style={S.statement}><Text style={S.fieldLabel}>{item.label}</Text><Text style={S.statementText}>{item.value}</Text></View>;
-  return <View wrap={false} style={S.field}><Text style={S.fieldLabel}>{item.label}</Text><Text style={S.body}>{item.value}</Text></View>;
+function ChapterMarker({ context, plan, light = false }: { context: RenderContext; plan: EditorialPagePlan; light?: boolean }) {
+  return (
+    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 34 }}>
+      <Text style={[context.styles.label, { color: light ? "#FFFFFF" : context.theme.colors.accent }]}>{plan.number} — {plan.chapter}</Text>
+      <View style={{ width: 64, height: context.theme.layout.lineWidth, backgroundColor: light ? "#FFFFFF" : context.theme.colors.accent }} />
+    </View>
+  );
 }
 
-function PdfBrandLockup({ data, size, showBaseline = false }: { data: BrandGuideData; size: "large" | "medium" | "small"; showBaseline?: boolean }) {
-  const logoStyle = size === "large" ? S.lockupLogoLarge : size === "medium" ? S.lockupLogoMedium : S.lockupLogoSmall;
-  const nameStyle = size === "large" ? [S.lockupNameLarge, { fontSize: getCoverTitleFontSize(data.brandName) }] : size === "medium" ? S.lockupNameMedium : S.lockupNameSmall;
-  return <View style={S.lockup}>{data.logoUrl ? <Image src={data.logoUrl} style={logoStyle}/> : null}<View><Text style={nameStyle}>{data.brandName}</Text>{showBaseline && data.baseline ? <Text style={S.coverBaseline}>{data.baseline}</Text> : null}</View></View>;
-}
-
-function EditorialFields({ items }: { items: PdfField[] }) {
-  const layout = selectEditorialLayout(items);
-  if (layout === "manifesto") return <Field item={items[0]} statement/>;
-  return <View style={S.grid}>{items.map((item, index) => <View key={item.label} wrap={false} style={layout === "profile" && index === 0 ? { width: "100%", marginBottom: 20 } : S.column}><Field item={item}/></View>)}</View>;
-}
-
-function FoundationStory({ items }: { items: PdfField[] }) {
-  const mission = items.find((item) => item.label === "Mission");
-  const supporting = items.filter((item) => item !== mission);
-  return <View>{mission ? <View wrap={false} style={[S.quote, { marginBottom: 30 }]}><Text style={S.fieldLabel}>Mission</Text><Text style={[S.quoteText, { textAlign: "left" }]}>{mission.value}</Text></View> : null}<View style={S.grid}>{supporting.map((item) => <View key={item.label} style={S.column}><Field item={item}/></View>)}</View></View>;
-}
-
-function PdfBrandValue({ value }: { value: BrandValueData }) {
-  const details = [
-    ["Ce que cette valeur signifie", value.meaning],
-    ["Dans la pratique", value.concreteApplication],
-    ["Dans la communication", value.communicationExpression],
-  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
-  return <View wrap={false} style={S.valueCard}><Text style={S.valueName}>{value.name}</Text>{details.map(([label, text]) => <View key={label} style={S.valueSection}><Text style={S.valueLabel}>{label}</Text><Text style={S.body}>{text}</Text></View>)}</View>;
-}
-
-function contrastFor(hex: string) {
-  return getAccessibleTextColor(hex) === BRAND.ink ? "Texte sombre conseillé" : "Texte clair conseillé";
-}
-
-function PalettePage({ data, number }: { data: BrandGuideData; number: string }) {
-  return <Page size="A4" style={S.page}><PageChrome data={data} chapter="Univers visuel"/><ChapterHeading number={number} title="Univers visuel" intro={data.ambiance}/><View style={S.paletteRow}>{data.palette.map((color) => <View wrap={false} key={color.id} style={S.colorCard}><View style={[S.colorSwatch, { backgroundColor: color.hex }]}/><View style={S.colorBody}><Text style={S.colorName}>{color.name}</Text><Text style={S.colorMeta}>{color.hex} · {color.role === "primary" ? "Principale" : "Secondaire"}</Text>{color.usage ? <Text style={S.colorMeta}>{color.usage}</Text> : null}<Text style={S.colorMeta}>{contrastFor(color.hex)}</Text></View></View>)}</View></Page>;
-}
-
-function MoodboardItem({ item }: { item: GuideMoodboardItem }) {
-  const style = { left: `${item.x}%`, top: `${item.y}%`, width: `${item.width}%`, height: `${item.height}%`, transform: `rotate(${item.rotation}deg)`, backgroundColor: item.type === "color" ? item.color : BRAND.white };
-  const availableTextWidth = Math.max(12, (item.width / 100) * 491.28 - 20);
-  const requestedFontSize = item.fontSize || 10;
-  const fittedFontSize = item.type === "keyword"
-    ? Math.max(6, Math.min(requestedFontSize, availableTextWidth / Math.max(item.label.length * 0.72, 1)))
-    : Math.min(requestedFontSize, 22);
-  return <View style={[S.moodItem, style]}>{item.imageUrl && (item.type === "image" || item.type === "icon") ? (
-    // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
-    <Image src={item.imageUrl} style={[S.moodImage, { objectFit: item.type === "icon" ? "contain" : "cover", objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }]}/>
-  ) : <View style={S.moodText}><Text style={[S.moodLabel, { color: item.type === "color" ? BRAND.white : item.textColor || BRAND.ink, fontSize: fittedFontSize }]}>{item.label}</Text></View>}</View>;
-}
-
-function MoodboardPage({ data, number }: { data: BrandGuideData; number: string }) {
-  const composition = composeMoodboard(data.moodboard);
-  return <Page size="A4" style={S.page}><PageChrome data={data} chapter="Moodboard"/><ChapterHeading number={number} title="Planche d’inspiration"/><View style={[S.moodboard, { backgroundColor: data.moodboardBackground }]}>{composition.map((item) => <MoodboardItem key={item.id} item={item}/>)}</View></Page>;
-}
-
-function BrandGuideDocument({ data }: { data: BrandGuideData }) {
-  const palette = data.palette.slice(0, 5);
-  const coverLayout = selectCoverLayout(data);
-  const coverImage = coverLayout === "logo-image" ? data.moodboard.find((item) => item.type === "image" && item.imageUrl)?.imageUrl : undefined;
-  const chapterNo = (id: string) => data.chapters.find((chapter) => chapter.id === id)?.number || "";
-  return <Document title={`Guide de marque — ${data.brandName}`} author="Brand Studio" subject={`Guide de marque de ${data.brandName}`} language="fr-FR">
-    <Page size="A4" style={[S.cover]}>
-      <View style={S.coverTop}><Text style={S.brandMark}>BRAND STUDIO</Text><View style={S.coverRule}/></View>
-      <View style={S.coverBody}><Text style={S.coverKicker}>GUIDE DE MARQUE</Text><PdfBrandLockup data={data} size="large" showBaseline/>{coverImage ? <Image src={coverImage} style={S.coverImage}/> : <View style={S.coverShape}/>}<View style={S.coverPalette}>{palette.map((color) => <View key={color.id} style={[S.coverSwatch, { backgroundColor: color.hex }]}/>)}</View></View>
-      <View style={S.coverFooter}><Text style={S.small}>Version 1.0 · {formatDate(data.generatedAt)}</Text><Text style={S.small}>Créé avec Brand Studio</Text></View>
+function CoverPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, identity, theme, styles } = context;
+  const image = identity.moodboard.images[0]?.imageUrl;
+  const isDark = plan.variant === "image" || plan.variant === "collage" || plan.variant === "chromatic";
+  const pageStyle = isDark ? styles.pageDark : styles.page;
+  const textColor = isDark ? getAccessibleTextColor(theme.colors.primary) : theme.colors.text;
+  return (
+    <Page size="A4" style={[pageStyle, { padding: 0 }]}>
+      {plan.variant === "image" && image ? (
+        <>
+          <View style={{ position: "absolute", top: 0, left: 0, width: A4.width, height: A4.height, overflow: "hidden" }}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={image} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </View>
+          <View style={{ position: "absolute", top: 0, left: 0, width: A4.width, height: A4.height, backgroundColor: theme.colors.primary, opacity: 0.62 }} />
+        </>
+      ) : null}
+      {plan.variant === "chromatic" ? (
+        <View style={{ position: "absolute", right: 0, top: 0, width: 205, height: A4.height, backgroundColor: theme.colors.secondary }} />
+      ) : null}
+      {plan.variant === "collage" ? (
+        <>
+          <View style={{ position: "absolute", right: -26, top: 80, width: 250, height: 330, backgroundColor: theme.colors.secondary, transform: "rotate(7deg)" }} />
+          <View style={{ position: "absolute", right: 76, bottom: 62, width: 190, height: 270, backgroundColor: theme.colors.accent, transform: "rotate(-5deg)" }} />
+          <View style={{ position: "absolute", right: 28, top: 310, width: 110, height: 110, borderRadius: 55, backgroundColor: generateTint(theme.colors.primary, 64) }} />
+        </>
+      ) : null}
+      <View style={{ position: "absolute", top: 52, left: 48, right: 48, flexDirection: "row", justifyContent: "space-between" }}>
+        <Text style={[styles.tiny, { color: textColor }]}>Guide de marque</Text>
+        <Text style={[styles.tiny, { color: textColor }]}>Édition {formatDate(data.generatedAt)}</Text>
+      </View>
+      <View wrap={false} style={{ position: "absolute", left: 48, right: 48, top: plan.variant === "minimal-premium" ? 270 : 220, height: 260 }}>
+        <BrandLockup context={context} size={plan.variant === "collage" || plan.variant === "chromatic" ? "medium" : "large"} light={isDark} baseline />
+      </View>
+      <View style={{ position: "absolute", left: 48, bottom: 54, flexDirection: "row", alignItems: "center" }}>
+        {data.palette.slice(0, 6).map((color, index) => <View key={color.id} style={{ width: index === 0 ? 64 : 28, height: 10, backgroundColor: color.hex }} />)}
+      </View>
+      <Text style={[styles.tiny, { position: "absolute", right: 48, bottom: 52, color: textColor }]}>Créé avec Brand Studio</Text>
     </Page>
-    <Page size="A4" style={S.page}><PageChrome data={data} chapter="Sommaire"/><Text style={S.tocTitle}>Sommaire</Text><Text style={S.intro}>Ce guide rassemble les décisions stratégiques, verbales et visuelles de {data.brandName}. Utilise-le comme référence avant toute création de contenu ou de support.</Text>{data.chapters.map((chapter) => <View key={chapter.id} style={S.tocRow}><Text style={S.tocNo}>{chapter.number}</Text><Text style={S.tocName}>{chapter.title}</Text><View style={S.tocDots}/><Text style={S.tocPage}>{chapter.page}</Text></View>)}</Page>
-    {data.foundations.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Fondations"/><ChapterHeading number={chapterNo("foundations")} title="Fondations" intro="Les repères essentiels qui donnent du sens et une direction durable à la marque."/><FoundationStory items={data.foundations}/></Page> : null}
-    {data.values.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Valeurs"/><ChapterHeading number={chapterNo("values")} title="Valeurs incarnées" intro="Des principes traduits en comportements et en signes reconnaissables."/><View style={S.grid}>{data.values.map((value) => <PdfBrandValue key={value.name} value={value}/>)}</View></Page> : null}
-    {data.positioning.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter={data.combinePositioningAndMessages ? "Positionnement & messages" : "Positionnement"}/><ChapterHeading number={chapterNo("positioning")} title="Positionnement" intro="La place que la marque choisit d’occuper dans l’esprit de ses clients."/><EditorialFields items={data.positioning}/>{data.combinePositioningAndMessages ? <View wrap={false}><Text style={[S.chapterTitle, { fontSize: 20, marginTop: 8, marginBottom: 14 }]}>Messages essentiels</Text><EditorialFields items={data.messages}/></View> : null}</Page> : null}
-    {(data.personality.length || data.language.use.length || data.language.avoid.length) ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Personnalité & langage"/><ChapterHeading number={chapterNo("voice")} title="Personnalité & langage" intro="Une identité claire et des repères concrets pour prendre la parole."/>{data.personality[0] ? <View style={[S.quote, { marginBottom: 26 }]}><Text style={S.fieldLabel}>{data.personality[0].label}</Text><Text style={[S.quoteText, { textAlign: "left" }]}>{data.personality[0].value}</Text></View> : null}<View style={S.grid}>{data.personality.slice(1).map((item) => <View key={item.label} style={S.column}><Field item={item}/></View>)}</View>{(data.language.use.length || data.language.avoid.length) ? <View style={[S.grid, { marginTop: 12 }]}><View style={S.languageColumn}><Text style={S.fieldLabel}>À privilégier</Text>{data.language.use.map((word) => <View key={word} style={S.languageItem}><Text style={S.languageSymbol}>+</Text><Text style={S.body}>{word}</Text></View>)}</View><View style={[S.languageColumn, S.languageAvoid]}><Text style={S.fieldLabel}>À éviter</Text>{data.language.avoid.map((word) => <View key={word} style={S.languageItem}><Text style={S.languageSymbol}>−</Text><Text style={S.body}>{word}</Text></View>)}</View></View> : null}</Page> : null}
-    {data.messages.length && !data.combinePositioningAndMessages ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Messages"/><ChapterHeading number={chapterNo("messages")} title="Messages" intro="Les formulations centrales à préserver sur tous les points de contact."/>{data.messages.map((item, index) => index === 0 ? <View key={item.label} style={S.quote}><Text style={S.fieldLabel}>{item.label}</Text><Text style={S.quoteText}>{item.value}</Text></View> : <Field key={item.label} item={item} statement/>)}</Page> : null}
-    {data.palette.length || data.ambiance ? <PalettePage data={data} number={chapterNo("visual")}/> : null}
-    {data.moodboard.length ? <MoodboardPage data={data} number={chapterNo("moodboard")}/> : null}
-    {data.summary.length ? <Page size="A4" style={S.page}><PageChrome data={data} chapter="Synthèse"/><ChapterHeading number={chapterNo("summary")} title="Ta marque en un coup d’œil"/><View style={S.summaryHero}><PdfBrandLockup data={data} size="medium" showBaseline/></View><EditorialFields items={data.summary.filter((item) => item.label !== "Baseline")}/></Page> : null}
-  </Document>;
+  );
 }
 
-export async function prepareMoodboardAssets(data: BrandGuideData) {
+function ContentsPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { styles, theme, composition } = context;
+  return (
+    <Page size="A4" style={styles.page}>
+      <Text style={[styles.display, { maxWidth: 390 }]}>Le territoire de la marque</Text>
+      <View style={{ marginTop: 50 }}>
+        {composition.contents.map((item, index) => (
+          <View key={item.title} style={{ flexDirection: "row", paddingVertical: 13, borderTop: `${index === 0 ? theme.layout.lineWidth : 0.5} solid ${theme.colors.border}` }}>
+            <Text style={[styles.label, { width: 38, color: theme.colors.accent }]}>{item.number}</Text>
+            <View style={{ flexGrow: 1, maxWidth: 390 }}>
+              <Text style={[styles.h2, { fontSize: 16 }]}>{item.title}</Text>
+              <Text style={[styles.small, { color: theme.colors.mutedText, marginTop: 4 }]}>{item.description}</Text>
+            </View>
+            <Text style={[styles.label, { width: 28, textAlign: "right" }]}>{String(item.page).padStart(2, "0")}</Text>
+          </View>
+        ))}
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function FoundationsPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  const mission = data.foundations.find((item) => item.label === "Mission");
+  const others = data.foundations.filter((item) => item !== mission);
+  return (
+    <Page size="A4" style={styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <Text style={[styles.h1, { maxWidth: 420 }]}>Ce qui donne une direction à la marque.</Text>
+      {mission ? <Text style={[styles.quote, { marginTop: 48, maxWidth: 455, color: theme.colors.primary }]}>{mission.value}</Text> : null}
+      <View style={{ flexDirection: "row", marginTop: 64, gap: 30 }}>
+        {others.map((item, index) => (
+          <View key={item.label} style={{ width: `${100 / Math.max(others.length, 1) - 3}%`, paddingTop: 12, borderTop: `${index === 0 ? theme.layout.lineWidth : 1} solid ${index === 0 ? theme.colors.accent : theme.colors.border}` }}>
+            <Text style={[styles.label, { color: theme.colors.mutedText }]}>{item.label}</Text>
+            <Text style={[styles.body, { marginTop: 12 }]}>{item.value}</Text>
+          </View>
+        ))}
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function ManifestoPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const mission = context.data.foundations.find((item) => item.label === "Mission")?.value || "";
+  const light = getAccessibleTextColor(context.theme.colors.primary) === "#FFFFFF";
+  return (
+    <Page size="A4" style={context.styles.pageDark}>
+      <Text style={[context.styles.label, { color: light ? "#FFFFFF" : context.theme.colors.text }]}>Notre mission</Text>
+      <View style={{ flexGrow: 1, justifyContent: "center" }}>
+        <Text style={[context.styles.display, { fontSize: 46, color: light ? "#FFFFFF" : context.theme.colors.text }]}>{mission}</Text>
+      </View>
+      <PageFooter context={context} plan={plan} light={light} />
+    </Page>
+  );
+}
+
+function ValueStory({ context, value, index }: { context: RenderContext; value: BrandValueData; index: number }) {
+  const { styles, theme } = context;
+  return (
+    <View style={{ width: index === 0 ? "100%" : "48%", marginBottom: 34, paddingTop: 14, borderTop: `${index === 0 ? theme.layout.lineWidth : 1} solid ${theme.colors.accent}` }}>
+      <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+        <Text style={{ fontFamily: theme.typography.displayFont, fontSize: index === 0 ? 62 : 34, color: generateTint(theme.colors.primary, 40), marginRight: 14 }}>{String(index + 1).padStart(2, "0")}</Text>
+        <Text style={[styles.h2, { fontSize: index === 0 ? 27 : 20 }]}>{value.name}</Text>
+      </View>
+      {value.meaning ? <Text style={[styles.body, { fontSize: index === 0 ? 14 : 10.5, marginTop: 10, maxWidth: index === 0 ? 400 : undefined }]}>{value.meaning}</Text> : null}
+      <View style={{ flexDirection: index === 0 ? "row" : "column", gap: 18, marginTop: 18 }}>
+        {value.concreteApplication ? <View style={{ flexGrow: 1 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans les faits</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.concreteApplication}</Text></View> : null}
+        {value.communicationExpression ? <View style={{ flexGrow: 1 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la communication</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.communicationExpression}</Text></View> : null}
+      </View>
+    </View>
+  );
+}
+
+function ValuesPage({ context, plan, occurrence }: { context: RenderContext; plan: EditorialPagePlan; occurrence: number }) {
+  const values = context.data.values.length > 4
+    ? occurrence === 0 ? context.data.values.slice(0, 3) : context.data.values.slice(3)
+    : context.data.values;
+  return (
+    <Page size="A4" style={context.styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <Text style={[context.styles.h1, { marginBottom: 42 }]}>Des principes qui deviennent des gestes.</Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+        {values.map((value, index) => <ValueStory key={value.name} context={context} value={value} index={index + occurrence * 3} />)}
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function PositioningPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  const statement = data.positioning.find((item) => item.label.includes("final")) || data.positioning.at(-1);
+  const contextField = data.positioning.find((item) => item !== statement);
+  return (
+    <Page size="A4" style={styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <View style={{ flexDirection: "row", minHeight: 610 }}>
+        <View style={{ width: "36%", paddingRight: 28, justifyContent: "space-between" }}>
+          <Text style={styles.h1}>La place que la marque choisit d’occuper.</Text>
+          {contextField ? <View><Text style={[styles.label, { color: theme.colors.mutedText }]}>{contextField.label}</Text><Text style={[styles.body, { marginTop: 10 }]}>{contextField.value}</Text></View> : null}
+        </View>
+        <View style={{ width: "64%", backgroundColor: theme.colors.primary, padding: 32, justifyContent: "center" }}>
+          <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.primary), marginBottom: 28 }]}>Positionnement</Text>
+          <Text style={[styles.quote, { color: getAccessibleTextColor(theme.colors.primary) }]}>{statement?.value}</Text>
+        </View>
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function PersonalityPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, identity, styles, theme } = context;
+  const portrait = identity.moodboard.images[0]?.imageUrl;
+  const portraitField = data.personality[0];
+  return (
+    <Page size="A4" style={styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <View style={{ flexDirection: "row", gap: 30 }}>
+        <View style={{ width: "43%" }}>
+          {portrait ? (
+            // eslint-disable-next-line jsx-a11y/alt-text
+            <Image src={portrait} style={{ width: "100%", height: 285, objectFit: "cover" }} />
+          ) : <View style={{ height: 285, backgroundColor: theme.colors.secondary, justifyContent: "center", padding: 24 }}><Text style={[styles.display, { fontSize: 38, color: getAccessibleTextColor(theme.colors.secondary) }]}>{identity.personalityTraits.join("\n")}</Text></View>}
+          {portraitField ? <Text style={[styles.body, { marginTop: 18 }]}>{portraitField.value}</Text> : null}
+        </View>
+        <View style={{ width: "51%" }}>
+          <Text style={[styles.h1, { marginBottom: 34 }]}>Une présence reconnaissable avant même de parler.</Text>
+          {data.personality.slice(1).map((item) => <View key={item.label} style={{ marginBottom: 20 }}><Text style={[styles.label, { color: theme.colors.accent }]}>{item.label}</Text><Text style={[styles.body, { marginTop: 7 }]}>{item.value}</Text></View>)}
+        </View>
+      </View>
+      <View style={{ position: "absolute", left: A4.margin, right: A4.margin, bottom: 72, flexDirection: "row" }}>
+        <View style={{ width: "50%", paddingRight: 20 }}><Text style={[styles.label, { color: theme.colors.accent }]}>À privilégier</Text><Text style={[styles.body, { marginTop: 8 }]}>{data.language.use.join(" · ")}</Text></View>
+        <View style={{ width: "50%", paddingLeft: 20, borderLeft: `1 solid ${theme.colors.border}` }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>À écarter</Text><Text style={[styles.body, { marginTop: 8 }]}>{data.language.avoid.join(" · ")}</Text></View>
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function MessagesPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  return (
+    <Page size="A4" style={styles.pageAccent}>
+      <ChapterMarker context={context} plan={plan} light />
+      <Text style={[styles.h1, { color: getAccessibleTextColor(theme.colors.accent), maxWidth: 380 }]}>Les mots qui portent la marque.</Text>
+      <View style={{ flexGrow: 1, justifyContent: "center" }}>
+        {data.messages.map((item, index) => (
+          <View key={item.label} style={{ marginBottom: index === 0 ? 54 : 28 }}>
+            <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.accent), opacity: 0.7 }]}>{item.label}</Text>
+            <Text style={[index === 0 ? styles.display : styles.h2, { color: getAccessibleTextColor(theme.colors.accent), marginTop: 12 }]}>{item.value}</Text>
+          </View>
+        ))}
+      </View>
+      <PageFooter context={context} plan={plan} light />
+    </Page>
+  );
+}
+
+function VisualSystemPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  const colors = data.palette;
+  const total = Math.max(colors.length, 1);
+  return (
+    <Page size="A4" style={styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <View style={{ width: "48%" }}><Text style={styles.h1}>Le système visuel de la marque.</Text><Text style={[styles.body, { marginTop: 18, color: theme.colors.mutedText }]}>{data.ambiance}</Text></View>
+        <View style={{ width: "42%", minHeight: 120, justifyContent: "center", alignItems: "center" }}><BrandLockup context={context} size="medium" /></View>
+      </View>
+      <View style={{ flexDirection: "row", height: 245, marginTop: 50 }}>
+        {colors.map((color, index) => (
+          <View key={color.id} style={{ width: `${index === 0 ? Math.max(30, 100 / total) : 100 / total}%`, backgroundColor: color.hex, padding: 10, justifyContent: "flex-end" }}>
+            <Text style={[styles.label, { color: getAccessibleTextColor(color.hex) }]}>{color.name}</Text>
+            <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 4 }]}>{color.hex}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={{ flexDirection: "row", marginTop: 28, gap: 24 }}>
+        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie d’expression</Text><Text style={{ fontFamily: theme.typography.displayFont, fontSize: 34, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.displayFont}</Text></View>
+        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie de lecture</Text><Text style={{ fontFamily: theme.typography.bodyFont, fontSize: 28, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.bodyFont}</Text></View>
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function MoodboardElement({ item, theme }: { item: GuideMoodboardItem; theme: BrandGuideTheme }) {
+  const style = {
+    position: "absolute" as const,
+    left: `${Math.max(0, Math.min(item.x, 96))}%`,
+    top: `${Math.max(0, Math.min(item.y, 96))}%`,
+    width: `${Math.max(6, Math.min(item.width, 90))}%`,
+    height: `${Math.max(6, Math.min(item.height, 90))}%`,
+    transform: `rotate(${item.rotation}deg)`,
+    overflow: "hidden" as const,
+    backgroundColor: item.type === "color" ? item.color : "#FFFFFF",
+    borderRadius: theme.layout.cornerRadius,
+  };
+  if (item.imageUrl && (item.type === "image" || item.type === "icon")) {
+    return (
+      <View style={style}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+        <Image src={item.imageUrl} style={{ width: "100%", height: "100%", objectFit: item.type === "icon" ? "contain" : "cover", objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }} />
+      </View>
+    );
+  }
+  const available = Math.max(20, item.width * 4.55 - 16);
+  const requested = item.fontSize || 12;
+  const fitted = item.type === "keyword" ? Math.max(6, Math.min(requested, available / Math.max(item.label.length * 0.62, 1))) : Math.min(requested, 24);
+  return <View style={[style, { justifyContent: "center", alignItems: "center", padding: 8 }]}><Text style={{ fontFamily: item.type === "text" ? theme.typography.displayFont : theme.typography.bodyFont, fontSize: fitted, fontWeight: item.type === "keyword" ? 600 : 400, textAlign: "center", color: item.type === "color" ? getAccessibleTextColor(item.color || theme.colors.primary) : item.textColor || theme.colors.text }}>{item.label}</Text></View>;
+}
+
+function MoodboardPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  return (
+    <Page size="A4" style={styles.page}>
+      <Text style={[styles.label, { color: theme.colors.accent, marginBottom: 18 }]}>{plan.number} — Direction artistique</Text>
+      <View style={{ position: "relative", width: A4.content, height: 690, overflow: "hidden", backgroundColor: data.moodboardBackground || theme.colors.surface }}>
+        {data.moodboard.slice().sort((a, b) => a.zIndex - b.zIndex).map((item) => <MoodboardElement key={item.id} item={item} theme={theme} />)}
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function ApplicationsPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme, identity } = context;
+  const promise = data.messages[0]?.value || data.summary[0]?.value || "";
+  const word = identity.visualKeywords[0] || identity.personalityTraits[0] || data.brandName;
+  return (
+    <Page size="A4" style={styles.page}>
+      <ChapterMarker context={context} plan={plan} />
+      <Text style={[styles.h1, { maxWidth: 390 }]}>Le système en mouvement.</Text>
+      <View style={{ marginTop: 42, flexDirection: "row", height: 470 }}>
+        <View style={{ width: "58%", backgroundColor: theme.colors.primary, padding: 30, justifyContent: "space-between" }}>
+          <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.primary) }]}>{data.brandName}</Text>
+          <Text style={[styles.display, { fontSize: 42, color: getAccessibleTextColor(theme.colors.primary) }]}>{promise}</Text>
+          <Text style={[styles.small, { color: getAccessibleTextColor(theme.colors.primary) }]}>Exemple de prise de parole</Text>
+        </View>
+        <View style={{ width: "42%" }}>
+          <View style={{ flexGrow: 1, backgroundColor: theme.colors.secondary, padding: 20, justifyContent: "center" }}><Text style={[styles.h2, { color: getAccessibleTextColor(theme.colors.secondary), fontSize: 28 }]}>{word}</Text></View>
+          <View style={{ flexGrow: 1, backgroundColor: theme.colors.surface, padding: 20, justifyContent: "space-between" }}><Text style={styles.label}>Signature</Text><Text style={styles.body}>{data.baseline || promise}</Text><View style={{ alignSelf: "flex-start", backgroundColor: theme.colors.accent, paddingVertical: 8, paddingHorizontal: 16 }}><Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.accent) }]}>Découvrir</Text></View></View>
+        </View>
+      </View>
+      <PageFooter context={context} plan={plan} />
+    </Page>
+  );
+}
+
+function SummaryPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
+  const { data, styles, theme } = context;
+  const light = getAccessibleTextColor(theme.colors.primary) === "#FFFFFF";
+  return (
+    <Page size="A4" style={styles.pageDark}>
+      <BrandLockup context={context} size="medium" light={light} baseline />
+      <View style={{ marginTop: 46, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+        {data.summary.filter((item) => item.label !== "Baseline" && item.label !== "Palette").slice(0, 6).map((item, index) => (
+          <View key={item.label} style={{ width: index === 0 ? "100%" : "47%", marginBottom: 28, paddingTop: 12, borderTop: `1 solid ${light ? "#FFFFFF" : theme.colors.text}` }}>
+            <Text style={[styles.label, { color: light ? "#FFFFFF" : theme.colors.text, opacity: 0.7 }]}>{item.label}</Text>
+            <Text style={[index === 0 ? styles.h2 : styles.body, { color: light ? "#FFFFFF" : theme.colors.text, marginTop: 9 }]}>{item.value}</Text>
+          </View>
+        ))}
+      </View>
+      <View style={{ position: "absolute", left: A4.margin, right: A4.margin, bottom: 58, flexDirection: "row" }}>
+        {data.palette.map((color) => <View key={color.id} style={{ flexGrow: 1, height: 22, backgroundColor: color.hex }} />)}
+      </View>
+      <PageFooter context={context} plan={plan} light={light} />
+    </Page>
+  );
+}
+
+function renderPlannedPage(context: RenderContext, plan: EditorialPagePlan, occurrence: number) {
+  if (plan.kind === "cover") return <CoverPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "contents") return <ContentsPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "foundations") return <FoundationsPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "manifesto") return <ManifestoPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "values") return <ValuesPage key={plan.id} context={context} plan={plan} occurrence={occurrence} />;
+  if (plan.kind === "positioning") return <PositioningPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "personality") return <PersonalityPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "messages") return <MessagesPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "visual-system") return <VisualSystemPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "moodboard") return <MoodboardPage key={plan.id} context={context} plan={plan} />;
+  if (plan.kind === "applications") return <ApplicationsPage key={plan.id} context={context} plan={plan} />;
+  return <SummaryPage key={plan.id} context={context} plan={plan} />;
+}
+
+function BrandGuideDocument({ context }: { context: RenderContext }) {
+  const occurrences = new Map<string, number>();
+  return (
+    <Document title={`Guide de marque — ${context.data.brandName}`} author="Brand Studio" subject={`Guide de marque de ${context.data.brandName}`} language="fr-FR">
+      {context.composition.pages.map((plan) => {
+        const occurrence = occurrences.get(plan.kind) || 0;
+        occurrences.set(plan.kind, occurrence + 1);
+        return renderPlannedPage(context, plan, occurrence);
+      })}
+    </Document>
+  );
+}
+
+export async function prepareBrandGuideAssets(data: BrandGuideData) {
   async function loadDataUrl(url?: string) {
     if (!url || url.startsWith("data:")) return url;
     try {
@@ -218,32 +467,37 @@ export async function prepareMoodboardAssets(data: BrandGuideData) {
       const type = response.headers.get("content-type") || "image/png";
       const bytes = Buffer.from(await response.arrayBuffer());
       return `data:${type};base64,${bytes.toString("base64")}`;
-    } catch { return undefined; }
+    } catch {
+      return undefined;
+    }
   }
   const moodboard = await Promise.all(data.moodboard.map(async (item) => {
-    if (!item.imageUrl || item.imageUrl.startsWith("data:")) return item;
+    if (!item.imageUrl) return item;
     return { ...item, imageUrl: await loadDataUrl(item.imageUrl) };
   }));
-  return { ...data, logoUrl: await loadDataUrl(data.logoUrl), moodboard: moodboard.filter((item) => item.type !== "image" || Boolean(item.imageUrl)) };
+  return {
+    ...data,
+    logoUrl: await loadDataUrl(data.logoUrl),
+    moodboard: moodboard.filter((item) => !["image", "icon"].includes(item.type) || Boolean(item.imageUrl)),
+  };
 }
 
+export const prepareMoodboardAssets = prepareBrandGuideAssets;
+
 export async function renderBrandGuidePdf(guide: GeneratedBrandGuide) {
-  const data = await prepareMoodboardAssets(createBrandGuideData(guide));
+  const initialData = createBrandGuideData(guide);
+  const data = await prepareBrandGuideAssets(initialData);
+  const identity = buildBrandVisualIdentity({
+    ...guide,
+    brandAssets: { ...guide.brandAssets, logoUrl: data.logoUrl },
+    visualUniverse: { ...guide.visualUniverse, moodboard: data.moodboard },
+  });
+  const theme = createBrandGuideTheme(identity);
+  const composition = composeEditorialPages({ data, identity, direction: theme.direction });
   const consistency = validateBrandGuideData(data);
   if (!consistency.valid) {
-    if (process.env.NODE_ENV !== "production") console.error("Brand guide identity conflict", consistency);
-    throw new Error(`Brand guide identity conflict: ${consistency.conflicts.join(", ")}`);
+    if (process.env.NODE_ENV !== "production") throw new Error(`Brand guide identity conflict: ${consistency.conflicts.join(", ")}`);
   }
-  if (process.env.NODE_ENV !== "production") {
-    console.info("Brand guide generation report", {
-      brandName: data.brandName,
-      renderedSections: data.chapters.map((chapter) => chapter.id),
-      skippedSections: ["foundations", "positioning", "voice", "messages", "visual", "moodboard", "summary"].filter((id) => !data.chapters.some((chapter) => chapter.id === id)),
-      missingImages: guide.visualUniverse.moodboard.filter((item) => item.imageUrl).length - data.moodboard.filter((item) => item.imageUrl).length,
-      pageCount: Math.max(2, ...data.chapters.map((chapter) => chapter.page)),
-      detectedBrandNames: consistency.detectedBrandNames,
-      warnings: consistency.warnings,
-    });
-  }
-  return renderToBuffer(<BrandGuideDocument data={data}/>);
+  const context: RenderContext = { data, identity, theme, composition, styles: createStyles(theme) };
+  return renderToBuffer(<BrandGuideDocument context={context} />);
 }
