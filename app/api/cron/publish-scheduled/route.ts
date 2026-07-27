@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { publishScheduledAdminModuleSnapshot } from "@/lib/training";
 import type { BrandModule, BrandSubmodule, ModuleExercise } from "@/lib/training-types";
+import { retryPendingActivationEmails } from "@/lib/activation-email-delivery";
 
 function isAuthorized(request: Request) {
   const expected = process.env.CRON_SECRET;
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const supabase = createSupabaseServerClient();
+  const activationEmails = await retryPendingActivationEmails();
   const { data, error } = await supabase.rpc("publish_due_module_versions");
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -41,5 +43,5 @@ export async function GET(request: Request) {
       await supabase.from("admin_deployment_schedules").update({ status: "failed", error_message: cause instanceof Error ? cause.message : "Erreur inconnue", updated_at: new Date().toISOString() }).eq("id", schedule.id);
     }
   }
-  return NextResponse.json({ publishedVersions: data ?? 0, deployments });
+  return NextResponse.json({ publishedVersions: data ?? 0, deployments, activationEmails });
 }

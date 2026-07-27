@@ -14,6 +14,8 @@ export type ActivationCodeRecord = {
   status: string;
   consumed_at: string | null;
   expires_at: string | null;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export function generateActivationCode() {
@@ -82,6 +84,50 @@ export async function markActivationEmailSent(id: number) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function claimActivationEmail(id: number) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("purchase_activation_codes")
+    .update({ status: "sending", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("status", "paid")
+    .select("*")
+    .maybeSingle<ActivationCodeRecord>();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function releaseActivationEmail(id: number) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase
+    .from("purchase_activation_codes")
+    .update({ status: "paid", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("status", "sending");
+  if (error) throw new Error(error.message);
+}
+
+export async function findPendingActivationEmails(limit = 20) {
+  const supabase = createSupabaseServerClient();
+  const staleSending = new Date(Date.now() - 1000 * 60 * 10).toISOString();
+  await supabase
+    .from("purchase_activation_codes")
+    .update({ status: "paid", updated_at: new Date().toISOString() })
+    .eq("status", "sending")
+    .lt("updated_at", staleSending);
+  const { data, error } = await supabase
+    .from("purchase_activation_codes")
+    .select("*")
+    .eq("status", "paid")
+    .is("consumed_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: true })
+    .limit(limit)
+    .returns<ActivationCodeRecord[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export async function findUsableActivationCode(input: {

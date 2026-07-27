@@ -3,9 +3,8 @@ import Stripe from "stripe";
 import {
   createActivationCode,
   findActivationCodeByCheckoutSession,
-  markActivationEmailSent,
 } from "@/lib/activation-codes";
-import { sendAccountActivationEmail } from "@/lib/mailer";
+import { deliverActivationEmail } from "@/lib/activation-email-delivery";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
@@ -57,6 +56,9 @@ async function findUserIdByStripeIds(input: {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  if (!["paid", "no_payment_required"].includes(session.payment_status)) {
+    return;
+  }
   const userId = Number(session.metadata?.user_id);
   const subscriptionId = objectId(
     session.subscription as string | { id: string } | null | undefined,
@@ -86,16 +88,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         priceId: process.env.STRIPE_PRICE_ID ?? null,
       }));
 
-    if (activation.status === "email_sent" || activation.consumed_at) {
-      return;
-    }
-
-    await sendAccountActivationEmail({
-      email,
-      clientName: email,
-      activationToken: activation.code,
-    });
-    await markActivationEmailSent(activation.id);
+    await deliverActivationEmail(activation);
 
     return;
   }
@@ -193,6 +186,7 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded":
         await handleCheckoutCompleted(event.data.object);
         break;
       case "customer.subscription.created":
