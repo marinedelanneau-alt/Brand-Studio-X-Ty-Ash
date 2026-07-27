@@ -126,7 +126,7 @@ function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
   );
 }
 
-const firstModuleVisibleLabels = new Set([
+const positioningModuleVisibleLabels = new Set([
   "le moment ou ta marque intervient",
   "ta difference",
   "ton positionnement formule",
@@ -148,9 +148,9 @@ function ModuleKeyTakeaways({
   modulePosition: number;
 }) {
   const takeaways =
-    modulePosition === 1
+    modulePosition === 2
       ? summary.keyTakeaways.filter((item) =>
-          firstModuleVisibleLabels.has(normalizeSummaryLabel(item.label)),
+          positioningModuleVisibleLabels.has(normalizeSummaryLabel(item.label)),
         )
       : summary.keyTakeaways;
 
@@ -255,10 +255,10 @@ function ModuleDetailAccordion({
     .map((submodule) => ({
       ...submodule,
       highlights:
-        modulePosition === 1
+        modulePosition === 2
           ? submodule.highlights.filter(
               (highlight) =>
-                firstModuleVisibleLabels.has(
+                positioningModuleVisibleLabels.has(
                   normalizeSummaryLabel(highlight.label),
                 ),
             )
