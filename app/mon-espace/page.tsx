@@ -214,7 +214,7 @@ export default async function MonEspacePage() {
   const continueHref = getResumeHref(workspace.modules);
   const ctaHref = hasStartedModules ? continueHref : firstModuleHref;
   const workspaceTitle =
-    account.company_name?.trim() || workspace.project?.name || "Mon projet";
+    workspace.project?.name.trim() || account.company_name?.trim() || "Mon projet";
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
@@ -372,7 +372,7 @@ export default async function MonEspacePage() {
                   ) : null}
 
                   <div className="border-b border-[#f0e4d3] pb-6">
-                    <CompanyNameForm currentCompanyName={account.company_name} />
+                    <CompanyNameForm currentCompanyName={workspaceTitle} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
                         currentLogoUrl={workspace.project.logo_url}

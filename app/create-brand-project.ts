@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
+import { updateAccountCompanyName } from "@/lib/access-codes";
 import { createProjectForAccount, uploadProjectLogo } from "@/lib/training";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
@@ -57,6 +58,10 @@ export async function createBrandProject(
     }
 
     await createProjectForAccount(account.id, name, logoUrl);
+    await updateAccountCompanyName({
+      accountId: account.id,
+      companyName: name,
+    });
   } catch (error) {
     unstable_rethrow(error);
 
@@ -67,6 +72,7 @@ export async function createBrandProject(
   }
 
   revalidatePath("/mon-espace");
+  revalidatePath("/");
 
   return {
     status: "idle",
