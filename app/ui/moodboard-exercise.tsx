@@ -12,7 +12,7 @@ import {
   SwatchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { uploadExerciseImages } from "@/app/upload-exercise-images";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
@@ -133,6 +133,52 @@ async function compressMoodboardImage(file: File) {
 
 function clampPercent(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+function AutoFitKeyword({
+  children,
+  color,
+  fontSize,
+}: {
+  children: string;
+  color: string;
+  fontSize: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [fittedSize, setFittedSize] = useState(fontSize);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const fit = () => {
+      const availableWidth = Math.max(0, container.clientWidth - 32);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context || availableWidth === 0) return;
+
+      context.font = `900 ${fontSize}px Arial`;
+      const letterSpacing = fontSize * 0.18 * Math.max(children.length - 1, 0);
+      const naturalWidth = context.measureText(children.toUpperCase()).width + letterSpacing;
+      setFittedSize(Math.max(8, Math.min(fontSize, fontSize * (availableWidth / naturalWidth))));
+    };
+
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [children, fontSize]);
+
+  return (
+    <div ref={containerRef} className="flex h-full w-full items-center justify-center px-4 py-4">
+      <span
+        className="max-w-full whitespace-nowrap text-center font-black uppercase tracking-[0.18em]"
+        style={{ color, fontSize: `${fittedSize}px` }}
+      >
+        {children}
+      </span>
+    </div>
+  );
 }
 
 function MoodboardIconGraphic({ name }: { name: "spark" | "star" | "leaf" | "circle" | "wave" }) {
@@ -304,10 +350,22 @@ async function renderBoardToCanvas(input: {
       context.fillStyle = "rgba(255,255,255,0.92)";
       context.fillRect(0, 0, blockWidth, blockHeight);
       context.fillStyle = sanitizeHex(block.textColor, "#4B4550");
-      context.font = block.type === "text"
-        ? `italic 600 ${block.fontSize}px Georgia`
-        : `700 ${block.fontSize}px Arial`;
       const text = block.type === "text" ? block.text : block.keyword;
+
+      if (block.type === "keyword") {
+        context.font = `900 ${block.fontSize}px Arial`;
+        const availableWidth = Math.max(1, blockWidth - 72);
+        const naturalWidth = context.measureText(text.toUpperCase()).width;
+        const fittedSize = Math.max(12, Math.min(block.fontSize, block.fontSize * (availableWidth / naturalWidth)));
+        context.font = `900 ${fittedSize}px Arial`;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(text.toUpperCase(), blockWidth / 2, blockHeight / 2);
+        context.restore();
+        continue;
+      }
+
+      context.font = `italic 600 ${block.fontSize}px Georgia`;
       const words = text.split(/\s+/);
       let line = "";
       let lineY = 72;
@@ -1160,11 +1218,12 @@ export default function MoodboardExercise({
                       ) : null}
 
                       {block.type === "keyword" ? (
-                        <div className="flex h-full items-center justify-center px-4 py-4">
-                          <span className="text-center font-black uppercase tracking-[0.18em]" style={{ color: sanitizeHex(block.textColor, "#4B4550"), fontSize: `${block.fontSize}px` }}>
-                            {block.keyword}
-                          </span>
-                        </div>
+                        <AutoFitKeyword
+                          color={sanitizeHex(block.textColor, "#4B4550")}
+                          fontSize={block.fontSize}
+                        >
+                          {block.keyword}
+                        </AutoFitKeyword>
                       ) : null}
 
                       {block.type === "icon" ? (
@@ -1347,7 +1406,7 @@ export default function MoodboardExercise({
                     <div className="grid grid-cols-[1fr_5rem] gap-3 rounded-xl border border-[#eadfca] bg-[#fffdf7] p-3">
                       <label className="block space-y-2">
                         <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
-                          Taille <span>{selectedBlock.fontSize}px</span>
+                          Taille maximale <span>{selectedBlock.fontSize}px</span>
                         </span>
                         <input
                           type="range"
@@ -1368,6 +1427,9 @@ export default function MoodboardExercise({
                           className="h-9 w-full cursor-pointer rounded-lg border border-[#eadfca] bg-white p-1"
                         />
                       </label>
+                      <p className="col-span-2 text-[0.68rem] leading-4 text-[#7a7087]">
+                        Si le mot est trop long, sa taille s’adapte automatiquement pour rester entièrement visible.
+                      </p>
                     </div>
                   ) : null}
 
