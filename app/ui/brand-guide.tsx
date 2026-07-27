@@ -255,9 +255,6 @@ function CompletionBanner({
 }
 
 export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
-  const colors = [...guide.visualUniverse.palette.primary, ...guide.visualUniverse.palette.secondary].slice(0, 5);
-  const moodboardItems = guide.visualUniverse.moodboard.filter((item) => item.type === "image").slice(0, 2);
-
   return (
     <section className="overflow-hidden rounded-[1.6rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] shadow-[0_24px_60px_rgba(126,102,78,0.09)] print:rounded-none print:shadow-none">
       <div className="grid min-h-[32rem] gap-8 p-8 sm:p-12 lg:grid-cols-[1.1fr_0.9fr] lg:p-14">
@@ -280,39 +277,19 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
             </p>
           </div>
         </div>
-        <div className="grid min-h-[22rem] grid-cols-2 gap-3">
+        <div className="flex min-h-[22rem] items-center justify-center">
           {guide.brandAssets.logoUrl ? (
-            <div className="col-span-2 flex min-h-24 items-center justify-center rounded-[1rem] border border-white/70 bg-white px-8 py-5">
+            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-white/70 bg-white px-10 py-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={guide.brandAssets.logoUrl}
                 alt={`Logo ${guide.brandName}`}
-                className="max-h-24 max-w-full object-contain"
+                className="max-h-48 max-w-full object-contain"
               />
             </div>
-          ) : null}
-          {moodboardItems.map((item) =>
-            item.imageUrl ? (
-              <div key={item.id} className="overflow-hidden rounded-[1rem] border border-white/70 bg-white">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.imageUrl} alt={item.label} className="h-full min-h-44 w-full object-cover" />
-              </div>
-            ) : null,
-          )}
-          {colors.length > 0 ? (
-            colors.map((color) => (
-              <div
-                key={color.id}
-                className="rounded-[1rem] border border-white/70 p-4 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]"
-                style={{ background: color.css }}
-              >
-                <p className="text-sm font-black drop-shadow">{color.name}</p>
-                <p className="mt-1 text-xs font-semibold drop-shadow">{color.hex}</p>
-              </div>
-            ))
           ) : (
-            <div className="col-span-2 flex items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-white p-6 text-center text-sm font-semibold text-[#7b7068]">
-              Aperçu neutre. Palette à compléter dans le module Palette de couleurs.
+            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-white p-8 text-center text-sm font-semibold text-[#7b7068]">
+              Ajoute ton logo pour personnaliser la couverture.
             </div>
           )}
         </div>
