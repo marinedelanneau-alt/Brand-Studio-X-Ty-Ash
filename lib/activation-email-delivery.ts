@@ -8,16 +8,19 @@ import {
   type ActivationCodeRecord,
 } from "./activation-codes";
 import { sendAccountActivationEmail } from "./mailer";
+import { sendWithImmediateRetry } from "./activation-email-retry";
 
 export async function deliverActivationEmail(activation: ActivationCodeRecord) {
   if (activation.status === "email_sent" || activation.consumed_at) return false;
   const claimed = await claimActivationEmail(activation.id);
   if (!claimed) return false;
   try {
-    await sendAccountActivationEmail({
-      email: claimed.email,
-      clientName: claimed.email.split("@")[0],
-      activationToken: claimed.code,
+    await sendWithImmediateRetry(() => {
+      return sendAccountActivationEmail({
+        email: claimed.email,
+        clientName: claimed.email.split("@")[0],
+        activationToken: claimed.code,
+      });
     });
     await markActivationEmailSent(claimed.id);
     return true;

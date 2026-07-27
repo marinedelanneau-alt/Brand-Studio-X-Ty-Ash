@@ -10,6 +10,7 @@ import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function objectId(value: string | { id: string } | null | undefined) {
   if (!value) {
