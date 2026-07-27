@@ -170,10 +170,15 @@ function PalettePage({ data, number }: { data: BrandGuideData; number: string })
 
 function MoodboardItem({ item }: { item: GuideMoodboardItem }) {
   const style = { left: `${item.x}%`, top: `${item.y}%`, width: `${item.width}%`, height: `${item.height}%`, transform: `rotate(${item.rotation}deg)`, backgroundColor: item.type === "color" ? item.color : BRAND.white };
+  const availableTextWidth = Math.max(12, (item.width / 100) * 491.28 - 20);
+  const requestedFontSize = item.fontSize || 10;
+  const fittedFontSize = item.type === "keyword"
+    ? Math.max(6, Math.min(requestedFontSize, availableTextWidth / Math.max(item.label.length * 0.72, 1)))
+    : Math.min(requestedFontSize, 22);
   return <View style={[S.moodItem, style]}>{item.imageUrl && (item.type === "image" || item.type === "icon") ? (
     // eslint-disable-next-line jsx-a11y/alt-text -- React PDF Image has no alt prop.
-    <Image src={item.imageUrl} style={[S.moodImage, { objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }]}/>
-  ) : <View style={S.moodText}><Text style={[S.moodLabel, { color: item.type === "color" ? BRAND.white : item.textColor || BRAND.ink, fontSize: Math.min(item.fontSize || 10, 22) }]}>{item.label}</Text></View>}</View>;
+    <Image src={item.imageUrl} style={[S.moodImage, { objectFit: item.type === "icon" ? "contain" : "cover", objectPosition: `${item.cropX ?? 50}% ${item.cropY ?? 50}%` }]}/>
+  ) : <View style={S.moodText}><Text style={[S.moodLabel, { color: item.type === "color" ? BRAND.white : item.textColor || BRAND.ink, fontSize: fittedFontSize }]}>{item.label}</Text></View>}</View>;
 }
 
 function MoodboardPage({ data, number }: { data: BrandGuideData; number: string }) {

@@ -123,11 +123,6 @@ export function mapValueAnswers(values: string[]): BrandValueData[] {
     .map((name) => ({ name }));
 }
 
-function isGenericMoodboardLabel(value: string) {
-  const label = normalized(value);
-  return !label || label === "couleur" || /^inspiration\s+\d+$/.test(label) || label === "mot-cle" || label === "pictogramme";
-}
-
 export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
   const values = mapValueAnswers(guide.dna.values);
   const foundations = fields([
@@ -157,14 +152,9 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
   const palette = [...guide.visualUniverse.palette.primary, ...guide.visualUniverse.palette.secondary]
     .filter((color) => isPdfContent(color.name) && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
   const ambiance = isPdfContent(guide.visualUniverse.ambiance) ? compact(guide.visualUniverse.ambiance) : "";
-  const moodboard = guide.visualUniverse.moodboard
-    .filter((item) => {
-      if (item.type === "image") return Boolean(item.imageUrl);
-      if (item.type === "color") return Boolean(item.color && /^#[0-9A-Fa-f]{6}$/.test(item.color) && !isGenericMoodboardLabel(item.label));
-      if (item.type === "icon") return Boolean(item.imageUrl) || !isGenericMoodboardLabel(item.label);
-      return hasMeaningfulContent(item.label) && !isGenericMoodboardLabel(item.label);
-    })
-    .map((item) => isGenericMoodboardLabel(item.label) ? { ...item, label: "" } : item);
+  const moodboard = guide.visualUniverse.moodboard.filter(
+    (item) => item.type !== "image" || Boolean(item.imageUrl),
+  );
 
   const definitions: Array<Omit<BrandGuideChapter, "number" | "page">> = [
     { id: "foundations", title: "Fondations", fields: foundations },

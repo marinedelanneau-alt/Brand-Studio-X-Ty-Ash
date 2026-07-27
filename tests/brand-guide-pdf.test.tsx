@@ -116,12 +116,12 @@ describe("editorial brand guide PDF", () => {
     ]);
   });
 
-  it("rejects generic moodboard blocks and meaningless content", () => {
+  it("preserves every moodboard block created in the exercise", () => {
     const guide = makeGuide();
     guide.visualUniverse.moodboard = [
       { id: "generic", type: "color", color: "#CF7430", label: "Couleur", description: "", x: 0, y: 0, width: 20, height: 20, rotation: 0, zIndex: 1 },
     ];
-    expect(createBrandGuideData(guide).moodboard).toEqual([]);
+    expect(createBrandGuideData(guide).moodboard).toEqual(guide.visualUniverse.moodboard);
     expect(hasMeaningfulContent("Inspiration 1")).toBe(false);
   });
 

@@ -281,6 +281,16 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
           </div>
         </div>
         <div className="grid min-h-[22rem] grid-cols-2 gap-3">
+          {guide.brandAssets.logoUrl ? (
+            <div className="col-span-2 flex min-h-24 items-center justify-center rounded-[1rem] border border-white/70 bg-white px-8 py-5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={guide.brandAssets.logoUrl}
+                alt={`Logo ${guide.brandName}`}
+                className="max-h-24 max-w-full object-contain"
+              />
+            </div>
+          ) : null}
           {moodboardItems.map((item) =>
             item.imageUrl ? (
               <div key={item.id} className="overflow-hidden rounded-[1rem] border border-white/70 bg-white">
