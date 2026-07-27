@@ -70,7 +70,7 @@ export async function uploadExerciseImages(
     if (files.length === 0) {
       return {
         status: "error",
-        message: "Ajoutez au moins une image.",
+        message: "Ajoute au moins une image.",
       };
     }
 

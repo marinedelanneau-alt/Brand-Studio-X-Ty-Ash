@@ -262,7 +262,7 @@ function createEmptySubmodule(position: number): EditorSubmodule {
     videoUrl: "",
     audioUrl: "",
     audioTranscript: "",
-    contentHtml: "<p>Ajoutez ici le contenu du sous-module.</p>",
+    contentHtml: "<p>Ajoute ici le contenu du sous-module.</p>",
     exerciseGroups: [createEmptyExerciseGroup()],
   };
 }
@@ -1009,8 +1009,8 @@ function QuestionCard({
                 onChange={(contentHtml) => onChange((current) => ({ ...current, question: contentHtml }))}
                 placeholder={
                   question.type === "popup_message"
-                    ? "Ajoutez ici la citation ou le message inspirant."
-                    : "Ajoutez ici le texte d'introduction ou d'explication."
+                    ? "Ajoute ici la citation ou le message inspirant."
+                    : "Ajoute ici le texte d'introduction ou d'explication."
                 }
               />
             ) : (
@@ -1099,7 +1099,7 @@ function QuestionCard({
                     onChange={(contentHtml) =>
                       onChange((current) => ({ ...current, explanation: contentHtml }))
                     }
-                    placeholder="Ajoutez ici une description pédagogique, une astuce, un exemple ou un point d'attention."
+                    placeholder="Ajoute ici une description pédagogique, une astuce, un exemple ou un point d'attention."
                   />
                 )}
               </label>
@@ -2096,7 +2096,7 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        placeholder="Ajoutez ici le contenu du sous-module."
+                        placeholder="Ajoute ici le contenu du sous-module."
                       />
                     </div>
 

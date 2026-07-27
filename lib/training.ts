@@ -2366,7 +2366,7 @@ export async function saveModuleDefinition(input: {
   const moduleAudioUrl = firstSubmodule?.audioUrl?.trim() || null;
   const moduleAudioTranscript = firstSubmodule?.audioTranscript?.trim() || null;
   const moduleContentHtml = appendAudioMetadataToHtml(
-    firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
+    firstSubmodule?.contentHtml ?? "<p>Ajoute ici le contenu du sous-module.</p>",
     moduleAudioUrl ?? "",
     moduleAudioTranscript ?? "",
   );
