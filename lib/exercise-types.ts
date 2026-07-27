@@ -19,6 +19,7 @@ import {
   isEditorialCalendarOptions,
 } from "@/lib/editorial-calendar";
 import { isSmartFeedbackOption } from "@/lib/smart-feedback";
+import { getSerializedTypographyOptions, isTypographyOptions, TYPOGRAPHY_CONFIG_PREFIX } from "@/lib/typography";
 
 export type ExerciseType =
   | "static_text"
@@ -37,6 +38,7 @@ export type ExerciseType =
   | "brand_persona"
   | "spectrum"
   | "color_palette"
+  | "typography"
   | "editorial_calendar"
   | "moodboard";
 
@@ -82,6 +84,7 @@ export const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
   brand_persona: "Persona de marque",
   spectrum: "Curseur spectrum",
   color_palette: "Palette de couleurs",
+  typography: "Typographies",
   editorial_calendar: "Calendrier éditorial",
   moodboard: "Moodboard",
 };
@@ -156,6 +159,7 @@ export function exerciseNeedsOptions(type: ExerciseType) {
     type !== "brand_persona" &&
     type !== "spectrum" &&
     type !== "color_palette"
+    && type !== "typography"
   );
 }
 
@@ -225,6 +229,7 @@ export function normalizeExerciseOptions(type: ExerciseType, rawOptions: string[
   if (type === "color_palette") {
     return getSerializedColorPaletteOptions(getDefaultColorPaletteConfig());
   }
+  if (type === "typography") return getSerializedTypographyOptions();
 
   if (type === "group_open") {
     return getSerializedGroupOpenOptions(cleanedOptions, getDefaultGroupOpenConfig());
@@ -293,6 +298,7 @@ export function getPersistedExerciseType(type: ExerciseType) {
   if (type === "color_palette") {
     return "multiple";
   }
+  if (type === "typography") return "multiple";
 
   return type;
 }
@@ -361,6 +367,7 @@ export function resolveExerciseType(
   if (type === "multiple" && isColorPaletteOptions(options)) {
     return "color_palette";
   }
+  if (type === "multiple" && isTypographyOptions(options)) return "typography";
 
   return type;
 }
@@ -435,6 +442,7 @@ export function resolveStoredExerciseOptions(type: ExerciseType, rawOptions: str
   if (type === "color_palette") {
     return sanitizedOptions.filter((option) => isColorPaletteOptions([option]));
   }
+  if (type === "typography") return sanitizedOptions.filter((option) => option.startsWith(TYPOGRAPHY_CONFIG_PREFIX));
 
   return sanitizedOptions;
 }
@@ -695,6 +703,7 @@ export function getEditorOptionsText(type: ExerciseType, rawOptions: string[]) {
   if (type === "color_palette") {
     return "";
   }
+  if (type === "typography") return "";
 
   return resolveStoredExerciseOptions(type, rawOptions).join("\n");
 }

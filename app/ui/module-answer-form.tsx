@@ -38,6 +38,8 @@ import SpectrumExercise from "./spectrum-exercise";
 import SmartFeedback from "./smart-feedback";
 import { isSmartFeedbackOption } from "@/lib/smart-feedback";
 import ColorPaletteExercise from "./color-palette-exercise";
+import TypographyExercise from "./typography-exercise";
+import { isTypographyComplete, parseStoredTypographyAnswer } from "@/lib/typography";
 import MoodboardExercise from "./moodboard-exercise";
 import EditorialCalendarExercise from "./editorial-calendar-exercise";
 import PedagogicalContent from "./pedagogical-content";
@@ -1211,6 +1213,9 @@ function isExerciseAnswered(
       parseStoredColorPaletteConfig(exercise.options),
     );
   }
+  if (exercise.type === "typography") {
+    return isTypographyComplete(parseStoredTypographyAnswer(normalizedValues));
+  }
 
   if (exercise.type === "image_upload") {
     return getImageUploadValues(normalizedValues).length > 0;
@@ -2048,6 +2053,7 @@ export default function ModuleAnswerForm({
             currentExercise.type !== "fill_blank" &&
             currentExercise.type !== "brand_persona" &&
             currentExercise.type !== "color_palette" &&
+            currentExercise.type !== "typography" &&
             currentQuestionPrompts.length === 0 &&
             !isMultiQuestionExerciseGroup &&
             cleanStoredExerciseQuestionText(currentExercise.question).length > 0 ? (
@@ -2067,6 +2073,7 @@ export default function ModuleAnswerForm({
             !isPassiveContentType(currentExercise.type) &&
             currentExercise.type !== "brand_persona" &&
             currentExercise.type !== "color_palette" &&
+            currentExercise.type !== "typography" &&
             currentQuestionPrompts.length === 0 &&
             !isMultiQuestionExerciseGroup ? (
               <PedagogicalContent
@@ -2190,6 +2197,17 @@ export default function ModuleAnswerForm({
                     ...current,
                     [currentExercise.id]: nextValues,
                   }))
+                }
+              />
+            ) : null}
+
+            {currentExercise.type === "typography" ? (
+              <TypographyExercise
+                key={currentExercise.id}
+                exercise={currentExercise}
+                answers={answers[currentExercise.id] ?? []}
+                onChange={(nextValues) =>
+                  setAnswers((current) => ({ ...current, [currentExercise.id]: nextValues }))
                 }
               />
             ) : null}

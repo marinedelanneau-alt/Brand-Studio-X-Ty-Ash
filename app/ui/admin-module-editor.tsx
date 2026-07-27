@@ -231,6 +231,8 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
         ? "Ou se situe ta marque entre sobriete et expression ?"
         : type === "color_palette"
           ? "Construis la palette de couleurs de ta marque"
+        : type === "typography"
+          ? "Choisis les typographies de ta marque"
           : type === "editorial_calendar"
             ? "Construis ton calendrier éditorial"
           : type === "moodboard"
@@ -351,6 +353,7 @@ function getQuestionLabel(type: ExerciseType) {
   if (type === "brand_persona") return "Titre de l'exercice";
   if (type === "spectrum") return "Question du spectrum";
   if (type === "color_palette") return "Titre de l'exercice";
+  if (type === "typography") return "Titre de l'exercice";
   return "Question";
 }
 
@@ -367,6 +370,7 @@ function getQuestionHint(type: ExerciseType) {
   if (type === "brand_persona") return "Configure ici les sections et questions du persona de marque, avec leur ordre, leur type et leurs exemples.";
   if (type === "spectrum") return "Configure un axe entre deux polarites, avec emojis, justification et effets subtils aux extremes.";
   if (type === "color_palette") return "Configure un exercice de palette avec couleurs principales, secondaires, picker visuel, HEX, pipette et éventuels dégradés.";
+  if (type === "typography") return "L’utilisateur choisit une police pour les titres, les sous-titres et le texte, ou importe ses propres fichiers.";
   return "";
 }
 
@@ -383,7 +387,7 @@ function supportsExplanationField(type: ExerciseType) {
 }
 
 function supportsPlaceholderField(type: ExerciseType) {
-  return !isPassiveContentType(type) && type !== "table" && type !== "image_upload" && type !== "editorial_calendar" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette";
+  return !isPassiveContentType(type) && type !== "table" && type !== "image_upload" && type !== "editorial_calendar" && type !== "moodboard" && type !== "brand_persona" && type !== "spectrum" && type !== "color_palette" && type !== "typography";
 }
 
 function supportsSmartFeedbackField(type: ExerciseType) {
@@ -395,6 +399,7 @@ function supportsSmartFeedbackField(type: ExerciseType) {
     type !== "brand_persona" &&
     type !== "spectrum" &&
     type !== "color_palette"
+    && type !== "typography"
   );
 }
 

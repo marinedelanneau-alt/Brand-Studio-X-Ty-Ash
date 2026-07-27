@@ -30,6 +30,7 @@ const STRUCTURED_VALUE_EXERCISE_TYPES = new Set<ExerciseType>([
   "brand_persona",
   "spectrum",
   "color_palette",
+  "typography",
   "editorial_calendar",
   "moodboard",
 ]);

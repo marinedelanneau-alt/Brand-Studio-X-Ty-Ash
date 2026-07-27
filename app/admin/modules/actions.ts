@@ -111,6 +111,7 @@ function parseQuestion(rawQuestion: unknown) {
       type !== "brand_persona" &&
       type !== "spectrum" &&
       type !== "color_palette"
+      && type !== "typography"
     ) {
       return null;
     }
@@ -140,7 +141,8 @@ function parseQuestion(rawQuestion: unknown) {
         type !== "group_open" &&
         type !== "brand_persona" &&
         type !== "spectrum" &&
-        type !== "color_palette"
+          type !== "color_palette"
+          && type !== "typography"
       ) {
         return null;
       }

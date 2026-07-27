@@ -51,6 +51,7 @@ import {
   parseStoredColorPaletteConfig,
 } from "@/lib/color-palette";
 import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
+import { isTypographyComplete, parseStoredTypographyAnswer } from "@/lib/typography";
 import { isMissingDatabaseObject } from "@/lib/database-errors";
 import {
   getSerializedSmartFeedbackOption,
@@ -485,6 +486,9 @@ function getModuleProgress(
         parseStoredColorPaletteAnswer(answerMap[exercise.id] ?? []),
         parseStoredColorPaletteConfig(exercise.options),
       );
+    }
+    if (exercise.type === "typography") {
+      return isTypographyComplete(parseStoredTypographyAnswer(answerMap[exercise.id] ?? []));
     }
 
     if (exercise.type === "editorial_calendar") {
@@ -1234,6 +1238,23 @@ async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftMod
   return snapshot.modules;
 }
 
+export async function uploadProjectExerciseFont(input: {
+  projectId: number;
+  exerciseId: number;
+  file: File;
+}) {
+  const supabase = createSupabaseServerClient();
+  const extension = input.file.name.split(".").pop()?.toLowerCase() || "woff2";
+  const filePath = `exercise-fonts/${input.projectId}/${input.exerciseId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage.from("project-assets").upload(
+    filePath,
+    await input.file.arrayBuffer(),
+    { contentType: input.file.type || "application/octet-stream", upsert: false },
+  );
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("project-assets").getPublicUrl(filePath).data.publicUrl;
+}
+
 export async function updateProjectNameForAccount(input: {
   accountId: number;
   name: string;
@@ -1271,7 +1292,6 @@ async function restoreMissingPublishedModulesInDraft(
       if (titleKey) seenTitles.add(titleKey);
       return true;
     }
-
     return false;
   });
   const draftModuleIds = new Set(
