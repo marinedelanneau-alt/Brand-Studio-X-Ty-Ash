@@ -1,5 +1,6 @@
 import type { GeneratedBrandGuide, GuideColor, GuideMoodboardItem } from "@/lib/brand-guide";
 import { calculatePageDensity } from "./brand-guide-editorial-layout";
+import { sanitizeMoodboardItems } from "./brand-guide-layout";
 
 export type PdfField = { label: string; value: string };
 
@@ -94,7 +95,15 @@ function cleanList(values: string[]) {
 }
 
 export function mapValueAnswers(values: string[]): BrandValueData[] {
-  const source = values.join(" · ");
+  const result = values.flatMap((source) => parseValueAnswer(source));
+  if (result.length > 0) return result.slice(0, 6);
+  return cleanList(values)
+    .filter((value) => !value.includes(":"))
+    .slice(0, 6)
+    .map((name) => ({ name }));
+}
+
+function parseValueAnswer(source: string): BrandValueData[] {
   const labels = "Valeur|Cela signifie que je|Ce que cette valeur signifie|Dans la pratique|Concrètement|Dans ma communication|Dans la communication";
   const matches = [...source.matchAll(new RegExp(`(?:^|\\s*·\\s*)(?:\\d+\\s*·\\s*)?(${labels})\\s*:\\s*(.*?)(?=\\s*·\\s*(?:\\d+\\s*·\\s*)?(?:${labels})\\s*:|$)`, "gi"))];
   const result: BrandValueData[] = [];
@@ -116,12 +125,10 @@ export function mapValueAnswers(values: string[]): BrandValueData[] {
     }
   }
 
-  if (result.length > 0) return result.slice(0, 6);
-  return cleanList(values)
-    .filter((value) => !value.includes(":"))
-    .slice(0, 6)
-    .map((name) => ({ name }));
+  return result;
 }
+
+export const normalizeBrandValues = mapValueAnswers;
 
 export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
   const values = mapValueAnswers(guide.dna.values);
@@ -152,9 +159,7 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
   const palette = [...guide.visualUniverse.palette.primary, ...guide.visualUniverse.palette.secondary]
     .filter((color) => isPdfContent(color.name) && /^#[0-9A-Fa-f]{6}$/.test(color.hex));
   const ambiance = isPdfContent(guide.visualUniverse.ambiance) ? compact(guide.visualUniverse.ambiance) : "";
-  const moodboard = guide.visualUniverse.moodboard.filter(
-    (item) => item.type !== "image" || Boolean(item.imageUrl),
-  );
+  const moodboard = sanitizeMoodboardItems(guide.visualUniverse.moodboard);
 
   const definitions: Array<Omit<BrandGuideChapter, "number" | "page">> = [
     { id: "foundations", title: "Fondations", fields: foundations },

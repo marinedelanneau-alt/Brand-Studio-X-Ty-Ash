@@ -3,6 +3,7 @@ import path from "node:path";
 import type { GeneratedBrandGuide, GuideMoodboardItem } from "./brand-guide";
 import { createBrandGuideData, validateBrandGuideData, type BrandGuideData, type BrandValueData } from "./brand-guide-pdf-data";
 import { composeEditorialPages, type EditorialComposition, type EditorialPagePlan } from "./brand-guide-editorial-composer";
+import { fitTextToBox, getPositioningLayout, selectApplicationMessage, validateGeneratedGuide } from "./brand-guide-layout";
 import {
   buildBrandVisualIdentity,
   createBrandGuideTheme,
@@ -100,7 +101,7 @@ function PageFooter({ context, plan, light = false }: { context: RenderContext; 
   return (
     <View fixed style={styles.footer}>
       <Text style={[styles.tiny, { color }]}>Brand Studio · Guide de marque</Text>
-      <Text style={[styles.tiny, { color }]}>{String(plan.page).padStart(2, "0")}</Text>
+      <Text style={[styles.tiny, { color }]}>{String(plan.pageNumber).padStart(2, "0")}</Text>
     </View>
   );
 }
@@ -214,33 +215,33 @@ function ManifestoPage({ context, plan }: { context: RenderContext; plan: Editor
   );
 }
 
-function ValueStory({ context, value, index }: { context: RenderContext; value: BrandValueData; index: number }) {
+function ValueStory({ context, value, index, featured }: { context: RenderContext; value: BrandValueData; index: number; featured: boolean }) {
   const { styles, theme } = context;
   return (
-    <View style={{ width: index === 0 ? "100%" : "48%", marginBottom: 34, paddingTop: 14, borderTop: `${index === 0 ? theme.layout.lineWidth : 1} solid ${theme.colors.accent}` }}>
+    <View wrap={false} style={{ width: featured ? "100%" : "48%", marginBottom: 34, paddingTop: 14, borderTop: `${featured ? theme.layout.lineWidth : 1} solid ${theme.colors.accent}` }}>
       <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-        <Text style={{ fontFamily: theme.typography.displayFont, fontSize: index === 0 ? 62 : 34, color: generateTint(theme.colors.primary, 40), marginRight: 14 }}>{String(index + 1).padStart(2, "0")}</Text>
-        <Text style={[styles.h2, { fontSize: index === 0 ? 27 : 20 }]}>{value.name}</Text>
+        <Text style={{ fontFamily: theme.typography.displayFont, fontSize: featured ? 62 : 34, color: generateTint(theme.colors.primary, 40), marginRight: 14 }}>{String(index + 1).padStart(2, "0")}</Text>
+        <Text style={[styles.h2, { fontSize: featured ? 27 : 20 }]}>{value.name}</Text>
       </View>
-      {value.meaning ? <Text style={[styles.body, { fontSize: index === 0 ? 14 : 10.5, marginTop: 10, maxWidth: index === 0 ? 400 : undefined }]}>{value.meaning}</Text> : null}
-      <View style={{ flexDirection: index === 0 ? "row" : "column", gap: 18, marginTop: 18 }}>
-        {value.concreteApplication ? <View style={{ flexGrow: 1 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans les faits</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.concreteApplication}</Text></View> : null}
-        {value.communicationExpression ? <View style={{ flexGrow: 1 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la communication</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.communicationExpression}</Text></View> : null}
+      {value.meaning ? <Text style={[styles.body, { fontSize: featured ? 14 : 10.5, marginTop: 10, maxWidth: featured ? 400 : undefined }]}>{value.meaning}</Text> : null}
+      <View style={{ flexDirection: featured ? "row" : "column", gap: 18, marginTop: 18 }}>
+        {value.concreteApplication ? <View style={featured ? { width: "47%" } : { width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la pratique</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.concreteApplication}</Text></View> : null}
+        {value.communicationExpression ? <View style={featured ? { width: "47%" } : { width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la communication</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.communicationExpression}</Text></View> : null}
       </View>
     </View>
   );
 }
 
 function ValuesPage({ context, plan, occurrence }: { context: RenderContext; plan: EditorialPagePlan; occurrence: number }) {
-  const values = context.data.values.length > 4
-    ? occurrence === 0 ? context.data.values.slice(0, 3) : context.data.values.slice(3)
-    : context.data.values;
+  const longValues = context.data.values.some((value) => [value.meaning, value.concreteApplication, value.communicationExpression].join("").length > 280);
+  const batchSize = longValues ? 1 : 3;
+  const values = context.data.values.slice(occurrence * batchSize, occurrence * batchSize + batchSize);
   return (
     <Page size="A4" style={context.styles.page}>
       <ChapterMarker context={context} plan={plan} />
       <Text style={[context.styles.h1, { marginBottom: 42 }]}>Des principes qui deviennent des gestes.</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-        {values.map((value, index) => <ValueStory key={value.name} context={context} value={value} index={index + occurrence * 3} />)}
+        {values.map((value, index) => <ValueStory key={value.name} context={context} value={value} index={index + occurrence * batchSize} featured={index === 0} />)}
       </View>
       <PageFooter context={context} plan={plan} />
     </Page>
@@ -251,17 +252,19 @@ function PositioningPage({ context, plan }: { context: RenderContext; plan: Edit
   const { data, styles, theme } = context;
   const statement = data.positioning.find((item) => item.label.includes("final")) || data.positioning.at(-1);
   const contextField = data.positioning.find((item) => item !== statement);
+  const layout = getPositioningLayout(statement?.value || "", contextField?.value || "");
+  const statementFit = fitTextToBox({ text: statement?.value || "", width: layout.columns ? 390 : 282, height: layout.columns ? 285 : 500, minFontSize: 20, maxFontSize: layout.statementFontSize, lineHeight: 1.18 });
   return (
     <Page size="A4" style={styles.page}>
       <ChapterMarker context={context} plan={plan} />
-      <View style={{ flexDirection: "row", minHeight: 610 }}>
-        <View style={{ width: "36%", paddingRight: 28, justifyContent: "space-between" }}>
+      <View wrap={false} style={{ flexDirection: layout.columns ? "column" : "row", minHeight: 610 }}>
+        <View style={{ width: layout.columns ? "100%" : "36%", paddingRight: layout.columns ? 0 : 28, marginBottom: layout.columns ? 24 : 0, justifyContent: "space-between" }}>
           <Text style={styles.h1}>La place que la marque choisit d’occuper.</Text>
-          {contextField ? <View><Text style={[styles.label, { color: theme.colors.mutedText }]}>{contextField.label}</Text><Text style={[styles.body, { marginTop: 10 }]}>{contextField.value}</Text></View> : null}
+          {contextField ? <View style={{ marginTop: layout.columns ? 18 : 0 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>{contextField.label}</Text><Text style={[styles.body, { marginTop: 10, fontSize: layout.contextFontSize }]}>{contextField.value}</Text></View> : null}
         </View>
-        <View style={{ width: "64%", backgroundColor: theme.colors.primary, padding: 32, justifyContent: "center" }}>
+        <View wrap={false} style={{ width: layout.columns ? "100%" : "64%", minHeight: layout.columns ? 285 : 610, backgroundColor: theme.colors.primary, padding: 32, justifyContent: "center" }}>
           <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.primary), marginBottom: 28 }]}>Positionnement</Text>
-          <Text style={[styles.quote, { color: getAccessibleTextColor(theme.colors.primary) }]}>{statement?.value}</Text>
+          <Text style={[styles.quote, { fontSize: statementFit.fontSize, color: getAccessibleTextColor(theme.colors.primary) }]}>{statement?.value}</Text>
         </View>
       </View>
       <PageFooter context={context} plan={plan} />
@@ -333,6 +336,8 @@ function VisualSystemPage({ context, plan }: { context: RenderContext; plan: Edi
           <View key={color.id} style={{ width: `${index === 0 ? Math.max(30, 100 / total) : 100 / total}%`, backgroundColor: color.hex, padding: 10, justifyContent: "flex-end" }}>
             <Text style={[styles.label, { color: getAccessibleTextColor(color.hex) }]}>{color.name}</Text>
             <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 4 }]}>{color.hex}</Text>
+            <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 4 }]}>{color.usage}</Text>
+            <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 3 }]}>{index === 0 ? "45 % du système" : `${Math.round(55 / Math.max(colors.length - 1, 1))} % du système`}</Text>
           </View>
         ))}
       </View>
@@ -365,10 +370,19 @@ function MoodboardElement({ item, theme }: { item: GuideMoodboardItem; theme: Br
       </View>
     );
   }
+  if (item.type === "color") {
+    const color = item.color || theme.colors.primary;
+    return (
+      <View style={[style, { justifyContent: "flex-end", padding: 10 }]}>
+        <Text style={{ fontSize: 8, fontWeight: 600, color: getAccessibleTextColor(color) }}>{item.label === "Couleur" ? "Teinte du moodboard" : item.label}</Text>
+        <Text style={{ fontSize: 7, marginTop: 4, color: getAccessibleTextColor(color) }}>{color.toUpperCase()}</Text>
+      </View>
+    );
+  }
   const available = Math.max(20, item.width * 4.55 - 16);
   const requested = item.fontSize || 12;
   const fitted = item.type === "keyword" ? Math.max(6, Math.min(requested, available / Math.max(item.label.length * 0.62, 1))) : Math.min(requested, 24);
-  return <View style={[style, { justifyContent: "center", alignItems: "center", padding: 8 }]}><Text style={{ fontFamily: item.type === "text" ? theme.typography.displayFont : theme.typography.bodyFont, fontSize: fitted, fontWeight: item.type === "keyword" ? 600 : 400, textAlign: "center", color: item.type === "color" ? getAccessibleTextColor(item.color || theme.colors.primary) : item.textColor || theme.colors.text }}>{item.label}</Text></View>;
+  return <View style={[style, { justifyContent: "center", alignItems: "center", padding: 8 }]}><Text style={{ fontFamily: item.type === "text" ? theme.typography.displayFont : theme.typography.bodyFont, fontSize: fitted, fontWeight: item.type === "keyword" ? 600 : 400, textAlign: "center", color: item.textColor || theme.colors.text }}>{item.label}</Text></View>;
 }
 
 function MoodboardPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
@@ -386,21 +400,27 @@ function MoodboardPage({ context, plan }: { context: RenderContext; plan: Editor
 
 function ApplicationsPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
   const { data, styles, theme, identity } = context;
-  const promise = data.messages[0]?.value || data.summary[0]?.value || "";
+  const promise = selectApplicationMessage(data);
+  const messageFit = fitTextToBox({ text: promise, width: 240, height: 210, minFontSize: 20, maxFontSize: 38, lineHeight: 1.08 });
   const word = identity.visualKeywords[0] || identity.personalityTraits[0] || data.brandName;
   return (
     <Page size="A4" style={styles.page}>
       <ChapterMarker context={context} plan={plan} />
       <Text style={[styles.h1, { maxWidth: 390 }]}>Le système en mouvement.</Text>
-      <View style={{ marginTop: 42, flexDirection: "row", height: 470 }}>
+      <View wrap={false} style={{ marginTop: 42, flexDirection: "row", height: 470 }}>
         <View style={{ width: "58%", backgroundColor: theme.colors.primary, padding: 30, justifyContent: "space-between" }}>
           <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.primary) }]}>{data.brandName}</Text>
-          <Text style={[styles.display, { fontSize: 42, color: getAccessibleTextColor(theme.colors.primary) }]}>{promise}</Text>
-          <Text style={[styles.small, { color: getAccessibleTextColor(theme.colors.primary) }]}>Exemple de prise de parole</Text>
+          <Text style={[styles.display, { fontSize: messageFit.fontSize, color: getAccessibleTextColor(theme.colors.primary) }]}>{promise}</Text>
+          <Text style={[styles.small, { color: getAccessibleTextColor(theme.colors.primary) }]}>Publication sociale · principe de composition</Text>
         </View>
         <View style={{ width: "42%" }}>
           <View style={{ flexGrow: 1, backgroundColor: theme.colors.secondary, padding: 20, justifyContent: "center" }}><Text style={[styles.h2, { color: getAccessibleTextColor(theme.colors.secondary), fontSize: 28 }]}>{word}</Text></View>
-          <View style={{ flexGrow: 1, backgroundColor: theme.colors.surface, padding: 20, justifyContent: "space-between" }}><Text style={styles.label}>Signature</Text><Text style={styles.body}>{data.baseline || promise}</Text><View style={{ alignSelf: "flex-start", backgroundColor: theme.colors.accent, paddingVertical: 8, paddingHorizontal: 16 }}><Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.accent) }]}>Découvrir</Text></View></View>
+          <View style={{ flexGrow: 1, backgroundColor: theme.colors.surface, padding: 20, justifyContent: "space-between" }}>
+            <Text style={styles.label}>Signature</Text>
+            <BrandLockup context={context} size="small" />
+            {data.baseline ? <Text style={[styles.small, { fontSize: 7.5 }]}>{data.baseline}</Text> : null}
+            <Text style={[styles.label, { fontSize: 6.2, letterSpacing: 1.2, color: theme.colors.accent, borderTop: `1 solid ${theme.colors.accent}`, paddingTop: 8 }]}>EN SAVOIR PLUS</Text>
+          </View>
         </View>
       </View>
       <PageFooter context={context} plan={plan} />
@@ -494,6 +514,8 @@ export async function renderBrandGuidePdf(guide: GeneratedBrandGuide) {
   });
   const theme = createBrandGuideTheme(identity);
   const composition = composeEditorialPages({ data, identity, direction: theme.direction });
+  const composedValidation = validateGeneratedGuide(composition);
+  if (!composedValidation.valid) throw new Error(`Brand guide composition invalid: ${composedValidation.errors.join(", ")}`);
   const consistency = validateBrandGuideData(data);
   if (!consistency.valid) {
     if (process.env.NODE_ENV !== "production") throw new Error(`Brand guide identity conflict: ${consistency.conflicts.join(", ")}`);

@@ -5,6 +5,7 @@ import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-p
 import { composeEditorialPages } from "../lib/brand-guide-editorial-composer";
 import { buildBrandVisualIdentity, createBrandGuideTheme } from "../lib/brand-visual-identity";
 import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectCoverLayout, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
+import { fitTextToBox, getPositioningLayout, selectApplicationMessage, validateGeneratedGuide } from "../lib/brand-guide-layout";
 
 function makeGuide(): GeneratedBrandGuide {
   return {
@@ -118,12 +119,14 @@ describe("editorial brand guide PDF", () => {
     ]);
   });
 
-  it("preserves every moodboard block created in the exercise", () => {
+  it("preserves valid moodboard colors and rejects generic invalid colors", () => {
     const guide = makeGuide();
     guide.visualUniverse.moodboard = [
       { id: "generic", type: "color", color: "#CF7430", label: "Couleur", description: "", x: 0, y: 0, width: 20, height: 20, rotation: 0, zIndex: 1 },
     ];
     expect(createBrandGuideData(guide).moodboard).toEqual(guide.visualUniverse.moodboard);
+    guide.visualUniverse.moodboard[0].color = "";
+    expect(createBrandGuideData(guide).moodboard).toEqual([]);
     expect(hasMeaningfulContent("Inspiration 1")).toBe(false);
   });
 
@@ -147,5 +150,23 @@ describe("editorial brand guide PDF", () => {
     const theme = createBrandGuideTheme(identity);
     const plannedPageCount = composeEditorialPages({ data, identity, direction: theme.direction }).pages.length;
     expect(pageCount).toBe(plannedPageCount);
+  });
+
+  it("fits long positioning without creating an orphan page", () => {
+    const guide = makeGuide();
+    guide.positioning.context = "Un contexte détaillé ".repeat(28);
+    guide.positioning.finalPositioning = "Une marque experte qui transforme la complexité en direction claire sans perdre son authenticité ".repeat(4);
+    const data = createBrandGuideData(guide);
+    const identity = buildBrandVisualIdentity(guide);
+    const composition = composeEditorialPages({ data, identity, direction: createBrandGuideTheme(identity).direction });
+    expect(getPositioningLayout(guide.positioning.finalPositioning, guide.positioning.context).statementFontSize).toBeGreaterThanOrEqual(20);
+    expect(composition.pages.filter((page) => page.kind === "positioning")).toHaveLength(1);
+    expect(validateGeneratedGuide(composition).valid).toBe(true);
+  });
+
+  it("selects a short application message and reports text fit", () => {
+    const data = createBrandGuideData(makeGuide());
+    expect(selectApplicationMessage(data)).toBe(data.baseline);
+    expect(fitTextToBox({ text: data.baseline, width: 240, height: 100, minFontSize: 20, maxFontSize: 38, lineHeight: 1.1 }).fits).toBe(true);
   });
 });

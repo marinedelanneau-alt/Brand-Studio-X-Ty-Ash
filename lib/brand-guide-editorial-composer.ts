@@ -1,47 +1,39 @@
 import type { BrandGuideData } from "./brand-guide-pdf-data";
+import { getPositioningLayout, mergeOrphanContentIntoPreviousPage, shouldRenderMissionSpread, visibleFields } from "./brand-guide-layout";
 import type { BrandArtDirection, BrandVisualIdentity } from "./brand-visual-identity";
 
 export type EditorialPageKind =
-  | "cover"
-  | "contents"
-  | "foundations"
-  | "manifesto"
-  | "values"
-  | "positioning"
-  | "personality"
-  | "messages"
-  | "visual-system"
-  | "moodboard"
-  | "applications"
-  | "summary";
+  | "cover" | "contents" | "foundations" | "manifesto" | "values" | "positioning"
+  | "personality" | "messages" | "visual-system" | "moodboard" | "applications" | "summary";
 
 export type EditorialPagePlan = {
   id: string;
+  chapterId: string;
   kind: EditorialPageKind;
   chapter: string;
   number?: string;
   page: number;
+  pageNumber: number;
   variant: string;
   density: number;
+  contentScore: number;
+  visibleContentCount: number;
+};
+
+export type GuideNavigationEntry = {
+  id: string;
+  chapterNumber: string;
+  label: string;
+  firstPage: number;
 };
 
 export type EditorialComposition = {
   pages: EditorialPagePlan[];
   contents: Array<{ number: string; title: string; page: number; description: string }>;
+  tableOfContents: GuideNavigationEntry[];
+  guideNavigationModel: GuideNavigationEntry[];
+  totalPages: number;
 };
-
-function contentScore(values: string[]) {
-  const characters = values.reduce((sum, value) => sum + value.length, 0);
-  return Math.min(1, 0.18 + characters / 1_900);
-}
-
-function coverVariant(direction: BrandArtDirection, identity: BrandVisualIdentity) {
-  if (identity.moodboard.images.length >= 3 && direction === "creative-studio") return "collage";
-  if (identity.moodboard.images.length > 0 && ["bold", "graphic", "contemporary"].includes(direction)) return "image";
-  if (["luxury", "premium-editorial"].includes(direction)) return "minimal-premium";
-  if (identity.colors.length >= 3) return "chromatic";
-  return "typographic";
-}
 
 const descriptions: Record<string, string> = {
   foundations: "La raison d’être, la mission et la vision qui donnent sa direction à la marque.",
@@ -55,136 +47,88 @@ const descriptions: Record<string, string> = {
   summary: "Une affiche stratégique qui rassemble l’essentiel de la marque.",
 };
 
-export function composeEditorialPages(input: {
+function score(values: string[]) {
+  return Math.min(1, 0.18 + values.reduce((sum, value) => sum + value.length, 0) / 1_900);
+}
+
+function coverVariant(direction: BrandArtDirection, identity: BrandVisualIdentity) {
+  if (identity.moodboard.images.length >= 3 && direction === "creative-studio") return "collage";
+  if (identity.moodboard.images.length && ["bold", "graphic", "contemporary"].includes(direction)) return "image";
+  if (["luxury", "premium-editorial"].includes(direction)) return "minimal-premium";
+  if (identity.colors.length >= 3) return "chromatic";
+  return "typographic";
+}
+
+export function composeEditorialPages({ data, identity, direction }: {
   data: BrandGuideData;
   identity: BrandVisualIdentity;
   direction: BrandArtDirection;
 }): EditorialComposition {
-  const { data, identity, direction } = input;
-  const chapters: Array<Omit<EditorialPagePlan, "page" | "number"> & { tocId: string }> = [];
-  const foundationValues = data.foundations.map((item) => item.value);
-  if (foundationValues.length) {
-    chapters.push({
-      id: "foundations",
-      tocId: "foundations",
-      kind: "foundations",
-      chapter: "Fondations",
-      variant: foundationValues.join("").length > 900 ? "narrative-dense" : "statement-led",
-      density: contentScore(foundationValues),
-    });
-    const mission = data.foundations.find((item) => item.label === "Mission")?.value;
-    if (mission && mission.length < 280 && direction !== "contemporary") {
-      chapters.push({
-        id: "mission-opening",
-        tocId: "foundations",
-        kind: "manifesto",
-        chapter: "Mission",
-        variant: "single-statement",
-        density: 0.66,
-      });
-    }
-  }
-  if (data.values.length) {
-    const batches = data.values.length > 4
-      ? [data.values.slice(0, 3), data.values.slice(3)]
-      : [data.values];
-    batches.forEach((batch, index) => chapters.push({
-      id: `values-${index + 1}`,
-      tocId: "values",
-      kind: "values",
-      chapter: "Valeurs",
-      variant: index % 2 === 0 ? "editorial-sequences" : "numbered-stories",
-      density: contentScore(batch.flatMap((value) => [value.name, value.meaning || "", value.concreteApplication || "", value.communicationExpression || ""])),
-    }));
-  }
-  if (data.positioning.length) chapters.push({
-    id: "positioning",
-    tocId: "positioning",
-    kind: "positioning",
-    chapter: "Positionnement",
-    variant: direction === "bold" || direction === "graphic" ? "contrast-path" : "editorial-path",
-    density: contentScore(data.positioning.map((item) => item.value)),
-  });
-  if (data.personality.length || data.language.use.length || data.language.avoid.length) chapters.push({
-    id: "personality",
-    tocId: "personality",
-    kind: "personality",
-    chapter: "Personnalité",
-    variant: identity.moodboard.images.length ? "magazine-portrait" : "typographic-portrait",
-    density: contentScore([...data.personality.map((item) => item.value), ...data.language.use, ...data.language.avoid]),
-  });
-  if (data.messages.length) chapters.push({
-    id: "messages",
-    tocId: "messages",
-    kind: "messages",
-    chapter: "Messages",
-    variant: "message-architecture",
-    density: contentScore(data.messages.map((item) => item.value)),
-  });
-  if (data.palette.length || data.logoUrl || data.ambiance) chapters.push({
-    id: "visual-system",
-    tocId: "visual",
-    kind: "visual-system",
-    chapter: "Univers visuel",
-    variant: data.palette.length > 5 ? "chromatic-spectrum" : "chromatic-proportions",
-    density: Math.min(0.9, 0.45 + data.palette.length * 0.07),
-  });
-  if (data.moodboard.length) chapters.push({
-    id: "moodboard",
-    tocId: "moodboard",
-    kind: "moodboard",
-    chapter: "Moodboard",
-    variant: direction === "creative-studio" ? "free-collage" : direction === "premium-editorial" || direction === "luxury" ? "minimal-gallery" : identity.moodboard.images.length >= 2 ? "asymmetrical-story" : "editorial-grid",
-    density: 0.82,
-  });
-  if (data.messages.length || data.language.use.length) chapters.push({
-    id: "applications",
-    tocId: "applications",
-    kind: "applications",
-    chapter: "Applications",
-    variant: "graphic-specimens",
-    density: 0.72,
-  });
-  if (data.summary.length) chapters.push({
-    id: "summary",
-    tocId: "summary",
-    kind: "summary",
-    chapter: "Synthèse",
-    variant: "strategy-poster",
-    density: 0.8,
-  });
-
-  let nextChapter = 1;
-  const chapterNumbers = new Map<string, string>();
-  for (const chapter of chapters) {
-    if (!chapterNumbers.has(chapter.tocId)) {
-      chapterNumbers.set(chapter.tocId, String(nextChapter).padStart(2, "0"));
-      nextChapter += 1;
-    }
-  }
-  const planned = chapters.map((chapter, index) => ({
-    ...chapter,
-    page: index + 3,
-    number: chapterNumbers.get(chapter.tocId),
-  }));
-  const firstPages = new Map<string, EditorialPagePlan>();
-  planned.forEach((page) => {
-    const tocId = chapters.find((chapter) => chapter.id === page.id)?.tocId;
-    if (tocId && !firstPages.has(tocId)) firstPages.set(tocId, page);
-  });
-  const contents = [...firstPages.entries()].map(([id, page]) => ({
-    number: page.number || "",
-    title: page.chapter,
-    page: page.page,
-    description: descriptions[id] || "",
-  }));
-
-  return {
-    pages: [
-      { id: "cover", kind: "cover", chapter: "Couverture", page: 1, variant: coverVariant(direction, identity), density: 0.76 },
-      { id: "contents", kind: "contents", chapter: "Sommaire", page: 2, variant: "editorial-index", density: Math.min(0.88, 0.35 + contents.length * 0.06) },
-      ...planned,
-    ],
-    contents,
+  type Draft = Omit<EditorialPagePlan, "page" | "pageNumber" | "number">;
+  const drafts: Draft[] = [];
+  const add = (draft: Omit<Draft, "contentScore" | "visibleContentCount">, values: string[], count = values.filter(Boolean).length) => {
+    const contentScore = score(values);
+    drafts.push({ ...draft, density: contentScore, contentScore, visibleContentCount: count });
   };
+
+  const foundationValues = visibleFields(data.foundations).map((item) => item.value);
+  const foundationsVariant = foundationValues.join("").length > 900 ? "narrative-dense" : "statement-led";
+  if (foundationValues.length) {
+    add({ id: "foundations", chapterId: "foundations", kind: "foundations", chapter: "Fondations", variant: foundationsVariant, density: 0 }, foundationValues);
+    if (shouldRenderMissionSpread(data, foundationsVariant)) {
+      add({ id: "mission", chapterId: "foundations", kind: "manifesto", chapter: "Mission", variant: "single-statement", density: 0 }, [data.foundations.find((item) => item.label === "Mission")?.value || ""]);
+    }
+  }
+
+  if (data.values.length) {
+    const longValues = data.values.some((value) => [value.meaning, value.concreteApplication, value.communicationExpression].join("").length > 280);
+    const batchSize = longValues ? 1 : 3;
+    for (let offset = 0; offset < data.values.length; offset += batchSize) {
+      const batch = data.values.slice(offset, offset + batchSize);
+      add({ id: `values-${offset / batchSize + 1}`, chapterId: "values", kind: "values", chapter: "Valeurs", variant: longValues ? "vertical-stories" : "editorial-sequences", density: 0 },
+        batch.flatMap((value) => [value.name, value.meaning || "", value.concreteApplication || "", value.communicationExpression || ""]), batch.length);
+    }
+  }
+
+  if (data.positioning.length) {
+    const statement = data.positioning.find((item) => /final/i.test(item.label))?.value || data.positioning.at(-1)?.value || "";
+    const context = data.positioning.find((item) => !/final/i.test(item.label))?.value || "";
+    const layout = getPositioningLayout(statement, context);
+    add({ id: "positioning", chapterId: "positioning", kind: "positioning", chapter: "Positionnement", variant: layout.variant, density: 0 }, [statement, context], 2);
+  }
+  if (data.personality.length || data.language.use.length || data.language.avoid.length) {
+    add({ id: "personality", chapterId: "personality", kind: "personality", chapter: "Personnalité", variant: identity.moodboard.images.length ? "magazine-portrait" : "typographic-portrait", density: 0 },
+      [...data.personality.map((item) => item.value), ...data.language.use, ...data.language.avoid]);
+  }
+  if (data.messages.length) add({ id: "messages", chapterId: "messages", kind: "messages", chapter: "Messages", variant: "message-architecture", density: 0 }, data.messages.map((item) => item.value));
+  if (data.palette.length || data.logoUrl || data.ambiance) add({ id: "visual-system", chapterId: "visual", kind: "visual-system", chapter: "Univers visuel", variant: "complete-identity-system", density: 0 }, [data.ambiance, ...data.palette.flatMap((color) => [color.name, color.hex, color.usage])], data.palette.length + Number(Boolean(data.logoUrl)));
+  if (data.moodboard.length) add({ id: "moodboard", chapterId: "moodboard", kind: "moodboard", chapter: "Moodboard", variant: "original-composition", density: 0 }, data.moodboard.map((item) => item.label), data.moodboard.length);
+  if (data.messages.length || data.language.use.length) add({ id: "applications", chapterId: "applications", kind: "applications", chapter: "Applications", variant: "brand-specimens", density: 0 }, [data.baseline, ...data.messages.map((item) => item.value)], 3);
+  if (data.summary.length) add({ id: "summary", chapterId: "summary", kind: "summary", chapter: "Synthèse", variant: "strategy-poster", density: 0 }, data.summary.map((item) => item.value));
+
+  const usefulDrafts = mergeOrphanContentIntoPreviousPage(drafts);
+  const chapterIds = [...new Set(usefulDrafts.map((page) => page.chapterId))];
+  const chapterNumbers = new Map(chapterIds.map((id, index) => [id, String(index + 1).padStart(2, "0")]));
+  const contentPages = usefulDrafts.map((draft, index) => ({
+    ...draft,
+    page: index + 3,
+    pageNumber: index + 3,
+    number: chapterNumbers.get(draft.chapterId),
+  }));
+  const navigation = chapterIds.map((id) => {
+    const page = contentPages.find((candidate) => candidate.chapterId === id)!;
+    return { id, chapterNumber: chapterNumbers.get(id)!, label: page.chapter, firstPage: page.pageNumber };
+  });
+  const contents = navigation.map((item) => ({
+    number: item.chapterNumber,
+    title: item.label,
+    page: item.firstPage,
+    description: descriptions[item.id] || "",
+  }));
+  const pages: EditorialPagePlan[] = [
+    { id: "cover", chapterId: "cover", kind: "cover", chapter: "Couverture", page: 1, pageNumber: 1, variant: coverVariant(direction, identity), density: 0.76, contentScore: 0.76, visibleContentCount: 1 },
+    { id: "contents", chapterId: "contents", kind: "contents", chapter: "Sommaire", page: 2, pageNumber: 2, variant: "editorial-index", density: Math.min(0.88, 0.35 + contents.length * 0.06), contentScore: 0.7, visibleContentCount: contents.length },
+    ...contentPages,
+  ];
+  return { pages, contents, tableOfContents: navigation, guideNavigationModel: navigation, totalPages: pages.length };
 }

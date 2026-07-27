@@ -6,6 +6,7 @@ import { createBrandGuideData, validateBrandGuideData } from "../lib/brand-guide
 import { composeEditorialPages } from "../lib/brand-guide-editorial-composer";
 import { buildBrandVisualIdentity, createBrandGuideTheme } from "../lib/brand-visual-identity";
 import { renderBrandGuidePdf } from "../lib/brand-guide-pdf";
+import { forbiddenPdfTexts } from "../lib/brand-guide-layout";
 
 const output = path.join(process.cwd(), "artifacts", "brand-guide-visual-tests");
 
@@ -157,14 +158,36 @@ const scenarios: Record<string, GeneratedBrandGuide> = {
   "guide-complet": fixture("Édition Commune", { palette: ["#4E3832", "#F0E3D4", "#D17A4B", "#738575"], traits: ["Éditoriale", "Chaleureuse", "Structurée"], ambiance: "Éditoriale, chaleureuse et structurée", logo: "horizontal", moodboard: "dense" }),
 };
 
+const positioningLong = fixture("Perspective Longue", { palette: ["#302A4A", "#EEE8DB", "#C35F45"], traits: ["Précise", "Humaine"], ambiance: "Éditoriale et structurée", logo: "horizontal", moodboard: "minimal" });
+positioningLong.positioning.context = "Lorsque l’entreprise entre dans une nouvelle phase de développement, son expertise est reconnue mais son expression reste fragmentée. Ses publics comprennent imparfaitement sa valeur, ses messages varient selon les supports et son identité ne traduit plus son niveau d’ambition. Elle a besoin d’un cadre clair pour aligner son discours, ses choix visuels et l’expérience proposée.";
+positioningLong.positioning.finalPositioning = "Perspective Longue accompagne les organisations expertes qui veulent transformer une offre complexe en une marque claire, singulière et immédiatement reconnaissable, en reliant stratégie, récit et direction visuelle sans perdre la nuance, la proximité ni l’authenticité qui fondent leur différence.";
+scenarios["positionnement-long"] = positioningLong;
+
+const valuesLong = fixture("Maison Attention", { palette: ["#435649", "#EEE5D5", "#B96E54"], traits: ["Attentive", "Exigeante"], ambiance: "Sensible et précise", logo: "vertical", moodboard: "dense" });
+valuesLong.dna.values = ["Écoute", "Clarté", "Exigence"].map((name, index) =>
+  `${index + 1} · Valeur: ${name} · Cela signifie que je: prends le temps de comprendre chaque projet, son histoire et les personnes qu’il doit servir avant de proposer une direction · Dans la pratique: je questionne, je reformule, je hiérarchise les décisions et je construis un cadre partagé qui rend chaque choix compréhensible · Dans la communication: j’adopte une parole humaine, précise, rassurante et directe qui donne confiance sans simplifier artificiellement les sujets`,
+);
+scenarios["trois-valeurs-longues"] = valuesLong;
+
+const invalidMoodboard = fixture("Teinte Juste", { palette: ["#264653", "#E9C46A", "#E76F51"], traits: ["Graphique"], ambiance: "Vive et structurée", moodboard: "minimal" });
+invalidMoodboard.visualUniverse.moodboard.push({ id: "invalid-color", type: "color", color: "", label: "Couleur", description: "", x: 2, y: 2, width: 20, height: 20, rotation: 0, zIndex: 9 });
+scenarios["moodboard-couleur-invalide"] = invalidMoodboard;
+
 async function renderPages(pdf: Buffer, scenario: string, expectedDensity: number[]) {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const document = await pdfjs.getDocument({ data: new Uint8Array(pdf) }).promise;
+  if (document.numPages !== expectedDensity.length) {
+    throw new Error(`${scenario}: ${document.numPages} pages générées pour ${expectedDensity.length} pages composées`);
+  }
   const directory = path.join(output, scenario);
   await mkdir(directory, { recursive: true });
   const pages = [];
   for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
     const page = await document.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    const extractedText = textContent.items.map((item) => "str" in item ? item.str : "").join(" ");
+    const forbiddenTexts = forbiddenPdfTexts.filter((value) => extractedText.includes(value));
+    if (forbiddenTexts.length) throw new Error(`${scenario}, page ${pageNumber}: textes interdits ${forbiddenTexts.join(", ")}`);
     const viewport = page.getViewport({ scale: 1.4 });
     const canvas = createCanvas(Math.ceil(viewport.width), Math.ceil(viewport.height));
     await page.render({ canvas: canvas as never, canvasContext: canvas.getContext("2d") as never, viewport }).promise;
@@ -174,7 +197,18 @@ async function renderPages(pdf: Buffer, scenario: string, expectedDensity: numbe
     const png = path.join(directory, `page-${String(pageNumber).padStart(2, "0")}.png`);
     await writeFile(png, canvas.toBuffer("image/png"));
     if (samples.size < 4) throw new Error(`${scenario}, page ${pageNumber}: page visuellement vide`);
-    pages.push({ page: pageNumber, expectedDensity: expectedDensity[pageNumber - 1], sampledColors: samples.size, image: png });
+    pages.push({
+      page: pageNumber,
+      expectedDensity: expectedDensity[pageNumber - 1],
+      sampledColors: samples.size,
+      visibleTextLength: extractedText.length,
+      blockCount: textContent.items.length,
+      forbiddenTexts,
+      overflows: [],
+      warnings: extractedText.length < 35 ? ["Page peu dense"] : [],
+      errors: [],
+      image: png,
+    });
   }
   return pages;
 }
