@@ -126,8 +126,33 @@ function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
   );
 }
 
-function ModuleKeyTakeaways({ summary }: { summary: ModuleSummaryCard }) {
-  const takeaways = summary.keyTakeaways;
+const firstModuleVisibleLabels = new Set([
+  "le moment ou ta marque intervient",
+  "ta difference",
+  "ton positionnement formule",
+]);
+
+function normalizeSummaryLabel(label: string) {
+  return label
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("fr")
+    .trim();
+}
+
+function ModuleKeyTakeaways({
+  summary,
+  modulePosition,
+}: {
+  summary: ModuleSummaryCard;
+  modulePosition: number;
+}) {
+  const takeaways =
+    modulePosition === 1
+      ? summary.keyTakeaways.filter((item) =>
+          firstModuleVisibleLabels.has(normalizeSummaryLabel(item.label)),
+        )
+      : summary.keyTakeaways;
 
   if (takeaways.length === 0) {
     return null;
@@ -226,11 +251,6 @@ function ModuleDetailAccordion({
   summary: ModuleSummaryCard;
   modulePosition: number;
 }) {
-  const firstModuleVisibleLabels = new Set([
-    "le moment ou ta marque intervient",
-    "ta difference",
-    "ton positionnement formule",
-  ]);
   const recaps = summary.submoduleRecaps
     .map((submodule) => ({
       ...submodule,
@@ -239,11 +259,7 @@ function ModuleDetailAccordion({
           ? submodule.highlights.filter(
               (highlight) =>
                 firstModuleVisibleLabels.has(
-                  highlight.label
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-                    .toLocaleLowerCase("fr")
-                    .trim(),
+                  normalizeSummaryLabel(highlight.label),
                 ),
             )
           : submodule.highlights,
@@ -551,7 +567,9 @@ export default function ModuleCompletionScreen({
   return (
     <section id="resume-module" className="mt-10 space-y-7">
       <CompletionHero summary={summary} shareData={shareData} />
-      {!isActivationModule ? <ModuleKeyTakeaways summary={summary} /> : null}
+      {!isActivationModule ? (
+        <ModuleKeyTakeaways summary={summary} modulePosition={modulePosition} />
+      ) : null}
       <StorySharePreview
         storyRef={storyRef}
         shareData={shareData}
