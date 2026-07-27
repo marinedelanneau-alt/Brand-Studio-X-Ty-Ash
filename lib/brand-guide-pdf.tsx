@@ -143,8 +143,25 @@ function CoverPage({ context, plan }: { context: RenderContext; plan: EditorialP
         <Text style={[styles.tiny, { color: textColor }]}>Guide de marque</Text>
         <Text style={[styles.tiny, { color: textColor }]}>Édition {formatDate(data.generatedAt)}</Text>
       </View>
-      <View wrap={false} style={{ position: "absolute", left: 48, right: 48, top: plan.variant === "minimal-premium" ? 270 : 220, height: 260 }}>
-        <BrandLockup context={context} size={plan.variant === "collage" || plan.variant === "chromatic" ? "medium" : "large"} light={isDark} baseline />
+      <View
+        wrap={false}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: plan.variant === "minimal-premium" ? 248 : 198,
+          minHeight: 300,
+          paddingHorizontal: 48,
+          paddingVertical: 28,
+          backgroundColor: "#FFFFFF",
+          justifyContent: "center",
+        }}
+      >
+        <BrandLockup
+          context={context}
+          size={plan.variant === "collage" || plan.variant === "chromatic" ? "medium" : "large"}
+          baseline
+        />
       </View>
       <View style={{ position: "absolute", left: 48, bottom: 54, flexDirection: "row", alignItems: "center" }}>
         {data.palette.slice(0, 6).map((color, index) => <View key={color.id} style={{ width: index === 0 ? 64 : 28, height: 10, backgroundColor: color.hex }} />)}

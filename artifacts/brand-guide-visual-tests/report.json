@@ -12,7 +12,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 36,
+        "sampledColors": 42,
         "visibleTextLength": 160,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -155,7 +155,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 42,
+        "sampledColors": 46,
         "visibleTextLength": 158,
         "blockCount": 8,
         "forbiddenTexts": [],
@@ -299,7 +299,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 174,
+        "sampledColors": 173,
         "visibleTextLength": 161,
         "blockCount": 8,
         "forbiddenTexts": [],
@@ -442,7 +442,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 34,
+        "sampledColors": 44,
         "visibleTextLength": 160,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -585,7 +585,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 27,
+        "sampledColors": 33,
         "visibleTextLength": 155,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -728,7 +728,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 32,
+        "sampledColors": 39,
         "visibleTextLength": 160,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -1014,7 +1014,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 33,
+        "sampledColors": 41,
         "visibleTextLength": 158,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -1162,7 +1162,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 138,
+        "sampledColors": 141,
         "visibleTextLength": 158,
         "blockCount": 8,
         "forbiddenTexts": [],
@@ -1306,7 +1306,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 39,
+        "sampledColors": 43,
         "visibleTextLength": 164,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -1449,7 +1449,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 28,
+        "sampledColors": 39,
         "visibleTextLength": 154,
         "blockCount": 8,
         "forbiddenTexts": [],
@@ -1592,7 +1592,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 30,
+        "sampledColors": 32,
         "visibleTextLength": 161,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -1736,7 +1736,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 37,
+        "sampledColors": 44,
         "visibleTextLength": 163,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -1879,7 +1879,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 34,
+        "sampledColors": 45,
         "visibleTextLength": 162,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -2022,7 +2022,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 38,
+        "sampledColors": 40,
         "visibleTextLength": 166,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -2165,7 +2165,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 34,
+        "sampledColors": 40,
         "visibleTextLength": 164,
         "blockCount": 9,
         "forbiddenTexts": [],
@@ -2332,7 +2332,7 @@
       {
         "page": 1,
         "expectedDensity": 0.76,
-        "sampledColors": 27,
+        "sampledColors": 34,
         "visibleTextLength": 160,
         "blockCount": 9,
         "forbiddenTexts": [],
