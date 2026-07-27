@@ -219,10 +219,36 @@ function StorySharePreview({
   );
 }
 
-function ModuleDetailAccordion({ summary }: { summary: ModuleSummaryCard }) {
-  const recaps = summary.submoduleRecaps.filter(
-    (submodule) => submodule.highlights.length > 0,
-  );
+function ModuleDetailAccordion({
+  summary,
+  modulePosition,
+}: {
+  summary: ModuleSummaryCard;
+  modulePosition: number;
+}) {
+  const firstModuleHiddenLabels = new Set([
+    "tes valeurs en pratique",
+    "a toi de completer",
+    "phrase cle",
+  ]);
+  const recaps = summary.submoduleRecaps
+    .map((submodule) => ({
+      ...submodule,
+      highlights:
+        modulePosition === 1
+          ? submodule.highlights.filter(
+              (highlight) =>
+                !firstModuleHiddenLabels.has(
+                  highlight.label
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLocaleLowerCase("fr")
+                    .trim(),
+                ),
+            )
+          : submodule.highlights,
+    }))
+    .filter((submodule) => submodule.highlights.length > 0);
   const [openIds, setOpenIds] = useState<Set<number>>(() =>
     new Set(recaps[0] ? [recaps[0].id] : []),
   );
@@ -392,6 +418,7 @@ function CompletionActions({
 export default function ModuleCompletionScreen({
   summary,
   shareData,
+  modulePosition,
   editHref,
   completionHref,
   pdfHref,
@@ -401,6 +428,7 @@ export default function ModuleCompletionScreen({
 }: {
   summary: ModuleSummaryCard;
   shareData: ModuleShareData;
+  modulePosition: number;
   editHref: string;
   completionHref: string;
   pdfHref: string;
@@ -532,7 +560,9 @@ export default function ModuleCompletionScreen({
         onShareStory={() => void shareStory()}
         onShowBrandNameChange={setShowBrandName}
       />
-      {!isActivationModule ? <ModuleDetailAccordion summary={summary} /> : null}
+      {!isActivationModule ? (
+        <ModuleDetailAccordion summary={summary} modulePosition={modulePosition} />
+      ) : null}
       <CompletionActions
         pdfHref={pdfHref}
         editHref={editHref}
