@@ -4,8 +4,8 @@ import RegisterForm from "../ui/register-form";
 import { findUsableActivationCodeByToken } from "@/lib/activation-codes";
 
 const values = [
-  "Code d'activation reçu après paiement",
-  "Création du compte avec mot de passe",
+  "Lien personnel reçu après paiement",
+  "Choix de ton mot de passe",
   "Connexion ensuite par e-mail et mot de passe",
 ];
 
@@ -106,25 +106,28 @@ export default async function RegisterPage({
                 </div>
                 <div className="rounded-[1.6rem] bg-[#fff5da] px-4 py-3 text-right">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-[#cf7430]">
-                    Activation
+                    Accès personnel
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Lien envoyé après paiement
+                    Prêt après ton paiement
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
                 {activation
-                  ? "Choisis ton mot de passe pour activer ton accès. Ton adresse e-mail est celle utilisée lors du paiement."
-                  : "Ouvre le lien d'activation reçu par e-mail après ton paiement pour créer ton compte."}
+                  ? "Choisis ton mot de passe pour créer ton compte. Ton adresse e-mail est déjà associée à ton paiement."
+                  : "Ce lien personnel est absent, invalide ou expiré. Reprends le lien reçu par e-mail après ton paiement."}
               </p>
 
               <div className="mt-7">
-                <RegisterForm
-                  activationToken={activation?.code}
-                  email={activation?.email}
-                />
+                {activation ? (
+                  <RegisterForm registrationToken={activation.code} email={activation.email} />
+                ) : (
+                  <div className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffaf1] p-5 text-sm leading-7 text-[#82766b]">
+                    Pour protéger ton accès, la création du compte est disponible uniquement depuis le lien personnel envoyé après ton paiement.
+                  </div>
+                )}
               </div>
             </div>
           </div>

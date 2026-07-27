@@ -17,11 +17,11 @@ const inputClassName =
   "h-16 w-full rounded-[1.15rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-base text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(223,203,171,0.12)] outline-none transition duration-200 placeholder:text-[#aa9d91] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20";
 
 export default function RegisterForm({
-  activationToken,
+  registrationToken,
   email,
 }: {
-  activationToken?: string;
-  email?: string;
+  registrationToken: string;
+  email: string;
 }) {
   const [state, formAction, pending] = useActionState(
     registerAccount,
@@ -31,27 +31,7 @@ export default function RegisterForm({
   return (
     <form action={formAction} className="space-y-5">
       <div className="grid gap-5">
-        {activationToken ? (
-          <input name="activationCode" type="hidden" value={activationToken} />
-        ) : (
-        <div className="space-y-2">
-          <label
-            htmlFor="activationCode"
-            className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
-          >
-            Code d&apos;activation
-          </label>
-          <input
-            id="activationCode"
-            name="activationCode"
-            type="text"
-            required
-            autoComplete="one-time-code"
-            placeholder="BRAND-2026ABCD"
-            className={`${inputClassName} uppercase tracking-[0.12em]`}
-          />
-        </div>
-        )}
+        <input name="registrationToken" type="hidden" value={registrationToken} />
 
         <div className="space-y-2">
           <label
@@ -134,8 +114,7 @@ export default function RegisterForm({
           Ce que tu obtiens
         </p>
         <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Ce lien sert uniquement à activer ton compte. Ensuite, la connexion
-          se fait avec ton e-mail et ton mot de passe.
+          Après avoir choisi ton mot de passe, ton compte sera créé et tu accéderas directement à la formation.
         </p>
       </div>
 
@@ -144,7 +123,7 @@ export default function RegisterForm({
         disabled={pending}
         className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
-        {pending ? "Activation du compte..." : "Créer mon compte"}
+        {pending ? "Création du compte..." : "Créer mon compte"}
       </button>
 
       <div className="min-h-7">

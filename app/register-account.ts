@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   attachAuthUserToAccount,
-  findAccountByCode,
   findAccountByEmail,
   insertAccount,
 } from "@/lib/access-codes";
@@ -27,9 +26,9 @@ export async function registerAccount(
   _prevState: RegisterState,
   formData: FormData,
 ): Promise<RegisterState> {
-  const activationCode =
-    typeof formData.get("activationCode") === "string"
-      ? String(formData.get("activationCode")).trim().toUpperCase().replace(/\s+/g, "")
+  const registrationToken =
+    typeof formData.get("registrationToken") === "string"
+      ? String(formData.get("registrationToken")).trim().toUpperCase().replace(/\s+/g, "")
       : "";
   const email =
     typeof formData.get("email") === "string"
@@ -46,10 +45,10 @@ export async function registerAccount(
       ? String(formData.get("companyName")).trim()
       : "";
 
-  if (!activationCode || !email || !password || !clientName || !companyName) {
+  if (!registrationToken || !email || !password || !clientName || !companyName) {
     return {
       status: "error",
-      message: "Merci de remplir le code, l'e-mail, le mot de passe, le nom et l'entreprise.",
+      message: "Merci de remplir l'e-mail, le mot de passe, le nom et l'entreprise.",
     };
   }
 
@@ -69,22 +68,14 @@ export async function registerAccount(
 
   try {
     const activation = await findUsableActivationCode({
-      code: activationCode,
+      code: registrationToken,
       email,
     });
-    const legacyAccount = activation ? null : await findAccountByCode(activationCode);
 
-    if (!activation && !legacyAccount) {
+    if (!activation) {
       return {
         status: "error",
-        message: "Code d'activation invalide, expiré ou déjà utilisé.",
-      };
-    }
-
-    if (legacyAccount && legacyAccount.email.toLowerCase() !== email) {
-      return {
-        status: "error",
-        message: "Ce code n'est pas associé à cet e-mail.",
+        message: "Ce lien personnel est invalide, expiré ou déjà utilisé.",
       };
     }
 
@@ -116,12 +107,12 @@ export async function registerAccount(
       };
     }
 
-    if (legacyAccount) {
+    if (existingAccount) {
       await attachAuthUserToAccount({
-        accountId: legacyAccount.id,
+        accountId: existingAccount.id,
         authUserId: authData.user.id,
       });
-    } else if (!existingAccount) {
+    } else {
       await insertAccount({
         code: null,
         authUserId: authData.user.id,
@@ -140,8 +131,7 @@ export async function registerAccount(
       };
     }
 
-    if (activation) {
-      await upsertSubscription({
+    await upsertSubscription({
         userId: account.id,
         stripeCustomerId: activation.stripe_customer_id,
         stripeSubscriptionId: activation.stripe_subscription_id,
@@ -151,8 +141,7 @@ export async function registerAccount(
         accessGranted: true,
       });
 
-      await consumeActivationCode(activation.id);
-    }
+    await consumeActivationCode(activation.id);
 
     const authSupabase = await createSupabaseAuthServerClient();
     const { error: signInError } = await authSupabase.auth.signInWithPassword({
@@ -179,7 +168,7 @@ export async function registerAccount(
     return {
       status: "error",
       message:
-        "L'activation du compte a échoué. Vérifie ton code ou contacte le support.",
+        "La création du compte a échoué. Reprends ton lien personnel ou contacte le support.",
     };
   }
 

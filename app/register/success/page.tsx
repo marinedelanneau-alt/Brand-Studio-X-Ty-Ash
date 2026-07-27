@@ -33,7 +33,7 @@ export default async function RegisterSuccessPage() {
                 {clientName ?? "dans Brand Studio"}
               </h1>
               <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[#82766b]">
-                Ton compte est prêt. Ton code d&apos;activation a été consommé
+                Ton compte est prêt. Ton lien personnel a bien été utilisé
                 et ton accès se fait maintenant avec ton e-mail et ton mot
                 de passe.
               </p>

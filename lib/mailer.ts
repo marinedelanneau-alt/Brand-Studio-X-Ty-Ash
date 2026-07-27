@@ -150,14 +150,14 @@ export async function sendAccountActivationEmail(
             Ton inscription est confirmée et ton espace est prêt. Tu vas pouvoir poser les fondations de ta marque, affirmer ce qui la rend unique et construire une identité qui te ressemble vraiment.
           </p>
           <p style="margin:0 0 28px; color:#6f645b; font-size:16px; line-height:1.75;">
-            Crée maintenant ton compte et choisis ton mot de passe pour ouvrir les portes de ton studio et commencer ton parcours.
+            Choisis maintenant ton mot de passe pour créer ton compte, ouvrir les portes de ton studio et commencer ton parcours.
           </p>
           <a href="${registerUrl.toString()}" style="display:inline-block; padding:17px 26px; border-radius:16px; background:linear-gradient(135deg,#df9b39,#f1cc56); color:#ffffff; text-decoration:none; font-size:13px; font-weight:800; letter-spacing:0.10em; text-transform:uppercase; box-shadow:0 12px 26px rgba(223,155,57,0.22);">
             Créer mon espace
           </a>
           <div style="margin-top:30px; padding:18px 20px; border:1px solid #f0e4d3; border-radius:16px; background:#fffdf8;">
             <p style="margin:0; color:#7b7068; font-size:13px; line-height:1.65;">
-              Ce lien est personnel, utilisable une seule fois et valable 30 jours.
+              Ce lien personnel est utilisable une seule fois et valable 30 jours. Aucun code n’est nécessaire.
             </p>
           </div>
           <p style="margin:30px 0 0; color:#4b4550; font-size:15px; line-height:1.7;">
@@ -177,7 +177,7 @@ export async function sendAccountActivationEmail(
     "",
     "Ton inscription est confirmée et ton espace est prêt.",
     "",
-    "Crée ton compte et choisis ton mot de passe pour commencer ton parcours :",
+    "Choisis ton mot de passe pour créer ton compte et commencer ton parcours :",
     registerUrl.toString(),
     "",
     "Ce lien est personnel, utilisable une seule fois et valable 30 jours.",
