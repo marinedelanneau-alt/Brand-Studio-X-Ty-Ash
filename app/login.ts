@@ -211,10 +211,30 @@ export async function sendPasswordResetLink(
       };
     }
 
-    await sendPasswordResetEmail({
-      email,
-      resetUrl: data.properties.action_link,
-    });
+    try {
+      await sendPasswordResetEmail({
+        email,
+        resetUrl: data.properties.action_link,
+      });
+    } catch (deliveryError) {
+      console.error("Brand Studio password email delivery failed", {
+        reason:
+          deliveryError instanceof Error
+            ? deliveryError.message
+            : "Unknown delivery error",
+      });
+
+      const { error: fallbackError } = await supabase.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo: `${siteUrl}/auth/reset/callback`,
+        },
+      );
+
+      if (fallbackError) {
+        throw fallbackError;
+      }
+    }
 
     return {
       status: "success",
