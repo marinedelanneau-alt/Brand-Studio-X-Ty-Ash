@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useActionState, useState } from "react";
 import { registerAccount } from "../register-account";
 
 type RegisterState = {
@@ -27,6 +28,7 @@ export default function RegisterForm({
     registerAccount,
     initialState,
   );
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={formAction} className="space-y-5">
@@ -60,16 +62,31 @@ export default function RegisterForm({
           >
             Mot de passe
           </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            placeholder="8 caracteres minimum"
-            className={inputClassName}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="8 caractères minimum"
+              className={`${inputClassName} pr-16`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              aria-pressed={showPassword}
+              className="absolute inset-y-0 right-0 flex w-16 items-center justify-center text-[#8b7a70] transition hover:text-[#cf7430] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
+            >
+              {showPassword ? (
+                <EyeSlashIcon aria-hidden="true" className="h-6 w-6" />
+              ) : (
+                <EyeIcon aria-hidden="true" className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="space-y-2">
