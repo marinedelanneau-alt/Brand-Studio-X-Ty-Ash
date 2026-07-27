@@ -1294,14 +1294,49 @@ async function restoreMissingPublishedModulesInDraft(
     }
     return false;
   });
+  const repairedModules = cleanedModules.map((draftModule) => {
+    const publishedModule = publishedModules.find(
+      (candidate) =>
+        candidate.id === draftModule.id ||
+        candidate.position === draftModule.position ||
+        getDraftModuleIdentity(candidate.title) === getDraftModuleIdentity(draftModule.title),
+    );
+    if (!publishedModule) return draftModule;
+
+    const knownSubmoduleIds = new Set(draftModule.submodules.map((submodule) => submodule.id));
+    const knownSubmoduleTitles = new Set(
+      draftModule.submodules.map((submodule) => getDraftModuleIdentity(submodule.title)),
+    );
+    const submodules = [...draftModule.submodules];
+    for (const publishedSubmodule of publishedModule.submodules) {
+      if (
+        knownSubmoduleIds.has(publishedSubmodule.id) ||
+        knownSubmoduleTitles.has(getDraftModuleIdentity(publishedSubmodule.title))
+      ) continue;
+      submodules.splice(
+        Math.max(0, Math.min(publishedSubmodule.position - 1, submodules.length)),
+        0,
+        publishedSubmodule,
+      );
+    }
+    const normalizedSubmodules = submodules.map((submodule, index) => ({
+      ...submodule,
+      position: index + 1,
+    }));
+    return {
+      ...draftModule,
+      submodules: normalizedSubmodules,
+      exercises: normalizedSubmodules.flatMap((submodule) => submodule.exercises),
+    };
+  });
   const draftModuleIds = new Set(
-    cleanedModules
+    repairedModules
       .filter((moduleItem) => moduleItem.id > 0)
       .map((moduleItem) => moduleItem.id),
   );
-  const draftPositions = new Set(cleanedModules.map((moduleItem) => moduleItem.position));
+  const draftPositions = new Set(repairedModules.map((moduleItem) => moduleItem.position));
   const draftTitles = new Set(
-    cleanedModules.map((moduleItem) => getDraftModuleIdentity(moduleItem.title)),
+    repairedModules.map((moduleItem) => getDraftModuleIdentity(moduleItem.title)),
   );
   const missingPublishedModules = publishedModules.filter(
     (moduleItem) =>
@@ -1313,13 +1348,14 @@ async function restoreMissingPublishedModulesInDraft(
 
   if (
     missingPublishedModules.length === 0 &&
-    cleanedModules.length === modules.length
+    cleanedModules.length === modules.length &&
+    repairedModules.every((moduleItem, index) => moduleItem === cleanedModules[index])
   ) {
     return normalizeDraftModules(cleanedModules);
   }
 
   const restoredModules = normalizeDraftModules([
-    ...cleanedModules,
+    ...repairedModules,
     ...missingPublishedModules,
   ]);
 
