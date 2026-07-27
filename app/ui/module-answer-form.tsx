@@ -1694,6 +1694,18 @@ export default function ModuleAnswerForm({
   }, [currentExercise?.id, currentExercise?.type]);
 
   useEffect(() => {
+    if (!currentExercise) {
+      return;
+    }
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [currentExercise]);
+
+  useEffect(() => {
     const activeModule = moduleRef.current;
     const nextInitialAnswers = createInitialAnswers(activeModule);
 
