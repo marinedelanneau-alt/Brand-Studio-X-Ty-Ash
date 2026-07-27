@@ -226,10 +226,10 @@ function ModuleDetailAccordion({
   summary: ModuleSummaryCard;
   modulePosition: number;
 }) {
-  const firstModuleHiddenLabels = new Set([
-    "tes valeurs en pratique",
-    "a toi de completer",
-    "phrase cle",
+  const firstModuleVisibleLabels = new Set([
+    "le moment ou ta marque intervient",
+    "ta difference",
+    "ton positionnement formule",
   ]);
   const recaps = summary.submoduleRecaps
     .map((submodule) => ({
@@ -238,7 +238,7 @@ function ModuleDetailAccordion({
         modulePosition === 1
           ? submodule.highlights.filter(
               (highlight) =>
-                !firstModuleHiddenLabels.has(
+                firstModuleVisibleLabels.has(
                   highlight.label
                     .normalize("NFD")
                     .replace(/[\u0300-\u036f]/g, "")
