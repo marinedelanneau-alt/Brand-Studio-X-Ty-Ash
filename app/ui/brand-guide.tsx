@@ -48,19 +48,33 @@ export default function BrandGuideLayout({
     setMessage("Le contenu du guide est copié.");
   }
 
-  function exportPdf() {
+  async function exportPdf() {
     setIsExporting(true);
     setMessage("Génération du PDF en cours…");
-    const anchor = document.createElement("a");
-    anchor.href = "/brand-guide/download";
-    anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => {
+
+    try {
+      const response = await fetch("/brand-guide/download", {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("La génération du PDF a échoué.");
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = downloadUrl;
+      anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(downloadUrl);
+      setMessage("Ton Guide de Marque a bien été téléchargé.");
+    } catch {
+      setMessage("Le PDF n’a pas pu être généré. Réessaie dans quelques instants.");
+    } finally {
       setIsExporting(false);
-      setMessage("Le téléchargement du Guide de Marque a été lancé.");
-    }, 1_000);
+    }
   }
 
   return (

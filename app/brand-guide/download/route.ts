@@ -11,6 +11,7 @@ import { getWorkspaceData } from "@/lib/training";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 function slugify(value: string) {
   return value

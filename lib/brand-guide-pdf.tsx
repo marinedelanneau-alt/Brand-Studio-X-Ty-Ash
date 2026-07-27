@@ -493,25 +493,61 @@ function BrandGuideDocument({ context }: { context: RenderContext }) {
 }
 
 export async function prepareBrandGuideAssets(data: BrandGuideData) {
+  const assetCache = new Map<string, Promise<string | undefined>>();
+
   async function loadDataUrl(url?: string) {
     if (!url || url.startsWith("data:")) return url;
-    try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(8_000) });
-      if (!response.ok) return undefined;
-      const type = response.headers.get("content-type") || "image/png";
-      const bytes = Buffer.from(await response.arrayBuffer());
-      return `data:${type};base64,${bytes.toString("base64")}`;
-    } catch {
-      return undefined;
-    }
+
+    const cached = assetCache.get(url);
+    if (cached) return cached;
+
+    const promise = (async () => {
+      try {
+        const response = await fetch(url, { signal: AbortSignal.timeout(5_000) });
+        if (!response.ok) return undefined;
+
+        const declaredSize = Number(response.headers.get("content-length") ?? 0);
+        if (declaredSize > 8 * 1024 * 1024) return undefined;
+
+        const type = response.headers.get("content-type") || "image/png";
+        if (!type.startsWith("image/")) return undefined;
+
+        const source = Buffer.from(await response.arrayBuffer());
+        if (source.byteLength > 8 * 1024 * 1024) return undefined;
+
+        const sharp = (await import("sharp")).default;
+        const bytes = await sharp(source)
+          .rotate()
+          .resize({
+            width: 1600,
+            height: 1600,
+            fit: "inside",
+            withoutEnlargement: true,
+          })
+          .jpeg({ quality: 82, progressive: true })
+          .toBuffer();
+
+        return `data:image/jpeg;base64,${bytes.toString("base64")}`;
+      } catch {
+        return undefined;
+      }
+    })();
+
+    assetCache.set(url, promise);
+    return promise;
   }
-  const moodboard = await Promise.all(data.moodboard.map(async (item) => {
-    if (!item.imageUrl) return item;
-    return { ...item, imageUrl: await loadDataUrl(item.imageUrl) };
-  }));
+
+  const [logoUrl, moodboard] = await Promise.all([
+    loadDataUrl(data.logoUrl),
+    Promise.all(data.moodboard.map(async (item) => {
+      if (!item.imageUrl) return item;
+      return { ...item, imageUrl: await loadDataUrl(item.imageUrl) };
+    })),
+  ]);
+
   return {
     ...data,
-    logoUrl: await loadDataUrl(data.logoUrl),
+    logoUrl,
     moodboard: moodboard.filter((item) => !["image", "icon"].includes(item.type) || Boolean(item.imageUrl)),
   };
 }
