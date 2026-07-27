@@ -641,6 +641,10 @@ function summarizeExerciseAnswer(
       : null;
   }
 
+  if (exercise.type === "moodboard") {
+    return null;
+  }
+
   if (exercise.type === "checklist") {
     const entries = parseChecklistEntries(values);
     const keptEntries = entries.filter((entry) => entry.checked).map((entry) => entry.label);
