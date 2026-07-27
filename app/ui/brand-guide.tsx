@@ -48,25 +48,19 @@ export default function BrandGuideLayout({
     setMessage("Le contenu du guide est copié.");
   }
 
-  async function exportPdf() {
+  function exportPdf() {
     setIsExporting(true);
     setMessage("Génération du PDF en cours…");
-    try {
-      const response = await fetch("/brand-guide/download");
-      if (!response.ok) throw new Error("export-failed");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
-      anchor.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-      setMessage("Le Guide de Marque a été téléchargé.");
-    } catch {
-      setMessage("L’export n’a pas abouti. Réessaie dans quelques instants.");
-    } finally {
+    const anchor = document.createElement("a");
+    anchor.href = "/brand-guide/download";
+    anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => {
       setIsExporting(false);
-    }
+      setMessage("Le téléchargement du Guide de Marque a été lancé.");
+    }, 1_000);
   }
 
   return (
