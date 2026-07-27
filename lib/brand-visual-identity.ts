@@ -244,3 +244,8 @@ export function createBrandGuideTheme(identity: BrandVisualIdentity): BrandGuide
     },
   };
 }
+
+export const createPdfThemeFromBrandPalette = createBrandGuideTheme;
+export const createTint = generateTint;
+export const createShade = generateShade;
+export const getRelativeLuminance = luminance;

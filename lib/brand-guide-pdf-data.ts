@@ -1,6 +1,7 @@
 import type { GeneratedBrandGuide, GuideColor, GuideMoodboardItem } from "@/lib/brand-guide";
 import { calculatePageDensity } from "./brand-guide-editorial-layout";
 import { sanitizeMoodboardItems } from "./brand-guide-layout";
+import { normalizeBrandValuesFromExercise } from "./brand-guide-normalizers";
 
 export type PdfField = { label: string; value: string };
 
@@ -13,6 +14,7 @@ export type BrandGuideChapter = {
 };
 
 export type BrandValueData = {
+  id?: string;
   name: string;
   meaning?: string;
   concreteApplication?: string;
@@ -131,7 +133,11 @@ function parseValueAnswer(source: string): BrandValueData[] {
 export const normalizeBrandValues = mapValueAnswers;
 
 export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideData {
-  const values = mapValueAnswers(guide.dna.values);
+  const values = guide.dna.brandValues?.length
+    ? guide.dna.brandValues
+    : normalizeBrandValuesFromExercise(guide.dna.values).length
+      ? normalizeBrandValuesFromExercise(guide.dna.values)
+      : mapValueAnswers(guide.dna.values);
   const foundations = fields([
     field("Activité", guide.dna.activity),
     field("Raison d’être", guide.dna.essence),
@@ -177,6 +183,7 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
     field("Baseline", guide.baselineSection.final),
     field("Personnalité", cleanList(guide.personality.traits).join(" · ")),
     field("Tonalité", guide.personality.tone),
+    field("Valeurs", values.map((value) => value.name).join(" · ")),
     field("Mots-clés", language.use.slice(0, 5).join(" · ")),
     field("Palette", palette.map((color) => `${color.name} ${color.hex}`).join(" · ")),
   ]);
@@ -220,7 +227,7 @@ export function normalizeBrandGuideData(guide: GeneratedBrandGuide): BrandGuideD
     messages,
     palette,
     ambiance,
-    moodboardBackground: guide.visualUniverse.moodboardBackground || "#F5E8C8",
+    moodboardBackground: guide.visualUniverse.moodboardBackground,
     moodboard,
     summary,
     combinePositioningAndMessages,

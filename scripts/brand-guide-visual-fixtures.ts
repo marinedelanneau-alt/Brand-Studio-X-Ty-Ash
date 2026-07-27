@@ -158,6 +158,22 @@ const scenarios: Record<string, GeneratedBrandGuide> = {
   "guide-complet": fixture("Édition Commune", { palette: ["#4E3832", "#F0E3D4", "#D17A4B", "#738575"], traits: ["Éditoriale", "Chaleureuse", "Structurée"], ambiance: "Éditoriale, chaleureuse et structurée", logo: "horizontal", moodboard: "dense" }),
 };
 
+const lumiereStudio = fixture("Lumière Studio", {
+  palette: ["#EFE8D0", "#F3C447", "#A7C4A0"],
+  traits: ["Claire", "structurée", "rassurante"],
+  ambiance: "Épurée, douce et lumineuse",
+  logo: "horizontal",
+  moodboard: "dense",
+});
+lumiereStudio.visualUniverse.moodboardBackground = "#2F4858";
+lumiereStudio.dna.brandValues = [
+  { id: "value-1", name: "Écoute", meaning: "Je prends le temps de comprendre chaque projet et chaque personne.", concreteApplication: "Je questionne, j’échange et je construis en collaboration.", communicationExpression: "Un discours humain, rassurant et attentif." },
+  { id: "value-2", name: "Créativité", meaning: "Je cherche des idées singulières plutôt que des solutions toutes faites.", concreteApplication: "J’explore, je teste et je développe plusieurs pistes visuelles.", communicationExpression: "Un univers inspirant, vivant et visuel." },
+  { id: "value-3", name: "Authenticité", meaning: "Je révèle la vraie personnalité du projet sans créer une image artificielle.", concreteApplication: "Je m’appuie sur son histoire, ses valeurs et sa singularité.", communicationExpression: "Un ton sincère, naturel et transparent." },
+];
+lumiereStudio.dna.values = lumiereStudio.dna.brandValues.map((value) => value.name);
+scenarios["lumiere-studio"] = lumiereStudio;
+
 const positioningLong = fixture("Perspective Longue", { palette: ["#302A4A", "#EEE8DB", "#C35F45"], traits: ["Précise", "Humaine"], ambiance: "Éditoriale et structurée", logo: "horizontal", moodboard: "minimal" });
 positioningLong.positioning.context = "Lorsque l’entreprise entre dans une nouvelle phase de développement, son expertise est reconnue mais son expression reste fragmentée. Ses publics comprennent imparfaitement sa valeur, ses messages varient selon les supports et son identité ne traduit plus son niveau d’ambition. Elle a besoin d’un cadre clair pour aligner son discours, ses choix visuels et l’expérience proposée.";
 positioningLong.positioning.finalPositioning = "Perspective Longue accompagne les organisations expertes qui veulent transformer une offre complexe en une marque claire, singulière et immédiatement reconnaissable, en reliant stratégie, récit et direction visuelle sans perdre la nuance, la proximité ni l’authenticité qui fondent leur différence.";

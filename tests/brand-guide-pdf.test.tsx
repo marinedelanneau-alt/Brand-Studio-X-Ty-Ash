@@ -6,6 +6,8 @@ import { composeEditorialPages } from "../lib/brand-guide-editorial-composer";
 import { buildBrandVisualIdentity, createBrandGuideTheme } from "../lib/brand-visual-identity";
 import { calculatePageDensity, composeMoodboard, getAccessibleTextColor, selectCoverLayout, selectEditorialLayout } from "../lib/brand-guide-editorial-layout";
 import { fitTextToBox, getPositioningLayout, selectApplicationMessage, validateGeneratedGuide } from "../lib/brand-guide-layout";
+import { normalizeBrandPalette, normalizeBrandValuesFromExercise } from "../lib/brand-guide-normalizers";
+import { BRAND_GUIDE_TYPOGRAPHY, BRAND_GUIDE_TYPE_LIMITS, selectEditorialTextStyle } from "../lib/brand-guide-typography-scale";
 
 function makeGuide(): GeneratedBrandGuide {
   return {
@@ -89,8 +91,8 @@ describe("editorial brand guide PDF", () => {
   });
 
   it("adapts the cover title to short, medium and long brand names", () => {
-    expect(getCoverTitleFontSize("Éclat")).toBe(48);
-    expect(getCoverTitleFontSize("Marine Communication")).toBe(40);
+    expect(getCoverTitleFontSize("Éclat")).toBe(44);
+    expect(getCoverTitleFontSize("Marine Communication")).toBe(44);
     expect(getCoverTitleFontSize("Une marque au nom particulièrement long et exigeant")).toBe(30);
   });
   it("removes placeholders and keeps only populated chapters", () => {
@@ -111,6 +113,7 @@ describe("editorial brand guide PDF", () => {
     ];
     expect(createBrandGuideData(guide).values).toEqual([
       {
+        id: "value-1",
         name: "Écoute",
         meaning: "prends le temps de comprendre",
         concreteApplication: "je questionne et je construis",
@@ -128,6 +131,41 @@ describe("editorial brand guide PDF", () => {
     guide.visualUniverse.moodboard[0].color = "";
     expect(createBrandGuideData(guide).moodboard).toEqual([]);
     expect(hasMeaningfulContent("Inspiration 1")).toBe(false);
+  });
+
+  it("normalizes the three complete Lumière Studio value rows without losing columns", () => {
+    const raw = [
+      "Écoute", "prends le temps de comprendre chaque projet et chaque personne.",
+      "je questionne, j’échange et je construis en collaboration.", "un discours humain, rassurant et attentif.",
+      "Créativité", "cherche des idées singulières plutôt que des solutions toutes faites.",
+      "j’explore, je teste et je développe plusieurs pistes visuelles.", "un univers inspirant, vivant et visuel.",
+      "Authenticité", "révèle la vraie personnalité du projet sans créer une image artificielle.",
+      "je m’appuie sur son histoire, ses valeurs et sa singularité.", "un ton sincère, naturel et transparent.",
+    ];
+    const values = normalizeBrandValuesFromExercise(raw);
+    expect(values).toHaveLength(3);
+    expect(values.map((value) => value.name)).toEqual(["Écoute", "Créativité", "Authenticité"]);
+    expect(values.every((value) => value.meaning && value.concreteApplication && value.communicationExpression)).toBe(true);
+  });
+
+  it("normalizes only the palette exercise answer and preserves user order", () => {
+    const answer = `__color_palette_answer__:${encodeURIComponent(JSON.stringify({
+      type: "color_palette",
+      primaryColors: [{ id: "beige", mode: "solid", name: "Beige chaud", hex: "EFE8D0", usage: "Fond principal" }],
+      secondaryColors: [
+        { id: "yellow", mode: "solid", name: "Jaune accent", hex: "#F3C447", usage: "Accent" },
+        { id: "green", mode: "solid", name: "Vert doux", hex: "#A7C4A0", usage: "Respiration" },
+      ],
+    }))}`;
+    expect(normalizeBrandPalette([answer]).map((color) => color.hex)).toEqual(["#EFE8D0", "#F3C447", "#A7C4A0"]);
+    expect(normalizeBrandPalette(["#111111"])).toEqual([]);
+  });
+
+  it("keeps all content typography inside the professional scale", () => {
+    expect(BRAND_GUIDE_TYPOGRAPHY.coverTitle).toBeLessThanOrEqual(44);
+    expect(BRAND_GUIDE_TYPE_LIMITS).toEqual({ contentMin: 10, contentMax: 28 });
+    expect(selectEditorialTextStyle({ text: "x".repeat(400), role: "statement" }).fontSize).toBeGreaterThanOrEqual(13);
+    expect(selectEditorialTextStyle({ text: "Une phrase courte", role: "statement" }).fontSize).toBeLessThanOrEqual(28);
   });
 
   it("blocks an export when two brand identities are detected", () => {

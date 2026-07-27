@@ -12,6 +12,7 @@ import {
   type BrandGuideTheme,
   type BrandVisualIdentity,
 } from "./brand-visual-identity";
+import { BRAND_GUIDE_TYPOGRAPHY as TYPE, selectEditorialTextStyle } from "./brand-guide-typography-scale";
 
 Font.registerHyphenationCallback((word) => [word]);
 const fontFile = (name: string) => path.join(process.cwd(), "public", "fonts", name);
@@ -32,14 +33,14 @@ function createStyles(theme: BrandGuideTheme) {
     page: { backgroundColor: colors.background, color: colors.text, fontFamily: typography.bodyFont, padding: A4.margin },
     pageDark: { backgroundColor: colors.primary, color: getAccessibleTextColor(colors.primary), fontFamily: typography.bodyFont, padding: A4.margin },
     pageAccent: { backgroundColor: colors.accent, color: getAccessibleTextColor(colors.accent), fontFamily: typography.bodyFont, padding: A4.margin },
-    tiny: { fontSize: 7, letterSpacing: 1.4, textTransform: "uppercase" },
-    label: { fontSize: 7.5, fontWeight: 600, letterSpacing: 1.8, textTransform: "uppercase" },
-    body: { fontSize: 10.5, lineHeight: 1.58 },
-    small: { fontSize: 8.5, lineHeight: 1.45 },
-    display: { fontFamily: typography.displayFont, fontSize: 52 * typography.displayScale, fontWeight: typography.headingWeight, lineHeight: 0.96 },
-    h1: { fontFamily: typography.headingFont, fontSize: 34 * typography.displayScale, fontWeight: typography.headingWeight, lineHeight: 1.02 },
-    h2: { fontFamily: typography.headingFont, fontSize: 22, fontWeight: typography.headingWeight, lineHeight: 1.08 },
-    quote: { fontFamily: typography.displayFont, fontSize: 27 * typography.displayScale, lineHeight: 1.18 },
+    tiny: { fontSize: TYPE.label, letterSpacing: 1.2, textTransform: "uppercase" },
+    label: { fontSize: TYPE.label, fontWeight: 600, letterSpacing: 1.4, textTransform: "uppercase" },
+    body: { fontSize: TYPE.body, lineHeight: 1.48 },
+    small: { fontSize: TYPE.caption, lineHeight: 1.42 },
+    display: { fontFamily: typography.displayFont, fontSize: TYPE.coverTitle, fontWeight: typography.headingWeight, lineHeight: 1 },
+    h1: { fontFamily: typography.headingFont, fontSize: TYPE.chapterTitle, fontWeight: typography.headingWeight, lineHeight: 1.08 },
+    h2: { fontFamily: typography.headingFont, fontSize: TYPE.sectionTitle, fontWeight: typography.headingWeight, lineHeight: 1.15 },
+    quote: { fontFamily: typography.displayFont, fontSize: TYPE.editorialLarge, lineHeight: 1.2 },
     rule: { height: layout.lineWidth, backgroundColor: colors.accent },
     footer: { position: "absolute", bottom: 24, left: A4.margin, right: A4.margin, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
     logoSmall: { width: 28, height: 20, objectFit: "contain" },
@@ -61,11 +62,7 @@ function formatDate(value: string) {
 }
 
 export function getCoverTitleFontSize(name: string) {
-  const longestWord = Math.max(...name.split(/\s+/).map((word) => word.length));
-  if (name.length > 44 || longestWord > 18) return 30;
-  if (name.length > 30 || longestWord > 14) return 34;
-  if (name.length >= 20) return 40;
-  return 48;
+  return selectEditorialTextStyle({ text: name, role: "cover" }).fontSize;
 }
 
 function BrandLockup({ context, size = "medium", light = false, baseline = false }: {
@@ -76,7 +73,7 @@ function BrandLockup({ context, size = "medium", light = false, baseline = false
 }) {
   const { data, styles, theme } = context;
   const imageStyle = size === "large" ? styles.logoLarge : size === "medium" ? styles.logoMedium : styles.logoSmall;
-  const nameSize = size === "large" ? getCoverTitleFontSize(data.brandName) : size === "medium" ? 22 : 8;
+  const nameSize = size === "large" ? getCoverTitleFontSize(data.brandName) : size === "medium" ? TYPE.editorialMedium : TYPE.label;
   return (
     <View style={{ flexDirection: size === "small" ? "row" : "column", alignItems: size === "small" ? "center" : "flex-start" }}>
       {data.logoUrl ? (
@@ -167,7 +164,7 @@ function ContentsPage({ context, plan }: { context: RenderContext; plan: Editori
           <View key={item.title} style={{ flexDirection: "row", paddingVertical: 13, borderTop: `${index === 0 ? theme.layout.lineWidth : 0.5} solid ${theme.colors.border}` }}>
             <Text style={[styles.label, { width: 38, color: theme.colors.accent }]}>{item.number}</Text>
             <View style={{ flexGrow: 1, maxWidth: 390 }}>
-              <Text style={[styles.h2, { fontSize: 16 }]}>{item.title}</Text>
+              <Text style={styles.h2}>{item.title}</Text>
               <Text style={[styles.small, { color: theme.colors.mutedText, marginTop: 4 }]}>{item.description}</Text>
             </View>
             <Text style={[styles.label, { width: 28, textAlign: "right" }]}>{String(item.page).padStart(2, "0")}</Text>
@@ -208,25 +205,25 @@ function ManifestoPage({ context, plan }: { context: RenderContext; plan: Editor
     <Page size="A4" style={context.styles.pageDark}>
       <Text style={[context.styles.label, { color: light ? "#FFFFFF" : context.theme.colors.text }]}>Notre mission</Text>
       <View style={{ flexGrow: 1, justifyContent: "center" }}>
-        <Text style={[context.styles.display, { fontSize: 46, color: light ? "#FFFFFF" : context.theme.colors.text }]}>{mission}</Text>
+        <Text style={[context.styles.display, { fontSize: selectEditorialTextStyle({ text: mission, role: "statement" }).fontSize, color: light ? "#FFFFFF" : context.theme.colors.text }]}>{mission}</Text>
       </View>
       <PageFooter context={context} plan={plan} light={light} />
     </Page>
   );
 }
 
-function ValueStory({ context, value, index, featured }: { context: RenderContext; value: BrandValueData; index: number; featured: boolean }) {
+function ValueStory({ context, value, index, width }: { context: RenderContext; value: BrandValueData; index: number; width: string }) {
   const { styles, theme } = context;
   return (
-    <View wrap={false} style={{ width: featured ? "100%" : "48%", marginBottom: 34, paddingTop: 14, borderTop: `${featured ? theme.layout.lineWidth : 1} solid ${theme.colors.accent}` }}>
+    <View wrap={false} style={{ width, minHeight: 410, marginBottom: 20, padding: 14, backgroundColor: theme.colors.surface, borderTop: `2 solid ${theme.colors.accent}` }}>
       <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-        <Text style={{ fontFamily: theme.typography.displayFont, fontSize: featured ? 62 : 34, color: generateTint(theme.colors.primary, 40), marginRight: 14 }}>{String(index + 1).padStart(2, "0")}</Text>
-        <Text style={[styles.h2, { fontSize: featured ? 27 : 20 }]}>{value.name}</Text>
+        <Text style={{ fontFamily: theme.typography.displayFont, fontSize: TYPE.editorialLarge, color: theme.colors.accent, marginRight: 14 }}>{String(index + 1).padStart(2, "0")}</Text>
+        <Text style={styles.h2}>{value.name}</Text>
       </View>
-      {value.meaning ? <Text style={[styles.body, { fontSize: featured ? 14 : 10.5, marginTop: 10, maxWidth: featured ? 400 : undefined }]}>{value.meaning}</Text> : null}
-      <View style={{ flexDirection: featured ? "row" : "column", gap: 18, marginTop: 18 }}>
-        {value.concreteApplication ? <View style={featured ? { width: "47%" } : { width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la pratique</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.concreteApplication}</Text></View> : null}
-        {value.communicationExpression ? <View style={featured ? { width: "47%" } : { width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la communication</Text><Text style={[styles.small, { marginTop: 6 }]}>{value.communicationExpression}</Text></View> : null}
+      {value.meaning ? <View style={{ marginTop: 10 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Sens</Text><Text style={[styles.body, { marginTop: 6 }]}>{value.meaning}</Text></View> : null}
+      <View style={{ flexDirection: "column", gap: 16, marginTop: 16 }}>
+        {value.concreteApplication ? <View style={{ width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la pratique</Text><Text style={[styles.body, { marginTop: 6 }]}>{value.concreteApplication}</Text></View> : null}
+        {value.communicationExpression ? <View style={{ width: "100%" }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>Dans la communication</Text><Text style={[styles.body, { marginTop: 6 }]}>{value.communicationExpression}</Text></View> : null}
       </View>
     </View>
   );
@@ -239,9 +236,9 @@ function ValuesPage({ context, plan, occurrence }: { context: RenderContext; pla
   return (
     <Page size="A4" style={context.styles.page}>
       <ChapterMarker context={context} plan={plan} />
-      <Text style={[context.styles.h1, { marginBottom: 42 }]}>Des principes qui deviennent des gestes.</Text>
+      <Text style={[context.styles.h1, { marginBottom: 34 }]}>Des valeurs qui guident chaque choix.</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-        {values.map((value, index) => <ValueStory key={value.name} context={context} value={value} index={index + occurrence * batchSize} featured={index === 0} />)}
+        {values.map((value, index) => <ValueStory key={value.id || value.name} context={context} value={value} index={index + occurrence * batchSize} width={values.length === 3 ? "31%" : values.length === 2 ? "48%" : "100%"} />)}
       </View>
       <PageFooter context={context} plan={plan} />
     </Page>
@@ -253,16 +250,16 @@ function PositioningPage({ context, plan }: { context: RenderContext; plan: Edit
   const statement = data.positioning.find((item) => item.label.includes("final")) || data.positioning.at(-1);
   const contextField = data.positioning.find((item) => item !== statement);
   const layout = getPositioningLayout(statement?.value || "", contextField?.value || "");
-  const statementFit = fitTextToBox({ text: statement?.value || "", width: layout.columns ? 390 : 282, height: layout.columns ? 285 : 500, minFontSize: 20, maxFontSize: layout.statementFontSize, lineHeight: 1.18 });
+  const statementFit = fitTextToBox({ text: statement?.value || "", width: layout.columns ? 390 : 282, height: layout.columns ? 220 : 360, minFontSize: 15, maxFontSize: Math.min(22, layout.statementFontSize), lineHeight: 1.2 });
   return (
     <Page size="A4" style={styles.page}>
       <ChapterMarker context={context} plan={plan} />
-      <View wrap={false} style={{ flexDirection: layout.columns ? "column" : "row", minHeight: 610 }}>
+      <View wrap={false} style={{ flexDirection: layout.columns ? "column" : "row", minHeight: 520 }}>
         <View style={{ width: layout.columns ? "100%" : "36%", paddingRight: layout.columns ? 0 : 28, marginBottom: layout.columns ? 24 : 0, justifyContent: "space-between" }}>
-          <Text style={styles.h1}>La place que la marque choisit d’occuper.</Text>
-          {contextField ? <View style={{ marginTop: layout.columns ? 18 : 0 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>{contextField.label}</Text><Text style={[styles.body, { marginTop: 10, fontSize: layout.contextFontSize }]}>{contextField.value}</Text></View> : null}
+          <Text style={[styles.h1, { fontSize: TYPE.editorialLarge }]}>La place que la marque choisit d’occuper.</Text>
+          {contextField ? <View style={{ marginTop: layout.columns ? 18 : 0 }}><Text style={[styles.label, { color: theme.colors.mutedText }]}>{contextField.label}</Text><Text style={[styles.body, { marginTop: 10, fontSize: Math.max(10, Math.min(TYPE.bodyLarge, layout.contextFontSize)) }]}>{contextField.value}</Text></View> : null}
         </View>
-        <View wrap={false} style={{ width: layout.columns ? "100%" : "64%", minHeight: layout.columns ? 285 : 610, backgroundColor: theme.colors.primary, padding: 32, justifyContent: "center" }}>
+        <View wrap={false} style={{ width: layout.columns ? "100%" : "64%", minHeight: layout.columns ? 220 : 430, backgroundColor: theme.colors.primary, padding: 32, justifyContent: "center" }}>
           <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.primary), marginBottom: 28 }]}>Positionnement</Text>
           <Text style={[styles.quote, { fontSize: statementFit.fontSize, color: getAccessibleTextColor(theme.colors.primary) }]}>{statement?.value}</Text>
         </View>
@@ -284,7 +281,7 @@ function PersonalityPage({ context, plan }: { context: RenderContext; plan: Edit
           {portrait ? (
             // eslint-disable-next-line jsx-a11y/alt-text
             <Image src={portrait} style={{ width: "100%", height: 285, objectFit: "cover" }} />
-          ) : <View style={{ height: 285, backgroundColor: theme.colors.secondary, justifyContent: "center", padding: 24 }}><Text style={[styles.display, { fontSize: 38, color: getAccessibleTextColor(theme.colors.secondary) }]}>{identity.personalityTraits.join("\n")}</Text></View>}
+          ) : <View style={{ height: 260, backgroundColor: theme.colors.secondary, justifyContent: "center", padding: 24 }}><Text style={[styles.h2, { color: getAccessibleTextColor(theme.colors.secondary) }]}>{identity.personalityTraits.join("\n")}</Text></View>}
           {portraitField ? <Text style={[styles.body, { marginTop: 18 }]}>{portraitField.value}</Text> : null}
         </View>
         <View style={{ width: "51%" }}>
@@ -311,7 +308,7 @@ function MessagesPage({ context, plan }: { context: RenderContext; plan: Editori
         {data.messages.map((item, index) => (
           <View key={item.label} style={{ marginBottom: index === 0 ? 54 : 28 }}>
             <Text style={[styles.label, { color: getAccessibleTextColor(theme.colors.accent), opacity: 0.7 }]}>{item.label}</Text>
-            <Text style={[index === 0 ? styles.display : styles.h2, { color: getAccessibleTextColor(theme.colors.accent), marginTop: 12 }]}>{item.value}</Text>
+            <Text style={[index === 0 ? styles.quote : styles.h2, { fontSize: index === 0 ? selectEditorialTextStyle({ text: item.value, role: "statement" }).fontSize : TYPE.sectionTitle, color: getAccessibleTextColor(theme.colors.accent), marginTop: 12 }]}>{item.value}</Text>
           </View>
         ))}
       </View>
@@ -337,13 +334,13 @@ function VisualSystemPage({ context, plan }: { context: RenderContext; plan: Edi
             <Text style={[styles.label, { color: getAccessibleTextColor(color.hex) }]}>{color.name}</Text>
             <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 4 }]}>{color.hex}</Text>
             <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 4 }]}>{color.usage}</Text>
-            <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 3 }]}>{index === 0 ? "45 % du système" : `${Math.round(55 / Math.max(colors.length - 1, 1))} % du système`}</Text>
+            <Text style={[styles.small, { color: getAccessibleTextColor(color.hex), marginTop: 3 }]}>{index === 0 ? "Usage recommandé : 55 %" : `Usage recommandé : ${Math.round(45 / Math.max(colors.length - 1, 1))} %`}</Text>
           </View>
         ))}
       </View>
       <View style={{ flexDirection: "row", marginTop: 28, gap: 24 }}>
-        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie d’expression</Text><Text style={{ fontFamily: theme.typography.displayFont, fontSize: 34, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.displayFont}</Text></View>
-        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie de lecture</Text><Text style={{ fontFamily: theme.typography.bodyFont, fontSize: 28, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.bodyFont}</Text></View>
+        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie d’expression</Text><Text style={{ fontFamily: theme.typography.displayFont, fontSize: TYPE.editorialLarge, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.displayFont}</Text></View>
+        <View style={{ width: "48%" }}><Text style={[styles.label, { color: theme.colors.accent }]}>Typographie de lecture</Text><Text style={{ fontFamily: theme.typography.bodyFont, fontSize: TYPE.editorialMedium, marginTop: 12 }}>Aa Bb Cc</Text><Text style={[styles.small, { marginTop: 8 }]}>{theme.typography.bodyFont}</Text></View>
       </View>
       <PageFooter context={context} plan={plan} />
     </Page>
@@ -374,14 +371,14 @@ function MoodboardElement({ item, theme }: { item: GuideMoodboardItem; theme: Br
     const color = item.color || theme.colors.primary;
     return (
       <View style={[style, { justifyContent: "flex-end", padding: 10 }]}>
-        <Text style={{ fontSize: 8, fontWeight: 600, color: getAccessibleTextColor(color) }}>{item.label === "Couleur" ? "Teinte du moodboard" : item.label}</Text>
-        <Text style={{ fontSize: 7, marginTop: 4, color: getAccessibleTextColor(color) }}>{color.toUpperCase()}</Text>
+        <Text style={{ fontSize: TYPE.caption, fontWeight: 600, color: getAccessibleTextColor(color) }}>{item.label === "Couleur" ? "Teinte du moodboard" : item.label}</Text>
+        <Text style={{ fontSize: TYPE.caption, marginTop: 4, color: getAccessibleTextColor(color) }}>{color.toUpperCase()}</Text>
       </View>
     );
   }
   const available = Math.max(20, item.width * 4.55 - 16);
   const requested = item.fontSize || 12;
-  const fitted = item.type === "keyword" ? Math.max(6, Math.min(requested, available / Math.max(item.label.length * 0.62, 1))) : Math.min(requested, 24);
+  const fitted = item.type === "keyword" ? Math.max(TYPE.caption, Math.min(requested, available / Math.max(item.label.length * 0.62, 1))) : Math.max(TYPE.caption, Math.min(requested, 24));
   return <View style={[style, { justifyContent: "center", alignItems: "center", padding: 8 }]}><Text style={{ fontFamily: item.type === "text" ? theme.typography.displayFont : theme.typography.bodyFont, fontSize: fitted, fontWeight: item.type === "keyword" ? 600 : 400, textAlign: "center", color: item.textColor || theme.colors.text }}>{item.label}</Text></View>;
 }
 
@@ -401,7 +398,7 @@ function MoodboardPage({ context, plan }: { context: RenderContext; plan: Editor
 function ApplicationsPage({ context, plan }: { context: RenderContext; plan: EditorialPagePlan }) {
   const { data, styles, theme, identity } = context;
   const promise = selectApplicationMessage(data);
-  const messageFit = fitTextToBox({ text: promise, width: 240, height: 210, minFontSize: 20, maxFontSize: 38, lineHeight: 1.08 });
+  const messageFit = fitTextToBox({ text: promise, width: 240, height: 210, minFontSize: 14, maxFontSize: 26, lineHeight: 1.12 });
   const word = identity.visualKeywords[0] || identity.personalityTraits[0] || data.brandName;
   return (
     <Page size="A4" style={styles.page}>
@@ -414,12 +411,12 @@ function ApplicationsPage({ context, plan }: { context: RenderContext; plan: Edi
           <Text style={[styles.small, { color: getAccessibleTextColor(theme.colors.primary) }]}>Publication sociale · principe de composition</Text>
         </View>
         <View style={{ width: "42%" }}>
-          <View style={{ flexGrow: 1, backgroundColor: theme.colors.secondary, padding: 20, justifyContent: "center" }}><Text style={[styles.h2, { color: getAccessibleTextColor(theme.colors.secondary), fontSize: 28 }]}>{word}</Text></View>
+          <View style={{ flexGrow: 1, backgroundColor: theme.colors.secondary, padding: 20, justifyContent: "center" }}><Text style={[styles.h2, { color: getAccessibleTextColor(theme.colors.secondary) }]}>{word}</Text></View>
           <View style={{ flexGrow: 1, backgroundColor: theme.colors.surface, padding: 20, justifyContent: "space-between" }}>
             <Text style={styles.label}>Signature</Text>
             <BrandLockup context={context} size="small" />
-            {data.baseline ? <Text style={[styles.small, { fontSize: 7.5 }]}>{data.baseline}</Text> : null}
-            <Text style={[styles.label, { fontSize: 6.2, letterSpacing: 1.2, color: theme.colors.accent, borderTop: `1 solid ${theme.colors.accent}`, paddingTop: 8 }]}>EN SAVOIR PLUS</Text>
+            {data.baseline ? <Text style={styles.small}>{data.baseline}</Text> : null}
+            <Text style={[styles.label, { color: theme.colors.accent, borderTop: `1 solid ${theme.colors.accent}`, paddingTop: 8 }]}>EN SAVOIR PLUS</Text>
           </View>
         </View>
       </View>

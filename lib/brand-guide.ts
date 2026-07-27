@@ -14,6 +14,11 @@ import {
   parseStoredTableConfig,
 } from "@/lib/exercise-types";
 import { analyzeMoodboard, parseStoredMoodboardAnswer, type MoodboardAnswer } from "@/lib/moodboard";
+import {
+  normalizeBrandPalette,
+  normalizeBrandValuesFromExercise,
+  type BrandValue,
+} from "@/lib/brand-guide-normalizers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BrandProject, ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 
@@ -88,6 +93,7 @@ export type GeneratedBrandGuide = {
     mission: string;
     vision: string;
     values: string[];
+    brandValues?: BrandValue[];
     promise: string;
   };
   positioning: {
@@ -361,6 +367,24 @@ function collectColors(sources: AnswerSource[]) {
   };
 }
 
+function collectPaletteFromColorModule(modules: WorkspaceModule[]) {
+  const exercise = modules
+    .flatMap((module) => module.exercises)
+    .find((item) => item.type === "color_palette");
+  if (!exercise) return [];
+  const owner = modules.find((module) => module.exercises.some((item) => item.id === exercise.id));
+  return normalizeBrandPalette(owner?.answers[exercise.id] ?? []);
+}
+
+function collectBrandValues(modules: WorkspaceModule[]) {
+  const exercise = modules
+    .flatMap((module) => module.exercises)
+    .find((item) => item.type === "table" && normalizeForSearch(item.question).includes("valeur"));
+  if (!exercise) return [];
+  const owner = modules.find((module) => module.exercises.some((item) => item.id === exercise.id));
+  return normalizeBrandValuesFromExercise(owner?.answers[exercise.id] ?? []);
+}
+
 function collectMoodboard(sources: AnswerSource[]) {
   const source = sources.find((item) => item.exercise.type === "moodboard");
   const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
@@ -481,7 +505,18 @@ export function generateBrandGuide(input: {
 }): GeneratedBrandGuide {
   const sources = collectSources(input.modules);
   const brandName = compactText(input.brandName) || compactText(input.project.name) || "Ma marque";
-  const colors = collectColors(sources);
+  const normalizedPalette = collectPaletteFromColorModule(input.modules);
+  const colors = normalizedPalette.length > 0
+    ? {
+        primary: normalizedPalette.filter((color) => color.role === "primary").map((color) => ({
+          ...color, usage: color.usage || "", css: color.hex, role: "primary" as const,
+        })),
+        secondary: normalizedPalette.filter((color) => color.role !== "primary").map((color) => ({
+          ...color, usage: color.usage || "", css: color.hex, role: "secondary" as const,
+        })),
+      }
+    : collectColors(sources);
+  const brandValues = collectBrandValues(input.modules);
   const moodboard = collectMoodboard(sources);
 
   const missionSource = findSource(sources, [["mission"]]);
@@ -526,10 +561,9 @@ export function generateBrandGuide(input: {
 
   const primaryColorNames = colors.primary.map((color) => color.name);
   const toneWords = listFromText(traitsText || tone, ["Clair", "Coherent", "Professionnel"]).slice(0, 3);
-  const values = listFromText(
-    findText(sources, [["valeur"]], ""),
-    [MISSING.values],
-  );
+  const values = brandValues.length > 0
+    ? brandValues.map((value) => value.name).filter(Boolean)
+    : listFromText(findText(sources, [["valeur"]], ""), []);
   const wordsToUse = listFromText(
     findText(sources, [["mots", "utiliser"], ["vocabulaire", "privilegier"]], ""),
     ["Mots alignés avec le ton de marque à compléter."],
@@ -591,6 +625,7 @@ export function generateBrandGuide(input: {
       mission,
       vision,
       values,
+      brandValues,
       promise,
     },
     positioning: {
