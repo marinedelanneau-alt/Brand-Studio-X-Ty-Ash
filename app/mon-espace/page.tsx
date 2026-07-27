@@ -467,12 +467,12 @@ export default async function MonEspacePage() {
                   Création
                 </p>
                 <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[#4b4550] sm:text-[3rem]">
-                  Crée ton unique projet de marque
+                  Lance ton projet
                 </h2>
                 <p className="mt-4 max-w-xl text-base leading-8 text-[#7b7068]">
-                  Le projet commence simplement avec un nom. Tu pourras ensuite
-                  suivre les modules, les vidéos, le contenu et les exercices
-                  dans le bon ordre.
+                  Le projet commence simplement avec le nom de ton entreprise et
+                  ton logo (si tu en as déjà un). Tu pourras ensuite suivre
+                  l&apos;ensemble des modules et des exercices.
                 </p>
               </div>
 
