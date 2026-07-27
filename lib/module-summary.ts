@@ -491,7 +491,13 @@ function buildPositioningQuickRecap(module: WorkspaceModule) {
     },
     {
       label: "Ton positionnement formulé",
-      keywords: ["positionnement final", "phrase de positionnement", "positionnement en une phrase"],
+      keywords: [
+        "mon positionnement",
+        "ton positionnement",
+        "positionnement final",
+        "phrase de positionnement",
+        "positionnement en une phrase",
+      ],
     },
   ];
 
