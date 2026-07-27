@@ -181,6 +181,17 @@ export async function findUsableActivationCodeByToken(token: string) {
   return data;
 }
 
+export async function findActivationCodeByToken(token: string) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("purchase_activation_codes")
+    .select("*")
+    .eq("code", token)
+    .maybeSingle<ActivationCodeRecord>();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function consumeActivationCode(id: number) {
   const supabase = createSupabaseServerClient();
   const { error } = await supabase

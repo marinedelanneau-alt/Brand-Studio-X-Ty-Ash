@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import RegisterForm from "../ui/register-form";
-import { findUsableActivationCodeByToken } from "@/lib/activation-codes";
+import { findActivationCodeByToken, findUsableActivationCodeByToken } from "@/lib/activation-codes";
 
 const values = [
   "Lien personnel reçu après paiement",
@@ -20,6 +20,10 @@ export default async function RegisterPage({
   const activation = activationToken
     ? await findUsableActivationCodeByToken(activationToken)
     : null;
+  const activationRecord = activationToken && !activation
+    ? await findActivationCodeByToken(activationToken)
+    : activation;
+  const accountAlreadyCreated = Boolean(activationRecord?.consumed_at);
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -117,12 +121,18 @@ export default async function RegisterPage({
               <p className="mt-6 max-w-md text-base leading-7 text-[#82766b]">
                 {activation
                   ? "Choisis ton mot de passe pour créer ton compte. Ton adresse e-mail est déjà associée à ton paiement."
+                  : accountAlreadyCreated
+                    ? "Ton compte a déjà été créé avec ce lien. Tu peux maintenant te connecter avec ton e-mail et ton mot de passe."
                   : "Ce lien personnel est absent, invalide ou expiré. Reprends le lien reçu par e-mail après ton paiement."}
               </p>
 
               <div className="mt-7">
                 {activation ? (
                   <RegisterForm registrationToken={activation.code} email={activation.email} />
+                ) : accountAlreadyCreated ? (
+                  <Link href="/" className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)]">
+                    Me connecter
+                  </Link>
                 ) : (
                   <div className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffaf1] p-5 text-sm leading-7 text-[#82766b]">
                     Pour protéger ton accès, la création du compte est disponible uniquement depuis le lien personnel envoyé après ton paiement.
