@@ -40,6 +40,18 @@ export type ReleaseState = {
   updated_at: string;
 };
 
+export type ContentReleaseSchedule = {
+  id: string;
+  release_id: string;
+  scheduled_at: string;
+  timezone: string;
+  notes: string;
+  status: "scheduled" | "processing" | "published" | "cancelled" | "failed";
+  error_message: string | null;
+  created_at: string;
+  published_at: string | null;
+};
+
 export type ActiveContentRelease = {
   source: "legacy" | "controlled";
   release: ContentRelease | null;
@@ -259,6 +271,38 @@ export function publishContentRelease(input: {
     draft_release_id: input.releaseId,
     release_notes: input.notes,
   });
+}
+
+export function scheduleContentRelease(input: {
+  releaseId: string;
+  scheduledAt: string;
+  notes: string;
+}) {
+  return callAuthenticatedReleaseRpc("schedule_content_release", {
+    target_release_id: input.releaseId,
+    deployment_at: input.scheduledAt,
+    deployment_notes: input.notes,
+  });
+}
+
+export function cancelContentReleaseSchedule(scheduleId: string) {
+  return callAuthenticatedReleaseRpc("cancel_content_release_schedule", {
+    target_schedule_id: scheduleId,
+  });
+}
+
+export async function listContentReleaseSchedules() {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("content_release_schedules")
+    .select(
+      "id,release_id,scheduled_at,timezone,notes,status,error_message,created_at,published_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(20)
+    .returns<ContentReleaseSchedule[]>();
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export function updateCurrentDraftSnapshot(input: {

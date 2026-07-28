@@ -43,5 +43,46 @@ export async function GET(request: Request) {
       await supabase.from("admin_deployment_schedules").update({ status: "failed", error_message: cause instanceof Error ? cause.message : "Erreur inconnue", updated_at: new Date().toISOString() }).eq("id", schedule.id);
     }
   }
-  return NextResponse.json({ publishedVersions: data ?? 0, deployments, activationEmails });
+  const { data: releaseSchedules, error: releaseSchedulesError } = await supabase
+    .from("content_release_schedules")
+    .select("id")
+    .eq("status", "scheduled")
+    .lte("scheduled_at", new Date().toISOString())
+    .limit(10)
+    .returns<Array<{ id: string }>>();
+  let releaseDeployments = 0;
+  if (!releaseSchedulesError) {
+    for (const schedule of releaseSchedules ?? []) {
+      const { data: claimed } = await supabase
+        .from("content_release_schedules")
+        .update({ status: "processing", updated_at: new Date().toISOString() })
+        .eq("id", schedule.id)
+        .eq("status", "scheduled")
+        .select("id")
+        .maybeSingle();
+      if (!claimed) continue;
+      const { error: publicationError } = await supabase.rpc(
+        "publish_scheduled_content_release",
+        { target_schedule_id: schedule.id },
+      );
+      if (publicationError) {
+        await supabase
+          .from("content_release_schedules")
+          .update({
+            status: "failed",
+            error_message: publicationError.message,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", schedule.id);
+      } else {
+        releaseDeployments += 1;
+      }
+    }
+  }
+  return NextResponse.json({
+    publishedVersions: data ?? 0,
+    deployments,
+    releaseDeployments,
+    activationEmails,
+  });
 }

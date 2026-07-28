@@ -18,6 +18,17 @@ const resolver = readFileSync(
   new URL("../lib/content-releases.ts", import.meta.url),
   "utf8",
 );
+const schedulingMigration = readFileSync(
+  new URL(
+    "../supabase/migrations/20260728170000_schedule_content_releases.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const releasesPage = readFileSync(
+  new URL("../app/admin/releases/page.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("migration contrôlée des releases", () => {
   it("reste additive et ne détruit aucune table ou réponse historique", () => {
@@ -148,6 +159,36 @@ describe("identité stable et comparaison", () => {
     expect(summary.removed).toBe(1);
     expect(summary.modified).toBeGreaterThanOrEqual(1);
     expect(summary.moved).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("déploiement global programmé", () => {
+  it("ne touche jamais au contenu historique ni aux réponses", () => {
+    expect(schedulingMigration).not.toMatch(
+      /\b(?:delete|update)\s+(?:from\s+)?public\.(?:brand_modules|brand_submodules|module_exercises|project_exercise_answers|user_answers)\b/i,
+    );
+  });
+
+  it("réserve l'exécution automatique au service cron", () => {
+    expect(schedulingMigration).toContain(
+      "revoke all on function public.publish_scheduled_content_release(uuid)",
+    );
+    expect(schedulingMigration).toContain("from public, anon, authenticated");
+    expect(schedulingMigration).toContain("to service_role");
+  });
+
+  it("conserve une confirmation persistante après publication", () => {
+    expect(schedulingMigration).toContain("status = 'published'");
+    expect(schedulingMigration).toContain("published_at = now()");
+    expect(releasesPage).toContain("Confirmations de déploiement");
+    expect(releasesPage).toContain("Déploiement effectué");
+  });
+
+  it("propose le déploiement immédiat et la programmation", () => {
+    expect(releasesPage).toContain(
+      "Déployer à tous les utilisateurs maintenant",
+    );
+    expect(releasesPage).toContain("Programmer le déploiement");
   });
 });
 

@@ -143,7 +143,7 @@ begin
   if nullif(btrim(draft_name), '') is null then raise exception 'draft name required'; end if;
 
   select * into state_row from public.application_release_state where id = 1 for update;
-  select * into source_row from public.content_releases where id = source_release_id;
+  select * into source_row from public.content_releases where id = $1;
   if source_row.id is null then raise exception 'source release not found'; end if;
 
   if state_row.current_draft_release_id is not null then
