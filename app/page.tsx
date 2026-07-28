@@ -108,9 +108,6 @@ export default async function Home({
                   <h2 className="font-[family:var(--font-cormorant)] text-[2rem] leading-[0.92] tracking-[-0.04em] text-[#4b4550] sm:text-[2.35rem]">
                     Ouvrir ton espace
                   </h2>
-                  <p className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-5 py-3 text-[0.7rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
-                    Espace de travail
-                  </p>
                 </div>
 
                 <p className="mt-3 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[#7b7068]">
