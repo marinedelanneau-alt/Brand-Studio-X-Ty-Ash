@@ -28,6 +28,8 @@ export function useAnswerSync(input: {
   const [status, setStatus] = useState<AnswerSyncStatus>("local");
   const [errorMessage, setErrorMessage] = useState("");
   const syncingRef = useRef(false);
+  const syncRequestedRef = useRef(false);
+  const syncRef = useRef<() => Promise<void>>(async () => undefined);
   const retryTimerRef = useRef<number | null>(null);
   const channelRef = useRef<BroadcastChannel | null>(null);
   const onRemoteAnswersRef = useRef(input.onRemoteAnswers);
@@ -37,7 +39,11 @@ export function useAnswerSync(input: {
   const enabled = input.enabled;
 
   const sync = useCallback(async () => {
-    if (!enabled || syncingRef.current) return;
+    if (!enabled) return;
+    if (syncingRef.current) {
+      syncRequestedRef.current = true;
+      return;
+    }
     if (!navigator.onLine) {
       setStatus("offline");
       return;
@@ -88,8 +94,13 @@ export function useAnswerSync(input: {
       debugSync("error", { message, delay });
     } finally {
       syncingRef.current = false;
+      if (syncRequestedRef.current) {
+        syncRequestedRef.current = false;
+        queueMicrotask(() => void syncRef.current());
+      }
     }
   }, [enabled, moduleId, projectId, scopeKey, userId]);
+  syncRef.current = sync;
 
   useEffect(() => {
     if (!enabled) return;

@@ -25,6 +25,7 @@ export function usePersistentAnswers(input: {
   const [hasHydrated, setHasHydrated] = useState(false);
   const [changeToken, setChangeToken] = useState(0);
   const userInteractionRef = useRef(false);
+  const locallyEditedDuringHydrationRef = useRef(new Set<number>());
   const answersRef = useRef(answers);
   const broadcastAnswerRef = useRef<(answer: LocalAnswerRecord) => void>(() => undefined);
   const { userId, projectId, moduleId } = input.scope;
@@ -47,6 +48,11 @@ export function usePersistentAnswers(input: {
       const next = { ...current };
       let changed = false;
       for (const record of records) {
+        if (
+          locallyEditedDuringHydrationRef.current.has(record.exerciseId)
+        ) {
+          continue;
+        }
         const values = record.deleted ? [] : record.values;
         if (JSON.stringify(next[record.exerciseId] ?? []) !== JSON.stringify(values)) {
           next[record.exerciseId] = [...values];
@@ -85,6 +91,7 @@ export function usePersistentAnswers(input: {
       const merged = await mergeRemoteModuleAnswers(scope, remoteVersions);
       if (cancelled) return;
       applyRecords(merged);
+      locallyEditedDuringHydrationRef.current.clear();
 
       const knownExerciseIds = new Set(
         [...localFirst, ...merged].map((answer) => answer.exerciseId),
@@ -122,12 +129,7 @@ export function usePersistentAnswers(input: {
     return () => {
       cancelled = true;
     };
-  }, [applyRecords, moduleId, projectId, remoteVersions, userId]);
-
-  const hasHydratedRef = useRef(hasHydrated);
-  useEffect(() => {
-    hasHydratedRef.current = hasHydrated;
-  }, [hasHydrated]);
+  }, [applyRecords, input.module.exercises, moduleId, projectId, remoteVersions, userId]);
 
   const setAnswers = useCallback(
     (update: AnswersByExercise | ((current: AnswersByExercise) => AnswersByExercise)) => {
@@ -136,12 +138,14 @@ export function usePersistentAnswers(input: {
         answersRef.current = next;
         setAnswersState(next);
 
-        if (!hasHydratedRef.current) return;
-
         for (const exercise of exercisesRef.current) {
           const previousValues = current[exercise.id] ?? [];
           const nextValues = next[exercise.id] ?? [];
           if (JSON.stringify(previousValues) === JSON.stringify(nextValues)) continue;
+
+          if (!hasHydrated) {
+            locallyEditedDuringHydrationRef.current.add(exercise.id);
+          }
 
           const explicitDelete =
             userInteractionRef.current && hasValue(previousValues) && !hasValue(nextValues);
@@ -155,12 +159,14 @@ export function usePersistentAnswers(input: {
           }).then((record) => {
             broadcastAnswerRef.current(record);
             setChangeToken((token) => token + 1);
+          }).catch((error) => {
+            console.error("[Brand Studio persistence] local write failed", error);
           });
         }
 
         userInteractionRef.current = false;
     },
-    [moduleId, projectId, userId],
+    [hasHydrated, moduleId, projectId, userId],
   );
 
   const markUserInteraction = useCallback(() => {

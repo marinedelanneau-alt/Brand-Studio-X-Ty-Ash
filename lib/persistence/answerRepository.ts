@@ -146,7 +146,34 @@ export async function acknowledgeMutations(
   scope: AnswerPersistenceScope,
   remoteAnswers: RemoteAnswerVersion[],
 ) {
-  return mergeRemoteModuleAnswers(scope, remoteAnswers);
+  const merged = await mergeRemoteModuleAnswers(scope, remoteAnswers);
+  const db = getAnswerDatabase();
+
+  // An exact server echo is a successful acknowledgement too. The conflict
+  // resolver deliberately keeps the local record on an exact tie, so relying
+  // on `source === "remote"` alone leaves the mutation queued forever.
+  await db.transaction("rw", db.mutations, async () => {
+    for (const remote of remoteAnswers) {
+      const mutationId = getAnswerKey(scope, remote.exerciseId);
+      const pending = await db.mutations.get(mutationId);
+      if (!pending) continue;
+
+      const serverHasAcknowledgedThisMutation =
+        remote.updatedAt > pending.updatedAt ||
+        (
+          remote.updatedAt === pending.updatedAt &&
+          remote.revision >= pending.revision &&
+          remote.deleted === (pending.operation === "delete") &&
+          JSON.stringify(remote.values) === JSON.stringify(pending.values)
+        );
+
+      if (serverHasAcknowledgedThisMutation) {
+        await db.mutations.delete(mutationId);
+      }
+    }
+  });
+
+  return merged;
 }
 
 export async function failMutations(ids: string[], message: string) {

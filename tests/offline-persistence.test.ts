@@ -4,6 +4,7 @@ import { getAnswerDatabase } from "../lib/persistence/answerDatabase";
 import {
   failMutations,
   getPendingMutations,
+  acknowledgeMutations,
   loadLocalModuleAnswers,
   mergeRemoteModuleAnswers,
   persistLocalAnswer,
@@ -69,6 +70,25 @@ describe("offline-first answer repository", () => {
       deleted: false,
     }]);
     expect(merged[0]?.values).toEqual(["distant récent"]);
+    expect(await getAnswerDatabase().mutations.count()).toBe(0);
+  });
+
+  it("acknowledges an exact server echo and removes it from the queue", async () => {
+    const local = await persistLocalAnswer({
+      scope,
+      exerciseId: 10,
+      values: ["enregistrée"],
+      explicitDelete: false,
+    });
+    const merged = await acknowledgeMutations(scope, [{
+      exerciseId: local.exerciseId,
+      values: local.values,
+      revision: local.revision,
+      updatedAt: local.updatedAt,
+      deleted: false,
+    }]);
+
+    expect(merged[0]?.values).toEqual(["enregistrée"]);
     expect(await getAnswerDatabase().mutations.count()).toBe(0);
   });
 
