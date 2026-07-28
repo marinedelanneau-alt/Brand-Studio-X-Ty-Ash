@@ -1,19 +1,13 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { updatePassword } from "../login";
 
 type ActionState = {
   status: "idle" | "error" | "success";
   message: string;
-};
-
-const initialState: ActionState = {
-  status: "idle",
-  message: "",
 };
 
 const inputClassName =
@@ -25,7 +19,11 @@ export default function ResetPasswordForm({
   hasCallbackError?: boolean;
 }) {
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(updatePassword, initialState);
+  const [state, setState] = useState<ActionState>({
+    status: "idle",
+    message: "",
+  });
+  const [pending, setPending] = useState(false);
   const [linkError, setLinkError] = useState(hasCallbackError);
   const [sessionReady, setSessionReady] = useState(false);
 
@@ -81,19 +79,54 @@ export default function ResetPasswordForm({
     };
   }, []);
 
-  useEffect(() => {
-    if (state.status !== "success") {
+  const updateRecoveryPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const password = String(new FormData(event.currentTarget).get("password") ?? "");
+    if (password.length < 8) {
+      setState({
+        status: "error",
+        message: "Le mot de passe doit contenir au moins 8 caractères.",
+      });
       return;
     }
 
-    startTransition(() => {
-      router.push("/mon-espace");
-      router.refresh();
+    setPending(true);
+    const supabase = createSupabaseBrowserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setLinkError(true);
+      setState({
+        status: "error",
+        message:
+          "La session de réinitialisation a expiré. Demande un nouveau lien.",
+      });
+      setPending(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      setState({
+        status: "error",
+        message:
+          "Le mot de passe n’a pas pu être mis à jour. Demande un nouveau lien si celui-ci a expiré.",
+      });
+      setPending(false);
+      return;
+    }
+
+    setState({
+      status: "success",
+      message: "Mot de passe mis à jour. Redirection en cours…",
     });
-  }, [router, state.status]);
+    router.push("/mon-espace");
+    router.refresh();
+  };
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form onSubmit={updateRecoveryPassword} className="space-y-5">
       {linkError ? (
         <div
           role="alert"
@@ -115,7 +148,7 @@ export default function ResetPasswordForm({
           minLength={8}
           disabled={linkError || !sessionReady}
           autoComplete="new-password"
-          placeholder="8 caracteres minimum"
+          placeholder="8 caractères minimum"
           className={inputClassName}
         />
       </label>
@@ -126,7 +159,7 @@ export default function ResetPasswordForm({
         className="flex h-13 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.92rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_24px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending
-          ? "Mise a jour..."
+          ? "Mise à jour…"
           : sessionReady
             ? "Enregistrer mon mot de passe"
             : "Validation du lien..."}

@@ -240,24 +240,24 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
         <div style="height:8px; background:linear-gradient(90deg,#cf7430 0%,#f0cf55 100%);"></div>
         <div style="padding:36px 38px 40px;">
           <img src="${logoUrl}" width="132" alt="Brand Studio" style="display:block; width:132px; height:auto; margin:0 0 30px;">
-          <p style="margin:0; color:#cf7430; font-size:12px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase;">Ton aventure commence ici</p>
-          <h1 style="margin:14px 0 18px; color:#4b4550; font-family:Georgia,'Times New Roman',serif; font-size:40px; font-weight:500; line-height:1.05;">Bienvenue dans ton Brand Studio&nbsp;!</h1>
+          <p style="margin:0; color:#cf7430; font-size:12px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase;">Sécurité du compte</p>
+          <h1 style="margin:14px 0 18px; color:#4b4550; font-family:Georgia,'Times New Roman',serif; font-size:40px; font-weight:500; line-height:1.05;">Réinitialise ton mot de passe</h1>
           <p style="margin:0 0 16px; color:#6f645b; font-size:16px; line-height:1.75;">
-            Ton espace est prêt. Tu vas pouvoir poser les fondations de ta marque, affirmer ce qui la rend unique et construire une identité qui te ressemble vraiment.
+            Tu as demandé à modifier le mot de passe de ton espace Brand Studio.
           </p>
           <p style="margin:0 0 28px; color:#6f645b; font-size:16px; line-height:1.75;">
-            Choisis maintenant ton mot de passe pour ouvrir les portes de ton studio et commencer ton parcours.
+            Clique sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien est personnel et temporaire.
           </p>
           <a href="${input.resetUrl}" style="display:inline-block; padding:17px 26px; border-radius:16px; background:linear-gradient(135deg,#df9b39,#f1cc56); color:#ffffff; text-decoration:none; font-size:13px; font-weight:800; letter-spacing:0.10em; text-transform:uppercase; box-shadow:0 12px 26px rgba(223,155,57,0.22);">
-            Créer mon mot de passe
+            Modifier mon mot de passe
           </a>
           <div style="margin-top:30px; padding:18px 20px; border:1px solid #f0e4d3; border-radius:16px; background:#fffdf8;">
             <p style="margin:0; color:#7b7068; font-size:13px; line-height:1.65;">
-              Ce lien est personnel et temporaire. Si tu n&apos;es pas à l&apos;origine de cette demande, tu peux simplement ignorer cet e-mail.
+              Si tu n&apos;es pas à l&apos;origine de cette demande, ne clique pas sur le lien et conserve ton mot de passe actuel.
             </p>
           </div>
           <p style="margin:30px 0 0; color:#4b4550; font-size:15px; line-height:1.7;">
-            À tout de suite dans le studio,<br>
+            À bientôt dans le studio,<br>
             <strong style="color:#cf7430;">L&apos;équipe Brand Studio</strong>
           </p>
         </div>
@@ -271,21 +271,21 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
   `;
 
   const text = [
-    "Bienvenue dans ton Brand Studio !",
+    "Réinitialise ton mot de passe Brand Studio",
     "",
-    "Ton espace est prêt. Tu vas pouvoir poser les fondations de ta marque, affirmer ce qui la rend unique et construire une identité qui te ressemble vraiment.",
+    "Tu as demandé à modifier le mot de passe de ton espace Brand Studio.",
     "",
-    "Choisis ton mot de passe pour commencer ton parcours :",
+    "Choisis un nouveau mot de passe :",
     input.resetUrl,
     "",
     "Ce lien est personnel et temporaire. Si tu n'es pas à l'origine de cette demande, ignore cet e-mail.",
     "",
-    "À tout de suite dans le studio,",
+    "À bientôt dans le studio,",
     "L'équipe Brand Studio",
   ].join("\n");
 
   await brevo.transactionalEmails.sendTransacEmail({
-    subject: "Bienvenue dans ton Brand Studio ✨",
+    subject: "Réinitialisation de ton mot de passe Brand Studio",
     sender: {
       email: config.senderEmail,
       name: config.senderName,
