@@ -51,6 +51,10 @@ export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
     process.env.NEXT_PUBLIC_FORMATION_URL ?? "http://localhost:3000";
 
   const html = `
+    <!doctype html>
+    <html lang="fr">
+    <head><meta charset="UTF-8"></head>
+    <body style="margin:0;">
     <div style="font-family: Arial, sans-serif; background:#f7f1e9; padding:32px;">
       <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:24px; overflow:hidden; border:1px solid #eadfce;">
         <div style="height:6px; background:linear-gradient(90deg,#b67d3d,#e4bb72);"></div>
@@ -73,6 +77,8 @@ export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
         </div>
       </div>
     </div>
+    </body>
+    </html>
   `;
 
   const text = [
@@ -139,6 +145,10 @@ export async function sendAccountActivationEmail(
   registerUrl.searchParams.set("activation", input.activationToken);
   const logoUrl = new URL("/logo.png", getPublicFormationUrl()).toString();
   const html = `
+    <!doctype html>
+    <html lang="fr">
+    <head><meta charset="UTF-8"></head>
+    <body style="margin:0;">
     <div style="margin:0; padding:40px 16px; background:#fffaf2; font-family:Arial,Helvetica,sans-serif;">
       <div style="max-width:620px; margin:0 auto; overflow:hidden; border:1px solid #eadfca; border-radius:28px; background:#ffffff; box-shadow:0 18px 46px rgba(126,102,78,0.10);">
         <div style="height:8px; background:linear-gradient(90deg,#cf7430 0%,#f0cf55 100%);"></div>
@@ -170,6 +180,8 @@ export async function sendAccountActivationEmail(
         Brand Studio — construis une marque forte, cohérente et profondément singulière.
       </p>
     </div>
+    </body>
+    </html>
   `;
 
   const text = [
@@ -219,6 +231,10 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
   const logoUrl = new URL("/logo.png", getPublicFormationUrl()).toString();
 
   const html = `
+    <!doctype html>
+    <html lang="fr">
+    <head><meta charset="UTF-8"></head>
+    <body style="margin:0;">
     <div style="margin:0; padding:40px 16px; background:#fffaf2; font-family:Arial,Helvetica,sans-serif;">
       <div style="max-width:620px; margin:0 auto; overflow:hidden; border:1px solid #eadfca; border-radius:28px; background:#ffffff; box-shadow:0 18px 46px rgba(126,102,78,0.10);">
         <div style="height:8px; background:linear-gradient(90deg,#cf7430 0%,#f0cf55 100%);"></div>
@@ -250,6 +266,8 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
         Brand Studio — construis une marque forte, cohérente et profondément singulière.
       </p>
     </div>
+    </body>
+    </html>
   `;
 
   const text = [
