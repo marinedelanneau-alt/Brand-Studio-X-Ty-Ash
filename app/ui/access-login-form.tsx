@@ -19,7 +19,7 @@ const initialState: ActionState = {
 };
 
 const inputClassName =
-  "h-13 w-full rounded-[1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-[0.95rem] text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_22px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[#a19388] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/22";
+  "h-12 w-full rounded-[1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-[0.92rem] text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_20px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[#a19388] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/22";
 
 export default function AccessLoginForm() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function AccessLoginForm() {
   }, [router, state.status]);
 
   return (
-    <form action={formAction} className="max-w-[41rem] space-y-5">
+    <form action={formAction} className="max-w-[41rem] space-y-4">
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -119,7 +119,7 @@ export default function AccessLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="flex h-13 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.92rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_24px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+        className="flex h-12 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.86rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Connexion..." : "Entrer"}
       </button>
@@ -134,7 +134,7 @@ export default function AccessLoginForm() {
         {resetPending ? "Envoi en cours..." : "Mot de passe oublie ?"}
       </button>
 
-      <div className="min-h-7">
+      <div className="min-h-5">
         {visibleState.message ? (
           <p
             aria-live="polite"
