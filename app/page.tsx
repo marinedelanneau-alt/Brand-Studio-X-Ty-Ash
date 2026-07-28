@@ -104,12 +104,6 @@ export default async function Home({
               </div>
 
               <div>
-                <div className="flex flex-col items-start gap-3">
-                  <h2 className="font-[family:var(--font-cormorant)] text-[2rem] leading-[0.92] tracking-[-0.04em] text-[#4b4550] sm:text-[2.35rem]">
-                    Ouvrir ton espace
-                  </h2>
-                </div>
-
                 <p className="mt-3 text-sm font-extrabold text-[#4b4550]">
                   Déjà client ?
                 </p>
