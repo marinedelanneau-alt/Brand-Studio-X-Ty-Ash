@@ -3,6 +3,7 @@ import DatabaseErrorState from "@/app/ui/database-error-state";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
+import { isLegalPreviewEnabled } from "@/lib/legal";
 
 export default async function AdminLayout({
   children,
@@ -37,6 +38,7 @@ export default async function AdminLayout({
     <AdminShell
       adminName={account.client_name ?? "Administrateur"}
       adminEmail={account.email}
+      showLegal={isLegalPreviewEnabled()}
     >
       {children}
     </AdminShell>

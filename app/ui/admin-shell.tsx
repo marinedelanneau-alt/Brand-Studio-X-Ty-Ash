@@ -7,6 +7,7 @@ import {
   HomeIcon,
   Square2StackIcon,
   UsersIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/solid";
 import LogoutButton from "./logout-button";
 
@@ -14,6 +15,7 @@ type AdminShellProps = {
   adminName: string;
   adminEmail: string;
   children: React.ReactNode;
+  showLegal?: boolean;
 };
 
 const navItems = [
@@ -27,6 +29,7 @@ export default function AdminShell({
   adminName,
   adminEmail,
   children,
+  showLegal = false,
 }: AdminShellProps) {
   const pathname = usePathname();
 
@@ -46,7 +49,7 @@ export default function AdminShell({
             </div>
 
             <nav className="mt-6 space-y-2">
-              {navItems.map((item) => {
+              {[...navItems, ...(showLegal ? [{ href: "/admin/legal", label: "Documents juridiques", icon: DocumentTextIcon }] : [])].map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
 
