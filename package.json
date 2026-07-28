@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test:persistence": "vitest run tests/offline-persistence.test.ts tests/module-routing.test.ts",
+    "test:persistence": "vitest run tests/offline-persistence.test.ts tests/module-routing.test.ts tests/stable-answer-keys.test.ts",
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",

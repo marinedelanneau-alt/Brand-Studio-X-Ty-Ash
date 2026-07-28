@@ -1,4 +1,5 @@
 import "server-only";
+import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -2140,12 +2141,36 @@ export async function getWorkspaceData(accountId: number) {
     }
 
     for (const stableAnswer of stableModuleAnswers) {
-      const positionMatch = stableAnswer.question_key.match(
+      const scopedPositionMatch = stableAnswer.question_key.match(
+        /^module_position_\d+_(module_root|submodule_position_(\d+))_exercise_position_(\d+)$/,
+      );
+      const legacyPositionMatch = stableAnswer.question_key.match(
         /^module_position_\d+_exercise_position_(\d+)$/,
       );
-      const exerciseId: number | undefined = positionMatch
-        ? module.exercises.find((exercise) => exercise.position === Number(positionMatch[1]))?.id
-        : Number(stableAnswer.question_key.replace(/^question_/, ""));
+      const exerciseId: number | undefined = scopedPositionMatch
+        ? module.exercises.find((exercise) => {
+            const exerciseSubmodule = module.submodules.find(
+              (submodule) => submodule.id === exercise.submodule_id,
+            );
+            const expectedSubmodulePosition =
+              scopedPositionMatch[1] === "module_root"
+                ? null
+                : Number(scopedPositionMatch[2]);
+            return (
+              exercise.position === Number(scopedPositionMatch[3]) &&
+              (exerciseSubmodule?.position ?? null) === expectedSubmodulePosition
+            );
+          })?.id
+        : legacyPositionMatch
+          ? (() => {
+              const matches = module.exercises.filter(
+                (exercise) => exercise.position === Number(legacyPositionMatch[1]),
+              );
+              // Old position-only keys are safe only when the position is unique
+              // across the whole module. Ambiguous rows must never be copied.
+              return matches.length === 1 ? matches[0].id : undefined;
+            })()
+          : Number(stableAnswer.question_key.replace(/^question_/, ""));
       if (typeof exerciseId !== "number" || !Number.isFinite(exerciseId)) continue;
       const value = stableAnswer.answer_value;
       answersMap[exerciseId] = Array.isArray(value)
@@ -2300,6 +2325,7 @@ export async function upsertStableModuleAnswers(input: {
   answers: Array<{
     exerciseId: number;
     exercisePosition: number;
+    submodulePosition: number | null;
     values: string[];
     clientUpdatedAt: number;
     revision?: number;
@@ -2313,8 +2339,16 @@ export async function upsertStableModuleAnswers(input: {
     project_id: input.projectId,
     module_key: `module_position_${input.modulePosition}`,
     submodule_key: "stable_position",
-    exercise_key: `module_position_${input.modulePosition}_exercise_position_${answer.exercisePosition}`,
-    question_key: `module_position_${input.modulePosition}_exercise_position_${answer.exercisePosition}`,
+    exercise_key: getStableExerciseAnswerKey({
+      modulePosition: input.modulePosition,
+      submodulePosition: answer.submodulePosition,
+      exercisePosition: answer.exercisePosition,
+    }),
+    question_key: getStableExerciseAnswerKey({
+      modulePosition: input.modulePosition,
+      submodulePosition: answer.submodulePosition,
+      exercisePosition: answer.exercisePosition,
+    }),
     field_key: "answer",
     answer_value: answer.values,
     source_version_id: null,

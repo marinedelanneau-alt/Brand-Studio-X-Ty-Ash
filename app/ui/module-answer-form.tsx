@@ -47,6 +47,7 @@ import VoiceNotePlayer from "./voice-note-player";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import { usePersistentAnswers } from "@/hooks/usePersistentAnswers";
 import type { AnswerPersistenceScope } from "@/lib/persistence/types";
+import { getStableBrowserExerciseSlot } from "@/lib/stable-answer-keys";
 import { getModuleHref } from "@/lib/module-routing";
 import {
   cleanStoredExerciseQuestionText,
@@ -77,6 +78,7 @@ type StoredAnswersDraft = {
   updatedAt: number;
   answers: AnswersByExercise;
   pendingExerciseIds: number[];
+  stableKeyVersion: number;
 };
 type AiAssistMode = "suggest" | "improve";
 type AiAssistState = {
@@ -885,6 +887,8 @@ function parseStoredAnswersDraft(value: string | null): StoredAnswersDraft | nul
     return {
       updatedAt,
       answers,
+      stableKeyVersion:
+        "stableKeyVersion" in parsed && parsed.stableKeyVersion === 2 ? 2 : 1,
       pendingExerciseIds:
         "pendingExerciseIds" in parsed && Array.isArray(parsed.pendingExerciseIds)
           ? parsed.pendingExerciseIds
@@ -927,19 +931,28 @@ function readBrowserAnswersDraft(module: WorkspaceModule) {
     getStableLocalAnswersDraftKey(module.position),
     getStableSessionAnswersDraftKey(module.position),
   );
+  const usableStableDraft = stableDraft?.stableKeyVersion === 2 ? stableDraft : null;
+  const getStableSlot = (exercise: ModuleExercise) => {
+    const submodulePosition =
+      module.submodules.find((submodule) => submodule.id === exercise.submodule_id)?.position ?? null;
+    return getStableBrowserExerciseSlot({
+      submodulePosition,
+      exercisePosition: exercise.position,
+    });
+  };
   const exerciseIdByPosition = new Map(
-    module.exercises.map((exercise) => [exercise.position, exercise.id]),
+    module.exercises.map((exercise) => [getStableSlot(exercise), exercise.id]),
   );
-  const stableAnswers = stableDraft
+  const stableAnswers = usableStableDraft
     ? Object.fromEntries(
-        Object.entries(stableDraft.answers).flatMap(([position, values]) => {
+        Object.entries(usableStableDraft.answers).flatMap(([position, values]) => {
           const exerciseId = exerciseIdByPosition.get(Number(position));
           return exerciseId ? [[exerciseId, values]] : [];
         }),
       ) as AnswersByExercise
     : null;
-  const stablePendingExerciseIds = stableDraft
-    ? stableDraft.pendingExerciseIds.flatMap((position) => {
+  const stablePendingExerciseIds = usableStableDraft
+    ? usableStableDraft.pendingExerciseIds.flatMap((position) => {
         const exerciseId = exerciseIdByPosition.get(position);
         return exerciseId ? [exerciseId] : [];
       })
@@ -948,22 +961,24 @@ function readBrowserAnswersDraft(module: WorkspaceModule) {
   if (!idDraft) {
     return stableAnswers
       ? {
-          updatedAt: stableDraft?.updatedAt ?? 0,
+          updatedAt: usableStableDraft?.updatedAt ?? 0,
           answers: stableAnswers,
           pendingExerciseIds: stablePendingExerciseIds,
+          stableKeyVersion: 2,
         }
       : null;
   }
 
-  if (!stableDraft || idDraft.updatedAt >= stableDraft.updatedAt) {
+  if (!usableStableDraft || idDraft.updatedAt >= usableStableDraft.updatedAt) {
     return idDraft;
   }
 
   return stableAnswers
     ? {
-        updatedAt: stableDraft.updatedAt,
+        updatedAt: usableStableDraft.updatedAt,
         answers: stableAnswers,
         pendingExerciseIds: stablePendingExerciseIds,
+        stableKeyVersion: 2,
       }
     : idDraft;
 }
@@ -992,15 +1007,29 @@ function writeBrowserAnswersDraft(
   });
   const stablePayload = JSON.stringify({
     updatedAt,
+    stableKeyVersion: 2,
     answers: Object.fromEntries(
       module.exercises.map((exercise) => [
-        exercise.position,
+        getStableBrowserExerciseSlot({
+          submodulePosition:
+            module.submodules.find((submodule) => submodule.id === exercise.submodule_id)?.position ??
+            null,
+          exercisePosition: exercise.position,
+        }),
         answers[exercise.id] ?? [],
       ]),
     ),
     pendingExerciseIds: module.exercises
       .filter((exercise) => pendingExerciseIds.includes(exercise.id))
-      .map((exercise) => exercise.position),
+      .map(
+        (exercise) =>
+          getStableBrowserExerciseSlot({
+            submodulePosition:
+              module.submodules.find((submodule) => submodule.id === exercise.submodule_id)
+                ?.position ?? null,
+            exercisePosition: exercise.position,
+          }),
+      ),
   });
 
   try {

@@ -50,6 +50,9 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
       .filter((exercise) => isAnswerableExerciseType(exercise.type))
       .map((exercise) => [exercise.id, exercise]),
   );
+  const submodulePositionById = new Map(
+    selectedModule.submodules.map((submodule) => [submodule.id, submodule.position]),
+  );
   const validMutations = mutations.filter(
     (mutation) =>
       mutation.userId === account.id &&
@@ -112,6 +115,12 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
     answers: validMutations.map((mutation) => ({
       exerciseId: mutation.exerciseId,
       exercisePosition: exerciseById.get(mutation.exerciseId)!.position,
+      submodulePosition: (() => {
+        const submoduleId = exerciseById.get(mutation.exerciseId)!.submodule_id;
+        return submoduleId === null
+          ? null
+          : (submodulePositionById.get(submoduleId) ?? null);
+      })(),
       values: mutation.operation === "delete" ? [] : mutation.values,
       clientUpdatedAt: mutation.updatedAt,
       revision: mutation.revision,

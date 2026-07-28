@@ -160,6 +160,9 @@ async function persistModuleAnswers(input: {
     const exerciseById = new Map(
       selectedModule.exercises.map((exercise) => [exercise.id, exercise]),
     );
+    const submodulePositionById = new Map(
+      selectedModule.submodules.map((submodule) => [submodule.id, submodule.position]),
+    );
 
     if (
       workspace.contentPreview.isPreviewMode &&
@@ -207,6 +210,12 @@ async function persistModuleAnswers(input: {
       answers: answers.map((answer) => ({
         exerciseId: answer.exerciseId,
         exercisePosition: exerciseById.get(answer.exerciseId)?.position ?? answer.exerciseId,
+        submodulePosition: (() => {
+          const submoduleId = exerciseById.get(answer.exerciseId)?.submodule_id;
+          return submoduleId === null || submoduleId === undefined
+            ? null
+            : (submodulePositionById.get(submoduleId) ?? null);
+        })(),
         values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
         clientUpdatedAt: Number(
           input.formData.get(`exerciseUpdatedAt-${answer.exerciseId}`),
