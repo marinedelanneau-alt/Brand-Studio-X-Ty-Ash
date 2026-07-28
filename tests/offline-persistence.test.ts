@@ -38,6 +38,31 @@ describe("offline-first answer repository", () => {
     expect(await getAnswerDatabase().mutations.count()).toBe(1);
   });
 
+  it("ignores a legacy record with an incomplete compound key", async () => {
+    const db = getAnswerDatabase();
+    await db.table("answers").put({
+      key: "legacy-incomplete",
+      userId: scope.userId,
+      projectId: scope.projectId,
+      exerciseId: 999,
+      values: ["ancienne donnée invalide"],
+      revision: 1,
+      updatedAt: Date.now(),
+      deleted: false,
+      syncedAt: null,
+    });
+    await persistLocalAnswer({
+      scope,
+      exerciseId: 11,
+      values: ["réponse valide"],
+      explicitDelete: false,
+    });
+
+    const loaded = await loadLocalModuleAnswers(scope);
+    expect(loaded.map((answer) => answer.values)).toEqual([["réponse valide"]]);
+    expect(await getPendingMutations(scope)).toHaveLength(1);
+  });
+
   it("increments revisions and keeps only the five previous versions", async () => {
     for (let index = 1; index <= 8; index += 1) {
       await persistLocalAnswer({ scope, exerciseId: 3, values: [`v${index}`], explicitDelete: false });

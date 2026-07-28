@@ -1541,7 +1541,16 @@ export default function ModuleAnswerForm({
     try {
       // IndexedDB remains the offline-first queue, but the direct scoped save
       // guarantees persistence even when a browser blocks or corrupts IndexedDB.
-      await retrySync();
+      try {
+        await retrySync();
+      } catch (localSyncError) {
+        // The server autosave below is intentionally independent. In particular,
+        // legacy/corrupt IndexedDB keys must never prevent a Supabase write.
+        console.error(
+          "[Brand Studio persistence] local queue unavailable; using direct autosave",
+          localSyncError,
+        );
+      }
 
       if (changedExerciseIds.size === 0) {
         return { status: "success", message: "" } satisfies ModuleState;

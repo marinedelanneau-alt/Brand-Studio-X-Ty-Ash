@@ -10,15 +10,17 @@ import {
 
 const HISTORY_LIMIT = 5;
 
-function moduleQuery(scope: AnswerPersistenceScope) {
-  return [scope.userId, scope.projectId, scope.moduleId] as [number, number, number];
-}
-
 export async function loadLocalModuleAnswers(scope: AnswerPersistenceScope) {
-  return getAnswerDatabase().answers
-    .where("[userId+projectId+moduleId]")
-    .equals(moduleQuery(scope))
-    .toArray();
+  // Do not use a compound IDBKeyRange here. Older browser databases can contain
+  // an invalid/partial compound key and make `IDBKeyRange.bound` throw before
+  // the direct server autosave gets a chance to run.
+  const answers = await getAnswerDatabase().answers.toArray();
+  return answers.filter(
+    (answer) =>
+      answer.userId === scope.userId &&
+      answer.projectId === scope.projectId &&
+      answer.moduleId === scope.moduleId,
+  );
 }
 
 export async function persistLocalAnswer(input: {
@@ -130,11 +132,14 @@ export async function mergeRemoteModuleAnswers(
 
 export async function getPendingMutations(scope: AnswerPersistenceScope) {
   const now = Date.now();
-  const mutations = await getAnswerDatabase().mutations
-    .where("[userId+projectId+moduleId]")
-    .equals(moduleQuery(scope))
-    .toArray();
-  return mutations.filter((mutation) => mutation.nextRetryAt <= now);
+  const mutations = await getAnswerDatabase().mutations.toArray();
+  return mutations.filter(
+    (mutation) =>
+      mutation.userId === scope.userId &&
+      mutation.projectId === scope.projectId &&
+      mutation.moduleId === scope.moduleId &&
+      mutation.nextRetryAt <= now,
+  );
 }
 
 export async function markMutationsSyncing(ids: string[]) {
