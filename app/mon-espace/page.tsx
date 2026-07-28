@@ -20,6 +20,7 @@ import {
   isAnswerableExerciseType,
   parseStoredTableConfig,
 } from "@/lib/exercise-types";
+import ContentPreviewFrame from "@/app/ui/content-preview-frame";
 
 export const dynamic = "force-dynamic";
 
@@ -216,7 +217,8 @@ export default async function MonEspacePage() {
     workspace.project?.name.trim() || account.company_name?.trim() || "Mon projet";
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+    <ContentPreviewFrame preview={workspace.contentPreview}>
+      <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <section className="mx-auto max-w-6xl space-y-6">
         <div className="border-b border-[#eadfca] pb-8 sm:pb-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
@@ -504,6 +506,7 @@ export default async function MonEspacePage() {
           </section>
         ) : null}
       </section>
-    </main>
+      </main>
+    </ContentPreviewFrame>
   );
 }

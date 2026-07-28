@@ -1973,11 +1973,37 @@ export async function publishScheduledAdminModuleSnapshot(
 export async function getWorkspaceData(accountId: number) {
   const project = await getProjectByAccountId(accountId);
   const account = await findAccountById(accountId);
-  // Clients always receive the published content. The administrator's own workspace is
-  // the isolated preview requested by the editor and may display its saved draft.
-  const modules = account?.role === "admin" || account?.is_admin
-    ? await getAdminWorkingModules(accountId)
-    : await getModulesWithExercises();
+  const {
+    getAdminPreviewAnswers,
+    getContentReleaseSnapshot,
+    getRequestedPreviewMode,
+    resolveActiveContentRelease,
+  } = await import("@/lib/content-releases");
+  const { hydrateReleaseSnapshotModules } = await import(
+    "@/lib/content-release-diff"
+  );
+  const previewMode = await getRequestedPreviewMode();
+  const contentPreview = await resolveActiveContentRelease({
+    account,
+    previewMode,
+  });
+  let modules: Awaited<ReturnType<typeof getModulesWithExercises>>;
+
+  if (contentPreview.source === "controlled" && contentPreview.release) {
+    const snapshot = await getContentReleaseSnapshot(contentPreview.release.id);
+    modules = snapshot
+      ? (hydrateReleaseSnapshotModules(
+          snapshot.modules,
+        ) as Awaited<ReturnType<typeof getModulesWithExercises>>)
+      : await getModulesWithExercises();
+  } else {
+    // Until the controlled cutover, clients always read the legacy published
+    // source. Admins only read the isolated legacy draft in preview environments.
+    modules =
+      (account?.role === "admin" || account?.is_admin) && previewMode
+        ? await getAdminWorkingModules(accountId)
+        : await getModulesWithExercises();
+  }
 
   if (!project) {
     return {
@@ -1986,6 +2012,7 @@ export async function getWorkspaceData(accountId: number) {
       progressPercent: 0,
       completedModulesCount: 0,
       totalModulesCount: modules.length,
+      contentPreview,
     };
   }
 
@@ -2041,12 +2068,28 @@ export async function getWorkspaceData(accountId: number) {
     throw new Error(stableAnswersResult.error.message);
   }
 
-  const answers = answersResult.data ?? [];
-  const moduleStates = isMissingDatabaseObject(moduleStatesResult.error)
+  const usesSeparatedPreviewAnswers =
+    contentPreview.isPreviewMode && contentPreview.previewMode === "new_user";
+  const previewAnswers =
+    usesSeparatedPreviewAnswers && contentPreview.release
+      ? await getAdminPreviewAnswers({
+          accountId,
+          releaseId: contentPreview.release.id,
+        })
+      : {};
+  const answers = usesSeparatedPreviewAnswers ? [] : (answersResult.data ?? []);
+  const moduleStates = usesSeparatedPreviewAnswers
+    ? []
+    : isMissingDatabaseObject(moduleStatesResult.error)
     ? []
     : (moduleStatesResult.data ?? []);
-  const answerBackup = parseAnswerBackupSnapshot(backupResult.data?.guide_snapshot);
-  const stableAnswers = isMissingDatabaseObject(stableAnswersResult.error) ? [] : (stableAnswersResult.data ?? []);
+  const answerBackup = usesSeparatedPreviewAnswers
+    ? null
+    : parseAnswerBackupSnapshot(backupResult.data?.guide_snapshot);
+  const stableAnswers =
+    usesSeparatedPreviewAnswers || isMissingDatabaseObject(stableAnswersResult.error)
+      ? []
+      : (stableAnswersResult.data ?? []);
 
   const groupedAnswers = new Map<number, ProjectExerciseAnswerRecord[]>();
 
@@ -2080,6 +2123,21 @@ export async function getWorkspaceData(accountId: number) {
         Number(left.module_key.startsWith("module_position_")) -
         Number(right.module_key.startsWith("module_position_")),
       );
+    const previewModuleKey =
+      "stableKey" in module && typeof module.stableKey === "string"
+        ? module.stableKey
+        : `module_${module.id}`;
+    const previewModuleAnswers = previewAnswers[previewModuleKey] ?? {};
+
+    if (usesSeparatedPreviewAnswers) {
+      for (const exercise of module.exercises) {
+        const exerciseKey =
+          "stableKey" in exercise && typeof exercise.stableKey === "string"
+            ? exercise.stableKey
+            : `exercise_${exercise.id}`;
+        answersMap[exercise.id] = previewModuleAnswers[exerciseKey] ?? [];
+      }
+    }
 
     for (const stableAnswer of stableModuleAnswers) {
       const positionMatch = stableAnswer.question_key.match(
@@ -2109,7 +2167,9 @@ export async function getWorkspaceData(accountId: number) {
         }
       }
     }
-    const isCompletedFromDatabase = completionStateByModuleId.get(module.id) ?? false;
+    const isCompletedFromDatabase = usesSeparatedPreviewAnswers
+      ? previewModuleAnswers.__completed?.includes("true") ?? false
+      : completionStateByModuleId.get(module.id) ?? false;
 
     return {
       ...module,
@@ -2162,6 +2222,7 @@ export async function getWorkspaceData(accountId: number) {
     progressPercent,
     completedModulesCount,
     totalModulesCount,
+    contentPreview,
   };
 }
 

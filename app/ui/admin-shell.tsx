@@ -19,7 +19,7 @@ type AdminShellProps = {
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: HomeIcon },
   { href: "/admin/modules", label: "Modules", icon: Square2StackIcon },
-  { href: "/admin/versions", label: "Versions", icon: Square2StackIcon },
+  { href: "/admin/releases", label: "Versions et déploiements", icon: Square2StackIcon },
   { href: "/admin/clients", label: "Clients", icon: UsersIcon },
 ];
 

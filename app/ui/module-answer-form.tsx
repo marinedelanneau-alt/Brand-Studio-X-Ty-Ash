@@ -458,7 +458,7 @@ function normalizeOtherChoiceValuesForSubmission(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function normalizeLegacyDisplayText(value: string | null | undefined) {
   return String(value ?? "")
-    .replace(/[â€™`]/g, "'")
+    .replace(/[’`]/g, "'")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase()
@@ -582,7 +582,7 @@ function getFillBlankAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   sourceQuestion: string,
   blankIndex: number,
-  fallback = "Ta rÃ©ponse",
+  fallback = "Ta réponse",
 ) {
   const placeholder = getAnswerPlaceholder(exercise, sourceQuestion, fallback);
   const blankCount = getFillBlankCount(sourceQuestion);
@@ -1353,7 +1353,7 @@ function PopupMessageCard({
         </div>
 
         <div className="mt-6 rounded-[1.5rem] bg-[linear-gradient(135deg,rgba(255,248,235,0.95),rgba(255,255,255,0.94))] px-6 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-          <p className="text-4xl leading-none text-[#cf7430]/60">â€œ</p>
+          <p className="text-4xl leading-none text-[#cf7430]/60">“</p>
           <div
             className="module-content mt-2 max-w-none font-[family:var(--font-cormorant)] text-[2rem] leading-[1.15] text-[#2f3d4f] sm:text-[2.35rem]"
             dangerouslySetInnerHTML={{ __html: getStaticTextHtml(question) }}

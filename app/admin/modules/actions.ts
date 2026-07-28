@@ -22,6 +22,12 @@ import {
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminWorkingModules } from "@/lib/training";
+import {
+  getApplicationReleaseState,
+  isAdminDraftPreviewEnabled,
+  updateCurrentDraftSnapshot,
+} from "@/lib/content-releases";
+import { normalizeReleaseSnapshotModules } from "@/lib/content-release-diff";
 
 type EditorExercise = {
   clientId: string;
@@ -65,6 +71,21 @@ function revalidateTrainingExperience(moduleId?: number) {
     revalidatePath(`/mon-espace/module/${moduleId}/summary-pdf`);
     revalidatePath(`/mon-espace/module/${moduleId}/complete`);
   }
+}
+
+async function syncAdminDraftRelease(accountId: number) {
+  if (!isAdminDraftPreviewEnabled()) return;
+  const state = await getApplicationReleaseState();
+  if (!state.current_draft_release_id) {
+    throw new Error(
+      "Crée d’abord un brouillon dans « Versions et déploiements ».",
+    );
+  }
+  const modules = await getAdminWorkingModules(accountId);
+  await updateCurrentDraftSnapshot({
+    releaseId: state.current_draft_release_id,
+    modules: normalizeReleaseSnapshotModules(modules),
+  });
 }
 
 function parseQuestion(rawQuestion: unknown) {
@@ -269,6 +290,7 @@ export async function saveAdminModule(formData: FormData) {
       isPublished,
       submodules,
     });
+    await syncAdminDraftRelease(account.id);
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
     redirect("/admin/modules?status=saved");
@@ -327,6 +349,7 @@ export async function saveAdminModuleDraft(formData: FormData) {
     }, {
       preserveOmittedContent: formData.get("saveMode") !== "manual",
     });
+    await syncAdminDraftRelease(account.id);
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 
@@ -410,6 +433,7 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
             : undefined,
         audioUrl: url,
       });
+      await syncAdminDraftRelease(account.id);
     }
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
@@ -463,6 +487,7 @@ export async function deleteAdminModule(formData: FormData) {
     }
 
     await deleteAdminModuleDefinitionDraft(account.id, moduleId);
+    await syncAdminDraftRelease(account.id);
     revalidateTrainingExperience(moduleId);
     redirect("/admin/modules?status=deleted");
   } catch (error) {
@@ -482,6 +507,13 @@ export async function publishAdminDraftToAllUsers(
 ): Promise<AdminDeploymentState> {
   try {
     const account = await getAuthenticatedAdmin();
+    if (isAdminDraftPreviewEnabled()) {
+      return {
+        status: "error",
+        message:
+          "La publication historique est désactivée. Utilise « Versions et déploiements ».",
+      };
+    }
 
     await publishAdminModuleDraftToUsers(account.id);
     revalidateTrainingExperience();
@@ -504,6 +536,11 @@ export async function publishAdminDraftToAllUsers(
 
 export async function scheduleAdminDraftDeployment(formData: FormData) {
   const account = await getAuthenticatedAdmin();
+  if (isAdminDraftPreviewEnabled()) {
+    redirect(
+      "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
+    );
+  }
   const value = String(formData.get("scheduledAt") ?? "");
   const scheduledAt = new Date(value);
   if (!value || Number.isNaN(scheduledAt.valueOf()) || scheduledAt <= new Date()) {
@@ -524,6 +561,11 @@ export async function scheduleAdminDraftDeployment(formData: FormData) {
 
 export async function cancelAdminDraftDeployment() {
   const account = await getAuthenticatedAdmin();
+  if (isAdminDraftPreviewEnabled()) {
+    redirect(
+      "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
+    );
+  }
   const supabase = createSupabaseServerClient();
   const { error } = await supabase.from("admin_deployment_schedules")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })

@@ -7,6 +7,8 @@ import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
+import Link from "next/link";
 
 export default async function AdminModulesPage({
   searchParams,
@@ -41,6 +43,7 @@ export default async function AdminModulesPage({
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const controlledReleasesEnabled = isAdminDraftPreviewEnabled();
   const status = resolvedSearchParams?.status;
   const errorMessage = resolvedSearchParams?.message;
   const statusValue = Array.isArray(status) ? status[0] : status;
@@ -75,8 +78,26 @@ export default async function AdminModulesPage({
           uniquement dans ton espace Marine Communication. Les autres utilisateurs
           gardent la version publiee jusqu&apos;au deploiement global.
         </p>
-        <AdminDeploymentButton />
-        <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 p-5">
+        {controlledReleasesEnabled ? (
+          <div className="mt-5 rounded-2xl border border-[#d9e6d5] bg-[#f7fbf5] p-5">
+            <p className="font-bold text-[#55745a]">
+              La publication historique destructive est désactivée.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[#637466]">
+              Les changements restent dans le brouillon jusqu’à une publication
+              volontaire depuis la gestion des releases.
+            </p>
+            <Link
+              href="/admin/releases"
+              className="mt-4 inline-flex rounded-xl bg-[#4b4550] px-4 py-2 text-sm font-bold text-white"
+            >
+              Ouvrir Versions et déploiements
+            </Link>
+          </div>
+        ) : (
+          <AdminDeploymentButton />
+        )}
+        {!controlledReleasesEnabled ? <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 p-5">
           <h2 className="text-lg font-semibold text-[#4b4550]">Programmer le déploiement</h2>
           <p className="mt-1 text-sm text-[#7b7068]">La date et l’heure sont interprétées en heure de Paris.</p>
           {activeSchedule ? <div className="mt-4 rounded-xl bg-[#fff6e3] p-4 text-sm"><strong>Programmé le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date(activeSchedule.scheduled_at))}</strong>{activeSchedule.notes ? <p className="mt-1">{activeSchedule.notes}</p> : null}<form action={cancelAdminDraftDeployment} className="mt-3"><button className="rounded-xl border border-[#cf7430] px-4 py-2 text-[#9b5424]">Annuler la programmation</button></form></div> :
@@ -85,7 +106,7 @@ export default async function AdminModulesPage({
             <label className="min-w-64 flex-1 text-sm"><span className="mb-1 block">Note facultative</span><input name="notes" className="h-11 w-full rounded-xl border border-[#eadfca] bg-white px-3" placeholder="Contenu de cette publication" /></label>
             <button className="h-11 rounded-xl bg-[#d98632] px-5 font-bold text-white">Programmer</button>
           </form>}
-        </div>
+        </div> : null}
         {message ? (
           <p className="mt-5 text-sm leading-6 text-[#6b625a]">{message}</p>
         ) : null}

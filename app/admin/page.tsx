@@ -197,7 +197,7 @@ export default async function AdminDashboardPage() {
                         {moduleItem.title}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-[#7b7068]">
-                        Module {moduleItem.position} Â· {moduleItem.exercises.length} exercice
+                        Module {moduleItem.position} · {moduleItem.exercises.length} exercice
                         {moduleItem.exercises.length > 1 ? "s" : ""}
                       </p>
                     </div>

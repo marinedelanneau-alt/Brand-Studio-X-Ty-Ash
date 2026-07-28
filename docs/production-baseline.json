@@ -1,0 +1,25 @@
+{
+  "capturedAt": "2026-07-28T11:34:39.574Z",
+  "productionUrl": "https://brand-studio-new.vercel.app",
+  "vercelDeploymentId": "dpl_2uwmetkwnkHeDah65xhT5gH1pSLx",
+  "gitCommit": "7685ce7",
+  "supabaseRef": "ndyasiohrwdyvrbxfdhn",
+  "contentTables": {
+    "brand_modules": {
+      "rows": 4,
+      "sha256": "9570cbbc2645e3277bdeafe023e3e14fae41231f4f750f019261e78a83ca3282"
+    },
+    "brand_submodules": {
+      "rows": 14,
+      "sha256": "147fa34744ba769fdee43a349525b8627038b431838d86c3aabc429486cc5689"
+    },
+    "module_exercises": {
+      "rows": 60,
+      "sha256": "00041fd7fab97be412ac7f6d1fb1157c318e543d1427afcb52059878d327871f"
+    }
+  },
+  "answerInventoryAtCapture": {
+    "project_exercise_answers": 11,
+    "user_answers": 106
+  }
+}

@@ -15,8 +15,8 @@ const SPECTRUM_PRESETS: Array<{ id: string; label: string; config: SpectrumConfi
     config: {
       leftLabel: "Sobre",
       rightLabel: "Expressif",
-      leftEmoji: "ðŸŒ¿",
-      rightEmoji: "ðŸŽ¨",
+      leftEmoji: "🌿",
+      rightEmoji: "🎨",
       defaultValue: 50,
       helperText: "Deplace le curseur pour situer ta marque.",
       enableJustification: true,
@@ -34,7 +34,7 @@ const SPECTRUM_PRESETS: Array<{ id: string; label: string; config: SpectrumConfi
     config: {
       leftLabel: "Accessible",
       rightLabel: "Premium",
-      leftEmoji: "ðŸ¤",
+      leftEmoji: "🤝",
       rightEmoji: "âœ¨",
       defaultValue: 50,
       helperText: "Deplace le curseur pour situer ta marque.",

@@ -7,6 +7,10 @@ import {
   getWorkspaceData,
   upsertStableModuleAnswers,
 } from "@/lib/training";
+import {
+  getAdminPreviewAnswers,
+  saveAdminPreviewAnswers,
+} from "@/lib/content-releases";
 
 export type AnswerSyncMutationInput = {
   id: string;
@@ -58,6 +62,46 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
 
   if (validMutations.length !== mutations.length) {
     throw new Error("Une mutation de réponse est invalide.");
+  }
+
+  if (
+    workspace.contentPreview.isPreviewMode &&
+    workspace.contentPreview.previewMode === "new_user" &&
+    workspace.contentPreview.release
+  ) {
+    const moduleKey =
+      "stableKey" in selectedModule &&
+      typeof selectedModule.stableKey === "string"
+        ? selectedModule.stableKey
+        : `module_${selectedModule.id}`;
+    const stored = await getAdminPreviewAnswers({
+      accountId: account.id,
+      releaseId: workspace.contentPreview.release.id,
+    });
+    const moduleAnswers = { ...(stored[moduleKey] ?? {}) };
+    for (const mutation of validMutations) {
+      const exercise = exerciseById.get(mutation.exerciseId)!;
+      const exerciseKey =
+        "stableKey" in exercise && typeof exercise.stableKey === "string"
+          ? exercise.stableKey
+          : `exercise_${mutation.exerciseId}`;
+      moduleAnswers[exerciseKey] =
+        mutation.operation === "delete" ? [] : mutation.values;
+    }
+    await saveAdminPreviewAnswers({
+      releaseId: workspace.contentPreview.release.id,
+      moduleKey,
+      answers: moduleAnswers,
+    });
+    return {
+      answers: validMutations.map((mutation) => ({
+        exerciseId: mutation.exerciseId,
+        values: mutation.operation === "delete" ? [] : mutation.values,
+        revision: mutation.revision,
+        updatedAt: mutation.updatedAt,
+        deleted: mutation.operation === "delete",
+      })),
+    };
   }
 
   await upsertStableModuleAnswers({

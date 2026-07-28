@@ -17,6 +17,7 @@ import {
   upsertStableModuleAnswers,
 } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { saveAdminPreviewAnswers } from "@/lib/content-releases";
 
 type ModuleState = {
   status: "idle" | "error" | "success";
@@ -159,6 +160,44 @@ async function persistModuleAnswers(input: {
     const exerciseById = new Map(
       selectedModule.exercises.map((exercise) => [exercise.id, exercise]),
     );
+
+    if (
+      workspace.contentPreview.isPreviewMode &&
+      workspace.contentPreview.previewMode === "new_user" &&
+      workspace.contentPreview.release
+    ) {
+      const moduleKey =
+        "stableKey" in selectedModule &&
+        typeof selectedModule.stableKey === "string"
+          ? selectedModule.stableKey
+          : `module_${selectedModule.id}`;
+      const previewAnswers = Object.fromEntries(
+        answers.map((answer) => {
+          const exercise = exerciseById.get(answer.exerciseId);
+          const exerciseKey =
+            exercise &&
+            "stableKey" in exercise &&
+            typeof exercise.stableKey === "string"
+              ? exercise.stableKey
+              : `exercise_${answer.exerciseId}`;
+          return [
+            exerciseKey,
+            answer.answerText ? [answer.answerText] : answer.selectedOptions,
+          ];
+        }),
+      );
+      if (input.markModuleCompleted) previewAnswers.__completed = ["true"];
+      await saveAdminPreviewAnswers({
+        releaseId: workspace.contentPreview.release.id,
+        moduleKey,
+        answers: previewAnswers,
+      });
+      return {
+        status: "success",
+        message:
+          "Réponses enregistrées dans le jeu de test Admin. Aucune donnée utilisateur n’a été modifiée.",
+      } satisfies ModuleState;
+    }
 
     await upsertStableModuleAnswers({
       userId: workspace.project.account_id,

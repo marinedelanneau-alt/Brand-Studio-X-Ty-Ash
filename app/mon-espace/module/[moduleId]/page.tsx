@@ -11,6 +11,7 @@ import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { getModuleHref, resolveWorkspaceModule } from "@/lib/module-routing";
+import ContentPreviewFrame from "@/app/ui/content-preview-frame";
 
 export const dynamic = "force-dynamic";
 
@@ -117,7 +118,8 @@ export default async function WorkspaceModulePage({
     .sort((left, right) => left.position - right.position)[0];
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+    <ContentPreviewFrame preview={workspace.contentPreview}>
+      <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <section className="mx-auto max-w-6xl space-y-6">
         <div className="flex items-center gap-4">
           <Link
@@ -193,6 +195,7 @@ export default async function WorkspaceModulePage({
           ) : null}
         </article>
       </section>
-    </main>
+      </main>
+    </ContentPreviewFrame>
   );
 }

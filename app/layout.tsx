@@ -4,6 +4,9 @@ import { Caveat, Cormorant_Garamond, Manrope, Satisfy } from "next/font/google";
 import { Suspense } from "react";
 import ScrollToTop from "./ui/scroll-to-top";
 import "./globals.css";
+import { getCurrentAccount } from "@/lib/session";
+import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
+import PreviewAccessDenied from "./ui/preview-access-denied";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -36,13 +39,20 @@ const moreSugar = localFont({
 export const metadata: Metadata = {
   title: "Espace Client | Formation Brand Studio",
   description: "Accède à ton espace de formation via ton code d'accès.",
+  robots: isAdminDraftPreviewEnabled()
+    ? { index: false, follow: false, nocache: true }
+    : undefined,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const account = isAdminDraftPreviewEnabled() ? await getCurrentAccount() : null;
+  const previewDenied =
+    account && account.role !== "admin" && account.is_admin !== true;
+
   return (
     <html
       lang="fr"
@@ -53,7 +63,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>
-        {children}
+        {previewDenied ? <PreviewAccessDenied /> : children}
       </body>
     </html>
   );

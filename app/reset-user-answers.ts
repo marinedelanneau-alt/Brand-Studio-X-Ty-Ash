@@ -7,6 +7,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getProjectByAccountId } from "@/lib/training";
 import { isMissingDatabaseObject } from "@/lib/database-errors";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import {
+  clearAdminPreviewAnswers,
+  getRequestedPreviewMode,
+  resolveActiveContentRelease,
+} from "@/lib/content-releases";
 
 export type ResetAnswersState = {
   status: "idle" | "error" | "success";
@@ -16,6 +21,23 @@ export type ResetAnswersState = {
 export async function resetCurrentUserAnswers(): Promise<ResetAnswersState> {
   try {
     const account = await getAuthenticatedAccount();
+    const preview = await resolveActiveContentRelease({
+      account,
+      previewMode: await getRequestedPreviewMode(),
+    });
+    if (
+      preview.isPreviewMode &&
+      preview.previewMode === "new_user" &&
+      preview.release
+    ) {
+      await clearAdminPreviewAnswers(preview.release.id);
+      revalidatePath("/mon-espace");
+      return {
+        status: "success",
+        message:
+          "Le jeu de réponses de test a été réinitialisé. Aucune réponse réelle n’a été supprimée.",
+      };
+    }
     const project = await getProjectByAccountId(account.id);
 
     if (!project) {

@@ -7,10 +7,18 @@ import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import {
+  getRequestedPreviewMode,
+  resolveActiveContentRelease,
+} from "@/lib/content-releases";
 
 export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
   try {
     const account = await getAuthenticatedAccount();
+    const preview = await resolveActiveContentRelease({
+      account,
+      previewMode: await getRequestedPreviewMode(),
+    });
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error" as const,
@@ -23,6 +31,14 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
       return {
         status: "error" as const,
         message: "Crée d'abord ton projet de marque.",
+      };
+    }
+
+    if (preview.isPreviewMode) {
+      return {
+        status: "success" as const,
+        message:
+          "Aperçu généré sans modifier les exports enregistrés de la version publiée.",
       };
     }
 

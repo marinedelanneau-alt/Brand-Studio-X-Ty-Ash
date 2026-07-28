@@ -9,6 +9,7 @@ import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
+import ContentPreviewFrame from "@/app/ui/content-preview-frame";
 
 export const dynamic = "force-dynamic";
 
@@ -56,5 +57,9 @@ export default async function BrandGuidePage() {
     brandName: accountBrandName || workspace.project.name,
   });
 
-  return <BrandGuideLayout guide={guide} latestGeneratedAt={latestGeneratedAt} />;
+  return (
+    <ContentPreviewFrame preview={workspace.contentPreview}>
+      <BrandGuideLayout guide={guide} latestGeneratedAt={latestGeneratedAt} />
+    </ContentPreviewFrame>
+  );
 }
