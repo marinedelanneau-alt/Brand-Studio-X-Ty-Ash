@@ -110,7 +110,10 @@ export default async function Home({
                   </h2>
                 </div>
 
-                <p className="mt-3 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[#7b7068]">
+                <p className="mt-3 text-sm font-extrabold text-[#4b4550]">
+                  Déjà client ?
+                </p>
+                <p className="mt-1 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[#7b7068]">
                   Connecte-toi avec ton e-mail et ton mot de passe pour
                   retrouver ton espace de travail.
                 </p>
