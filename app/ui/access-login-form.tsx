@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import {
   loginWithPassword,
-  sendPasswordlessLoginLink,
   sendPasswordResetLink,
 } from "../login";
 
@@ -30,19 +29,11 @@ export default function AccessLoginForm() {
     loginWithPassword,
     initialState,
   );
-  const [magicLinkState, magicLinkAction, magicLinkPending] = useActionState(
-    sendPasswordlessLoginLink,
-    initialState,
-  );
   const [resetState, resetAction, resetPending] = useActionState(
     sendPasswordResetLink,
     initialState,
   );
-  const visibleState = resetState.message
-    ? resetState
-    : magicLinkState.message
-      ? magicLinkState
-      : state;
+  const visibleState = resetState.message ? resetState : state;
 
   useEffect(() => {
     if (state.status !== "success") {
@@ -132,16 +123,6 @@ export default function AccessLoginForm() {
         className="flex h-13 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.92rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_24px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Connexion..." : "Entrer"}
-      </button>
-
-      <button
-        type="submit"
-        formAction={magicLinkAction}
-        formNoValidate
-        disabled={magicLinkPending}
-        className="flex h-13 w-full max-w-[41rem] items-center justify-center rounded-[1rem] border border-[#eadfca] bg-white px-6 text-[0.82rem] font-extrabold uppercase tracking-[0.12em] text-[#6f645b] shadow-[0_10px_22px_rgba(223,203,171,0.1)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
-      >
-        {magicLinkPending ? "Envoi du lien..." : "Recevoir un lien sans mot de passe"}
       </button>
 
       <button
