@@ -86,6 +86,23 @@ export default async function Home({
 
           <div className="border-t border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] px-7 py-8 sm:px-9 sm:py-9 lg:border-l lg:border-t-0 lg:px-9 lg:py-10">
             <div className="flex h-full flex-col justify-center gap-8">
+              <div className="rounded-[1.65rem] border border-[#eadfca] bg-[#fffdf7] p-5 shadow-[0_14px_28px_rgba(223,203,171,0.12)]">
+                <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
+                  Nouveau client
+                </p>
+                <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
+                  Le paiement déclenche l&apos;envoi d&apos;un lien personnel
+                  pour choisir ton mot de passe. Tu pourras ensuite créer ton
+                  compte et choisir ton mot de passe.
+                </p>
+                <Link
+                  href="/pricing"
+                  className="mt-5 flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#eadfca] bg-white px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
+                >
+                  Souscrire à la formation
+                </Link>
+              </div>
+
               <div>
                 <div className="flex flex-col items-start gap-5">
                   <h2 className="font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.92] tracking-[-0.04em] text-[#4b4550] sm:text-[2.7rem]">

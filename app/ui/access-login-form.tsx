@@ -1,7 +1,6 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import {
@@ -150,21 +149,6 @@ export default function AccessLoginForm() {
         ) : null}
       </div>
 
-      <div className="rounded-[1.65rem] border border-[#eadfca] bg-[#fffdf7] p-5 shadow-[0_14px_28px_rgba(223,203,171,0.12)]">
-        <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
-          Nouveau client
-        </p>
-        <p className="mt-4 text-sm leading-6 text-[#8b7a70]">
-          Le paiement déclenche l&apos;envoi d&apos;un lien personnel pour choisir ton mot de passe.
-          Tu pourras ensuite créer ton compte et choisir ton mot de passe.
-        </p>
-        <Link
-          href="/pricing"
-          className="mt-5 flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#eadfca] bg-white px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
-        >
-          Souscrire a la formation
-        </Link>
-      </div>
     </form>
   );
 }
