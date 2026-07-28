@@ -1,0 +1,27 @@
+{
+  "capturedAt": "2026-07-28T12:50:00Z",
+  "supabase": {
+    "name": "Brand Studio Preview",
+    "projectRef": "lsqulmivxidmgqzxpdsx",
+    "region": "eu-west-3",
+    "plan": "free",
+    "containsProductionUserData": false
+  },
+  "seed": {
+    "brand_modules": 4,
+    "brand_submodules": 14,
+    "module_exercises": 60,
+    "project_exercise_answers": 0,
+    "user_answers": 0
+  },
+  "release": {
+    "version": 1,
+    "status": "published",
+    "snapshotModules": 4
+  },
+  "vercel": {
+    "target": "preview",
+    "deploymentProtection": "sso",
+    "productionDeploymentModified": false
+  }
+}

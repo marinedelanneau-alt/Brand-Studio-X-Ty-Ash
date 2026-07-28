@@ -26,7 +26,8 @@ isolé, initialisé depuis une sauvegarde anonymisée ou contrôlée.
 ### Preview Admin
 
 - branche : `feature/*` puis `develop` ;
-- projet Supabase distinct de la production ;
+- projet Supabase gratuit distinct : `Brand Studio Preview`
+  (`lsqulmivxidmgqzxpdsx`, région `eu-west-3`) ;
 - `NEXT_PUBLIC_APP_ENV=preview` ;
 - `NEXT_PUBLIC_ENABLE_ADMIN_DRAFT_PREVIEW=true` ;
 - `CONTENT_RELEASE_READ_MODE=legacy` ;
@@ -37,6 +38,12 @@ isolé, initialisé depuis une sauvegarde anonymisée ou contrôlée.
 Le projet Supabase Preview est nécessaire : tester des migrations, des RPC et
 des brouillons dans la base des bêta-testeurs contredirait l'exigence de
 non-impact. Il ne doit contenir aucune donnée sensible non nécessaire.
+
+La Preview utilise un projet Free autonome et non une branche Supabase
+facturée. Elle contient uniquement le contenu éditorial publié (4 modules,
+14 sous-modules et 60 exercices), un compte Admin de test et aucune réponse de
+bêta-testeur. Le projet gratuit peut être mis en pause après une période
+d'inactivité ; cela n'a aucun effet sur la production.
 
 ## Procédure progressive
 
