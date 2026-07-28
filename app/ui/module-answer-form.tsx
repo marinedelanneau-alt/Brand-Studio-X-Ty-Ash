@@ -1524,14 +1524,78 @@ export default function ModuleAnswerForm({
 
   const persistCurrentDraft = useCallback(async ({ showPending = false } = {}) => {
     if (showPending) setIsSavingDraft(true);
+
+    const activeModule = moduleRef.current;
+    const answersToSave = latestAnswersRef.current;
+    const changedExerciseIds = new Set(
+      activeModule.exercises
+        .filter((exercise) => isAnswerableExerciseType(exercise.type))
+        .filter(
+          (exercise) =>
+            JSON.stringify(persistedAnswersRef.current[exercise.id] ?? []) !==
+            JSON.stringify(answersToSave[exercise.id] ?? []),
+        )
+        .map((exercise) => exercise.id),
+    );
+
     try {
+      // IndexedDB remains the offline-first queue, but the direct scoped save
+      // guarantees persistence even when a browser blocks or corrupts IndexedDB.
       await retrySync();
-      return { status: "success", message: "" } satisfies ModuleState;
+
+      if (changedExerciseIds.size === 0) {
+        return { status: "success", message: "" } satisfies ModuleState;
+      }
+
+      setSaveIndicator("saving");
+      const result = await saveModuleDraft(
+        buildSubmissionFormData(activeModule, answersToSave, changedExerciseIds),
+      );
+
+      if (result.status === "error") {
+        setSaveIndicator(navigator.onLine ? "error" : "offline");
+        setAutoSaveState(result);
+        return result;
+      }
+
+      for (const exerciseId of changedExerciseIds) {
+        const savedValues = answersToSave[exerciseId] ?? [];
+        if (
+          JSON.stringify(latestAnswersRef.current[exerciseId] ?? []) ===
+          JSON.stringify(savedValues)
+        ) {
+          persistedAnswersRef.current[exerciseId] = [...savedValues];
+        }
+      }
+
+      writeBrowserAnswersDraft(
+        activeModule,
+        latestAnswersRef.current,
+        persistedAnswersRef.current,
+      );
+      setSaveIndicator("saved");
+      setAutoSaveState(result);
+
+      if (saveIndicatorTimerRef.current !== null) {
+        window.clearTimeout(saveIndicatorTimerRef.current);
+      }
+      saveIndicatorTimerRef.current = window.setTimeout(() => {
+        setSaveIndicator("idle");
+        saveIndicatorTimerRef.current = null;
+      }, 2000);
+
+      return result;
     } catch (error) {
-      return {
+      const result = {
         status: "error",
-        message: error instanceof Error ? error.message : "Synchronisation impossible.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Connexion interrompue. La réponse reste conservée sur cet appareil.",
       } satisfies ModuleState;
+      setSaveIndicator(navigator.onLine ? "error" : "offline");
+      setAutoSaveState(result);
+      return result;
     } finally {
       if (showPending) setIsSavingDraft(false);
     }
