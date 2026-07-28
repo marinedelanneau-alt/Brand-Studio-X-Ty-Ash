@@ -87,6 +87,13 @@ export function isControlledProductionContentEnabled() {
   return process.env.CONTENT_RELEASE_READ_MODE === "controlled";
 }
 
+export function isControlledAdminPublishingEnabled() {
+  return (
+    isAdminDraftPreviewEnabled() ||
+    process.env.ENABLE_CONTROLLED_ADMIN_PUBLISHING === "true"
+  );
+}
+
 export async function getRequestedPreviewMode(): Promise<ContentPreviewMode | null> {
   if (!isAdminDraftPreviewEnabled()) return null;
   const value = (await cookies()).get(CONTENT_PREVIEW_COOKIE)?.value;

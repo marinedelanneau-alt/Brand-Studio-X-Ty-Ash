@@ -3,10 +3,10 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { getVersionReview, listEditorialVersions } from "@/lib/editorial-admin";
 import { cancelSchedule, createDraftFromVersion, publishVersion, scheduleVersion } from "./actions";
-import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
+import { isControlledAdminPublishingEnabled } from "@/lib/content-releases";
 
 export default async function VersionsPage({ searchParams }: { searchParams: Promise<Record<string,string|undefined>> }) {
-  if (isAdminDraftPreviewEnabled()) redirect("/admin/releases");
+  if (isControlledAdminPublishingEnabled()) redirect("/admin/releases");
   await getAuthenticatedAdmin(); const params = await searchParams;
   let versions: Awaited<ReturnType<typeof listEditorialVersions>> = []; let error = "";
   try { versions = await listEditorialVersions(); } catch (cause) { unstable_rethrow(cause); error = cause instanceof Error ? cause.message : "Migration éditoriale indisponible"; }

@@ -7,7 +7,7 @@ import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
+import { isControlledAdminPublishingEnabled } from "@/lib/content-releases";
 import Link from "next/link";
 
 export default async function AdminModulesPage({
@@ -43,7 +43,7 @@ export default async function AdminModulesPage({
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const controlledReleasesEnabled = isAdminDraftPreviewEnabled();
+  const controlledReleasesEnabled = isControlledAdminPublishingEnabled();
   const status = resolvedSearchParams?.status;
   const errorMessage = resolvedSearchParams?.message;
   const statusValue = Array.isArray(status) ? status[0] : status;

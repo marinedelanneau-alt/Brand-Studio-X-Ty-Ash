@@ -24,7 +24,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminWorkingModules } from "@/lib/training";
 import {
   getApplicationReleaseState,
-  isAdminDraftPreviewEnabled,
+  isControlledAdminPublishingEnabled,
   updateCurrentDraftSnapshot,
 } from "@/lib/content-releases";
 import { normalizeReleaseSnapshotModules } from "@/lib/content-release-diff";
@@ -74,7 +74,7 @@ function revalidateTrainingExperience(moduleId?: number) {
 }
 
 async function syncAdminDraftRelease(accountId: number) {
-  if (!isAdminDraftPreviewEnabled()) return;
+  if (!isControlledAdminPublishingEnabled()) return;
   const state = await getApplicationReleaseState();
   if (!state.current_draft_release_id) {
     throw new Error(
@@ -507,7 +507,7 @@ export async function publishAdminDraftToAllUsers(
 ): Promise<AdminDeploymentState> {
   try {
     const account = await getAuthenticatedAdmin();
-    if (isAdminDraftPreviewEnabled()) {
+    if (isControlledAdminPublishingEnabled()) {
       return {
         status: "error",
         message:
@@ -536,7 +536,7 @@ export async function publishAdminDraftToAllUsers(
 
 export async function scheduleAdminDraftDeployment(formData: FormData) {
   const account = await getAuthenticatedAdmin();
-  if (isAdminDraftPreviewEnabled()) {
+  if (isControlledAdminPublishingEnabled()) {
     redirect(
       "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
     );
@@ -561,7 +561,7 @@ export async function scheduleAdminDraftDeployment(formData: FormData) {
 
 export async function cancelAdminDraftDeployment() {
   const account = await getAuthenticatedAdmin();
-  if (isAdminDraftPreviewEnabled()) {
+  if (isControlledAdminPublishingEnabled()) {
     redirect(
       "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
     );

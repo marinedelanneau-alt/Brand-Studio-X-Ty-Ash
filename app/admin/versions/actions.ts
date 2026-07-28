@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { callEditorialRpc, getVersionReview } from "@/lib/editorial-admin";
-import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
+import { isControlledAdminPublishingEnabled } from "@/lib/content-releases";
 
 const id = (formData: FormData) => String(formData.get("versionId") ?? "");
 
@@ -14,7 +14,7 @@ function refresh(message: string) {
 }
 
 function blockLegacyVersioning() {
-  if (isAdminDraftPreviewEnabled()) {
+  if (isControlledAdminPublishingEnabled()) {
     redirect(
       "/admin/releases?kind=error&message=Le%20versionnement%20historique%20est%20désactivé.",
     );
