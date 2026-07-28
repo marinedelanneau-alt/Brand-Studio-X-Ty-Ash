@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import {
   compareReleaseSnapshots,
+  hydrateReleaseSnapshotModules,
   normalizeReleaseSnapshotModules,
   summarizeReleaseDifferences,
 } from "../lib/content-release-diff";
@@ -25,6 +26,52 @@ const schedulingMigration = readFileSync(
   ),
   "utf8",
 );
+
+describe("release snapshot hydration", () => {
+  it("assigns deterministic unique numeric IDs when published entities have no IDs", () => {
+    const snapshot = [{
+      stableKey: "module_brand",
+      title: "Fondations",
+      position: 1,
+      submodules: [
+        {
+          stableKey: "submodule_mission",
+          title: "Mission",
+          position: 1,
+          exercises: [
+            { stableKey: "question_activity", position: 1, type: "open", question: "Activité ?" },
+            { stableKey: "question_goal", position: 2, type: "open", question: "Objectif ?" },
+          ],
+        },
+      ],
+    }];
+
+    const first = hydrateReleaseSnapshotModules(snapshot);
+    const second = hydrateReleaseSnapshotModules(snapshot);
+    const hydratedModule = first[0] as {
+      id: number;
+      submodules: Array<{
+        id: number;
+        exercises: Array<{ id: number; module_id: number; submodule_id: number }>;
+      }>;
+    };
+    const exercises = hydratedModule.submodules[0].exercises;
+
+    expect(Number.isSafeInteger(hydratedModule.id)).toBe(true);
+    expect(Number.isSafeInteger(hydratedModule.submodules[0].id)).toBe(true);
+    expect(new Set(exercises.map((exercise) => exercise.id)).size).toBe(2);
+    expect(
+      exercises.every((exercise) => exercise.module_id === hydratedModule.id),
+    ).toBe(true);
+    expect(
+      exercises.every(
+        (exercise) =>
+          exercise.submodule_id === hydratedModule.submodules[0].id,
+      ),
+    ).toBe(true);
+    expect(second).toEqual(first);
+  });
+});
 const releasesPage = readFileSync(
   new URL("../app/admin/releases/page.tsx", import.meta.url),
   "utf8",

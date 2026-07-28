@@ -2185,7 +2185,18 @@ export async function getWorkspaceData(accountId: number) {
     if (backedUpModuleAnswers) {
       for (const exercise of module.exercises) {
         const persistedValues = answersMap[exercise.id] ?? [];
-        const backedUpValues = backedUpModuleAnswers[String(exercise.position)];
+        const submodulePosition =
+          module.submodules.find((submodule) => submodule.id === exercise.submodule_id)
+            ?.position ?? null;
+        const scopedBackupKey = `${submodulePosition ?? "root"}:${exercise.position}`;
+        const samePositionExercises = module.exercises.filter(
+          (candidate) => candidate.position === exercise.position,
+        );
+        const backedUpValues =
+          backedUpModuleAnswers[scopedBackupKey] ??
+          (samePositionExercises.length === 1
+            ? backedUpModuleAnswers[String(exercise.position)]
+            : undefined);
 
         if (persistedValues.length === 0 && Array.isArray(backedUpValues)) {
           answersMap[exercise.id] = backedUpValues;
@@ -2254,7 +2265,11 @@ export async function getWorkspaceData(accountId: number) {
 export async function backupModuleAnswers(input: {
   projectId: number;
   modulePosition: number;
-  answers: Array<{ exercisePosition: number; values: string[] }>;
+  answers: Array<{
+    submodulePosition: number | null;
+    exercisePosition: number;
+    values: string[];
+  }>;
 }) {
   if (input.answers.length === 0) {
     return;
@@ -2287,7 +2302,9 @@ export async function backupModuleAnswers(input: {
   const moduleAnswers = { ...(snapshot.modules[moduleKey] ?? {}) };
 
   for (const answer of input.answers) {
-    moduleAnswers[String(answer.exercisePosition)] = [...answer.values];
+    moduleAnswers[
+      `${answer.submodulePosition ?? "root"}:${answer.exercisePosition}`
+    ] = [...answer.values];
   }
 
   const nextSnapshot: AnswerBackupSnapshot = {
@@ -2381,7 +2398,7 @@ export async function replaceModuleAnswers(input: {
   const submittedExerciseIds = [
     ...new Set(
       (input.exerciseIds ?? input.answers.map((answer) => answer.exerciseId)).filter(
-        (exerciseId) => Number.isFinite(exerciseId) && exerciseId > 0,
+        (exerciseId) => Number.isFinite(exerciseId) && exerciseId !== 0,
       ),
     ),
   ];

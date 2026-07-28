@@ -56,7 +56,7 @@ function getSubmittedExerciseIds(formData: FormData) {
     formData
       .getAll("submittedExerciseId")
       .map((value) => Number(value))
-      .filter((value) => Number.isFinite(value) && value > 0),
+      .filter((value) => Number.isFinite(value) && value !== 0),
   );
 }
 
@@ -67,7 +67,7 @@ async function persistModuleAnswers(input: {
 }) {
   const moduleId = Number(input.formData.get("moduleId"));
 
-  if (!Number.isFinite(moduleId) || moduleId <= 0) {
+  if (!Number.isFinite(moduleId) || moduleId === 0) {
     return {
       status: "error",
       message: "Module introuvable.",
@@ -233,25 +233,38 @@ async function persistModuleAnswers(input: {
         }
 
         return [{
+          submodulePosition:
+            exercise.submodule_id === null
+              ? null
+              : (submodulePositionById.get(exercise.submodule_id) ?? null),
           exercisePosition: exercise.position,
           values: answer.answerText ? [answer.answerText] : answer.selectedOptions,
         }];
       }),
     });
 
-    await replaceModuleAnswers({
-      projectId: workspace.project.id,
-      moduleId: selectedModule.id,
-      answers,
-      exerciseIds: hasSubmittedExerciseScope ? [...submittedExerciseIds] : undefined,
-    });
-
-    if (input.markModuleCompleted) {
-      await setProjectModuleCompletion({
+    // Release snapshots use deterministic negative IDs and are not rows in the
+    // legacy FK tables. Their durable source is the stable user_answers table.
+    if (
+      selectedModule.id > 0 &&
+      answers.every((answer) => answer.exerciseId > 0)
+    ) {
+      await replaceModuleAnswers({
         projectId: workspace.project.id,
         moduleId: selectedModule.id,
-        isCompleted: true,
+        answers,
+        exerciseIds: hasSubmittedExerciseScope ? [...submittedExerciseIds] : undefined,
       });
+    }
+
+    if (input.markModuleCompleted) {
+      if (selectedModule.id > 0) {
+        await setProjectModuleCompletion({
+          projectId: workspace.project.id,
+          moduleId: selectedModule.id,
+          isCompleted: true,
+        });
+      }
       await updateCompletedModuleCookie({
         projectId: workspace.project.id,
         moduleId: selectedModule.id,

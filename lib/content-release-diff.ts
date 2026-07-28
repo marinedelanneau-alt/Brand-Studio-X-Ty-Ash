@@ -96,16 +96,76 @@ export function normalizeReleaseSnapshotModules(modules: unknown[]) {
 }
 
 export function hydrateReleaseSnapshotModules(modules: unknown[]) {
+  const usedModuleIds = new Set<number>();
+  const usedSubmoduleIds = new Set<number>();
+  const usedExerciseIds = new Set<number>();
+
+  function numericId(
+    value: unknown,
+    stableIdentity: string,
+    namespace: string,
+    usedIds: Set<number>,
+  ) {
+    if (typeof value === "number" && Number.isSafeInteger(value) && value !== 0) {
+      usedIds.add(value);
+      return value;
+    }
+
+    // FNV-1a provides a deterministic browser/server identity for snapshot
+    // entities that have no legacy database ID. Linear probing makes collisions
+    // impossible within one hydrated release.
+    let hash = 2166136261;
+    for (const character of `${namespace}:${stableIdentity}`) {
+      hash ^= character.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    let candidate = -(Math.abs(hash | 0) || 1);
+    while (usedIds.has(candidate)) {
+      candidate = candidate === -2147483647 ? -1 : candidate - 1;
+    }
+    usedIds.add(candidate);
+    return candidate;
+  }
+
   return normalizeReleaseSnapshotModules(modules).map((rawModule) => {
     const moduleItem = objectValue(rawModule);
+    const moduleStableKey = stableKey(moduleItem, "module_missing_key");
+    const moduleId = numericId(
+      moduleItem.id,
+      moduleStableKey,
+      "module",
+      usedModuleIds,
+    );
     const submodules = Array.isArray(moduleItem.submodules)
       ? moduleItem.submodules.map((rawSubmodule) => {
           const submodule = objectValue(rawSubmodule);
+          const submoduleStableKey = stableKey(
+            submodule,
+            `${moduleStableKey}:submodule_missing_key`,
+          );
+          const submoduleId = numericId(
+            submodule.id,
+            submoduleStableKey,
+            "submodule",
+            usedSubmoduleIds,
+          );
           const exercises = Array.isArray(submodule.exercises)
             ? submodule.exercises.map((rawExercise) => {
                 const exercise = objectValue(rawExercise);
+                const exerciseStableKey = stableKey(
+                  exercise,
+                  `${submoduleStableKey}:exercise_missing_key`,
+                );
                 return {
                   ...exercise,
+                  id: numericId(
+                    exercise.id,
+                    exerciseStableKey,
+                    "exercise",
+                    usedExerciseIds,
+                  ),
+                  module_id: moduleId,
+                  submodule_id: submoduleId,
                   answer_placeholder:
                     exercise.answer_placeholder ?? exercise.answerPlaceholder ?? null,
                   audio_url: exercise.audio_url ?? exercise.audioUrl ?? null,
@@ -118,6 +178,8 @@ export function hydrateReleaseSnapshotModules(modules: unknown[]) {
             : [];
           return {
             ...submodule,
+            id: submoduleId,
+            module_id: moduleId,
             video_url: submodule.video_url ?? submodule.videoUrl ?? null,
             audio_url: submodule.audio_url ?? submodule.audioUrl ?? null,
             audio_transcript:
@@ -130,6 +192,7 @@ export function hydrateReleaseSnapshotModules(modules: unknown[]) {
     const exercises = submodules.flatMap((submodule) => submodule.exercises);
     return {
       ...moduleItem,
+      id: moduleId,
       video_url: moduleItem.video_url ?? moduleItem.videoUrl ?? null,
       audio_url: moduleItem.audio_url ?? moduleItem.audioUrl ?? null,
       audio_transcript:
