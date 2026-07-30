@@ -222,7 +222,7 @@ export default async function MonEspacePage() {
       <section className="mx-auto max-w-6xl space-y-6">
         <div className="border-b border-[#eadfca] pb-8 sm:pb-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-2xl">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-4">
                 {workspace.project?.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -253,7 +253,7 @@ export default async function MonEspacePage() {
                   En route vers ta nouvelle identité de marque
                 </p>
               </div>
-              <div className="relative mt-12 max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-8">
+              <div className="relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6">
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
@@ -264,17 +264,17 @@ export default async function MonEspacePage() {
                       Introduction
                     </p>
                   </div>
-                  <div className="space-y-5 pt-5 text-[#6b625a]">
+                  <div className="space-y-4 pt-4 text-[#6b625a]">
                     <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                       Bienvenue dans le Brand Studio
                     </p>
-                    <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-4 text-[1.05rem] leading-8 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                    <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-3 text-[1.05rem] leading-7 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
                       Hello, ça y est, c&apos;est le grand moment ! Je te remercie
                       encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
                       belle mission de structurer ton identité de marque. Es-tu prêt
                       à entrer dans la peau d&apos;un Directeur Artistique ?
                     </p>
-                    <div className="space-y-4 text-base leading-8 text-[#6f645b]">
+                    <div className="space-y-3 text-base leading-7 text-[#6f645b]">
                       <p>
                         Ce guide est le document de référence de ton identité,{" "}
                         <span className="font-semibold italic text-[#5f544a]">
