@@ -253,84 +253,10 @@ export default async function MonEspacePage() {
                   En route vers ta nouvelle identité de marque
                 </p>
               </div>
-              <div className="relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6">
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
-                />
-                <div className="relative">
-                  <div>
-                    <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
-                      Introduction
-                    </p>
-                  </div>
-                  <div className="space-y-4 pt-4 text-[#6b625a]">
-                    <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
-                      Bienvenue dans le Brand Studio
-                    </p>
-                    <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-3 text-[1.05rem] leading-7 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
-                      Hello, ça y est, c&apos;est le grand moment ! Je te remercie
-                      encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
-                      belle mission de structurer ton identité de marque. Es-tu prêt
-                      à entrer dans la peau d&apos;un Directeur Artistique ?
-                    </p>
-                    <div className="space-y-3 text-base leading-7 text-[#6f645b]">
-                      <p>
-                        Ce guide est le document de référence de ton identité,{" "}
-                        <span className="font-semibold italic text-[#5f544a]">
-                          un kit clé en main pour poser les bases d&apos;une marque forte.
-                        </span>
-                      </p>
-                      <p>
-                        Il rassemble les fondations stratégiques et visuelles de ta
-                        marque afin de garantir une communication{" "}
-                        <strong className="font-extrabold text-[#4b4550]">
-                          cohérente, professionnelle et durable
-                        </strong>
-                        .
-                      </p>
-                      <p className="text-[#6f645b]">
-                        <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
-                        utilise-le comme un repère pour créer, décliner et faire
-                        évoluer ta marque en toute autonomie.
-                      </p>
-                    </div>
-                    {workspace.modules.length > 0 ? (
-                      <div className="flex flex-col gap-5 pt-4 sm:flex-row sm:items-end sm:justify-between">
-                        <Link
-                          href={ctaHref}
-                          className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)] transition hover:brightness-[1.02]"
-                        >
-                          {hasStartedModules ? "Reprendre" : "Commencer"}
-                        </Link>
-                        <div className="w-full max-w-[13rem] sm:text-right">
-                          <div className="flex items-end justify-between gap-3 sm:justify-end">
-                            <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
-                              Progression
-                            </p>
-                            <p className="text-lg font-black leading-none text-[#4b4550]">
-                              {workspace.progressPercent}%
-                            </p>
-                          </div>
-                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#f1ece5]">
-                            <div
-                              className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
-                              style={{ width: `${workspace.progressPercent}%` }}
-                            />
-                          </div>
-                          <p className="mt-1.5 text-[0.65rem] text-[#8a8077]">
-                            {workspace.completedModulesCount}/{workspace.totalModulesCount} modules terminés
-                          </p>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:w-[24rem] lg:grid-cols-1">
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+            <div className="grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1">
+              <div className="relative overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
@@ -339,7 +265,7 @@ export default async function MonEspacePage() {
                   iconOnly
                   className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
                 />
-                <div className="relative space-y-6">
+                <div className="relative space-y-4">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[#f0e4d3] pb-6">
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
@@ -450,6 +376,78 @@ export default async function MonEspacePage() {
                   </Link>
                 </div>
               ) : null}
+            </div>
+          </div>
+          <div className="relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+            />
+            <div className="relative">
+              <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+                Introduction
+              </p>
+              <div className="space-y-4 pt-4 text-[#6b625a]">
+                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                  Bienvenue dans le Brand Studio
+                </p>
+                <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-3 text-[1.05rem] leading-7 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                  Hello, ça y est, c&apos;est le grand moment ! Je te remercie
+                  encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
+                  belle mission de structurer ton identité de marque. Es-tu prêt
+                  à entrer dans la peau d&apos;un Directeur Artistique ?
+                </p>
+                <div className="grid gap-3 text-base leading-7 text-[#6f645b] lg:grid-cols-3 lg:gap-6">
+                  <p>
+                    Ce guide est le document de référence de ton identité,{" "}
+                    <span className="font-semibold italic text-[#5f544a]">
+                      un kit clé en main pour poser les bases d&apos;une marque forte.
+                    </span>
+                  </p>
+                  <p>
+                    Il rassemble les fondations stratégiques et visuelles de ta
+                    marque afin de garantir une communication{" "}
+                    <strong className="font-extrabold text-[#4b4550]">
+                      cohérente, professionnelle et durable
+                    </strong>
+                    .
+                  </p>
+                  <p>
+                    <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
+                    utilise-le comme un repère pour créer, décliner et faire
+                    évoluer ta marque en toute autonomie.
+                  </p>
+                </div>
+                {workspace.modules.length > 0 ? (
+                  <div className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between">
+                    <Link
+                      href={ctaHref}
+                      className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)] transition hover:brightness-[1.02]"
+                    >
+                      {hasStartedModules ? "Reprendre" : "Commencer"}
+                    </Link>
+                    <div className="w-full max-w-[13rem] sm:text-right">
+                      <div className="flex items-end justify-between gap-3 sm:justify-end">
+                        <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                          Progression
+                        </p>
+                        <p className="text-lg font-black leading-none text-[#4b4550]">
+                          {workspace.progressPercent}%
+                        </p>
+                      </div>
+                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#f1ece5]">
+                        <div
+                          className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
+                          style={{ width: `${workspace.progressPercent}%` }}
+                        />
+                      </div>
+                      <p className="mt-1.5 text-[0.65rem] text-[#8a8077]">
+                        {workspace.completedModulesCount}/{workspace.totalModulesCount} modules terminés
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
           <div className="mt-8 border-t border-[#eadfca] pt-7">
