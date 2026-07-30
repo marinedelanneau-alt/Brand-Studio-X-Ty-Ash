@@ -274,7 +274,7 @@ export default async function MonEspacePage() {
             <div
               className={`grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1 ${
                 workspace.project
-                  ? "lg:col-start-2 lg:mt-8 lg:row-start-2"
+                  ? "lg:col-start-2 lg:row-span-2 lg:row-start-1"
                   : ""
               }`}
             >
@@ -293,15 +293,15 @@ export default async function MonEspacePage() {
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
                         Navigation
                       </p>
-                      <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.5rem] leading-none text-[#4b4550]">
+                      <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[#4b4550]">
                         Tes modules
                       </h3>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="mt-2.5 flex flex-wrap gap-2">
                         {workspace.modules.map((module) => (
                           <Link
                             key={module.id}
                             href={getModuleHref(module)}
-                            className={`rounded-full border px-2.5 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.1em] transition ${
+                            className={`rounded-full border px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
                                 : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
@@ -312,7 +312,7 @@ export default async function MonEspacePage() {
                         ))}
                         <Link
                           href="/mon-espace/plan-action-communication"
-                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-2.5 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
+                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
                         >
                           Plan d&apos;action communication
                         </Link>
