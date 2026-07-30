@@ -398,13 +398,13 @@ export default async function MonEspacePage() {
                   à entrer dans la peau d&apos;un Directeur Artistique ?
                 </p>
                 <div className="grid gap-3 text-base leading-7 text-[#6f645b] lg:grid-cols-3 lg:gap-6">
-                  <p>
+                  <p className="pb-3 lg:pb-0 lg:pr-6">
                     Ce guide est le document de référence de ton identité,{" "}
                     <span className="font-semibold italic text-[#5f544a]">
                       un kit clé en main pour poser les bases d&apos;une marque forte.
                     </span>
                   </p>
-                  <p>
+                  <p className="border-t border-[#eadfca] py-3 lg:border-l lg:border-t-0 lg:px-6 lg:py-0">
                     Il rassemble les fondations stratégiques et visuelles de ta
                     marque afin de garantir une communication{" "}
                     <strong className="font-extrabold text-[#4b4550]">
@@ -412,7 +412,7 @@ export default async function MonEspacePage() {
                     </strong>
                     .
                   </p>
-                  <p>
+                  <p className="border-t border-[#eadfca] pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
                     <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
                     utilise-le comme un repère pour créer, décliner et faire
                     évoluer ta marque en toute autonomie.
