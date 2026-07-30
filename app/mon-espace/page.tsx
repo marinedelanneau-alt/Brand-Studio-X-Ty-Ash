@@ -222,19 +222,21 @@ export default async function MonEspacePage() {
       <section className="mx-auto max-w-6xl space-y-6">
         <div
           className={`border-b border-[#eadfca] pb-8 sm:pb-10 ${
-            workspace.project
-              ? "lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-x-8"
-              : ""
+            workspace.project ? "relative" : ""
           }`}
         >
           <div
             className={`flex flex-col gap-8 ${
               workspace.project
-                ? "lg:contents"
+                ? ""
                 : "lg:flex-row lg:items-start lg:justify-between"
             }`}
           >
-            <div className="min-w-0 flex-1">
+            <div
+              className={`min-w-0 flex-1 ${
+                workspace.project ? "lg:mr-[23rem]" : ""
+              }`}
+            >
               <div className="flex items-center gap-4">
                 {workspace.project?.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -269,7 +271,7 @@ export default async function MonEspacePage() {
 
             <div
               className={`grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1 ${
-                workspace.project ? "lg:col-start-2 lg:row-span-2 lg:row-start-1" : ""
+                workspace.project ? "lg:absolute lg:right-0 lg:top-0" : ""
               }`}
             >
               <div className="relative overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
@@ -396,7 +398,7 @@ export default async function MonEspacePage() {
           </div>
           <div
             className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6 ${
-              workspace.project ? "lg:col-start-1 lg:row-start-2" : ""
+              workspace.project ? "lg:w-[calc(100%-23rem)]" : ""
             }`}
           >
             <div
@@ -486,11 +488,7 @@ export default async function MonEspacePage() {
               </div>
             </div>
           </div>
-          <div
-            className={`mt-8 border-t border-[#eadfca] pt-7 ${
-              workspace.project ? "lg:col-span-2" : ""
-            }`}
-          >
+          <div className="mt-8 border-t border-[#eadfca] pt-7">
             <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[#5d5259] sm:text-[2.9rem] lg:text-[3.35rem]">
               Ton histoire commence ici, écrivons-la ensemble !
             </p>
