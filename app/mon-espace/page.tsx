@@ -274,7 +274,7 @@ export default async function MonEspacePage() {
                 workspace.project ? "lg:absolute lg:right-0 lg:top-0" : ""
               }`}
             >
-              <div className="relative overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+              <div className="relative overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-4 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
@@ -283,21 +283,21 @@ export default async function MonEspacePage() {
                   iconOnly
                   className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
                 />
-                <div className="relative space-y-4">
+                <div className="relative space-y-3">
                   {workspace.project && workspace.modules.length > 0 ? (
-                    <nav className="border-b border-[#f0e4d3] pb-6">
-                      <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                    <nav className="border-b border-[#f0e4d3] pb-3">
+                      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
                         Navigation
                       </p>
-                      <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
+                      <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.5rem] leading-none text-[#4b4550]">
                         Tes modules
                       </h3>
-                      <div className="mt-4 flex flex-wrap gap-3">
+                      <div className="mt-2 flex flex-wrap gap-1.5">
                         {workspace.modules.map((module) => (
                           <Link
                             key={module.id}
                             href={getModuleHref(module)}
-                            className={`rounded-full border px-4 py-2 text-sm font-black uppercase tracking-[0.12em] transition ${
+                            className={`rounded-full border px-2.5 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
                                 : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
@@ -308,7 +308,7 @@ export default async function MonEspacePage() {
                         ))}
                         <Link
                           href="/mon-espace/plan-action-communication"
-                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
+                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-2.5 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
                         >
                           Plan d&apos;action communication
                         </Link>
@@ -316,7 +316,7 @@ export default async function MonEspacePage() {
                     </nav>
                   ) : null}
 
-                  <div className="border-b border-[#f0e4d3] pb-6">
+                  <div className="border-b border-[#f0e4d3] pb-3">
                     <CompanyNameForm currentCompanyName={workspaceTitle} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
@@ -326,7 +326,7 @@ export default async function MonEspacePage() {
                     ) : null}
                   </div>
 
-                  <div className="rounded-[1rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-3 shadow-[0_8px_18px_rgba(207,116,48,0.07)]">
+                    <div className="rounded-[1rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-2.5 shadow-[0_8px_18px_rgba(207,116,48,0.07)]">
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
                         <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
@@ -359,22 +359,22 @@ export default async function MonEspacePage() {
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
                         Ton Guide de Marque
                       </p>
-                      <div className="mt-5 flex flex-wrap gap-3">
+                      <div className="mt-2 flex flex-wrap gap-2">
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-white"
+                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-white"
                         >
                           Generer
                         </Link>
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] border border-[#eadfca] bg-white px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#6b625a]"
                         >
                           Voir
                         </Link>
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] border border-[#eadfca] bg-white px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#6b625a]"
                         >
                           Regenerer
                         </Link>

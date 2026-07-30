@@ -28,7 +28,7 @@ export default function WorkspaceLogoForm({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <form action={formAction} className="mt-5 space-y-3">
+    <form action={formAction} className="mt-3 space-y-2">
       {!currentLogoUrl ? (
         <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]">
           Logo de l&apos;espace
@@ -54,7 +54,7 @@ export default function WorkspaceLogoForm({
         disabled={pending}
         className={`group relative overflow-hidden disabled:cursor-wait disabled:opacity-70 ${
           currentLogoUrl
-            ? "h-36 w-fit max-w-full rounded-[1rem] bg-transparent"
+            ? "h-20 w-fit max-w-full rounded-[0.8rem] bg-transparent"
             : "flex h-12 w-full items-center justify-center rounded-[0.95rem] border border-[#eadfca] bg-white px-4 text-sm"
         } font-black uppercase tracking-[0.12em] text-[#6b625a]`}
       >

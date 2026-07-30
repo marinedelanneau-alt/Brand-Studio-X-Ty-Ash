@@ -34,7 +34,7 @@ export default function CompanyNameForm({
 
   if (shouldShowDisplay) {
     return (
-      <div className="mt-5 space-y-2">
+      <div className="mt-3 space-y-1.5">
         <p className="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]">
           Nom de l&apos;entreprise
         </p>
@@ -44,7 +44,7 @@ export default function CompanyNameForm({
             setEditVersion((current) => current + 1);
             setIsEditing(true);
           }}
-          className="group flex min-h-12 w-full items-center justify-between gap-3 rounded-[0.95rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-left text-sm text-[#6a5d53] transition hover:border-[#cf7430] hover:bg-white"
+          className="group flex min-h-10 w-full items-center justify-between gap-3 rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-left text-sm text-[#6a5d53] transition hover:border-[#cf7430] hover:bg-white"
           aria-label="Modifier le nom de l'entreprise"
           title="Modifier le nom de l'entreprise"
         >
