@@ -222,19 +222,21 @@ export default async function MonEspacePage() {
       <section className="mx-auto max-w-6xl space-y-6">
         <div
           className={`border-b border-[#eadfca] pb-8 sm:pb-10 ${
-            workspace.project ? "relative" : ""
+            workspace.project
+              ? "lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-x-8"
+              : ""
           }`}
         >
           <div
             className={`flex flex-col gap-8 ${
               workspace.project
-                ? ""
+                ? "lg:contents"
                 : "lg:flex-row lg:items-start lg:justify-between"
             }`}
           >
             <div
               className={`min-w-0 flex-1 ${
-                workspace.project ? "lg:mr-[23rem]" : ""
+                workspace.project ? "lg:col-start-1 lg:row-start-1" : ""
               }`}
             >
               <div className="flex items-center gap-4">
@@ -272,7 +274,7 @@ export default async function MonEspacePage() {
             <div
               className={`grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1 ${
                 workspace.project
-                  ? "lg:absolute lg:bottom-0 lg:right-0 lg:top-0"
+                  ? "lg:col-start-2 lg:mt-8 lg:row-start-2"
                   : ""
               }`}
             >
@@ -285,7 +287,7 @@ export default async function MonEspacePage() {
                   iconOnly
                   className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
                 />
-                <div className="relative space-y-3">
+                <div className="relative flex h-full flex-col justify-between gap-3">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[#f0e4d3] pb-3">
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
@@ -400,7 +402,7 @@ export default async function MonEspacePage() {
           </div>
           <div
             className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6 ${
-              workspace.project ? "lg:w-[calc(100%-23rem)]" : ""
+              workspace.project ? "lg:col-start-1 lg:row-start-2" : ""
             }`}
           >
             <div
