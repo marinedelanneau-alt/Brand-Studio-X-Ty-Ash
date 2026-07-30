@@ -220,8 +220,20 @@ export default async function MonEspacePage() {
     <ContentPreviewFrame preview={workspace.contentPreview}>
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <section className="mx-auto max-w-6xl space-y-6">
-        <div className="border-b border-[#eadfca] pb-8 sm:pb-10">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+        <div
+          className={`border-b border-[#eadfca] pb-8 sm:pb-10 ${
+            workspace.project
+              ? "lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-x-8"
+              : ""
+          }`}
+        >
+          <div
+            className={`flex flex-col gap-8 ${
+              workspace.project
+                ? "lg:contents"
+                : "lg:flex-row lg:items-start lg:justify-between"
+            }`}
+          >
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-4">
                 {workspace.project?.logo_url ? (
@@ -255,7 +267,11 @@ export default async function MonEspacePage() {
               </div>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1">
+            <div
+              className={`grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1 ${
+                workspace.project ? "lg:col-start-2 lg:row-span-2 lg:row-start-1" : ""
+              }`}
+            >
               <div className="relative overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
@@ -378,7 +394,11 @@ export default async function MonEspacePage() {
               ) : null}
             </div>
           </div>
-          <div className="relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6">
+          <div
+            className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6 ${
+              workspace.project ? "lg:col-start-1 lg:row-start-2" : ""
+            }`}
+          >
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
@@ -397,14 +417,24 @@ export default async function MonEspacePage() {
                   belle mission de structurer ton identité de marque. Es-tu prêt
                   à entrer dans la peau d&apos;un Directeur Artistique ?
                 </p>
-                <div className="grid gap-3 text-base leading-7 text-[#6f645b] lg:grid-cols-3 lg:gap-6">
-                  <p className="pb-3 lg:pb-0 lg:pr-6">
+                <div
+                  className={`grid gap-3 text-base leading-7 text-[#6f645b] ${
+                    workspace.project ? "" : "lg:grid-cols-3 lg:gap-6"
+                  }`}
+                >
+                  <p className={`pb-3 ${workspace.project ? "" : "lg:pb-0 lg:pr-6"}`}>
                     Ce guide est le document de référence de ton identité,{" "}
                     <span className="font-semibold italic text-[#5f544a]">
                       un kit clé en main pour poser les bases d&apos;une marque forte.
                     </span>
                   </p>
-                  <p className="border-t border-[#eadfca] py-3 lg:border-l lg:border-t-0 lg:px-6 lg:py-0">
+                  <p
+                    className={`border-t border-[#eadfca] py-3 ${
+                      workspace.project
+                        ? ""
+                        : "lg:border-l lg:border-t-0 lg:px-6 lg:py-0"
+                    }`}
+                  >
                     Il rassemble les fondations stratégiques et visuelles de ta
                     marque afin de garantir une communication{" "}
                     <strong className="font-extrabold text-[#4b4550]">
@@ -412,7 +442,13 @@ export default async function MonEspacePage() {
                     </strong>
                     .
                   </p>
-                  <p className="border-t border-[#eadfca] pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                  <p
+                    className={`border-t border-[#eadfca] pt-3 ${
+                      workspace.project
+                        ? ""
+                        : "lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
+                    }`}
+                  >
                     <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
                     utilise-le comme un repère pour créer, décliner et faire
                     évoluer ta marque en toute autonomie.
@@ -450,7 +486,11 @@ export default async function MonEspacePage() {
               </div>
             </div>
           </div>
-          <div className="mt-8 border-t border-[#eadfca] pt-7">
+          <div
+            className={`mt-8 border-t border-[#eadfca] pt-7 ${
+              workspace.project ? "lg:col-span-2" : ""
+            }`}
+          >
             <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[#5d5259] sm:text-[2.9rem] lg:text-[3.35rem]">
               Ton histoire commence ici, écrivons-la ensemble !
             </p>
