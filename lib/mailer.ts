@@ -162,7 +162,7 @@ export async function sendAccountActivationEmail(
           <p style="margin:0 0 28px; color:#6f645b; font-size:16px; line-height:1.75;">
             Choisis maintenant ton mot de passe pour créer ton compte, ouvrir les portes de ton studio et commencer ton parcours.
           </p>
-          <a href="${registerUrl.toString()}" style="display:inline-block; padding:17px 26px; border-radius:16px; background:linear-gradient(135deg,#df9b39,#f1cc56); color:#ffffff; text-decoration:none; font-size:13px; font-weight:800; letter-spacing:0.10em; text-transform:uppercase; box-shadow:0 12px 26px rgba(223,155,57,0.22);">
+          <a href="${registerUrl.toString()}" style="display:inline-block; padding:17px 26px; border-radius:16px; background-color:#df9b39; color:#ffffff; text-decoration:none; font-family:Arial,Helvetica,sans-serif; font-size:13px; font-weight:800; line-height:20px; letter-spacing:0.10em; text-transform:uppercase;">
             Créer mon espace
           </a>
           <div style="margin-top:30px; padding:18px 20px; border:1px solid #f0e4d3; border-radius:16px; background:#fffdf8;">
@@ -248,7 +248,7 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
           <p style="margin:0 0 28px; color:#6f645b; font-size:16px; line-height:1.75;">
             Clique sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien est personnel et temporaire.
           </p>
-          <a href="${input.resetUrl}" style="display:inline-block; padding:17px 26px; border-radius:16px; background:linear-gradient(135deg,#df9b39,#f1cc56); color:#ffffff; text-decoration:none; font-size:13px; font-weight:800; letter-spacing:0.10em; text-transform:uppercase; box-shadow:0 12px 26px rgba(223,155,57,0.22);">
+          <a href="${input.resetUrl}" style="display:inline-block; padding:17px 26px; border-radius:16px; background-color:#df9b39; color:#ffffff; text-decoration:none; font-family:Arial,Helvetica,sans-serif; font-size:13px; font-weight:800; line-height:20px; letter-spacing:0.10em; text-transform:uppercase;">
             Modifier mon mot de passe
           </a>
           <div style="margin-top:30px; padding:18px 20px; border:1px solid #f0e4d3; border-radius:16px; background:#fffdf8;">

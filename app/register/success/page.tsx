@@ -38,14 +38,6 @@ export default async function RegisterSuccessPage() {
                 de passe.
               </p>
 
-              <div className="mt-8 rounded-[1.8rem] bg-[#fffaf1] p-5">
-                <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
-                  Connexion
-                </p>
-                <p className="mt-5 text-2xl font-black text-[#514b57] sm:text-3xl">
-                  E-mail + mot de passe
-                </p>
-              </div>
             </div>
 
             <div className="rounded-[2.4rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffefd,#fff8f0)] p-7 shadow-[0_22px_54px_rgba(221,204,176,0.14)] sm:p-8">
@@ -54,19 +46,9 @@ export default async function RegisterSuccessPage() {
                   <p className="inline-flex rounded-full bg-[#f2eef7] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                     Confirmation
                   </p>
-                  <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[#514b57] sm:text-[3rem]">
-                    Ton accès
-                    <br />
-                    est prêt
+                  <h2 className="mt-5 whitespace-nowrap font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[#514b57] sm:text-[3rem]">
+                    Ton accès est prêt
                   </h2>
-                </div>
-                <div className="rounded-[1.6rem] bg-[#fff5da] px-4 py-3 text-right">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#cf7430]">
-                    Activation
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[#82766b]">
-                    Connexion immédiate
-                  </p>
                 </div>
               </div>
 
