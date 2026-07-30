@@ -9,6 +9,19 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const account = await getCurrentAccount();
+    const body = (await request.json().catch(() => null)) as
+      | { email?: unknown }
+      | null;
+    const submittedEmail =
+      typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const email = account?.email.trim().toLowerCase() || submittedEmail;
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: "Une adresse e-mail valide est obligatoire pour souscrire." },
+        { status: 400 },
+      );
+    }
 
     const priceId = process.env.STRIPE_PRICE_ID;
 
@@ -30,7 +43,7 @@ export async function POST(request: Request) {
 
     if (account && !customerId) {
       const customer = await stripe.customers.create({
-        email: account.email,
+        email,
         name: account.client_name ?? account.company_name ?? undefined,
         metadata: {
           user_id: String(account.id),
@@ -51,6 +64,7 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode,
       customer: customerId ?? undefined,
+      customer_email: customerId ? undefined : email,
       customer_creation: !account && mode === "payment" ? "always" : undefined,
       line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
