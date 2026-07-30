@@ -287,7 +287,7 @@ export default async function MonEspacePage() {
                   iconOnly
                   className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
                 />
-                <div className="relative flex h-full flex-col justify-between gap-3">
+                <div className="relative flex h-full flex-col gap-4">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[#f0e4d3] pb-3">
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
