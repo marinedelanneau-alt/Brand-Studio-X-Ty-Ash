@@ -296,12 +296,12 @@ export default async function MonEspacePage() {
                       <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[#4b4550]">
                         Tes modules
                       </h3>
-                      <div className="mt-2.5 flex flex-wrap gap-2">
+                      <div className="mt-2.5 flex flex-col gap-1.5">
                         {workspace.modules.map((module) => (
                           <Link
                             key={module.id}
                             href={getModuleHref(module)}
-                            className={`rounded-full border px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
+                            className={`w-full rounded-full border px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
                                 : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
@@ -312,7 +312,7 @@ export default async function MonEspacePage() {
                         ))}
                         <Link
                           href="/mon-espace/plan-action-communication"
-                          className="rounded-full border border-[#cf7430] bg-[#fff1d5] px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
+                          className="w-full rounded-full border border-[#cf7430] bg-[#fff1d5] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
                         >
                           Plan d&apos;action communication
                         </Link>
