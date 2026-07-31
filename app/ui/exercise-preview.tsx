@@ -1,5 +1,6 @@
 import {
   cleanStoredExerciseQuestionText,
+  getStaticTextHtml,
   getAnswerPlaceholderItems,
   getFillBlankCount,
   getPromptOpenLabel,
@@ -40,25 +41,6 @@ function getQuestionPrompts(exercise: PreviewExercise) {
 function getQuestionColumns(exercise: PreviewExercise) {
   const config = parseStoredExerciseQuestionConfig(exercise.type, exercise.options);
   return Math.max(config.items.length > 0 ? config.columns : 1, 1);
-}
-
-function getStaticTextHtml(content: string) {
-  const trimmedContent = cleanStoredExerciseQuestionText(content);
-
-  if (!trimmedContent) {
-    return "";
-  }
-
-  if (/<[^>]+>/.test(trimmedContent)) {
-    return trimmedContent;
-  }
-
-  return trimmedContent
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => `<p>${block.replaceAll("\n", "<br />")}</p>`)
-    .join("");
 }
 
 function isPassiveContentType(type: ExerciseType) {

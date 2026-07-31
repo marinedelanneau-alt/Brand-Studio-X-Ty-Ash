@@ -505,6 +505,40 @@ export function cleanStoredExerciseQuestionText(question: string) {
   ).trim();
 }
 
+function decodeEncodedHtmlTags(value: string) {
+  let decoded = value;
+
+  // Older editorial imports may contain one or two encoded HTML layers.
+  for (let pass = 0; pass < 2; pass += 1) {
+    const next = decoded
+      .replace(/&amp;lt;/gi, "&lt;")
+      .replace(/&amp;gt;/gi, "&gt;")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">");
+
+    if (next === decoded) break;
+    decoded = next;
+  }
+
+  return decoded;
+}
+
+export function getStaticTextHtml(content: string) {
+  const trimmedContent = decodeEncodedHtmlTags(
+    cleanStoredExerciseQuestionText(content),
+  );
+
+  if (!trimmedContent) return "";
+  if (/<[^>]+>/.test(trimmedContent)) return trimmedContent;
+
+  return trimmedContent
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => `<p>${block.replaceAll("\n", "<br />")}</p>`)
+    .join("");
+}
+
 export function getPromptOpenLabel(question: string) {
   return getEditorExerciseQuestion("prompt_open", question);
 }

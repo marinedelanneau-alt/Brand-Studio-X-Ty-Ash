@@ -51,6 +51,7 @@ import { getStableBrowserExerciseSlot } from "@/lib/stable-answer-keys";
 import { getModuleHref } from "@/lib/module-routing";
 import {
   cleanStoredExerciseQuestionText,
+  getStaticTextHtml,
   getFillBlankCount,
   getTableCellCount,
   getAnswerPlaceholderItems,
@@ -1294,25 +1295,6 @@ function getModuleSummaryHref(module: Pick<WorkspaceModule, "id" | "position">) 
   return module.position === 4
     ? "/brand-guide"
     : `${getModuleHref(module)}?summary=1#resume-module`;
-}
-
-function getStaticTextHtml(content: string) {
-  const trimmedContent = cleanStoredExerciseQuestionText(content);
-
-  if (!trimmedContent) {
-    return "";
-  }
-
-  if (/<[^>]+>/.test(trimmedContent)) {
-    return trimmedContent;
-  }
-
-  return trimmedContent
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => `<p>${block.replaceAll("\n", "<br />")}</p>`)
-    .join("");
 }
 
 function shouldPreventImplicitSubmit(target: EventTarget | null) {
