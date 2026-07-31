@@ -21,6 +21,7 @@ import {
   getEditorOptionsText,
   getExerciseDefaultOptionsText,
   getFillBlankCount,
+  getStaticTextHtml,
   getSerializedTablePlaceholderOptions,
   normalizeExerciseOptions,
   parseColorOption,
@@ -908,9 +909,10 @@ function QuestionCard({
             <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">
               Question {questionIndex + 1}
             </p>
-            <p className="mt-2 whitespace-normal break-words text-base font-semibold text-[#4b4550]">
-              {questionSummary}
-            </p>
+            <div
+              className="module-content mt-2 whitespace-normal break-words text-base font-semibold text-[#4b4550]"
+              dangerouslySetInnerHTML={{ __html: getStaticTextHtml(questionSummary) }}
+            />
             <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[#8a8077]">
               {EXERCISE_TYPE_LABELS[question.type]}
             </p>
