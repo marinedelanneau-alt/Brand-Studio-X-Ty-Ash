@@ -61,6 +61,7 @@ import {
   parseStoredTableConfig,
   parseStoredTablePlaceholders,
   parseChecklistEntries,
+  resolveStoredExerciseOptions,
   getPromptOpenLabel,
   isAnswerableExerciseType,
   parseColorOption,
@@ -1466,7 +1467,7 @@ export default function ModuleAnswerForm({
   const currentExerciseQuestions = currentExerciseGroup?.questions ?? [];
   const currentExercise = currentExerciseQuestions[0];
   const currentVisibleOptions = currentExercise
-    ? currentExercise.options.filter((option) => !isSmartFeedbackOption(option))
+    ? resolveStoredExerciseOptions(currentExercise.type, currentExercise.options)
     : [];
   const currentQuestionPrompts = currentExercise ? getQuestionPrompts(currentExercise) : [];
   const isMultiQuestionExerciseGroup = currentExerciseQuestions.length > 1;

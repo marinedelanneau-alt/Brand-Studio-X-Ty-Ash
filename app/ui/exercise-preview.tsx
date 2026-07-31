@@ -10,6 +10,7 @@ import {
   parseStoredImageUploadConfig,
   parseStoredTableConfig,
   parseStoredTablePlaceholders,
+  resolveStoredExerciseOptions,
   splitFillBlankText,
   type ExerciseType,
 } from "@/lib/exercise-types";
@@ -33,6 +34,10 @@ type PreviewExercise = {
   question: string;
   options: string[];
 };
+
+function getVisibleOptions(exercise: PreviewExercise) {
+  return resolveStoredExerciseOptions(exercise.type, exercise.options);
+}
 
 function getQuestionPrompts(exercise: PreviewExercise) {
   return parseStoredExerciseQuestionConfig(exercise.type, exercise.options).items;
@@ -144,10 +149,11 @@ function PreviewChoiceGroup({
   prompt?: string;
   inputType: "radio" | "checkbox";
 }) {
+  const visibleOptions = getVisibleOptions(exercise);
   const options =
-    exercise.type === "boolean" && exercise.options.length === 0
+    exercise.type === "boolean" && visibleOptions.length === 0
       ? ["Oui", "Non"]
-      : exercise.options;
+      : visibleOptions;
 
   return (
     <div className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4">
@@ -168,11 +174,13 @@ function PreviewChoiceGroup({
 }
 
 function PreviewColorChoice({ exercise, prompt }: { exercise: PreviewExercise; prompt?: string }) {
+  const options = getVisibleOptions(exercise);
+
   return (
     <div className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4">
       {prompt ? <p className="text-sm font-semibold leading-7 text-[#5f544a]">{prompt}</p> : null}
       <div className={prompt ? "mt-3 grid gap-3" : "grid gap-3"}>
-        {exercise.options.map((option) => {
+        {options.map((option) => {
           const colorOption = parseColorOption(option);
 
           return (
