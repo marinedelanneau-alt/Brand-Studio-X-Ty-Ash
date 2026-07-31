@@ -2142,9 +2142,12 @@ export default function ModuleAnswerForm({
             !isMultiQuestionExerciseGroup &&
             cleanStoredExerciseQuestionText(currentExercise.question).length > 0 ? (
               <div className="mt-3 flex items-start gap-3">
-                <p className="min-w-0 flex-1 text-base leading-7 text-[#5f544a]">
-                  {cleanStoredExerciseQuestionText(currentExercise.question)}
-                </p>
+                <div
+                  className="module-content min-w-0 flex-1 text-base leading-7 text-[#5f544a]"
+                  dangerouslySetInnerHTML={{
+                    __html: getStaticTextHtml(currentExercise.question),
+                  }}
+                />
                 <ExerciseAiActions
                   exercise={currentExercise}
                   state={aiAssistStates[currentExercise.id] ?? initialAiAssistState}
