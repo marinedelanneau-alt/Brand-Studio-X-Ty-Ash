@@ -26,6 +26,8 @@ import {
   createContentDraft,
   getApplicationReleaseState,
   isControlledAdminPublishingEnabled,
+  markContentReleaseReady,
+  publishContentRelease,
   updateCurrentDraftSnapshot,
 } from "@/lib/content-releases";
 import { normalizeReleaseSnapshotModules } from "@/lib/content-release-diff";
@@ -109,14 +111,27 @@ async function syncAdminDraftRelease(accountId: number) {
     releaseId,
     modules: normalizeReleaseSnapshotModules(modules),
   });
+
+  return releaseId;
 }
 
-export async function prepareAdminRelease() {
+export async function deployAdminRelease() {
   const account = await getAuthenticatedAdmin();
-  await syncAdminDraftRelease(account.id);
-  revalidatePath("/admin/modules");
+  const releaseId = await syncAdminDraftRelease(account.id);
+  if (!releaseId) {
+    throw new Error("Le déploiement contrôlé n’est pas activé.");
+  }
+  const notes = `Déploiement ADMIN du ${new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: "Europe/Paris",
+  }).format(new Date())}`;
+
+  await markContentReleaseReady({ releaseId, notes });
+  await publishContentRelease({ releaseId, notes });
+  revalidateTrainingExperience();
   revalidatePath("/admin/releases");
-  redirect("/admin/releases?kind=success&message=La%20nouvelle%20version%20ADMIN%20est%20prête%20à%20être%20validée.");
+  redirect("/admin/modules?status=deployed");
 }
 
 function parseQuestion(rawQuestion: unknown) {

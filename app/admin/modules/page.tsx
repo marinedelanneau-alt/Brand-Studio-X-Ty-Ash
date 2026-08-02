@@ -1,4 +1,4 @@
-import { cancelAdminDraftDeployment, prepareAdminRelease, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
+import { cancelAdminDraftDeployment, deployAdminRelease, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
 import AdminDeploymentButton from "@/app/ui/admin-deployment-button";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
@@ -86,12 +86,12 @@ export default async function AdminModulesPage({
               Les changements restent dans le brouillon jusqu’à une publication
               volontaire depuis la gestion des releases.
             </p>
-            <form action={prepareAdminRelease} className="mt-4">
+            <form action={deployAdminRelease} className="mt-4">
               <button
                 type="submit"
                 className="inline-flex rounded-xl bg-[#4b4550] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3f3943]"
               >
-                Préparer la nouvelle version à déployer
+                Déployer
               </button>
             </form>
           </div>

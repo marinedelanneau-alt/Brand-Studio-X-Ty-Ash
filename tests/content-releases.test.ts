@@ -221,8 +221,10 @@ describe("déploiement global programmé", () => {
   it("prépare automatiquement la release manquante depuis le brouillon ADMIN", () => {
     expect(adminModuleActions).toContain("createContentDraft");
     expect(adminModuleActions).toContain("state.published_release_id");
-    expect(adminModuleActions).toContain("export async function prepareAdminRelease");
-    expect(adminModulesPage).toContain("action={prepareAdminRelease}");
+    expect(adminModuleActions).toContain("export async function deployAdminRelease");
+    expect(adminModuleActions).toContain("markContentReleaseReady");
+    expect(adminModuleActions).toContain("publishContentRelease");
+    expect(adminModulesPage).toContain("action={deployAdminRelease}");
   });
 
   it("ne touche jamais au contenu historique ni aux réponses", () => {
