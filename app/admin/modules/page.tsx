@@ -1,4 +1,4 @@
-import { cancelAdminDraftDeployment, deployAdminRelease, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
+import { cancelAdminDraftDeployment, publishFinalVersionForAllUsers, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
 import AdminDeploymentButton from "@/app/ui/admin-deployment-button";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
@@ -51,8 +51,8 @@ export default async function AdminModulesPage({
   const message =
     statusValue === "saved"
       ? "Brouillon admin enregistre. Tes changements sont visibles dans ton espace Marine Communication uniquement."
-      : statusValue === "deployed"
-        ? "Brouillon deploye a tous les utilisateurs."
+      : statusValue === "published"
+        ? "La nouvelle version finale est publiée pour tous les utilisateurs. Ton brouillon ADMIN reste ton espace de travail privé."
         : statusValue === "scheduled"
           ? "Déploiement programmé."
           : statusValue === "cancelled"
@@ -80,18 +80,18 @@ export default async function AdminModulesPage({
         {controlledReleasesEnabled ? (
           <div className="mt-5 rounded-2xl border border-[#d9e6d5] bg-[#f7fbf5] p-5">
             <p className="font-bold text-[#55745a]">
-              La publication historique destructive est désactivée.
+              Brouillon ADMIN privé
             </p>
             <p className="mt-2 text-sm leading-6 text-[#637466]">
-              Les changements restent dans le brouillon jusqu’à une publication
-              volontaire depuis la gestion des releases.
+              Tes changements restent visibles uniquement par ton compte ADMIN.
+              Publier crée une nouvelle version finale pour tous les utilisateurs.
             </p>
-            <form action={deployAdminRelease} className="mt-4">
+            <form action={publishFinalVersionForAllUsers} className="mt-4">
               <button
                 type="submit"
                 className="inline-flex rounded-xl bg-[#4b4550] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3f3943]"
               >
-                Déployer
+                Déployer la version finale
               </button>
             </form>
           </div>

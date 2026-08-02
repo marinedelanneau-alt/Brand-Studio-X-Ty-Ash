@@ -115,7 +115,7 @@ async function syncAdminDraftRelease(accountId: number) {
   return releaseId;
 }
 
-export async function deployAdminRelease() {
+export async function publishFinalVersionForAllUsers() {
   const account = await getAuthenticatedAdmin();
   const releaseId = await syncAdminDraftRelease(account.id);
   if (!releaseId) {
@@ -131,7 +131,7 @@ export async function deployAdminRelease() {
   await publishContentRelease({ releaseId, notes });
   revalidateTrainingExperience();
   revalidatePath("/admin/releases");
-  redirect("/admin/modules?status=deployed");
+  redirect("/admin/modules?status=published");
 }
 
 function parseQuestion(rawQuestion: unknown) {
