@@ -23,6 +23,7 @@ import { getAuthenticatedAdmin } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getAdminWorkingModules } from "@/lib/training";
 import {
+  createContentDraft,
   getApplicationReleaseState,
   isControlledAdminPublishingEnabled,
   updateCurrentDraftSnapshot,
@@ -75,17 +76,47 @@ function revalidateTrainingExperience(moduleId?: number) {
 
 async function syncAdminDraftRelease(accountId: number) {
   if (!isControlledAdminPublishingEnabled()) return;
-  const state = await getApplicationReleaseState();
-  if (!state.current_draft_release_id) {
-    throw new Error(
-      "Crée d’abord un brouillon dans « Versions et déploiements ».",
-    );
+
+  let state = await getApplicationReleaseState();
+  let releaseId = state.current_draft_release_id;
+
+  if (!releaseId) {
+    if (!state.published_release_id) {
+      throw new Error("Aucune version publiée ne peut servir de base au brouillon.");
+    }
+
+    try {
+      const createdReleaseId = await createContentDraft({
+        sourceReleaseId: state.published_release_id,
+        name: `Brouillon ADMIN du ${new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "short",
+          timeStyle: "short",
+          timeZone: "Europe/Paris",
+        }).format(new Date())}`,
+      });
+      releaseId = String(createdReleaseId);
+    } catch (creationError) {
+      // Les sauvegardes automatiques peuvent être simultanées. Si une autre
+      // requête vient de créer le brouillon, on réutilise celui-ci.
+      state = await getApplicationReleaseState();
+      releaseId = state.current_draft_release_id;
+      if (!releaseId) throw creationError;
+    }
   }
+
   const modules = await getAdminWorkingModules(accountId);
   await updateCurrentDraftSnapshot({
-    releaseId: state.current_draft_release_id,
+    releaseId,
     modules: normalizeReleaseSnapshotModules(modules),
   });
+}
+
+export async function prepareAdminRelease() {
+  const account = await getAuthenticatedAdmin();
+  await syncAdminDraftRelease(account.id);
+  revalidatePath("/admin/modules");
+  revalidatePath("/admin/releases");
+  redirect("/admin/releases?kind=success&message=La%20nouvelle%20version%20ADMIN%20est%20prête%20à%20être%20validée.");
 }
 
 function parseQuestion(rawQuestion: unknown) {
@@ -505,6 +536,7 @@ export type AdminDeploymentState = {
 export async function publishAdminDraftToAllUsers(
   _previousState: AdminDeploymentState,
 ): Promise<AdminDeploymentState> {
+  void _previousState;
   try {
     const account = await getAuthenticatedAdmin();
     if (isControlledAdminPublishingEnabled()) {

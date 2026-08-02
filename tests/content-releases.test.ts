@@ -76,6 +76,14 @@ const releasesPage = readFileSync(
   new URL("../app/admin/releases/page.tsx", import.meta.url),
   "utf8",
 );
+const adminModuleActions = readFileSync(
+  new URL("../app/admin/modules/actions.ts", import.meta.url),
+  "utf8",
+);
+const adminModulesPage = readFileSync(
+  new URL("../app/admin/modules/page.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("migration contrôlée des releases", () => {
   it("reste additive et ne détruit aucune table ou réponse historique", () => {
@@ -210,6 +218,13 @@ describe("identité stable et comparaison", () => {
 });
 
 describe("déploiement global programmé", () => {
+  it("prépare automatiquement la release manquante depuis le brouillon ADMIN", () => {
+    expect(adminModuleActions).toContain("createContentDraft");
+    expect(adminModuleActions).toContain("state.published_release_id");
+    expect(adminModuleActions).toContain("export async function prepareAdminRelease");
+    expect(adminModulesPage).toContain("action={prepareAdminRelease}");
+  });
+
   it("ne touche jamais au contenu historique ni aux réponses", () => {
     expect(schedulingMigration).not.toMatch(
       /\b(?:delete|update)\s+(?:from\s+)?public\.(?:brand_modules|brand_submodules|module_exercises|project_exercise_answers|user_answers)\b/i,
