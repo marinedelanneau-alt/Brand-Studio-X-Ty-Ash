@@ -208,7 +208,7 @@ function StorySharePreview({
             Une story pour célébrer cette belle avancée 🎉
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
-            Partage ton avancée avec une composition sobre, moderne et lisible, sans dévoiler tes réponses.
+            Partage ton avancée pour commencer à communiquer sur ta marque :)
           </p>
         </div>
 
