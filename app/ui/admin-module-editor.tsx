@@ -810,6 +810,7 @@ function QuestionCard({
   moduleId,
   modulePosition,
   questionIndex,
+  exerciseNumber,
   questionCount,
   availableSubmoduleTargets,
   onMoveUp,
@@ -824,6 +825,7 @@ function QuestionCard({
   moduleId?: number;
   modulePosition: number;
   questionIndex: number;
+  exerciseNumber: number;
   questionCount: number;
   availableSubmoduleTargets: Array<{ id: string; label: string }>;
   onMoveUp: () => void;
@@ -907,7 +909,11 @@ function QuestionCard({
             aria-expanded={isExpanded}
           >
             <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">
-              Question {questionIndex + 1}
+              {question.type === "static_text"
+                ? "Consigne"
+                : question.type === "popup_message"
+                  ? "Inspiration"
+                  : `Question ${exerciseNumber}`}
             </p>
             <div
               className="module-content mt-2 whitespace-normal break-words text-base font-semibold text-[#4b4550]"
@@ -1413,7 +1419,11 @@ function QuestionCard({
                   Aperçu
                 </p>
                 <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
-                  Question {questionIndex + 1}
+                  {question.type === "static_text"
+                    ? "Consigne"
+                    : question.type === "popup_message"
+                      ? "Inspiration"
+                      : `Question ${exerciseNumber}`}
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-[#7b7068]">
                   Visualisation du rendu final cote utilisateur.
@@ -2276,6 +2286,12 @@ function ModuleForm({
                                 moduleId={module.id}
                                 modulePosition={module.position}
                                 questionIndex={questionIndex}
+                                exerciseNumber={
+                                  group.questions
+                                    .slice(0, questionIndex + 1)
+                                    .filter((candidate) => !isPassiveContentType(candidate.type))
+                                    .length
+                                }
                                 questionCount={group.questions.length}
                                 availableSubmoduleTargets={module.submodules
                                   .filter((submodule) => submodule.id !== activeSubmodule.id)

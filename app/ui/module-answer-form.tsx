@@ -1466,6 +1466,16 @@ export default function ModuleAnswerForm({
   const currentExerciseGroup = visibleExerciseGroups[currentIndex];
   const currentExerciseQuestions = currentExerciseGroup?.questions ?? [];
   const currentExercise = currentExerciseQuestions[0];
+  const answerableExerciseGroups = useMemo(
+    () =>
+      visibleExerciseGroups.filter((group) =>
+        group.questions.some((exercise) => isAnswerableExerciseType(exercise.type)),
+      ),
+    [visibleExerciseGroups],
+  );
+  const currentAnswerableExerciseIndex = currentExerciseGroup
+    ? answerableExerciseGroups.findIndex((group) => group.id === currentExerciseGroup.id)
+    : -1;
   const currentVisibleOptions = currentExercise
     ? resolveStoredExerciseOptions(currentExercise.type, currentExercise.options)
     : [];
@@ -2089,9 +2099,9 @@ export default function ModuleAnswerForm({
             {visibleExerciseGroups.length > 0
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
-                  ? `Inspiration ${currentIndex + 1} sur ${visibleExerciseGroups.length}`
-                  : `Texte ${currentIndex + 1} sur ${visibleExerciseGroups.length}`
-                : `Question ${currentIndex + 1} sur ${visibleExerciseGroups.length}`
+                  ? "Inspiration"
+                  : "Consigne"
+                : `Question ${currentAnswerableExerciseIndex + 1} sur ${answerableExerciseGroups.length}`
               : "Aucun exercice dans ce sous-module"}
           </p>
           <p className="text-sm text-[#8a8077]">
@@ -2121,7 +2131,7 @@ export default function ModuleAnswerForm({
         {!isPassiveContentType(currentExercise?.type) ? (
           <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7a7087]">
             {visibleExerciseGroups.length > 0
-              ? `Exercice ${currentIndex + 1}`
+              ? `Exercice ${currentAnswerableExerciseIndex + 1}`
               : "Exercices à venir"}
           </p>
         ) : null}
