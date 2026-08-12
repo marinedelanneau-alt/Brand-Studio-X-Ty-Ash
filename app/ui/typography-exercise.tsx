@@ -33,7 +33,7 @@ export default function TypographyExercise({ exercise, answers, onChange }: {
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;600&family=Libre+Baskerville&family=Lora:wght@400;600&family=Manrope:wght@400;600&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400;600&family=Poppins:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bebas+Neue&family=Bodoni+Moda:wght@400;600&family=Cormorant+Garamond:wght@400;600&family=Crimson+Pro:wght@400;600&family=DM+Sans:wght@400;600&family=Libre+Baskerville&family=Lora:wght@400;600&family=Manrope:wght@400;600&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600&family=Nunito+Sans:wght@400;600&family=Open+Sans:wght@400;600&family=Oswald:wght@400;600&family=Playfair+Display:wght@400;600&family=Poppins:wght@400;600&family=Raleway:wght@400;600&family=Space+Grotesk:wght@400;600&family=Work+Sans:wght@400;600&display=swap";
     document.head.appendChild(link);
   }, []);
 

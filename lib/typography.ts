@@ -24,6 +24,15 @@ export const OPEN_SOURCE_FONT_LIBRARY = [
   { family: "Libre Baskerville", category: "Serif" },
   { family: "Space Grotesk", category: "Sans serif" },
   { family: "Bebas Neue", category: "Display" },
+  { family: "Open Sans", category: "Sans serif" },
+  { family: "Raleway", category: "Sans serif" },
+  { family: "Nunito Sans", category: "Sans serif" },
+  { family: "Work Sans", category: "Sans serif" },
+  { family: "Merriweather", category: "Serif" },
+  { family: "Crimson Pro", category: "Serif" },
+  { family: "Bodoni Moda", category: "Serif" },
+  { family: "Oswald", category: "Display" },
+  { family: "Abril Fatface", category: "Display" },
 ] as const;
 
 export function getSerializedTypographyOptions() {
