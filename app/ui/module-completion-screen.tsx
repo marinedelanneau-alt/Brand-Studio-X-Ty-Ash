@@ -336,9 +336,9 @@ function ModuleDetailAccordion({
                             <button
                               type="button"
                               onClick={() => onAdjustAnswer(item.exerciseId!)}
-                              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#eadfca]/80 bg-transparent px-2 py-1 text-[0.58rem] font-bold uppercase tracking-[0.06em] text-[#a97955] opacity-75 transition hover:border-[#dfb98d] hover:bg-white hover:text-[#cf7430] hover:opacity-100"
+                              className="inline-flex shrink-0 items-center gap-0.5 rounded-full border border-[#eadfca]/80 bg-transparent px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-[0.04em] text-[#a97955] opacity-70 transition hover:border-[#dfb98d] hover:bg-white hover:text-[#cf7430] hover:opacity-100"
                             >
-                              <PencilSquareIcon className="h-3 w-3" />
+                              <PencilSquareIcon className="h-2.5 w-2.5" />
                               Ajuster ma réponse
                             </button>
                           ) : null}
