@@ -33,6 +33,16 @@ export const OPEN_SOURCE_FONT_LIBRARY = [
   { family: "Bodoni Moda", category: "Serif" },
   { family: "Oswald", category: "Display" },
   { family: "Abril Fatface", category: "Display" },
+  { family: "Syne", category: "Display" },
+  { family: "Unbounded", category: "Display" },
+  { family: "Bricolage Grotesque", category: "Sans serif" },
+  { family: "Fraunces", category: "Serif" },
+  { family: "Yeseva One", category: "Display" },
+  { family: "Cinzel", category: "Serif" },
+  { family: "Josefin Sans", category: "Sans serif" },
+  { family: "Archivo Black", category: "Display" },
+  { family: "Righteous", category: "Display" },
+  { family: "Pacifico", category: "Script" },
 ] as const;
 
 export function getSerializedTypographyOptions() {
