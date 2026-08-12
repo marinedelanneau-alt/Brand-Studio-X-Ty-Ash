@@ -103,11 +103,13 @@ export default function ModuleSubmoduleViewer({
   currentIndex,
   onPrevious,
   onNext,
+  onStartExercises,
 }: {
   submodules: WorkspaceModule["submodules"];
   currentIndex: number;
   onPrevious: () => void;
   onNext: () => void;
+  onStartExercises: () => void;
 }) {
   const currentSubmodule = submodules[currentIndex];
   const answerableExerciseCount = currentSubmodule
@@ -199,6 +201,16 @@ export default function ModuleSubmoduleViewer({
           </div>
         </div>
       </section>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onStartExercises}
+          className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+        >
+          Commencer les exercices
+        </button>
+      </div>
 
       {submodules.length > 1 ? (
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">

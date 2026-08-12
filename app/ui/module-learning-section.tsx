@@ -93,20 +93,11 @@ export default function ModuleLearningSection({
           currentIndex={currentSubmoduleIndex}
           onPrevious={openPreviousSubmodule}
           onNext={openNextSubmodule}
+          onStartExercises={() => {
+            setExerciseStartIndex(0);
+            setIsReadingSubmodule(false);
+          }}
         />
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              setExerciseStartIndex(0);
-              setIsReadingSubmodule(false);
-            }}
-            className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
-          >
-            Commencer les exercices
-          </button>
-        </div>
       </div>
     );
   }
