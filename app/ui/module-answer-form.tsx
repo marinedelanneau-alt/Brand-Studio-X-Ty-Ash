@@ -2102,12 +2102,11 @@ export default function ModuleAnswerForm({
           <div
             className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)] transition-[width]"
             style={{
-              width: `${Math.max(
-                (visibleExerciseGroups.length > 0
-                  ? ((currentIndex + 1) / visibleExerciseGroups.length) * 100
-                  : 0),
-                8,
-              )}%`,
+              width: `${
+                totalAnswerableExercises > 0
+                  ? (progressCount / totalAnswerableExercises) * 100
+                  : 0
+              }%`,
             }}
           />
         </div>

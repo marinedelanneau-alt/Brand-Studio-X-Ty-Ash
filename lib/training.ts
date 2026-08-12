@@ -53,6 +53,7 @@ import {
 } from "@/lib/color-palette";
 import { isEditorialCalendarComplete } from "@/lib/editorial-calendar";
 import { isTypographyComplete, parseStoredTypographyAnswer } from "@/lib/typography";
+import { isMoodboardComplete, parseStoredMoodboardAnswer } from "@/lib/moodboard";
 import { isMissingDatabaseObject } from "@/lib/database-errors";
 import {
   getSerializedSmartFeedbackOption,
@@ -496,6 +497,22 @@ function getModuleProgress(
       return isEditorialCalendarComplete(answerMap[exercise.id] ?? []);
     }
 
+    if (exercise.type === "image_upload") {
+      return answer.some((value) => {
+        const trimmedValue = value.trim();
+        return (
+          trimmedValue.startsWith("http://") ||
+          trimmedValue.startsWith("https://") ||
+          trimmedValue.startsWith("/") ||
+          trimmedValue.startsWith("data:image/")
+        );
+      });
+    }
+
+    if (exercise.type === "moodboard") {
+      return isMoodboardComplete(parseStoredMoodboardAnswer(answer));
+    }
+
     if (exercise.type === "table") {
       const expectedCount = getTableCellCount(
         parseStoredTableConfig(exercise.options),
@@ -513,8 +530,11 @@ function getModuleProgress(
 
   const isUnlocked = true;
 
-  const completionPercent =
-    exerciseCount === 0 ? 0 : Math.round((answeredCount / exerciseCount) * 100);
+  const completionPercent = isCompleted
+    ? 100
+    : exerciseCount === 0
+      ? 0
+      : Math.round((answeredCount / exerciseCount) * 100);
 
   return {
     answeredCount,
@@ -2250,7 +2270,12 @@ export async function getWorkspaceData(accountId: number) {
   const progressPercent =
     totalModulesCount === 0
       ? 0
-      : Math.round((completedModulesCount / totalModulesCount) * 100);
+      : Math.round(
+          workspaceModules.reduce(
+            (total, module) => total + module.progress.completionPercent,
+            0,
+          ) / totalModulesCount,
+        );
 
   return {
     project,
