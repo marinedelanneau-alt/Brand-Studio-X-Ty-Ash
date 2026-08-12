@@ -178,6 +178,9 @@ export default async function WorkspaceModulePage({
             <ModuleCompletionScreen
               summary={summaryCard}
               shareData={shareData}
+              module={currentModule}
+              userId={account.id}
+              projectId={workspace.project.id}
               modulePosition={currentModule.position}
               editHref={`${moduleHref}?mode=exercises`}
               completionHref={completionHref}

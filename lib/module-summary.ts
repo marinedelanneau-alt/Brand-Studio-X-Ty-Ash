@@ -20,6 +20,7 @@ export type ModuleSummaryHighlight = {
   label: string;
   value: string;
   colors?: ModuleSummaryColor[];
+  exerciseId?: number;
 };
 
 export type ModuleSummaryColor = {
@@ -105,22 +106,27 @@ export function getModuleSummary(input: {
 
 function buildSubmoduleRecaps(module: WorkspaceModule) {
   return module.submodules.map((submodule) => {
-    const highlights = submodule.exercises.flatMap((exercise) => {
+    const highlights = submodule.exercises
+      .filter((exercise) => isAnswerableExerciseType(exercise.type))
+      .map((exercise) => {
       const values = module.answers[exercise.id] ?? [];
       const summary = summarizeExerciseAnswer(exercise, values);
 
-      return summary ? [summary] : [];
+      return {
+        ...(summary ?? buildEmptyHighlight(getExerciseSummaryLabel(exercise), "À compléter")),
+        exerciseId: exercise.id,
+      };
     });
-    const completedHighlights = highlights.filter(
-      (highlight) => !isPlaceholderSummaryValue(highlight.value),
-    );
 
     return {
       id: submodule.id,
       title: submodule.title,
       position: submodule.position,
-      summary: buildSubmoduleInsightSentence(submodule.title, completedHighlights),
-      highlights: completedHighlights,
+      summary: buildSubmoduleInsightSentence(
+        submodule.title,
+        highlights.filter((highlight) => !isPlaceholderSummaryValue(highlight.value)),
+      ),
+      highlights,
     } satisfies ModuleSubmoduleSummary;
   });
 }

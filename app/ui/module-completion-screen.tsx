@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownTrayIcon,
@@ -8,7 +9,9 @@ import {
   ChevronDownIcon,
   ClipboardDocumentIcon,
   DocumentArrowDownIcon,
+  PencilSquareIcon,
   ShareIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import type {
   ModuleKeyTakeaway,
@@ -16,6 +19,7 @@ import type {
   ModuleSummaryColor,
 } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
+import type { WorkspaceModule } from "@/lib/training-types";
 import { slugifyFilePart } from "@/lib/get-module-share-data";
 import {
   dataUrlToFile,
@@ -23,6 +27,7 @@ import {
   exportStoryAsPng,
 } from "@/lib/export-story-as-png";
 import ShareStoryCard from "./share-story-card";
+import ModuleAnswerForm from "./module-answer-form";
 
 function formatSummaryForClipboard(summary: ModuleSummaryCard) {
   return [
@@ -246,25 +251,14 @@ function StorySharePreview({
 
 function ModuleDetailAccordion({
   summary,
-  modulePosition,
+  onAdjustAnswer,
 }: {
   summary: ModuleSummaryCard;
-  modulePosition: number;
+  onAdjustAnswer: (exerciseId: number) => void;
 }) {
-  const recaps = summary.submoduleRecaps
-    .map((submodule) => ({
-      ...submodule,
-      highlights:
-        modulePosition === 2
-          ? submodule.highlights.filter(
-              (highlight) =>
-                positioningModuleVisibleLabels.has(
-                  normalizeSummaryLabel(highlight.label),
-                ),
-            )
-          : submodule.highlights,
-    }))
-    .filter((submodule) => submodule.highlights.length > 0);
+  const recaps = summary.submoduleRecaps.filter(
+    (submodule) => submodule.highlights.length > 0,
+  );
   const [openIds, setOpenIds] = useState<Set<number>>(() =>
     new Set(recaps[0] ? [recaps[0].id] : []),
   );
@@ -334,9 +328,21 @@ function ModuleDetailAccordion({
                         key={`${item.label}-${index}`}
                         className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3"
                       >
-                        <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a7087]">
-                          {item.label}
-                        </p>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a7087]">
+                            {item.label}
+                          </p>
+                          {item.exerciseId !== undefined ? (
+                            <button
+                              type="button"
+                              onClick={() => onAdjustAnswer(item.exerciseId!)}
+                              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#efd7b8] bg-white px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.08em] text-[#cf7430] transition hover:bg-[#fff6e3]"
+                            >
+                              <PencilSquareIcon className="h-3.5 w-3.5" />
+                              Ajuster ma réponse
+                            </button>
+                          ) : null}
+                        </div>
                         {item.colors && item.colors.length > 0 ? (
                           <PaletteSummary colors={item.colors} />
                         ) : (
@@ -434,6 +440,9 @@ function CompletionActions({
 export default function ModuleCompletionScreen({
   summary,
   shareData,
+  module,
+  userId,
+  projectId,
   modulePosition,
   editHref,
   completionHref,
@@ -444,6 +453,9 @@ export default function ModuleCompletionScreen({
 }: {
   summary: ModuleSummaryCard;
   shareData: ModuleShareData;
+  module: WorkspaceModule;
+  userId: number;
+  projectId: number;
   modulePosition: number;
   editHref: string;
   completionHref: string;
@@ -452,11 +464,28 @@ export default function ModuleCompletionScreen({
   nextLabel?: string;
   hideAnswerSummaries?: boolean;
 }) {
+  const router = useRouter();
   const storyRef = useRef<HTMLElement | null>(null);
   const [showBrandName, setShowBrandName] = useState(true);
   const [isCompleting, setIsCompleting] = useState(false);
   const [isExportingStory, setIsExportingStory] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [isValidatingAdjustment, setIsValidatingAdjustment] = useState(false);
+  const [adjustedExerciseId, setAdjustedExerciseId] = useState<number | null>(null);
+  const adjustedExercise = module.exercises.find(
+    (exercise) => exercise.id === adjustedExerciseId,
+  );
+  const adjustedSubmoduleIndex = adjustedExercise
+    ? module.submodules.findIndex(
+        (submodule) => submodule.id === adjustedExercise.submodule_id,
+      )
+    : -1;
+  const adjustedSubmodule = module.submodules[adjustedSubmoduleIndex];
+  const adjustedExerciseIndex = adjustedSubmodule && adjustedExercise
+    ? adjustedSubmodule.exercises.findIndex(
+        (exercise) => exercise.id === adjustedExercise.id,
+      )
+    : 0;
   const isActivationModule =
     hideAnswerSummaries ||
     shareData.moduleKey.includes("activation") ||
@@ -578,9 +607,10 @@ export default function ModuleCompletionScreen({
         onShareStory={() => void shareStory()}
         onShowBrandNameChange={setShowBrandName}
       />
-      {!isActivationModule ? (
-        <ModuleDetailAccordion summary={summary} modulePosition={modulePosition} />
-      ) : null}
+      <ModuleDetailAccordion
+        summary={summary}
+        onAdjustAnswer={setAdjustedExerciseId}
+      />
       <CompletionActions
         pdfHref={pdfHref}
         editHref={editHref}
@@ -597,6 +627,64 @@ export default function ModuleCompletionScreen({
         <p className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-3 text-sm font-bold text-[#5f544a]">
           {statusMessage}
         </p>
+      ) : null}
+
+      {adjustedExercise && adjustedSubmodule ? (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-[#2f2418]/45 px-4 py-6 backdrop-blur-[2px]"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Ajuster ma réponse"
+        >
+          <div className="mx-auto max-w-4xl rounded-[1.6rem] border border-[#eadfca] bg-[#fffdf8] p-5 shadow-[0_24px_70px_rgba(47,36,24,0.2)] sm:p-7">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#cf7430]">
+                  Ajuster ma réponse
+                </p>
+                <h2 className="mt-2 text-xl font-extrabold text-[#332d35]">
+                  {adjustedSubmodule.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAdjustedExerciseId(null)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a]"
+                aria-label="Fermer"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+            <ModuleAnswerForm
+              key={adjustedExercise.id}
+              module={module}
+              persistenceScope={{ userId, projectId, moduleId: module.id }}
+              activeSubmoduleId={adjustedSubmodule.id}
+              initialExerciseIndex={Math.max(adjustedExerciseIndex, 0)}
+              currentSubmoduleIndex={adjustedSubmoduleIndex}
+              totalSubmodules={module.submodules.length}
+            />
+
+            <div className="mt-5 flex justify-end border-t border-[#eadfca] pt-5">
+              <button
+                type="button"
+                disabled={isValidatingAdjustment}
+                onClick={async () => {
+                  setIsValidatingAdjustment(true);
+                  await new Promise((resolve) => window.setTimeout(resolve, 1400));
+                  setAdjustedExerciseId(null);
+                  setStatusMessage("Ta réponse a été mise à jour.");
+                  router.refresh();
+                  setIsValidatingAdjustment(false);
+                }}
+                className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white disabled:cursor-wait disabled:opacity-70"
+              >
+                {isValidatingAdjustment ? "Enregistrement..." : "Valider la modification"}
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </section>
   );
