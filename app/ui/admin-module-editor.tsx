@@ -910,7 +910,7 @@ function QuestionCard({
           >
             <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">
               {question.type === "static_text"
-                ? "Consigne"
+                ? "Pour t’éclairer"
                 : question.type === "popup_message"
                   ? "Inspiration"
                   : `Question ${exerciseNumber}`}
@@ -1420,7 +1420,7 @@ function QuestionCard({
                 </p>
                 <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
                   {question.type === "static_text"
-                    ? "Consigne"
+                    ? "Pour t’éclairer"
                     : question.type === "popup_message"
                       ? "Inspiration"
                       : `Question ${exerciseNumber}`}

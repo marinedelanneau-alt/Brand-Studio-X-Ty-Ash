@@ -2100,7 +2100,7 @@ export default function ModuleAnswerForm({
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
                   ? "Inspiration"
-                  : "Consigne"
+                  : "Pour t’éclairer"
                 : `Question ${currentAnswerableExerciseIndex + 1} sur ${answerableExerciseGroups.length}`
               : "Aucun exercice dans ce sous-module"}
           </p>
