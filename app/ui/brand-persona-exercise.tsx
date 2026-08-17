@@ -284,9 +284,6 @@ export default function BrandPersonaExercise({
                               question.label,
                               summary.firstName,
                             )}
-                            {question.required ? (
-                              <span className="ml-2 text-[#cf7430]">*</span>
-                            ) : null}
                           </span>
                           {question.helperText ? (
                             <span className="mt-1 block text-sm leading-6 text-[#7b7068]">

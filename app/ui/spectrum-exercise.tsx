@@ -261,9 +261,6 @@ export default function SpectrumExercise({
         <label className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4">
           <span className="block text-sm font-semibold leading-7 text-[#5f544a]">
             Pourquoi ce positionnement ?
-            {config.requireJustification ? (
-              <span className="ml-2 text-[#cf7430]">*</span>
-            ) : null}
           </span>
           <textarea
             value={justification}

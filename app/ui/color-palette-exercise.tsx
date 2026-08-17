@@ -575,9 +575,6 @@ export default function ColorPaletteExercise({
                         <label className="space-y-2 md:col-span-2">
                           <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
                             Usage
-                            {config.requireUsage ? (
-                              <span className="ml-2 text-[#cf7430]">*</span>
-                            ) : null}
                           </span>
                           <textarea
                             value={draftState.value.usage}
