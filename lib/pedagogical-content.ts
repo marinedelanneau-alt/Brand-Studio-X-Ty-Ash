@@ -123,7 +123,7 @@ function renderMarkdownBlocks(markdown: string) {
       index += 1;
     }
 
-    html.push(`<p>${applyInlineMarkdown(paragraphLines.join(" "))}</p>`);
+    html.push(`<p>${paragraphLines.map(applyInlineMarkdown).join("<br />")}</p>`);
   }
 
   return html.join("");
