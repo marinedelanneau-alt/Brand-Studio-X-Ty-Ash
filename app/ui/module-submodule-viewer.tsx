@@ -6,6 +6,7 @@ import type { WorkspaceModule } from "@/lib/training-types";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
 import ScentInspirationSection from "./scent-inspiration-section";
+import TypographyInspirationSection from "./typography-inspiration-section";
 
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.png",
@@ -43,6 +44,10 @@ function splitScentContent(submodule: WorkspaceModule["submodules"][number]) {
   if (!target || target.index === undefined) return { before: submodule.content_html, after: "" };
   const splitAt = target.index + target[0].length;
   return { before: submodule.content_html.slice(0, splitAt), after: submodule.content_html.slice(splitAt) };
+}
+
+function isTypographySubmodule(submodule: WorkspaceModule["submodules"][number]) {
+  return normalizeForSearch(submodule.title).includes("typograph");
 }
 
 function ColorSymbolismResource() {
@@ -137,6 +142,9 @@ export default function ModuleSubmoduleViewer({
     ? shouldShowColorSymbolismResource(currentSubmodule)
     : false;
   const scentContent = currentSubmodule ? splitScentContent(currentSubmodule) : null;
+  const showTypographyInspiration = currentSubmodule
+    ? isTypographySubmodule(currentSubmodule)
+    : false;
 
   if (!currentSubmodule) {
     return (
@@ -210,9 +218,15 @@ export default function ModuleSubmoduleViewer({
           />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
-            <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
-            {scentContent ? <ScentInspirationSection /> : null}
-            {scentContent?.after ? <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
+            {showTypographyInspiration ? (
+              <TypographyInspirationSection />
+            ) : (
+              <>
+                <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
+                {scentContent ? <ScentInspirationSection /> : null}
+                {scentContent?.after ? <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
+              </>
+            )}
             {showColorSymbolismResource ? <ColorSymbolismResource /> : null}
           </div>
         </div>
