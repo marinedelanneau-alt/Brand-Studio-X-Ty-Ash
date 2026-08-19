@@ -5,6 +5,7 @@ import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
+import ScentInspirationSection from "./scent-inspiration-section";
 
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.png",
@@ -27,6 +28,21 @@ function shouldShowColorSymbolismResource(
   );
 
   return haystack.includes("palette") && haystack.includes("couleur");
+}
+
+function splitScentContent(submodule: WorkspaceModule["submodules"][number]) {
+  const normalizedTitle = normalizeForSearch(submodule.title);
+  if (!normalizedTitle.includes("marque") || !normalizedTitle.includes("odeur")) return null;
+
+  const paragraphs = Array.from(submodule.content_html.matchAll(/<p\b[^>]*>[\s\S]*?<\/p>/gi));
+  const target = paragraphs.find((match) => {
+    const text = normalizeForSearch(match[0].replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " "));
+    return text.includes("objectif") && text.includes("parfum") && text.includes("communication");
+  });
+
+  if (!target || target.index === undefined) return { before: submodule.content_html, after: "" };
+  const splitAt = target.index + target[0].length;
+  return { before: submodule.content_html.slice(0, splitAt), after: submodule.content_html.slice(splitAt) };
 }
 
 function ColorSymbolismResource() {
@@ -120,6 +136,7 @@ export default function ModuleSubmoduleViewer({
   const showColorSymbolismResource = currentSubmodule
     ? shouldShowColorSymbolismResource(currentSubmodule)
     : false;
+  const scentContent = currentSubmodule ? splitScentContent(currentSubmodule) : null;
 
   if (!currentSubmodule) {
     return (
@@ -193,10 +210,9 @@ export default function ModuleSubmoduleViewer({
           />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
-            <div
-              className="module-content max-w-none text-[#5f544a]"
-              dangerouslySetInnerHTML={{ __html: currentSubmodule.content_html }}
-            />
+            <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
+            {scentContent ? <ScentInspirationSection /> : null}
+            {scentContent?.after ? <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
             {showColorSymbolismResource ? <ColorSymbolismResource /> : null}
           </div>
         </div>
