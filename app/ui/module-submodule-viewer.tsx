@@ -7,6 +7,7 @@ import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import VoiceNotePlayer from "./voice-note-player";
 import ScentInspirationSection from "./scent-inspiration-section";
 import TypographyInspirationSection from "./typography-inspiration-section";
+import BaselineInspirationSection from "./baseline-inspiration-section";
 
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.png",
@@ -48,6 +49,10 @@ function splitScentContent(submodule: WorkspaceModule["submodules"][number]) {
 
 function isTypographySubmodule(submodule: WorkspaceModule["submodules"][number]) {
   return normalizeForSearch(submodule.title).includes("typograph");
+}
+
+function isBaselineSubmodule(submodule: WorkspaceModule["submodules"][number]) {
+  return normalizeForSearch(submodule.title).includes("baseline");
 }
 
 function ColorSymbolismResource() {
@@ -145,6 +150,9 @@ export default function ModuleSubmoduleViewer({
   const showTypographyInspiration = currentSubmodule
     ? isTypographySubmodule(currentSubmodule)
     : false;
+  const showBaselineInspiration = currentSubmodule
+    ? isBaselineSubmodule(currentSubmodule)
+    : false;
 
   if (!currentSubmodule) {
     return (
@@ -218,7 +226,9 @@ export default function ModuleSubmoduleViewer({
           />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
-            {showTypographyInspiration ? (
+            {showBaselineInspiration ? (
+              <BaselineInspirationSection />
+            ) : showTypographyInspiration ? (
               <TypographyInspirationSection />
             ) : (
               <>
