@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf6ed;
-  --foreground: #6c6056;
-  --background-grid: rgba(184, 171, 152, 0.08);
+  --bs-paper: #fbf8f1;
+  --bs-surface: #fdfbf6;
+  --bs-surface-muted: #f7f1e6;
+  --bs-border: #e5ded3;
+  --bs-ink: #15213b;
+  --bs-copy: #5d5a57;
+  --bs-orange: #ec681c;
+  --bs-yellow: #e8bd3f;
+  --background: var(--bs-paper);
+  --foreground: var(--bs-copy);
+  --background-grid: rgba(118, 109, 98, 0.055);
 }
 
 @theme inline {
@@ -28,9 +36,9 @@ body {
   background-image:
     linear-gradient(var(--background-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--background-grid) 1px, transparent 1px),
-    radial-gradient(circle at 14% 10%, rgba(243, 198, 35, 0.08), transparent 16%),
-    radial-gradient(circle at 84% 18%, rgba(219, 232, 216, 0.14), transparent 18%),
-    radial-gradient(circle at 72% 84%, rgba(246, 178, 107, 0.08), transparent 18%);
+    radial-gradient(circle at 14% 10%, rgba(232, 189, 63, 0.035), transparent 16%),
+    radial-gradient(circle at 84% 18%, rgba(219, 232, 216, 0.08), transparent 18%),
+    radial-gradient(circle at 72% 84%, rgba(236, 104, 28, 0.025), transparent 18%);
   background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%, 100% 100%;
   background-position: top left, top left, top left, top left, top left;
   color: var(--foreground);

@@ -136,7 +136,7 @@ export default async function WorkspaceModulePage({
               <span className="inline-flex rounded-full bg-[#fff6e3] px-4 py-2 text-[0.74rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
                 Module {currentModule.position}
               </span>
-              <h1 className="mt-4 text-2xl font-semibold text-[#4b4550] sm:text-3xl">
+              <h1 className="mt-4 text-2xl font-semibold text-[#15213b] sm:text-3xl">
                 {currentModule.title}
               </h1>
             </div>
@@ -150,7 +150,7 @@ export default async function WorkspaceModulePage({
                 <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
                   Avancement du module
                 </p>
-                <p className="mt-4 text-4xl font-black leading-none text-[#4b4550]">
+                <p className="mt-4 text-4xl font-black leading-none text-[#15213b]">
                   {currentModule.progress.completionPercent}%
                 </p>
                 <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#f1ece5]">

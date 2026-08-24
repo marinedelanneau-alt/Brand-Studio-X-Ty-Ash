@@ -8,6 +8,7 @@ import VoiceNotePlayer from "./voice-note-player";
 import ScentInspirationSection from "./scent-inspiration-section";
 import TypographyInspirationSection from "./typography-inspiration-section";
 import BaselineInspirationSection from "./baseline-inspiration-section";
+import ColorLibrarySection from "./color-library-section";
 
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.png",
@@ -53,6 +54,11 @@ function isTypographySubmodule(submodule: WorkspaceModule["submodules"][number])
 
 function isBaselineSubmodule(submodule: WorkspaceModule["submodules"][number]) {
   return normalizeForSearch(submodule.title).includes("baseline");
+}
+
+function isColorPaletteSubmodule(submodule: WorkspaceModule["submodules"][number]) {
+  const title = normalizeForSearch(submodule.title);
+  return title.includes("palette") && title.includes("couleur");
 }
 
 function ColorSymbolismResource() {
@@ -153,6 +159,9 @@ export default function ModuleSubmoduleViewer({
   const showBaselineInspiration = currentSubmodule
     ? isBaselineSubmodule(currentSubmodule)
     : false;
+  const showColorLibrary = currentSubmodule
+    ? isColorPaletteSubmodule(currentSubmodule)
+    : false;
 
   if (!currentSubmodule) {
     return (
@@ -164,10 +173,10 @@ export default function ModuleSubmoduleViewer({
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-8">
+      <section className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-6 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-8">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_46%)]"
         />
         <div className="relative space-y-6">
           <div className="border-b border-[#f0e4d3] pb-4">
@@ -226,7 +235,9 @@ export default function ModuleSubmoduleViewer({
           />
 
           <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
-            {showBaselineInspiration ? (
+            {showColorLibrary ? (
+              <ColorLibrarySection recap={<ColorSymbolismResource />} />
+            ) : showBaselineInspiration ? (
               <BaselineInspirationSection />
             ) : showTypographyInspiration ? (
               <TypographyInspirationSection />
@@ -237,7 +248,7 @@ export default function ModuleSubmoduleViewer({
                 {scentContent?.after ? <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
               </>
             )}
-            {showColorSymbolismResource ? <ColorSymbolismResource /> : null}
+            {showColorSymbolismResource && !showColorLibrary ? <ColorSymbolismResource /> : null}
           </div>
         </div>
       </section>
@@ -247,7 +258,7 @@ export default function ModuleSubmoduleViewer({
           <button
             type="button"
             onClick={onStartExercises}
-            className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+            className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d]"
           >
             Commencer les exercices
           </button>
@@ -269,7 +280,7 @@ export default function ModuleSubmoduleViewer({
             type="button"
             onClick={onNext}
             disabled={currentIndex === submodules.length - 1}
-            className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Sous-module suivant
           </button>

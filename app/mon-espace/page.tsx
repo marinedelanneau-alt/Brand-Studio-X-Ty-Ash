@@ -278,10 +278,10 @@ export default async function MonEspacePage() {
                   : ""
               }`}
             >
-              <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/92 p-4 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+              <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-white/80 bg-[#fdfbf6]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_48%)]"
                 />
                 <LogoutButton
                   iconOnly
@@ -304,7 +304,7 @@ export default async function MonEspacePage() {
                             className={`w-full rounded-full border px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
-                                : "border-[#eadfca] bg-[#fff8f1] text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
+                                : "border-[#e5ded3] bg-[#fdfbf6] text-[#586071] hover:border-[#ec681c] hover:text-[#ec681c]"
                             }`}
                           >
                             {module.title}
@@ -312,7 +312,7 @@ export default async function MonEspacePage() {
                         ))}
                         <Link
                           href="/mon-espace/plan-action-communication"
-                          className="w-full rounded-full border border-[#cf7430] bg-[#fff1d5] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#cf7430] transition hover:bg-[#cf7430] hover:text-white"
+                          className="w-full rounded-full border border-[#ec681c] bg-[#fff8f2] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#d95d17] transition hover:bg-[#ec681c] hover:text-white"
                         >
                           Plan d&apos;action communication
                         </Link>
@@ -330,7 +330,7 @@ export default async function MonEspacePage() {
                     ) : null}
                   </div>
 
-                    <div className="rounded-[1rem] border border-[#efd7b8] bg-[linear-gradient(135deg,#fffaf1,#fff1d5)] p-2.5 shadow-[0_8px_18px_rgba(207,116,48,0.07)]">
+                    <div className="rounded-[1rem] border border-[#e5ded3] bg-[#fbf8f1] p-2.5 shadow-[0_8px_18px_rgba(21,33,59,0.045)]">
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
                         <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
@@ -352,7 +352,7 @@ export default async function MonEspacePage() {
                       href={END_OF_TRAINING_CALL_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-white shadow-[0_8px_16px_rgba(223,155,57,0.16)] transition hover:-translate-y-0.5"
+                      className="mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] bg-[#15213b] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-[#fbf8f1] shadow-[0_8px_16px_rgba(21,33,59,0.14)] transition hover:-translate-y-0.5 hover:bg-[#22304d]"
                     >
                       Réserver mon rendez-vous
                     </a>
@@ -366,7 +366,7 @@ export default async function MonEspacePage() {
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-white"
+                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] bg-[#15213b] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#fbf8f1] hover:bg-[#22304d]"
                         >
                           Generer
                         </Link>
@@ -401,13 +401,13 @@ export default async function MonEspacePage() {
             </div>
           </div>
           <div
-            className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 p-5 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 backdrop-blur-[2px] sm:p-6 ${
+            className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-5 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-6 ${
               workspace.project ? "lg:col-start-1 lg:row-start-2" : ""
             }`}
           >
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_46%)]"
             />
             <div className="relative">
               <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
@@ -417,7 +417,7 @@ export default async function MonEspacePage() {
                 <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
                   Bienvenue dans le Brand Studio
                 </p>
-                <p className="rounded-[1.35rem] border border-[#f2e4d2] bg-[#fff9f2] px-5 py-3 text-[1.05rem] leading-7 italic text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                <p className="rounded-[1.35rem] border border-[#e5ded3] bg-[#fbf8f1] px-5 py-3 text-[1.05rem] leading-7 italic text-[#505563] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
                   Hello, ça y est, c&apos;est le grand moment ! Je te remercie
                   encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
                   belle mission de structurer ton identité de marque. Es-tu prêt
@@ -464,7 +464,7 @@ export default async function MonEspacePage() {
                   <div className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between">
                     <Link
                       href={ctaHref}
-                      className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)] transition hover:brightness-[1.02]"
+                      className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] shadow-[0_12px_26px_rgba(21,33,59,0.17)] transition hover:bg-[#22304d] hover:shadow-[0_14px_28px_rgba(21,33,59,0.2)]"
                     >
                       {hasStartedModules ? "Reprendre" : "Commencer"}
                     </Link>

@@ -1340,7 +1340,7 @@ function PopupMessageCard({
   onClose?: () => void;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-[2rem] border border-[#eadfca] bg-[linear-gradient(145deg,#fffaf2,#fff3df_55%,#fef8ef)] p-5 shadow-[0_22px_60px_rgba(120,92,56,0.14)]">
+    <div className="relative overflow-hidden rounded-[2rem] border border-[#e5ded3] bg-[linear-gradient(145deg,#fdfbf6,#fbf8f1_58%,#f7f1e6)] p-5 shadow-[0_22px_60px_rgba(21,33,59,0.08)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(240,207,85,0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(207,116,48,0.18),transparent_38%)]" />
       <div className="relative rounded-[1.6rem] border border-white/80 bg-white/88 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-sm">
         <div className="flex items-start justify-between gap-4">
@@ -3467,7 +3467,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToNextStep()}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
@@ -3476,7 +3476,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToNextStep()}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
@@ -3485,7 +3485,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToCommunicationPlan()}
-              className="flex h-14 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+              className="flex h-14 items-center justify-center rounded-[1rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
             >
               {isSavingDraft ? "Enregistrement..." : "Vers mon plan de communication"}
             </button>
@@ -3497,7 +3497,7 @@ export default function ModuleAnswerForm({
                 onComplete?.(latestAnswersRef.current);
                 void goToNextStep();
               }}
-              className="flex h-14 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+              className="flex h-14 items-center justify-center rounded-[1rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
             >
               {pending ? "Enregistrement..." : "Valider le module"}
             </button>
@@ -3798,7 +3798,7 @@ function ExerciseAiActions({
                 type="button"
                 onClick={onImprove}
                 disabled={isLoading}
-                className="flex h-10 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+                className="flex h-10 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
               >
                 {isLoading && state.mode === "improve" ? "Relecture..." : "Ameliore"}
               </button>

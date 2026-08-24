@@ -52,7 +52,7 @@ function CompletionHero({
   const progress = Math.max(0, Math.min(shareData.progress, 100));
 
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-[#eadfca] bg-[linear-gradient(135deg,#fffdf8_0%,#fff3df_62%,#f8dfac_100%)] px-6 py-7 shadow-[0_18px_44px_rgba(91,73,57,0.08)] sm:px-8 sm:py-9">
+    <section className="relative overflow-hidden rounded-[1.75rem] border border-[#e5ded3] bg-[linear-gradient(135deg,#fdfbf6_0%,#fbf8f1_68%,#f7f1e6_100%)] px-6 py-7 shadow-[0_18px_44px_rgba(21,33,59,0.06)] sm:px-8 sm:py-9">
       <div className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 rounded-full border border-white/70 bg-white/35 sm:block" />
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
         <div>
