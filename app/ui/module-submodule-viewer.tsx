@@ -280,7 +280,7 @@ export default function ModuleSubmoduleViewer({
             type="button"
             onClick={onNext}
             disabled={currentIndex === submodules.length - 1}
-            className="bs-button-secondary flex h-12 items-center justify-center rounded-[0.9rem] border px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
+            className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
           >
             Sous-module suivant
           </button>

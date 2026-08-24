@@ -9,10 +9,6 @@
   --bs-copy: #5d5a57;
   --bs-orange: #ec681c;
   --bs-yellow: #e8bd3f;
-  --bs-action: #c44f1d;
-  --bs-action-hover: #b94718;
-  --bs-action-active: #a83e12;
-  --bs-action-soft: #fff2e9;
   --background: var(--bs-paper);
   --foreground: var(--bs-copy);
   --background-grid: rgba(118, 109, 98, 0.055);
@@ -60,10 +56,9 @@ input {
 }
 
 .bs-button-primary {
-  background-color: #e86f2e;
-  background-image: linear-gradient(110deg, #d95a20 0%, #e86f2e 52%, #f08a45 100%);
+  background-color: #df9b39;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
   color: #ffffff !important;
-  box-shadow: none !important;
   opacity: 1;
   transition:
     background-color 180ms ease,
@@ -72,39 +67,41 @@ input {
 }
 
 .bs-button-primary:hover:not(:disabled) {
-  background-color: #db6325;
-  background-image: linear-gradient(110deg, #c94f19 0%, #db6325 52%, #e77b39 100%);
+  background-color: #df9b39;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
   color: #ffffff !important;
   transform: translateY(-1px);
+  filter: brightness(1.02);
 }
 
 .bs-button-primary:focus-visible {
-  outline: 2px solid #f0b58e;
+  outline: 2px solid #f0cf55;
   outline-offset: 3px;
 }
 
 .bs-button-primary:active:not(:disabled) {
-  background-color: var(--bs-action-active);
-  background-image: linear-gradient(110deg, #bd4614 0%, #cf571d 52%, #dc6e30 100%);
+  background-color: #df9b39;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  filter: brightness(0.98);
   transform: translateY(0);
 }
 
 .bs-button-primary:disabled,
 .bs-button-primary[aria-disabled="true"] {
   cursor: not-allowed;
-  border-color: transparent;
-  background-color: #e7ddd4;
-  background-image: none;
-  color: #9b9189 !important;
-  opacity: 0.75;
+  background-color: #df9b39;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  color: #ffffff !important;
+  opacity: 0.5;
+  filter: none;
   transform: none;
 }
 
 .bs-button-secondary {
-  border-color: #e7a17c !important;
-  background-color: transparent !important;
+  border-color: #eadfca !important;
+  background-color: #ffffff !important;
   background-image: none !important;
-  color: #c95b2b !important;
+  color: #6b625a !important;
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
@@ -113,30 +110,30 @@ input {
 }
 
 .bs-button-secondary:hover:not(:disabled) {
-  border-color: #d97848 !important;
-  background-color: #fff4ed !important;
-  color: #c95b2b !important;
-  transform: translateY(-1px);
+  border-color: #eadfca !important;
+  background-color: #ffffff !important;
+  color: #6b625a !important;
+  transform: none;
 }
 
 .bs-button-secondary:focus-visible {
-  outline: 2px solid #f0b58e;
+  outline: 2px solid #f0cf55;
   outline-offset: 3px;
 }
 
 .bs-button-secondary:active:not(:disabled) {
-  border-color: var(--bs-action-active) !important;
-  color: var(--bs-action-active) !important;
+  border-color: #eadfca !important;
+  color: #6b625a !important;
   transform: translateY(0);
 }
 
 .bs-button-secondary:disabled,
 .bs-button-secondary[aria-disabled="true"] {
   cursor: not-allowed;
-  border-color: #d8cec5 !important;
-  background-color: transparent !important;
-  color: #9b9189 !important;
-  opacity: 0.7;
+  border-color: #eadfca !important;
+  background-color: #ffffff !important;
+  color: #6b625a !important;
+  opacity: 0.5;
   transform: none;
 }
 
@@ -145,8 +142,8 @@ button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"],
 a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
-  background-color: #e86f2e !important;
-  background-image: linear-gradient(110deg, #d95a20 0%, #e86f2e 52%, #f08a45 100%) !important;
+  background-color: #df9b39 !important;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56) !important;
   color: #ffffff !important;
 }
 
@@ -154,8 +151,8 @@ button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover:not(:disabled),
 a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover,
 button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover:not(:disabled),
 a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover {
-  background-color: #db6325 !important;
-  background-image: linear-gradient(110deg, #c94f19 0%, #db6325 52%, #e77b39 100%) !important;
+  background-color: #df9b39 !important;
+  background-image: linear-gradient(135deg, #df9b39, #f1cc56) !important;
 }
 
 textarea,
