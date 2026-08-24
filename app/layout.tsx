@@ -7,6 +7,7 @@ import "./globals.css";
 import { getCurrentAccount } from "@/lib/session";
 import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
 import PreviewAccessDenied from "./ui/preview-access-denied";
+import ThemeToggle from "./ui/theme-toggle";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -59,11 +60,19 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} ${satisfy.variable} ${moreSugar.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('brand-studio-theme');if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch(e){document.documentElement.dataset.theme='light'}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>
         {previewDenied ? <PreviewAccessDenied /> : children}
+        <ThemeToggle />
       </body>
     </html>
   );
