@@ -56,8 +56,9 @@ input {
 }
 
 .bs-button-primary {
-  background-color: var(--bs-ink);
-  color: #fffdf8 !important;
+  background-color: var(--bs-yellow);
+  background-image: linear-gradient(135deg, var(--bs-orange), var(--bs-yellow));
+  color: var(--bs-ink) !important;
   opacity: 1;
   transition:
     background-color 180ms ease,
@@ -66,8 +67,9 @@ input {
 }
 
 .bs-button-primary:hover:not(:disabled) {
-  background-color: #22304d;
-  color: #fffdf8 !important;
+  background-color: #f08028;
+  background-image: linear-gradient(135deg, #f07827, #f1c84c);
+  color: var(--bs-ink) !important;
   transform: translateY(-1px);
 }
 
@@ -80,6 +82,7 @@ input {
 .bs-button-primary[aria-disabled="true"] {
   cursor: not-allowed;
   background-color: #697184;
+  background-image: none;
   color: rgba(255, 253, 248, 0.78) !important;
   opacity: 0.72;
   transform: none;
