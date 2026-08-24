@@ -9,6 +9,10 @@
   --bs-copy: #5d5a57;
   --bs-orange: #ec681c;
   --bs-yellow: #e8bd3f;
+  --bs-action: #c44f1d;
+  --bs-action-hover: #b94718;
+  --bs-action-active: #a83e12;
+  --bs-action-soft: #fff2e9;
   --background: var(--bs-paper);
   --foreground: var(--bs-copy);
   --background-grid: rgba(118, 109, 98, 0.055);
@@ -56,9 +60,10 @@ input {
 }
 
 .bs-button-primary {
-  background-color: var(--bs-yellow);
-  background-image: linear-gradient(135deg, var(--bs-orange), var(--bs-yellow));
-  color: var(--bs-ink) !important;
+  background-color: var(--bs-action);
+  background-image: none;
+  color: #ffffff !important;
+  box-shadow: none !important;
   opacity: 1;
   transition:
     background-color 180ms ease,
@@ -67,25 +72,89 @@ input {
 }
 
 .bs-button-primary:hover:not(:disabled) {
-  background-color: #f08028;
-  background-image: linear-gradient(135deg, #f07827, #f1c84c);
-  color: var(--bs-ink) !important;
+  background-color: var(--bs-action-hover);
+  background-image: none;
+  color: #ffffff !important;
   transform: translateY(-1px);
 }
 
 .bs-button-primary:focus-visible {
-  outline: 2px solid var(--bs-orange);
+  outline: 2px solid #f0b58e;
   outline-offset: 3px;
+}
+
+.bs-button-primary:active:not(:disabled) {
+  background-color: var(--bs-action-active);
+  transform: translateY(0);
 }
 
 .bs-button-primary:disabled,
 .bs-button-primary[aria-disabled="true"] {
   cursor: not-allowed;
-  background-color: #697184;
+  border-color: transparent;
+  background-color: #e7ddd4;
   background-image: none;
-  color: rgba(255, 253, 248, 0.78) !important;
-  opacity: 0.72;
+  color: #9b9189 !important;
+  opacity: 0.75;
   transform: none;
+}
+
+.bs-button-secondary {
+  border-color: #e8682a !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #b94718 !important;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.bs-button-secondary:hover:not(:disabled) {
+  border-color: #d65b20 !important;
+  background-color: var(--bs-action-soft) !important;
+  color: #b94718 !important;
+  transform: translateY(-1px);
+}
+
+.bs-button-secondary:focus-visible {
+  outline: 2px solid #f0b58e;
+  outline-offset: 3px;
+}
+
+.bs-button-secondary:active:not(:disabled) {
+  border-color: var(--bs-action-active) !important;
+  color: var(--bs-action-active) !important;
+  transform: translateY(0);
+}
+
+.bs-button-secondary:disabled,
+.bs-button-secondary[aria-disabled="true"] {
+  cursor: not-allowed;
+  border-color: #d8cec5 !important;
+  background-color: transparent !important;
+  color: #9b9189 !important;
+  opacity: 0.7;
+  transform: none;
+}
+
+/* Normalise les anciens CTA encore porteurs d'une classe de dégradé. */
+button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
+a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
+button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"],
+a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
+  background-color: var(--bs-action) !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover:not(:disabled),
+a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover,
+button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover:not(:disabled),
+a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover {
+  background-color: var(--bs-action-hover) !important;
+  background-image: none !important;
 }
 
 textarea,

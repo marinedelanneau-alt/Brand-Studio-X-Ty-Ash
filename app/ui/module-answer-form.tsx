@@ -3430,7 +3430,7 @@ export default function ModuleAnswerForm({
           type="button"
           onClick={goToPreviousStep}
           disabled={(currentIndex === 0 && isFirstSubmodule) || isSavingDraft || pending}
-          className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+          className="bs-button-secondary flex h-12 items-center justify-center rounded-[0.9rem] border px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
         >
           {currentIndex > 0 || isFirstSubmodule
             ? "Question precedente"
@@ -3446,7 +3446,7 @@ export default function ModuleAnswerForm({
                 type="button"
                 disabled={pending || isSavingDraft}
                 onClick={() => void goToNextStep()}
-                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
+                className="bs-button-secondary flex h-12 items-center justify-center rounded-[0.9rem] border px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
               </button>
@@ -3455,7 +3455,7 @@ export default function ModuleAnswerForm({
                 type="button"
                 disabled={pending || isSavingDraft}
                 onClick={() => void goToNextStep()}
-                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
+                className="bs-button-secondary flex h-12 items-center justify-center rounded-[0.9rem] border px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
               >
                 {isSavingDraft ? "Enregistrement..." : "Passer et revenir plus tard"}
               </button>

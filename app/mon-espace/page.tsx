@@ -372,13 +372,13 @@ export default async function MonEspacePage() {
                         </Link>
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] border border-[#eadfca] bg-white px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#6b625a]"
+                          className="bs-button-secondary inline-flex h-9 items-center justify-center rounded-[0.75rem] border px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
                           Voir
                         </Link>
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] border border-[#eadfca] bg-white px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#6b625a]"
+                          className="bs-button-secondary inline-flex h-9 items-center justify-center rounded-[0.75rem] border px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
                           Regenerer
                         </Link>
