@@ -64,7 +64,7 @@ export default function ModuleLearningSection({
                 type="button"
                 onClick={() => openSubmodule(index)}
                 aria-current={isActive ? "step" : undefined}
-                className={`min-h-11 rounded-full border px-4 py-2 text-left text-xs font-black uppercase tracking-[0.12em] transition sm:text-sm ${
+                className={`bs-submodule-tab min-h-11 rounded-full border px-4 py-2 text-left text-xs font-black uppercase tracking-[0.12em] transition sm:text-sm ${
                   isActive
                     ? "border-[#cf7430] bg-[#fff6e3] text-[#cf7430]"
                     : "border-[#eadfca] bg-white text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"

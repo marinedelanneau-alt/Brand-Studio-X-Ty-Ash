@@ -66,7 +66,7 @@ export default function VoiceNotePlayer({
   const hasSubtitles = normalizedSubtitles.length > 0;
 
   return (
-    <div className="relative overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf7] shadow-[0_14px_34px_rgba(126,102,78,0.08)]">
+    <div className="bs-audio-card relative overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf7] shadow-[0_14px_34px_rgba(126,102,78,0.08)]">
       {hasSubtitles ? (
         <button
           type="button"
@@ -78,7 +78,7 @@ export default function VoiceNotePlayer({
         </button>
       ) : null}
       <div className="grid md:grid-cols-[minmax(15rem,22rem)_1fr]">
-        <div className="relative min-h-[20rem] bg-[#f4efe9] md:min-h-[24rem]">
+        <div className="bs-audio-portrait relative min-h-[20rem] bg-[#f4efe9] md:min-h-[24rem]">
           <Image
             src={audioHostVisual}
             alt="Portrait Brand Studio"
@@ -88,7 +88,7 @@ export default function VoiceNotePlayer({
           />
         </div>
 
-        <div className="flex min-w-0 flex-col justify-center gap-5 bg-[linear-gradient(180deg,#fffdf7,#fff8f1)] px-5 py-16 sm:px-7 md:py-6 md:pr-8">
+        <div className="bs-light-surface flex min-w-0 flex-col justify-center gap-5 bg-[linear-gradient(180deg,#fffdf7,#fff8f1)] px-5 py-16 sm:px-7 md:py-6 md:pr-8">
           <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
             {eyebrow}
           </p>

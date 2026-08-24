@@ -173,7 +173,7 @@ export default function ModuleSubmoduleViewer({
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-6 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-8">
+      <section className="bs-dark-card relative overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-6 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-8">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_46%)]"
@@ -234,7 +234,7 @@ export default function ModuleSubmoduleViewer({
             subtitles={currentSubmodule.audio_transcript}
           />
 
-          <div className="rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
+          <div className="bs-dark-subcard rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
             {showColorLibrary ? (
               <ColorLibrarySection recap={<ColorSymbolismResource />} />
             ) : showBaselineInspiration ? (

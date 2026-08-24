@@ -18,6 +18,14 @@
   --primary: #df9b39;
   --primary-foreground: #ffffff;
   --accent: var(--bs-orange);
+  --heading-color: var(--bs-ink);
+  --text-primary: var(--bs-copy);
+  --text-secondary: #7b7068;
+  --text-muted: #8a8077;
+  --text-on-light: #15213b;
+  --text-on-dark: #f5efe6;
+  --surface-elevated: var(--bs-surface-muted);
+  --surface-inverse: #15213b;
   --background: var(--bs-paper);
   --foreground: var(--bs-copy);
   --background-grid: rgba(118, 109, 98, 0.055);
@@ -41,6 +49,14 @@ html[data-theme="dark"] {
   --primary: #df9b39;
   --primary-foreground: #f5efe6;
   --accent: #e8682a;
+  --heading-color: #f5efe6;
+  --text-primary: #d6cec5;
+  --text-secondary: #b8b0a8;
+  --text-muted: #a49d96;
+  --text-on-light: #15213b;
+  --text-on-dark: #f5efe6;
+  --surface-elevated: #27282e;
+  --surface-inverse: #f5efe6;
   --background: #17181d;
   --foreground: #c9c0b6;
   --background-grid: rgba(92, 91, 96, 0.18);
@@ -137,33 +153,64 @@ html[data-theme="dark"] [class*="bg-[#f1ece5]"] {
   background-image: none !important;
 }
 
+html[data-theme="dark"] [class*="bg-[#f1ece5]"] {
+  background-color: #25262b !important;
+}
+
 html[data-theme="dark"] img[class*="bg-white"] {
   background-color: #ffffff !important;
 }
 
 html[data-theme="dark"] [class*="text-[#4b4550]"],
+html[data-theme="dark"] [class*="text-[#15213b]"],
+html[data-theme="dark"] [class*="text-[#20324a]"],
 html[data-theme="dark"] [class*="text-[#24364f]"],
 html[data-theme="dark"] [class*="text-[#332d35]"],
 html[data-theme="dark"] [class*="text-[#2f2a33]"],
 html[data-theme="dark"] [class*="text-[#2f2a36]"],
 html[data-theme="dark"] [class*="text-[#2f3d4f]"],
+html[data-theme="dark"] [class*="text-[#3f3747]"],
+html[data-theme="dark"] [class*="text-[#3f3945]"],
+html[data-theme="dark"] [class*="text-[#403845]"],
+html[data-theme="dark"] [class*="text-[#403a40]"],
+html[data-theme="dark"] [class*="text-[#4f463f]"],
+html[data-theme="dark"] [class*="text-[#505563]"],
+html[data-theme="dark"] [class*="text-[#514750]"],
 html[data-theme="dark"] [class*="text-[#5d5259]"] {
   color: #f5efe6 !important;
 }
 
 html[data-theme="dark"] [class*="text-[#5f544a]"],
+html[data-theme="dark"] [class*="text-[#564c45]"],
+html[data-theme="dark"] [class*="text-[#586071]"],
+html[data-theme="dark"] [class*="text-[#5f554d]"],
+html[data-theme="dark"] [class*="text-[#625850]"],
+html[data-theme="dark"] [class*="text-[#625a52]"],
+html[data-theme="dark"] [class*="text-[#6a5d53]"],
 html[data-theme="dark"] [class*="text-[#6b625a]"],
 html[data-theme="dark"] [class*="text-[#6f645b]"],
 html[data-theme="dark"] [class*="text-[#746961]"],
-html[data-theme="dark"] [class*="text-[#7b7068]"] {
-  color: #c9c0b6 !important;
+html[data-theme="dark"] [class*="text-[#7b7068]"],
+html[data-theme="dark"] [class*="text-[#746960]"],
+html[data-theme="dark"] [class*="text-[#7a7068]"],
+html[data-theme="dark"] [class*="text-[#7c736b]"],
+html[data-theme="dark"] [class*="text-[#81776f]"] {
+  color: #d6cec5 !important;
 }
 
 html[data-theme="dark"] [class*="text-[#7a7087]"],
 html[data-theme="dark"] [class*="text-[#8a8077]"],
 html[data-theme="dark"] [class*="text-[#8b7a70]"],
 html[data-theme="dark"] [class*="text-[#938980]"] {
-  color: #a9a29a !important;
+  color: #b8b0a8 !important;
+}
+
+html[data-theme="dark"] [class*="text-[#998d83]"],
+html[data-theme="dark"] [class*="text-[#a19388]"],
+html[data-theme="dark"] [class*="text-[#aa9d91]"],
+html[data-theme="dark"] [class*="text-[#aaa098]"],
+html[data-theme="dark"] [class*="text-[#b6aaa0]"] {
+  color: #a49d96 !important;
 }
 
 html[data-theme="dark"] [class*="border-[#eadfca]"],
@@ -211,7 +258,7 @@ html[data-theme="dark"] .bs-button-secondary:hover:not(:disabled) {
 html[data-theme="dark"] .pedagogical-content,
 html[data-theme="dark"] .module-content,
 html[data-theme="dark"] .tiptap-editor {
-  color: #c9c0b6;
+  color: #d6cec5;
 }
 
 html[data-theme="dark"] .pedagogical-content h1,
@@ -221,6 +268,76 @@ html[data-theme="dark"] .module-content h1,
 html[data-theme="dark"] .module-content h2,
 html[data-theme="dark"] .module-content h3 {
   color: #f5efe6;
+}
+
+html[data-theme="dark"] .pedagogical-content strong,
+html[data-theme="dark"] .module-content strong,
+html[data-theme="dark"] .tiptap-editor strong {
+  color: #f5efe6;
+}
+
+html[data-theme="dark"] .bs-dark-card {
+  border-color: rgba(245, 239, 230, 0.1) !important;
+  background-color: #24252b !important;
+  background-image: none !important;
+}
+
+html[data-theme="dark"] .bs-dark-subcard {
+  border-color: rgba(245, 239, 230, 0.12) !important;
+  background-color: #27282e !important;
+  background-image: none !important;
+}
+
+html[data-theme="dark"] .bs-audio-card {
+  border-color: rgba(245, 239, 230, 0.12) !important;
+  background-color: #24252b !important;
+}
+
+html[data-theme="dark"] .bs-audio-portrait {
+  background-color: #202126 !important;
+}
+
+html[data-theme="dark"] .bs-light-surface {
+  border-color: #eadfca !important;
+  background-color: #fffdf7 !important;
+  background-image: linear-gradient(180deg, #fffdf7, #fff8f1) !important;
+  color: #4f463f !important;
+}
+
+html[data-theme="dark"] .bs-light-surface [class*="text-[#4b4550]"],
+html[data-theme="dark"] .bs-light-surface [class*="text-[#2f2c2b]"] {
+  color: #15213b !important;
+}
+
+html[data-theme="dark"] .bs-light-surface [class*="text-[#5f544a]"],
+html[data-theme="dark"] .bs-light-surface [class*="text-[#6b625a]"] {
+  color: #5f544a !important;
+}
+
+html[data-theme="dark"] .bs-light-surface [class*="text-[#cf7430]"] {
+  color: #cf7430 !important;
+}
+
+html[data-theme="dark"] .bs-light-surface [class*="bg-white"] {
+  border-color: #eadfca !important;
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  color: #5f544a !important;
+}
+
+html[data-theme="dark"] .bs-submodule-tab:not([aria-current="step"]) {
+  border-color: #3a3a40 !important;
+  background-color: #27282d !important;
+  color: #e0d8cf !important;
+}
+
+html[data-theme="dark"] .bs-submodule-tab:not([aria-current="step"]) > span:first-child {
+  color: #a9a29a !important;
+}
+
+html[data-theme="dark"] .bs-submodule-tab[aria-current="step"] {
+  border-color: #cf7430 !important;
+  background-color: #fff6e3 !important;
+  color: #cf7430 !important;
 }
 
 @media (max-width: 640px) {
