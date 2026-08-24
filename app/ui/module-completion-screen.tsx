@@ -52,22 +52,22 @@ function CompletionHero({
   const progress = Math.max(0, Math.min(shareData.progress, 100));
 
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-[#e5ded3] bg-[linear-gradient(135deg,#fdfbf6_0%,#fbf8f1_68%,#f7f1e6_100%)] px-6 py-7 shadow-[0_18px_44px_rgba(21,33,59,0.06)] sm:px-8 sm:py-9">
+    <section className="bs-completion-hero relative overflow-hidden rounded-[1.75rem] border border-[#e5ded3] bg-[linear-gradient(135deg,#fdfbf6_0%,#fbf8f1_68%,#f7f1e6_100%)] px-6 py-7 shadow-[0_18px_44px_rgba(21,33,59,0.06)] sm:px-8 sm:py-9">
       <div className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 rounded-full border border-white/70 bg-white/35 sm:block" />
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
         <div>
           <span className="inline-flex rounded-full border border-white/70 bg-white/75 px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
             Module termine
           </span>
-          <h1 className="mt-5 max-w-3xl font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.95] text-[#332d35] sm:text-[3.35rem]">
+          <h1 className="bs-completion-title mt-5 max-w-3xl font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.95] text-[#332d35] sm:text-[3.35rem]">
             Bravo, tu viens de terminer {summary.title}.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-[#5f544a]">
+          <p className="bs-completion-copy mt-5 max-w-2xl text-base leading-8 text-[#5f544a]">
             Tu as posé une nouvelle base pour ta marque. Voici les éléments essentiels à garder, partager ou reprendre pour avancer.
           </p>
         </div>
 
-        <div className="rounded-[1.25rem] border border-white/75 bg-white/70 px-5 py-5">
+        <div className="bs-completion-progress rounded-[1.25rem] border border-white/75 bg-white/70 px-5 py-5">
           <div className="flex items-end justify-between">
             <p className="text-sm font-bold text-[#6f645b]">Progression du module</p>
             <p className="text-4xl font-black text-[#332d35]">{progress}%</p>

@@ -26,6 +26,12 @@
   --text-on-dark: #f5efe6;
   --surface-elevated: var(--bs-surface-muted);
   --surface-inverse: #15213b;
+  --surface-light: #fdfbf6;
+  --surface-dark: #25262c;
+  --text-on-light-primary: #17213b;
+  --text-on-light-secondary: #625c56;
+  --text-on-dark-primary: #f5efe6;
+  --text-on-dark-secondary: #c9c0b6;
   --background: var(--bs-paper);
   --foreground: var(--bs-copy);
   --background-grid: rgba(118, 109, 98, 0.055);
@@ -57,6 +63,12 @@ html[data-theme="dark"] {
   --text-on-dark: #f5efe6;
   --surface-elevated: #27282e;
   --surface-inverse: #f5efe6;
+  --surface-light: #f8f4ec;
+  --surface-dark: #25262c;
+  --text-on-light-primary: #17213b;
+  --text-on-light-secondary: #625c56;
+  --text-on-dark-primary: #f5efe6;
+  --text-on-dark-secondary: #c9c0b6;
   --background: #17181d;
   --foreground: #c9c0b6;
   --background-grid: rgba(92, 91, 96, 0.18);
@@ -338,6 +350,38 @@ html[data-theme="dark"] .bs-submodule-tab[aria-current="step"] {
   border-color: #cf7430 !important;
   background-color: #fff6e3 !important;
   color: #cf7430 !important;
+}
+
+html[data-theme="dark"] .bs-completion-hero {
+  border-color: #ded5c9 !important;
+  background-color: var(--surface-light) !important;
+  background-image: linear-gradient(135deg, #fdfbf6 0%, #fbf8f1 68%, #f7f1e6 100%) !important;
+}
+
+html[data-theme="dark"] .bs-completion-title {
+  color: var(--text-on-light-primary) !important;
+}
+
+html[data-theme="dark"] .bs-completion-copy {
+  color: var(--text-on-light-secondary) !important;
+}
+
+html[data-theme="dark"] .bs-completion-progress {
+  border-color: #46464c !important;
+  background-color: var(--surface-dark) !important;
+}
+
+html[data-theme="dark"] .bs-completion-progress [class*="text-[#6f645b]"],
+html[data-theme="dark"] .bs-completion-progress [class*="text-[#332d35]"] {
+  color: var(--text-on-dark-primary) !important;
+}
+
+html[data-theme="dark"] .bs-completion-progress > p:last-child {
+  color: var(--text-on-dark-secondary) !important;
+}
+
+html[data-theme="dark"] .bs-completion-progress [class*="bg-white"] {
+  background-color: #34353b !important;
 }
 
 @media (max-width: 640px) {
