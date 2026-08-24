@@ -258,7 +258,7 @@ export default function ModuleSubmoduleViewer({
           <button
             type="button"
             onClick={onStartExercises}
-            className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d]"
+            className="bs-button-primary flex h-12 items-center justify-center rounded-[0.95rem] px-6 text-sm font-extrabold uppercase tracking-[0.12em]"
           >
             Commencer les exercices
           </button>
@@ -280,7 +280,7 @@ export default function ModuleSubmoduleViewer({
             type="button"
             onClick={onNext}
             disabled={currentIndex === submodules.length - 1}
-            className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-not-allowed disabled:opacity-50"
+            className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
           >
             Sous-module suivant
           </button>

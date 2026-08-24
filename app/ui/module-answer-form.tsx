@@ -3467,7 +3467,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToNextStep()}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
+              className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
@@ -3476,7 +3476,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToNextStep()}
-              className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
+              className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
               {isSavingDraft ? "Enregistrement..." : nextStepLabel}
             </button>
@@ -3485,7 +3485,7 @@ export default function ModuleAnswerForm({
               type="button"
               disabled={pending || isSavingDraft}
               onClick={() => void goToCommunicationPlan()}
-              className="flex h-14 items-center justify-center rounded-[1rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
+              className="bs-button-primary flex h-14 items-center justify-center rounded-[1rem] px-6 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
               {isSavingDraft ? "Enregistrement..." : "Vers mon plan de communication"}
             </button>
@@ -3497,7 +3497,7 @@ export default function ModuleAnswerForm({
                 onComplete?.(latestAnswersRef.current);
                 void goToNextStep();
               }}
-              className="flex h-14 items-center justify-center rounded-[1rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
+              className="bs-button-primary flex h-14 items-center justify-center rounded-[1rem] px-6 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
               {pending ? "Enregistrement..." : "Valider le module"}
             </button>
@@ -3798,7 +3798,7 @@ function ExerciseAiActions({
                 type="button"
                 onClick={onImprove}
                 disabled={isLoading}
-                className="flex h-10 items-center justify-center rounded-[0.9rem] bg-[#15213b] px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] transition hover:bg-[#22304d] disabled:cursor-wait disabled:opacity-70"
+                className="bs-button-primary flex h-10 items-center justify-center rounded-[0.9rem] px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em]"
               >
                 {isLoading && state.mode === "improve" ? "Relecture..." : "Ameliore"}
               </button>

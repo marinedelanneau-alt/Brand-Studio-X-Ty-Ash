@@ -226,7 +226,7 @@ function StorySharePreview({
             type="button"
             onClick={onShareStory}
             disabled={isExportingStory}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white shadow-[0_14px_28px_rgba(75,69,80,0.16)] disabled:cursor-wait disabled:opacity-70"
+            className="bs-button-primary inline-flex h-12 items-center justify-center gap-2 rounded-[0.95rem] px-5 text-sm font-extrabold shadow-[0_14px_28px_rgba(21,33,59,0.16)]"
           >
             <ShareIcon className="h-4 w-4" />
             {isExportingStory ? "Préparation..." : "Partager en story Instagram"}
@@ -389,7 +389,7 @@ function CompletionActions({
   onDownloadStory: () => void;
   onCopySummary: () => void;
 }) {
-  const primaryClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white disabled:cursor-wait disabled:opacity-70 sm:w-auto";
+  const primaryClass = "bs-button-primary flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] px-5 text-sm font-extrabold sm:w-auto";
   const secondaryClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold text-[#5f544a] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
   const softClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[#efd7b8] bg-[#fff6e3] px-5 text-sm font-extrabold text-[#cf7430] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
 
@@ -679,7 +679,7 @@ export default function ModuleCompletionScreen({
                   router.refresh();
                   setIsValidatingAdjustment(false);
                 }}
-                className="inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[#4b4550] px-5 text-sm font-extrabold text-white disabled:cursor-wait disabled:opacity-70"
+                className="bs-button-primary inline-flex h-11 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold"
               >
                 {isValidatingAdjustment ? "Enregistrement..." : "Valider la modification"}
               </button>

@@ -55,6 +55,36 @@ input {
   font: inherit;
 }
 
+.bs-button-primary {
+  background-color: var(--bs-ink);
+  color: #fffdf8 !important;
+  opacity: 1;
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.bs-button-primary:hover:not(:disabled) {
+  background-color: #22304d;
+  color: #fffdf8 !important;
+  transform: translateY(-1px);
+}
+
+.bs-button-primary:focus-visible {
+  outline: 2px solid var(--bs-orange);
+  outline-offset: 3px;
+}
+
+.bs-button-primary:disabled,
+.bs-button-primary[aria-disabled="true"] {
+  cursor: not-allowed;
+  background-color: #697184;
+  color: rgba(255, 253, 248, 0.78) !important;
+  opacity: 0.72;
+  transform: none;
+}
+
 textarea,
 select {
   font: inherit;

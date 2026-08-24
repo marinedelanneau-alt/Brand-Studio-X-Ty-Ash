@@ -352,7 +352,7 @@ export default async function MonEspacePage() {
                       href={END_OF_TRAINING_CALL_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] bg-[#15213b] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] text-[#fbf8f1] shadow-[0_8px_16px_rgba(21,33,59,0.14)] transition hover:-translate-y-0.5 hover:bg-[#22304d]"
+                      className="bs-button-primary mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] shadow-[0_8px_16px_rgba(21,33,59,0.14)]"
                     >
                       Réserver mon rendez-vous
                     </a>
@@ -366,7 +366,7 @@ export default async function MonEspacePage() {
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Link
                           href="/brand-guide"
-                          className="inline-flex h-9 items-center justify-center rounded-[0.75rem] bg-[#15213b] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em] text-[#fbf8f1] hover:bg-[#22304d]"
+                          className="bs-button-primary inline-flex h-9 items-center justify-center rounded-[0.75rem] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
                           Generer
                         </Link>
@@ -464,7 +464,7 @@ export default async function MonEspacePage() {
                   <div className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-end sm:justify-between">
                     <Link
                       href={ctaHref}
-                      className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[#15213b] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-[#fbf8f1] shadow-[0_12px_26px_rgba(21,33,59,0.17)] transition hover:bg-[#22304d] hover:shadow-[0_14px_28px_rgba(21,33,59,0.2)]"
+                      className="bs-button-primary inline-flex h-12 items-center justify-center rounded-[0.95rem] px-6 text-sm font-extrabold uppercase tracking-[0.12em] shadow-[0_12px_26px_rgba(21,33,59,0.17)] hover:shadow-[0_14px_28px_rgba(21,33,59,0.2)]"
                     >
                       {hasStartedModules ? "Reprendre" : "Commencer"}
                     </Link>
