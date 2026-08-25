@@ -8,15 +8,16 @@ import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
 export async function getCurrentAccount() {
   let userId: string | null = null;
 
-  try {
-    const authSupabase = await createSupabaseAuthServerClient();
-    const {
-      data: { user },
-    } = await authSupabase.auth.getUser();
-    userId = user?.id ?? null;
-  } catch {
-    userId = null;
+  const authSupabase = await createSupabaseAuthServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await authSupabase.auth.getUser();
+
+  if (authError && authError.name !== "AuthSessionMissingError") {
+    throw authError;
   }
+  userId = user?.id ?? null;
 
   if (userId) {
     const account = await findAccountByAuthUserId(userId);

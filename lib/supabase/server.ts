@@ -4,6 +4,20 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
+const SUPABASE_REQUEST_TIMEOUT_MS = 8_000;
+
+function fetchSupabaseWithTimeout(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) {
+  const timeoutSignal = AbortSignal.timeout(SUPABASE_REQUEST_TIMEOUT_MS);
+  const signal = init?.signal
+    ? AbortSignal.any([init.signal, timeoutSignal])
+    : timeoutSignal;
+
+  return fetch(input, { ...init, signal });
+}
+
 export function createSupabaseServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey =
@@ -19,6 +33,9 @@ export function createSupabaseServerClient() {
       autoRefreshToken: false,
       persistSession: false,
     },
+    global: {
+      fetch: fetchSupabaseWithTimeout,
+    },
   });
 }
 
@@ -33,6 +50,9 @@ export async function createSupabaseAuthServerClient() {
   const cookieStore = await cookies();
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      fetch: fetchSupabaseWithTimeout,
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();
