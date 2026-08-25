@@ -14,11 +14,17 @@ import { saveBrandGuideExport } from "@/app/brand-guide/actions";
 type BrandGuideProps = {
   guide: GeneratedBrandGuide;
   latestGeneratedAt: string | null;
+  readOnly?: boolean;
+  backHref?: string;
+  backLabel?: string;
 };
 
 export default function BrandGuideLayout({
   guide,
   latestGeneratedAt,
+  readOnly = false,
+  backHref = "/mon-espace",
+  backLabel = "Retour au dashboard",
 }: BrandGuideProps) {
   const [mode, setMode] = useState<"complete" | "express">("complete");
   const [message, setMessage] = useState("");
@@ -86,10 +92,10 @@ export default function BrandGuideLayout({
         <header className="mb-6 flex flex-col gap-4 border-b border-[var(--guide-border)] pb-5 print:hidden lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/mon-espace"
+              href={backHref}
               className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
             >
-              Retour au dashboard
+              {backLabel}
             </Link>
             <button
               type="button"
@@ -106,7 +112,7 @@ export default function BrandGuideLayout({
               Synthèse express
             </button>
           </div>
-          <div className="flex flex-wrap gap-3">
+          {!readOnly ? <div className="flex flex-wrap gap-3">
             <button type="button" onClick={copyGuide} className={secondaryButtonClass}>
               Copier le contenu
             </button>
@@ -116,17 +122,17 @@ export default function BrandGuideLayout({
             <button type="button" onClick={exportPdf} disabled={isExporting} className={`${primaryButtonClass} disabled:cursor-wait disabled:opacity-60`}>
               {isExporting ? "Génération…" : "Exporter mon Guide de Marque"}
             </button>
-          </div>
+          </div> : null}
         </header>
 
-        <CompletionBanner
+        {!readOnly ? <CompletionBanner
           items={guide.completion.items}
           warning={guide.completion.warning}
           latestGeneratedAt={latestGeneratedAt}
           isPending={isPending}
           onSave={saveSnapshot}
           message={message}
-        />
+        /> : null}
 
         {!guide.completion.hasAnyData ? (
           <EmptyGuideState />

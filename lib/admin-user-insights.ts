@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getModulesWithExercises } from "@/lib/training";
@@ -56,7 +57,7 @@ function latestDate(...dates: Array<string | null | undefined>) {
   return dates.filter((date): date is string => Boolean(date)).sort().at(-1) ?? "";
 }
 
-export async function getAdminUsers(): Promise<AdminUserView[]> {
+export const getAdminUsers = cache(async function getAdminUsers(): Promise<AdminUserView[]> {
   await getAuthenticatedAdmin();
   const db = createSupabaseServerClient();
   const modules = await getModulesWithExercises();
@@ -147,7 +148,7 @@ export async function getAdminUsers(): Promise<AdminUserView[]> {
         answers: answers.sort((a, b) => a.modulePosition - b.modulePosition),
       } satisfies AdminUserView;
     });
-}
+});
 
 export async function getAdminUser(userId: number) {
   return (await getAdminUsers()).find((user) => user.id === userId) ?? null;

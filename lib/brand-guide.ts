@@ -385,10 +385,7 @@ function collectBrandValues(modules: WorkspaceModule[]) {
   return normalizeBrandValuesFromExercise(owner?.answers[exercise.id] ?? []);
 }
 
-function collectMoodboard(sources: AnswerSource[]) {
-  const source = sources.find((item) => item.exercise.type === "moodboard");
-  const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
-
+export function buildGuideMoodboard(answer: MoodboardAnswer | null) {
   return {
     ambiance: answer?.ambiance || (answer ? analyzeMoodboard(answer) : ""),
     backgroundColor: answer?.backgroundColor || "#F5E8C8",
@@ -461,6 +458,13 @@ function collectMoodboard(sources: AnswerSource[]) {
       };
     }),
   };
+}
+
+function collectMoodboard(sources: AnswerSource[]) {
+  const source = sources.find((item) => item.exercise.type === "moodboard");
+  const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
+
+  return buildGuideMoodboard(answer);
 }
 
 export function describeMoodboardElements(items: GuideMoodboardItem[]) {

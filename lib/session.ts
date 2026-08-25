@@ -1,11 +1,12 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { findAccountByAuthUserId, findAccountByCode } from "@/lib/access-codes";
 import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
 
-export async function getCurrentAccount() {
+export const getCurrentAccount = cache(async function getCurrentAccount() {
   let userId: string | null = null;
 
   const authSupabase = await createSupabaseAuthServerClient();
@@ -41,7 +42,7 @@ export async function getCurrentAccount() {
   }
 
   return account;
-}
+});
 
 export async function getAuthenticatedAccount() {
   const account = await getCurrentAccount();
