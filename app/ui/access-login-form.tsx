@@ -46,7 +46,7 @@ export default function AccessLoginForm() {
   }, [router, state.status]);
 
   return (
-    <form action={formAction} className="max-w-[41rem] space-y-4">
+    <form action={formAction} className="bs-access-login max-w-[41rem] space-y-4">
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -119,7 +119,7 @@ export default function AccessLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="flex h-12 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.86rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+        className="bs-access-primary-action flex h-12 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.86rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Connexion..." : "Entrer"}
       </button>

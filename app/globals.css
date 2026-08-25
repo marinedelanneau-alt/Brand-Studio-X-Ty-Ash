@@ -30,6 +30,7 @@
   --surface-dark: #25262c;
   --text-on-light-primary: #17213b;
   --text-on-light-secondary: #625c56;
+  --text-on-light-muted: #7a736d;
   --text-on-dark-primary: #f5efe6;
   --text-on-dark-secondary: #c9c0b6;
   --background: var(--bs-paper);
@@ -66,9 +67,10 @@ html[data-theme="dark"] {
   --surface-light: #f8f4ec;
   --surface-dark: #25262c;
   --text-on-light-primary: #17213b;
-  --text-on-light-secondary: #625c56;
+  --text-on-light-secondary: #5d5752;
+  --text-on-light-muted: #7a736d;
   --text-on-dark-primary: #f5efe6;
-  --text-on-dark-secondary: #c9c0b6;
+  --text-on-dark-secondary: #d8d0c7;
   --background: #17181d;
   --foreground: #c9c0b6;
   --background-grid: rgba(92, 91, 96, 0.18);
@@ -382,6 +384,91 @@ html[data-theme="dark"] .bs-completion-progress > p:last-child {
 
 html[data-theme="dark"] .bs-completion-progress [class*="bg-white"] {
   background-color: #34353b !important;
+}
+
+/* Mixed-theme access page: its ivory surfaces deliberately stay light. */
+html[data-theme="dark"] .bs-access-shell,
+html[data-theme="dark"] .bs-access-light-surface {
+  border-color: rgba(245, 239, 230, 0.1) !important;
+  background-color: #fffdf7 !important;
+  background-image: linear-gradient(180deg, #fffdfa, #fff8f1) !important;
+}
+
+html[data-theme="dark"] .bs-text-on-light-primary {
+  color: var(--text-on-light-primary) !important;
+}
+
+html[data-theme="dark"] .bs-text-on-light-secondary {
+  color: var(--text-on-light-secondary) !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .bs-text-on-light-muted {
+  color: var(--text-on-light-muted) !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .bs-access-dark-panel {
+  border-color: rgba(245, 239, 230, 0.12) !important;
+  background-color: #25262c !important;
+  background-image: none !important;
+}
+
+html[data-theme="dark"] .bs-text-on-dark-primary {
+  color: var(--text-on-dark-primary) !important;
+}
+
+html[data-theme="dark"] .bs-text-on-dark-secondary {
+  color: var(--text-on-dark-secondary) !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .bs-access-dark-action {
+  border-color: #5a5551 !important;
+  background-color: #1e1f24 !important;
+  color: var(--text-on-dark-primary) !important;
+}
+
+html[data-theme="dark"] .bs-access-dark-action:hover {
+  border-color: #756b64 !important;
+  background-color: #292a30 !important;
+}
+
+html[data-theme="dark"] .bs-access-primary-action {
+  color: var(--text-on-light-primary) !important;
+}
+
+html[data-theme="dark"] .bs-access-primary-action:focus-visible,
+html[data-theme="dark"] .bs-access-dark-action:focus-visible,
+html[data-theme="dark"] .bs-access-guide-action:focus-visible {
+  outline: 2px solid #f0cf55;
+  outline-offset: 3px;
+}
+
+html[data-theme="dark"] .bs-access-guide-action {
+  border-color: #d7c8b7 !important;
+  background-color: #f8f1e6 !important;
+  color: var(--text-on-light-primary) !important;
+}
+
+html[data-theme="dark"] .bs-access-guide-action:hover {
+  border-color: #bda88f !important;
+  background-color: #f3e8d8 !important;
+}
+
+html[data-theme="dark"] .bs-access-login label {
+  color: var(--text-on-light-muted) !important;
+}
+
+html[data-theme="dark"] .bs-access-login input {
+  border-color: #d7c8b7 !important;
+  background-color: #fffaf0 !important;
+  background-image: linear-gradient(180deg, #fffef9, #fff8dc) !important;
+  color: var(--text-on-light-primary) !important;
+}
+
+html[data-theme="dark"] .bs-access-login input::placeholder {
+  color: var(--text-on-light-muted) !important;
 }
 
 @media (max-width: 640px) {
