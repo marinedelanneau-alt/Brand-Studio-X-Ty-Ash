@@ -3,6 +3,8 @@ import { getAdminAccounts } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminClientsPage() {
   let accounts: Awaited<ReturnType<typeof getAdminAccounts>> = [];
   let loadError = "";

@@ -6,7 +6,6 @@ import {
   Cog6ToothIcon,
   HomeIcon,
   Square2StackIcon,
-  UsersIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/solid";
 import LogoutButton from "./logout-button";
@@ -19,10 +18,9 @@ type AdminShellProps = {
 };
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: HomeIcon },
+  { href: "/admin", label: "Utilisateurs", icon: HomeIcon },
   { href: "/admin/modules", label: "Modules", icon: Square2StackIcon },
   { href: "/admin/releases", label: "Versions et déploiements", icon: Square2StackIcon },
-  { href: "/admin/clients", label: "Clients", icon: UsersIcon },
 ];
 
 export default function AdminShell({
@@ -34,7 +32,7 @@ export default function AdminShell({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-[#f5f1e8] text-[#4b4550]">
+    <div className="bs-admin-shell min-h-screen bg-[#f5f1e8] text-[#4b4550]">
       <div className="flex min-h-screen flex-col lg:flex-row">
         <aside className="w-full border-b border-[#ddd1bf] bg-[#1f2937] text-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
           <div className="flex h-full flex-col px-5 py-6">

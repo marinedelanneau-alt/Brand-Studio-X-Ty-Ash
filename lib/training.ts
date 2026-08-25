@@ -2420,18 +2420,6 @@ export async function replaceModuleAnswers(input: {
 }) {
   const supabase = createSupabaseServerClient();
 
-  const submittedExerciseIds = [
-    ...new Set(
-      (input.exerciseIds ?? input.answers.map((answer) => answer.exerciseId)).filter(
-        (exerciseId) => Number.isFinite(exerciseId) && exerciseId !== 0,
-      ),
-    ),
-  ];
-
-  if (submittedExerciseIds.length === 0) {
-    return;
-  }
-
   const now = new Date().toISOString();
   const rows = input.answers
     .filter(
@@ -2460,25 +2448,8 @@ export async function replaceModuleAnswers(input: {
     }
   }
 
-  const savedExerciseIds = new Set(rows.map((row) => row.exercise_id));
-  const explicitlyClearedExerciseIds = submittedExerciseIds.filter(
-    (exerciseId) => !savedExerciseIds.has(exerciseId),
-  );
-
-  if (explicitlyClearedExerciseIds.length === 0) {
-    return;
-  }
-
-  const { error: deleteError } = await supabase
-    .from("project_exercise_answers")
-    .delete()
-    .eq("project_id", input.projectId)
-    .eq("module_id", input.moduleId)
-    .in("exercise_id", explicitlyClearedExerciseIds);
-
-  if (deleteError) {
-    throw new Error(deleteError.message);
-  }
+  // Missing or empty values are deliberately ignored. Only the separately
+  // confirmed account reset action is allowed to delete persisted answers.
 }
 
 export async function setProjectModuleCompletion(input: {

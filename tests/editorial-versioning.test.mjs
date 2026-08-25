@@ -60,7 +60,7 @@ test("une sauvegarde ancienne ne peut pas écraser une réponse plus récente", 
 
 test("les réponses survivent au remplacement des identifiants lors d'un déploiement", () => {
   assert.match(training, /module_position_\$\{input\.modulePosition\}/);
-  assert.match(training, /exercise_position_\$\{answer\.exercisePosition\}/);
+  assert.match(training, /getStableExerciseAnswerKey\(\{/);
   assert.match(stablePositionSql, /'module_position_' \|\| bm\.position/);
   assert.match(
     stablePositionSql,

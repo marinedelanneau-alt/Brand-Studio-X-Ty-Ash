@@ -163,6 +163,10 @@ async function persistModuleAnswers(input: {
     const submodulePositionById = new Map(
       selectedModule.submodules.map((submodule) => [submodule.id, submodule.position]),
     );
+    const persistableAnswers = answers.filter((answer) =>
+      (answer.answerText?.trim().length ?? 0) > 0 ||
+      answer.selectedOptions.some((value) => value.trim().length > 0),
+    );
 
     if (
       workspace.contentPreview.isPreviewMode &&
@@ -175,7 +179,7 @@ async function persistModuleAnswers(input: {
           ? selectedModule.stableKey
           : `module_${selectedModule.id}`;
       const previewAnswers = Object.fromEntries(
-        answers.map((answer) => {
+        persistableAnswers.map((answer) => {
           const exercise = exerciseById.get(answer.exerciseId);
           const exerciseKey =
             exercise &&
@@ -207,7 +211,7 @@ async function persistModuleAnswers(input: {
       projectId: workspace.project.id,
       moduleId: selectedModule.id,
       modulePosition: selectedModule.position,
-      answers: answers.map((answer) => ({
+      answers: persistableAnswers.map((answer) => ({
         exerciseId: answer.exerciseId,
         exercisePosition: exerciseById.get(answer.exerciseId)?.position ?? answer.exerciseId,
         submodulePosition: (() => {
@@ -226,7 +230,7 @@ async function persistModuleAnswers(input: {
     await backupModuleAnswers({
       projectId: workspace.project.id,
       modulePosition: selectedModule.position,
-      answers: answers.flatMap((answer) => {
+      answers: persistableAnswers.flatMap((answer) => {
         const exercise = exerciseById.get(answer.exerciseId);
         if (!exercise) {
           return [];
@@ -247,13 +251,13 @@ async function persistModuleAnswers(input: {
     // legacy FK tables. Their durable source is the stable user_answers table.
     if (
       selectedModule.id > 0 &&
-      answers.every((answer) => answer.exerciseId > 0)
+      persistableAnswers.every((answer) => answer.exerciseId > 0)
     ) {
       await replaceModuleAnswers({
         projectId: workspace.project.id,
         moduleId: selectedModule.id,
-        answers,
-        exerciseIds: hasSubmittedExerciseScope ? [...submittedExerciseIds] : undefined,
+        answers: persistableAnswers,
+        exerciseIds: persistableAnswers.map((answer) => answer.exerciseId),
       });
     }
 

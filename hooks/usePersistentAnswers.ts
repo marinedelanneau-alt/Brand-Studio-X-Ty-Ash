@@ -147,15 +147,15 @@ export function usePersistentAnswers(input: {
             locallyEditedDuringHydrationRef.current.add(exercise.id);
           }
 
-          const explicitDelete =
-            userInteractionRef.current && hasValue(previousValues) && !hasValue(nextValues);
-          if (!hasValue(nextValues) && !explicitDelete) continue;
+          // An empty transient UI value is never a deletion request. Answer
+          // deletion is reserved for an explicit, confirmed account action.
+          if (!hasValue(nextValues)) continue;
 
           void persistLocalAnswer({
             scope: { userId, projectId, moduleId },
             exerciseId: exercise.id,
             values: nextValues,
-            explicitDelete,
+            explicitDelete: false,
           }).then((record) => {
             broadcastAnswerRef.current(record);
             setChangeToken((token) => token + 1);

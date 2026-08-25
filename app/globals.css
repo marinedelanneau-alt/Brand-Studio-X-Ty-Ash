@@ -471,6 +471,22 @@ html[data-theme="dark"] .bs-access-login input::placeholder {
   color: var(--text-on-light-muted) !important;
 }
 
+html[data-theme="dark"] .bs-admin-shell {
+  background-color: #17181d !important;
+  color: var(--text-on-dark-secondary);
+}
+
+html[data-theme="dark"] .bs-admin-shell > div > div {
+  background-color: #1d1e23;
+}
+
+html[data-theme="dark"] .bs-admin-shell .bs-light-surface {
+  border-color: rgba(245, 239, 230, 0.12) !important;
+  background-color: #fffdf7 !important;
+  background-image: linear-gradient(180deg, #fffdf7, #fff8f1) !important;
+  color: var(--text-on-light-secondary) !important;
+}
+
 @media (max-width: 640px) {
   .bs-theme-toggle span {
     display: none;
