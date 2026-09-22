@@ -14,7 +14,8 @@ export async function acceptCurrentTerms(formData: FormData) {
   if (!document || document.id !== formData.get("documentId")) throw new Error("Version juridique invalide.");
   const requestHeaders = await headers();
   const ip = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const ipHash = ip ? createHash("sha256").update(`${process.env.LEGAL_IP_HASH_SALT ?? "preview-only"}:${ip}`).digest("hex") : null;
+  const salt = process.env.LEGAL_IP_HASH_SALT;
+  const ipHash = ip && salt ? createHash("sha256").update(`${salt}:${ip}`).digest("hex") : null;
   const { error } = await auth.from("legal_acceptances").insert({
     user_id: user.id, legal_document_id: document.id, document_type: document.document_type,
     document_version: document.version, acceptance_method: "explicit_checkbox",

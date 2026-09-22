@@ -1,6 +1,8 @@
 import "server-only";
+import { toPlainText } from "@/lib/plain-text";
 
 import { findFinalAnswerCandidate } from "@/lib/brand-guide-final-answers";
+import { getVocabularyDirection, isExcludedAnswerLabel } from "@/lib/brand-guide-answer-labels";
 import { parseStoredBrandPersonaConfig, getBrandPersonaFields } from "@/lib/brand-persona";
 import {
   getPaletteColorCss,
@@ -11,6 +13,7 @@ import {
   getPromptOpenLabel,
   parseChecklistEntries,
   parseIndexedAnswerItems,
+  parseStoredExerciseQuestionConfig,
   parseStoredTableConfig,
 } from "@/lib/exercise-types";
 import { analyzeMoodboard, parseStoredMoodboardAnswer, type MoodboardAnswer } from "@/lib/moodboard";
@@ -174,7 +177,7 @@ const MISSING = {
 };
 
 function compactText(value: string | null | undefined) {
-  return String(value ?? "").replace(/\s+/g, " ").trim();
+  return toPlainText(String(value ?? ""));
 }
 
 function normalizeForSearch(value: string) {
@@ -185,8 +188,8 @@ function normalizeForSearch(value: string) {
 }
 
 function splitList(value: string) {
-  return compactText(value)
-    .split(/\s*(?:,|;|\||\n| - )\s*/g)
+  return value
+    .split(/\s*(?:,|;|\||\r?\n| · | • | - )\s*/g)
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -247,7 +250,7 @@ function buildAnswerText(exercise: ModuleExercise, values: string[]) {
   if (exercise.type === "checklist") {
     const entries = parseChecklistEntries(values);
     const checked = entries.filter((entry) => entry.checked).map((entry) => entry.label);
-    return (checked.length > 0 ? checked : entries.map((entry) => entry.label)).join(", ");
+    return checked.join(", ");
   }
 
   if (exercise.type === "table") {
@@ -275,6 +278,18 @@ function collectSources(modules: WorkspaceModule[]) {
   return modules.flatMap((module) =>
     module.exercises.flatMap((exercise) => {
       const values = module.answers[exercise.id] ?? [];
+      const questions = parseStoredExerciseQuestionConfig(exercise.type, exercise.options).items;
+      if (questions.length > 0 && ["open", "prompt_open", "group_open", "fill_blank"].includes(exercise.type)) {
+        const answers = parseIndexedAnswerItems(values);
+        return questions.flatMap((label, questionIndex) => {
+          const questionValues = answers
+            .filter((item) => item.questionIndex === questionIndex)
+            .sort((a, b) => a.valueIndex - b.valueIndex)
+            .map((item) => item.value);
+          const text = buildAnswerText(exercise, questionValues);
+          return text ? [{ module, exercise, label, values: questionValues, text } satisfies AnswerSource] : [];
+        });
+      }
       const text = buildAnswerText(exercise, values);
       return text
         ? [{
@@ -290,14 +305,24 @@ function collectSources(modules: WorkspaceModule[]) {
 }
 
 function findSource(sources: AnswerSource[], keywordGroups: string[][]) {
-  return sources.find((source) => {
-    const haystack = normalizeForSearch(
-      `${source.module.title} ${source.label}`,
-    );
-    return keywordGroups.some((group) =>
-      group.every((keyword) => haystack.includes(normalizeForSearch(keyword))),
-    );
-  });
+  // Only the question identifies an answer, never its module title or content.
+  // Prefer final formulations over preparatory questions and self-assessments.
+  return sources
+    .filter((source) => ["open", "prompt_open", "group_open", "fill_blank"].includes(source.exercise.type))
+    .map((source) => {
+      const label = normalizeForSearch(source.label).replace(/[^a-z0-9]+/g, " ").trim();
+      const matches = keywordGroups.some((group) => group.every((keyword) => {
+        const phrase = normalizeForSearch(keyword).replace(/[^a-z0-9]+/g, " ").trim();
+        return new RegExp(`(?:^| )${phrase}s?(?: |$)`).test(label);
+      }));
+      const assessment = /\b(aligne|alignee|alignes|alignees|je pense|je suis|coherent|coherente)\b/.test(label);
+      const score = /\b(final|finale|definitif|definitive)\b/.test(label) ? 3
+        : /^(?:ta|ton|tes|ma|mon|mes|notre) \w+(?: de marque)?$/.test(label) ? 2
+        : source.exercise.type === "prompt_open" ? 1 : 0;
+      return { source, matches: matches && !assessment, score };
+    })
+    .filter((item) => item.matches)
+    .sort((a, b) => b.score - a.score)[0]?.source;
 }
 
 function findText(sources: AnswerSource[], keywordGroups: string[][], fallback: string) {
@@ -460,6 +485,14 @@ export function buildGuideMoodboard(answer: MoodboardAnswer | null) {
   };
 }
 
+function collectVocabulary(sources: AnswerSource[], direction: "use" | "avoid") {
+  return sources
+    .filter((source) => ["open", "prompt_open", "group_open", "fill_blank", "checklist", "multiple", "single"].includes(source.exercise.type))
+    .filter((source) => getVocabularyDirection(source.label) === direction)
+    .flatMap((source) => splitList(source.text))
+    .filter((item, index, items) => items.findIndex((other) => normalizeForSearch(other) === normalizeForSearch(item)) === index);
+}
+
 function collectMoodboard(sources: AnswerSource[]) {
   const source = sources.find((item) => item.exercise.type === "moodboard");
   const answer: MoodboardAnswer | null = source ? parseStoredMoodboardAnswer(source.values) : null;
@@ -482,7 +515,7 @@ export function describeMoodboardElements(items: GuideMoodboardItem[]) {
 }
 
 function listFromText(text: string, fallback: string[]) {
-  const items = splitList(text).slice(0, 8);
+  const items = splitList(text);
   return items.length > 0 ? items : fallback;
 }
 
@@ -526,7 +559,8 @@ export function generateBrandGuide(input: {
   const missionSource = findSource(sources, [["mission"]]);
   const positioningSource = findFinalAnswerSource(sources, "positioning");
   const promiseSource = findFinalAnswerSource(sources, "promise");
-  const toneSource = findSource(sources, [["ton"], ["voix"]]);
+  const toneSource = sources.find((source) => source.exercise.type === "brand_persona") ||
+    findSource(sources, [["ton de voix"], ["ton de marque"], ["ton", "adopter"], ["voix"]]);
   const paletteSource = sources.find((item) => item.exercise.type === "color_palette");
 
   const activity = findText(sources, [["activite"], ["metier"], ["description", "marque"]], MISSING.activity);
@@ -539,15 +573,16 @@ export function generateBrandGuide(input: {
   const differentiation = findText(sources, [["differenciation"], ["different"], ["singulier"]], "Différenciation à compléter dans le module Positionnement.");
   const competitors = findText(sources, [["concurrent"]], "Concurrents à renseigner si utile.");
   const finalPositioning = positioningSource?.text || MISSING.positioning;
-  const baseline = findText(sources, [["baseline"], ["slogan"], ["signature"]], "Baseline à compléter dans le module Baseline.");
+  const baseline = findText(sources.filter((source) => !/\b(variante|variantes|pistes|essais)\b/.test(normalizeForSearch(source.label))), [["baseline"], ["slogan"], ["signature"]], "Baseline à compléter dans le module Baseline.");
   const traitsText =
     collectPersonaValue(sources, ["dominant_traits", "traits dominants"]) ||
-    findText(sources, [["trait"], ["personnalite"]], "");
+    findText(sources.filter((source) => !isExcludedAnswerLabel(source.label)), [["trait"], ["personnalite"]], "");
   const tone =
     collectPersonaValue(sources, ["tone_of_voice", "ton de voix"]) ||
-    findText(sources, [["ton"], ["voix"]], MISSING.tone);
+    findText(sources, [["ton de voix"], ["ton de marque"], ["ton", "adopter"], ["voix"]], MISSING.tone);
   const persona =
-    collectPersonaValue(sources, ["final_summary_sentence", "phrase", "resume"]) ||
+    collectPersonaValue(sources, ["final_summary_sentence"]) ||
+    collectPersonaValue(sources, ["persona_summary_sentence"]) ||
     collectPersonaValue(sources, ["persona_first_name", "prenom"]) ||
     findText(sources, [["persona"]], "Persona de marque à compléter dans le module Persona.");
   const relationship =
@@ -564,18 +599,12 @@ export function generateBrandGuide(input: {
   );
 
   const primaryColorNames = colors.primary.map((color) => color.name);
-  const toneWords = listFromText(traitsText || tone, ["Clair", "Coherent", "Professionnel"]).slice(0, 3);
+  const toneWords = listFromText(traitsText, []);
   const values = brandValues.length > 0
     ? brandValues.map((value) => value.name).filter(Boolean)
     : listFromText(findText(sources, [["valeur"]], ""), []);
-  const wordsToUse = listFromText(
-    findText(sources, [["mots", "utiliser"], ["vocabulaire", "privilegier"]], ""),
-    ["Mots alignés avec le ton de marque à compléter."],
-  );
-  const wordsToAvoid = listFromText(
-    findText(sources, [["mots", "eviter"], ["vocabulaire", "eviter"]], ""),
-    ["Mots à éviter à compléter."],
-  );
+  const wordsToUse = collectVocabulary(sources, "use");
+  const wordsToAvoid = collectVocabulary(sources, "avoid");
 
   const completionItems: GuideCompletionItem[] = [
     { key: "brandName", label: "Nom de marque", status: hasRealValue(brandName) ? "ok" : "missing" },
@@ -620,7 +649,7 @@ export function generateBrandGuide(input: {
     cover: {
       title: `Guide de Marque - ${brandName}`,
       subtitle: baseline,
-      introLine: `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.`,
+      introLine: toneWords.length > 0 ? `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.` : "Les fondations de ta marque.",
     },
     introduction: `Ce guide rassemble les fondations stratégiques, verbales et visuelles de ${brandName}. Il sert de référence pour créer des contenus, guider les visuels et garder une communication cohérente dans le temps.`,
     dna: {
@@ -651,7 +680,7 @@ export function generateBrandGuide(input: {
     },
     baselineSection: {
       final: baseline,
-      variants: listFromText(findText(sources, [["variante"], ["baseline"]], ""), []).filter((item) => item !== baseline),
+      variants: listFromText(findText(sources, [["variante"]], ""), []).filter((item) => item !== baseline),
       recommendedUses: [
         "Couverture de presentation et documents commerciaux.",
         "Bio de reseaux sociaux lorsque l'espace le permet.",

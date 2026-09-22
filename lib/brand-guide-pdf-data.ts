@@ -1,4 +1,5 @@
 import type { GeneratedBrandGuide, GuideColor, GuideMoodboardItem } from "@/lib/brand-guide";
+import { toPlainText } from "@/lib/plain-text";
 import { calculatePageDensity } from "./brand-guide-editorial-layout";
 import { sanitizeMoodboardItems } from "./brand-guide-layout";
 import { normalizeBrandValuesFromExercise } from "./brand-guide-normalizers";
@@ -62,7 +63,7 @@ const EMPTY_MARKERS = [
 ];
 
 function compact(value: unknown) {
-  return String(value ?? "").replace(/\s+/g, " ").trim();
+  return toPlainText(String(value ?? ""));
 }
 
 function normalized(value: string) {

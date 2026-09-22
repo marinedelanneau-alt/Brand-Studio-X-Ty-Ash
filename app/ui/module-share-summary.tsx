@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import SummaryAnswerTable from "@/app/ui/summary-answer-table";
 import { useEffect, useState } from "react";
 import type { ModuleSummaryCard } from "@/lib/module-summary";
 
@@ -96,14 +97,14 @@ export default function ModuleShareSummary({
                     {submodule.highlights.map((item, index) => (
                       <div
                         key={`${item.label}-${index}`}
-                        className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3"
+                        className={`${item.table ? "sm:col-span-2 " : ""}rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3`}
                       >
                         <p className="text-[0.66rem] font-black uppercase tracking-[0.14em] text-[#7a7087]">
                           {item.label}
                         </p>
-                        <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
+                        {item.table ? <SummaryAnswerTable table={item.table} /> : <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
                           {item.value}
-                        </p>
+                        </p>}
                       </div>
                     ))}
                   </div>

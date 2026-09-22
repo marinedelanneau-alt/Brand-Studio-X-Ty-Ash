@@ -14,6 +14,8 @@ import {
   parseStoredBrandPersonaConfig,
 } from "@/lib/brand-persona";
 import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
+import { getVocabularyDirection } from "@/lib/brand-guide-answer-labels";
+import { toPlainText } from "@/lib/plain-text";
 import type { WorkspaceModule } from "@/lib/training-types";
 
 export type ModuleSummaryHighlight = {
@@ -21,6 +23,7 @@ export type ModuleSummaryHighlight = {
   value: string;
   colors?: ModuleSummaryColor[];
   exerciseId?: number;
+  table?: { columns: string[]; rows: string[][] };
 };
 
 export type ModuleSummaryColor = {
@@ -104,7 +107,7 @@ export function getModuleSummary(input: {
   return buildModuleSummaryCard(input);
 }
 
-function buildSubmoduleRecaps(module: WorkspaceModule) {
+function buildSubmoduleRecaps(module: WorkspaceModule): ModuleSubmoduleSummary[] {
   return module.submodules.map((submodule) => {
     const highlights = submodule.exercises
       .filter((exercise) => isAnswerableExerciseType(exercise.type))
@@ -355,7 +358,7 @@ function findHighlightByKeywords(
       submodule.highlights.map((highlight) => ({
         label: highlight.label,
         value: highlight.value,
-        haystack: normalizeForSearch(`${submodule.title} ${highlight.label}`),
+        haystack: normalizeForSearch(highlight.label),
       })),
     )
     .find((item) =>
@@ -420,7 +423,7 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       label: "Ta mission",
       item: findSemanticHighlight(
         module,
-        ["mission", "raison d'etre", "pourquoi ta marque existe"],
+        ["mission"],
         "Ta mission",
       ),
     },
@@ -428,7 +431,7 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       label: "Ta vision",
       item: findSemanticHighlight(
         module,
-        ["vision", "ambition", "dans 5 ans", "dans cinq ans"],
+        ["vision"],
         "Ta vision",
       ),
     },
@@ -440,7 +443,7 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       label: "Ta promesse",
       item: findSemanticHighlight(
         module,
-        ["promesse", "benefice client", "transformation promise"],
+        ["promesse"],
         "Ta promesse",
       ),
     },
@@ -572,7 +575,10 @@ function buildGenericQuickRecap(module: WorkspaceModule) {
 function summarizeExerciseAnswer(
   exercise: WorkspaceModule["exercises"][number],
   values: string[],
-) {
+): ModuleSummaryHighlight | null {
+  // Preserve cell indices: replacing metadata with empty cells avoids moving
+  // subsequent real answers into another column.
+  values = values.map((value) => isStoredConfiguration(value) ? "" : value);
   if (values.length === 0) {
     return null;
   }
@@ -586,7 +592,7 @@ function summarizeExerciseAnswer(
   }
 
   if (exercise.type === "multiple") {
-    return buildHighlight(exercise.question, values.join(", "));
+    return buildHighlight(exercise.question, values.map(compactText).filter(Boolean).join(", "));
   }
 
   if (exercise.type === "color") {
@@ -654,15 +660,12 @@ function summarizeExerciseAnswer(
   if (exercise.type === "checklist") {
     const entries = parseChecklistEntries(values);
     const keptEntries = entries.filter((entry) => entry.checked).map((entry) => entry.label);
-    const labels = (keptEntries.length > 0
-      ? keptEntries
-      : entries.map((entry) => entry.label)
-    );
+    const labels = keptEntries;
 
-    const checklistQuestion = normalizeForSearch(exercise.question || "");
-    const label = checklistQuestion.includes("eviter") || checklistQuestion.includes("interdit")
+    const direction = getVocabularyDirection(exercise.question || "");
+    const label = direction === "avoid"
       ? "Mots à éviter"
-      : checklistQuestion.includes("utiliser") || checklistQuestion.includes("privilegier")
+      : direction === "use"
         ? "Mots à utiliser"
         : "Éléments retenus";
 
@@ -746,7 +749,16 @@ function summarizeTableAnswer(
     ? "Tes valeurs en pratique"
     : rawQuestion || "Synthèse du tableau";
 
-  return buildHighlight(label, preview.join(" • "));
+  const summary = buildHighlight(label, preview.join(" • "));
+  if (!summary) return null;
+  const columns = Array.from({ length: tableConfig.columns }, (_, index) =>
+    compactText(cleanStoredExerciseQuestionText(tableConfig.columnLabels[index] ?? ""))
+      .replace(/[_:]+/g, " ").trim() || `Colonne ${index + 1}`,
+  );
+  const rows = Array.from({ length: tableConfig.rows }, (_, row) =>
+    columns.map((_, column) => compactText(values[row * tableConfig.columns + column] ?? "")),
+  ).filter((row) => row.some(Boolean));
+  return { ...summary, table: { columns, rows } } satisfies ModuleSummaryHighlight;
 }
 
 function summarizeGenericValues(values: string[]) {
@@ -930,124 +942,39 @@ function findSemanticHighlight(
   keywords: string[],
   label: string,
 ) {
-  const normalizedKeywords = keywords.map(normalizeForSearch);
-  const matchingSubmodules = module.submodules.filter((submodule) => {
-    const normalizedTitle = normalizeForSearch(submodule.title);
-    return normalizedKeywords.some((keyword) => normalizedTitle.includes(keyword));
-  });
-  const contextualCandidates = matchingSubmodules
-    .flatMap((submodule) => submodule.exercises)
-    .flatMap((exercise) => {
-      const summary = summarizeExerciseAnswer(
-        exercise,
-        module.answers[exercise.id] ?? [],
-      );
-
-      if (!summary || isPlaceholderSummaryValue(summary.value)) {
-        return [];
-      }
-
-      const normalizedQuestion = normalizeForSearch(
-        exercise.type === "prompt_open"
-          ? getPromptOpenLabel(exercise.question)
-          : exercise.question,
-      );
-      const priorityKeywords = [
-        "phrase essentielle",
-        "phrase finale",
-        "version finale",
-        "synthese",
-        ...normalizedKeywords,
-      ];
-      const score = priorityKeywords.reduce(
-        (total, keyword, index) =>
-          normalizedQuestion.includes(keyword)
-            ? total + priorityKeywords.length - index
-            : total,
-        0,
-      );
-
-      return [{ exercise, summary, score }];
-    })
-    .sort(
-      (left, right) =>
-        right.score - left.score || right.exercise.position - left.exercise.position,
-    );
-
-  if (contextualCandidates[0]) {
-    return {
-      label,
-      value: contextualCandidates[0].summary.value,
-    } satisfies ModuleSummaryHighlight;
-  }
-
-  for (const exercise of module.exercises) {
+  const normalizeLabel = (value: string) => normalizeForSearch(value).replace(/[^a-z0-9]+/g, " ").trim();
+  const normalizedKeywords = keywords.map(normalizeLabel);
+  const candidates = module.exercises.flatMap((exercise) => {
+    if (!["open", "prompt_open", "group_open", "fill_blank", "single", "multiple"].includes(exercise.type)) return [];
     const values = module.answers[exercise.id] ?? [];
-
-    if (values.length === 0) {
-      continue;
-    }
-
-    const questionConfig = parseStoredExerciseQuestionConfig(
-      exercise.type,
-      exercise.options,
-    );
-    const promptCandidates = questionConfig.items.length > 0
-      ? questionConfig.items
-      : exercise.type === "group_open"
-        ? exercise.options
-        : [];
-    const matchingPromptIndex = promptCandidates.findIndex((prompt) => {
-      const normalizedPrompt = normalizeForSearch(prompt);
-      return normalizedKeywords.some((keyword) => normalizedPrompt.includes(keyword));
+    const prompts = parseStoredExerciseQuestionConfig(exercise.type, exercise.options).items;
+    const indexed = parseIndexedAnswerItems(values);
+    const questions = prompts.length > 0 ? prompts : [getExerciseSummaryLabel(exercise)];
+    return questions.flatMap((question, questionIndex) => {
+      const normalized = normalizeLabel(question);
+      if (!normalizedKeywords.some((keyword) => (" " + normalized + " ").includes(" " + keyword + " "))) return [];
+      if (/\b(aligne\w*|coheren\w*|je pense|satisfait\w*)\b/.test(normalized)) return [];
+      const direct = normalized.replace(/^(?:ma|mon|mes|ta|ton|tes|notre|votre) /, "");
+      const exact = normalizedKeywords.includes(direct);
+      const final = /\b(final|finale|formule|formulee|definitif|definitive)\b/.test(normalized);
+      const score = exact ? 3 : final ? 2 : exercise.type === "prompt_open" ? 1 : 0;
+      const value = prompts.length > 0
+        ? (indexed.length > 0
+          ? indexed.filter((item) => item.questionIndex === questionIndex).sort((a, b) => a.valueIndex - b.valueIndex).map((item) => compactText(item.value)).filter(Boolean).join(", ")
+          : compactText(values[questionIndex] ?? ""))
+        : summarizeExerciseAnswer(exercise, values)?.value ?? "";
+      // An unanswered direct question must not be replaced by a preparatory answer.
+      return [{ label, value: value || "À compléter", exerciseId: exercise.id, score }];
     });
-
-    if (matchingPromptIndex >= 0) {
-      const indexedAnswers = parseIndexedAnswerItems(values)
-        .filter((item) => item.questionIndex === matchingPromptIndex)
-        .sort((left, right) => left.valueIndex - right.valueIndex)
-        .map((item) => compactText(item.value))
-        .filter(Boolean);
-      const matchingValues = indexedAnswers.length > 0
-        ? indexedAnswers
-        : [values[matchingPromptIndex] ?? ""].map(compactText).filter(Boolean);
-
-      if (matchingValues.length > 0) {
-        return {
-          label,
-          value: matchingValues.join(", "),
-        } satisfies ModuleSummaryHighlight;
-      }
-    }
-
-    const sourceLabel = exercise.type === "prompt_open"
-      ? getPromptOpenLabel(exercise.question)
-      : exercise.question;
-    const normalizedSource = normalizeForSearch(sourceLabel);
-
-    if (!normalizedKeywords.some((keyword) => normalizedSource.includes(keyword))) {
-      continue;
-    }
-
-    const summary = summarizeExerciseAnswer(exercise, values);
-
-    if (summary && !isPlaceholderSummaryValue(summary.value)) {
-      return {
-        label,
-        value: summary.value,
-      } satisfies ModuleSummaryHighlight;
-    }
-  }
-
-  return null;
+  }).sort((a, b) => b.score - a.score);
+  const match = candidates[0];
+  return match ? { label, value: match.value, exerciseId: match.exerciseId } satisfies ModuleSummaryHighlight : null;
 }
 
 function findValuesHighlight(module: WorkspaceModule) {
   const match = module.exercises.find((exercise) => {
     const normalizedQuestion = normalizeForSearch(exercise.question);
     return (
-      exercise.type === "table" ||
-      exercise.type === "checklist" ||
       normalizedQuestion.includes("valeur")
     );
   });
@@ -1081,7 +1008,7 @@ function buildTableValuesHighlight(
     const rowLabel = tableConfig.rowLabels[rowIndex] || `Ligne ${rowIndex + 1}`;
     const rowValues = Array.from({ length: tableConfig.columns }, (_, columnIndex) => {
       const cellIndex = rowIndex * tableConfig.columns + columnIndex;
-      const cellValue = values[cellIndex]?.trim() ?? "";
+      const cellValue = compactText(values[cellIndex] ?? "");
 
       if (!cellValue) {
         return null;
@@ -1114,12 +1041,11 @@ function collectFocusWords(module: WorkspaceModule) {
     if (exercise.type === "checklist") {
       const entries = parseChecklistEntries(values);
       const keptEntries = entries.filter((entry) => entry.checked).map((entry) => entry.label);
-      const source = keptEntries.length > 0 ? keptEntries : entries.map((entry) => entry.label);
-      return source.map(compactText);
+      return keptEntries.map(compactText).filter(Boolean);
     }
 
     if (exercise.type === "single" || exercise.type === "multiple" || exercise.type === "boolean") {
-      return values.map(compactText);
+      return values.map(compactText).filter(Boolean);
     }
 
     if (exercise.type === "color") {
@@ -1256,7 +1182,7 @@ function buildHighlight(label: string, value: string) {
   }
 
   return {
-    label: cleanStoredExerciseQuestionText(label) || "Point clé",
+    label: toPlainText(cleanStoredExerciseQuestionText(label)) || "Point clé",
     value: normalizedValue,
   } satisfies ModuleSummaryHighlight;
 }
@@ -1285,7 +1211,13 @@ function buildEmptyHighlight(label: string, value: string) {
 }
 
 function compactText(value: string) {
-  return value.replace(/\s+/g, " ").trim();
+  return toPlainText(value);
+}
+
+function isStoredConfiguration(value: string) {
+  let decoded = value;
+  try { decoded = decodeURIComponent(value); } catch { /* Literal percent sign. */ }
+  return /^\s*__(?:table_(?:rows|columns|row|column|placeholder)|question_(?:item|columns)|answer_placeholder|explanation|exercise_group_id|group_open_layout|[a-z_]+_config)__\s*:/i.test(decoded);
 }
 
 function normalizeForSearch(value: string) {

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { allowsOfferAccess, BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 
 export type SubscriptionStatus =
   | "none"
@@ -15,6 +16,7 @@ export type SubscriptionStatus =
   | "incomplete_expired";
 
 export type SubscriptionAccessStatus = {
+  plan?: string | null;
   status: SubscriptionStatus;
   accessGranted: boolean;
   stripeCustomerId: string | null;
@@ -29,7 +31,7 @@ export async function getSubscriptionAccessStatus(
   const { data, error } = await supabase
     .from("subscriptions")
     .select(
-      "status, access_granted, stripe_customer_id, stripe_subscription_id, current_period_end",
+      "status, access_granted, stripe_customer_id, stripe_subscription_id, current_period_end, plan",
     )
     .eq("user_id", userId)
     .order("updated_at", { ascending: false })
@@ -52,7 +54,8 @@ export async function getSubscriptionAccessStatus(
 
   return {
     status: (data.status ?? "none") as SubscriptionStatus,
-    accessGranted: data.access_granted === true,
+    accessGranted: allowsOfferAccess(data.plan, data.access_granted === true, data.current_period_end),
+    plan: data.plan ?? null,
     stripeCustomerId: data.stripe_customer_id ?? null,
     stripeSubscriptionId: data.stripe_subscription_id ?? null,
     currentPeriodEnd: data.current_period_end ?? null,
@@ -103,15 +106,17 @@ export async function upsertSubscription(input: {
 
   const { data: existingSubscription, error: selectError } = await supabase
     .from("subscriptions")
-    .select("id")
+    .select("id,plan")
     .eq("user_id", input.userId)
     .order("updated_at", { ascending: false })
     .limit(1)
-    .maybeSingle<{ id: number }>();
+    .maybeSingle<{ id: number; plan: string | null }>();
 
   if (selectError) {
     throw new Error(selectError.message);
   }
+  // An old checkout/subscription event cannot turn a dated purchase into unlimited access.
+  if (existingSubscription?.plan === BRAND_STUDIO_OFFER.version && input.plan !== BRAND_STUDIO_OFFER.version) return;
 
   const payload = {
     user_id: input.userId,

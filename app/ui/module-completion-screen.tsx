@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import SummaryAnswerTable from "@/app/ui/summary-answer-table";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -344,7 +345,7 @@ function ModuleDetailAccordion({
                             </button>
                           ) : null}
                         </div>
-                        {item.colors && item.colors.length > 0 ? (
+                        {item.table ? <SummaryAnswerTable table={item.table} /> : item.colors && item.colors.length > 0 ? (
                           <PaletteSummary colors={item.colors} />
                         ) : (
                           <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">

@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type ActivationCodeRecord = {
+  offer_version?: string | null;
   id: number;
   code: string;
   email: string;
@@ -28,6 +29,7 @@ export async function createActivationCode(input: {
   stripeSubscriptionId?: string | null;
   stripeCheckoutSessionId?: string | null;
   priceId?: string | null;
+  offerVersion?: string;
 }) {
   const supabase = createSupabaseServerClient();
   const code = generateActivationCode();
@@ -44,6 +46,7 @@ export async function createActivationCode(input: {
       price_id: input.priceId ?? null,
       status: "paid",
       expires_at: expiresAt,
+      ...(input.offerVersion ? { offer_version: input.offerVersion } : {}),
     })
     .select("*")
     .single<ActivationCodeRecord>();

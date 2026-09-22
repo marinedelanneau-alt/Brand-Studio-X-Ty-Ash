@@ -8,6 +8,8 @@ import { getCurrentAccount } from "@/lib/session";
 import { isAdminDraftPreviewEnabled } from "@/lib/content-releases";
 import PreviewAccessDenied from "./ui/preview-access-denied";
 import ThemeToggle from "./ui/theme-toggle";
+import LegalFooter from "./ui/legal-footer";
+import { isLegalReleaseEnabled } from "@/lib/legal-release";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -73,6 +75,7 @@ export default async function RootLayout({
         </Suspense>
         {previewDenied ? <PreviewAccessDenied /> : children}
         <ThemeToggle />
+        {isLegalReleaseEnabled() ? <LegalFooter /> : null}
       </body>
     </html>
   );

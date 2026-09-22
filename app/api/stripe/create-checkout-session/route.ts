@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentAccount } from "@/lib/session";
-import { findStripeCustomerId, upsertSubscription } from "@/lib/subscriptions";
+import { findStripeCustomerId, getSubscriptionAccessStatus, upsertSubscription } from "@/lib/subscriptions";
+import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 import { getStripe, getStripeCheckoutMode } from "@/lib/stripe";
 import { createStripeReturnUrl } from "@/lib/stripe-return-url";
 
@@ -9,6 +10,9 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const account = await getCurrentAccount();
+    if (account && (await getSubscriptionAccessStatus(account.id)).plan === BRAND_STUDIO_OFFER.version) {
+      return NextResponse.json({ error: "Contactez le support pour votre achat Brand Studio." }, { status: 409 });
+    }
     const body = (await request.json().catch(() => null)) as
       | { email?: unknown }
       | null;

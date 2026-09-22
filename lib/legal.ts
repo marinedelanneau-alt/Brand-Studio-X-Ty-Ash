@@ -1,4 +1,6 @@
 import "server-only";
+import { isLegalReleaseEnabled } from "@/lib/legal-release";
+import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shouldRequireAcceptance, type EnforcementMode } from "@/lib/legal-policy";
 export { BRAND_STUDIO_FIRST_PUBLICATION_YEAR, copyrightText } from "@/lib/legal-policy";
@@ -12,7 +14,7 @@ export type LegalDocument = {
 };
 
 export function isLegalPreviewEnabled() {
-  return process.env.VERCEL_ENV === "preview" && process.env.LEGAL_SYSTEM_UI_ENABLED === "true";
+  return isLegalReleaseEnabled() || (process.env.VERCEL_ENV === "preview" && process.env.LEGAL_SYSTEM_UI_ENABLED === "true");
 }
 
 export async function getPublishedLegalDocument(type: string) {
@@ -22,6 +24,8 @@ export async function getPublishedLegalDocument(type: string) {
 }
 
 export async function getLegalDocumentsForAdmin() {
+  const { getAuthenticatedAdmin } = await import("@/lib/session");
+  await getAuthenticatedAdmin();
   if (!isLegalPreviewEnabled()) return [];
   const { data, error } = await createSupabaseServerClient().from("legal_documents").select("*")
     .order("updated_at", { ascending: false });
@@ -29,9 +33,15 @@ export async function getLegalDocumentsForAdmin() {
   return data as LegalDocument[];
 }
 
-export async function getCurrentTermsRequirement(userId: string, account: { created_at: string; role?: string; is_admin?: boolean }) {
+export async function getCurrentTermsRequirement(userId: string, account: { id?: number; created_at: string; role?: string; is_admin?: boolean }) {
   if (!isLegalPreviewEnabled()) return null;
   const db = createSupabaseServerClient();
+  if (isLegalReleaseEnabled()) {
+    if (!account.id) return null;
+    const { data: subscription, error } = await db.from("subscriptions").select("plan").eq("user_id", account.id).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw error;
+    if (subscription?.plan !== BRAND_STUDIO_OFFER.version) return null;
+  }
   const [{ data: settings }, { data: document }] = await Promise.all([
     db.from("legal_system_settings").select("enforcement_mode,existing_user_cutoff").single(),
     db.from("legal_documents").select("*").eq("document_type","terms_of_use").eq("status","published").eq("is_mandatory",true).maybeSingle(),

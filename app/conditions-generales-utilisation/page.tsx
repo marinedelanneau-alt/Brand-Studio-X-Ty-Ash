@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLegalDocumentsForAdmin, getPublishedLegalDocument, isLegalPreviewEnabled } from "@/lib/legal";
+import { getAuthenticatedAdmin } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default async function TermsPage({ searchParams }: { searchParams: Promis
   let document = await getPublishedLegalDocument("terms_of_use");
   let preview = false;
   if (!document && previewId && isLegalPreviewEnabled()) {
+    await getAuthenticatedAdmin();
     document = (await getLegalDocumentsForAdmin()).find((item) => item.id === previewId) ?? null;
     preview = Boolean(document);
   }

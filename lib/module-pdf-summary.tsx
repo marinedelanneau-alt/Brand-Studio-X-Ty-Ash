@@ -10,8 +10,10 @@ import type {
   ModuleSummaryCard,
   ModuleSummaryColor,
   ModuleSubmoduleSummary,
+  ModuleSummaryHighlight,
 } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
+import { toPlainText } from "@/lib/plain-text";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -321,7 +323,7 @@ function formatDate(value: string) {
 }
 
 export function sanitizePdfText(value: string) {
-  return value
+  return toPlainText(value)
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F\u200D]/gu, "")
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, "")
     .replace(/\s+/g, " ")
@@ -375,6 +377,30 @@ function PdfPalette({ colors }: { colors: ModuleSummaryColor[] }) {
           </View>
         );
       })}
+    </View>
+  );
+}
+
+function PdfAnswerTable({ table }: { table: NonNullable<ModuleSummaryHighlight["table"]> }) {
+  const width = `${100 / table.columns.length}%`;
+  return (
+    <View style={{ marginTop: 8, borderTop: "1 solid #E7DCCB", borderLeft: "1 solid #E7DCCB" }}>
+      <View style={{ flexDirection: "row", backgroundColor: "#F9E8D8" }} wrap={false} minPresenceAhead={45}>
+        {table.columns.map((column, index) => (
+          <View key={index} style={{ width, padding: 7, borderRight: "1 solid #E7DCCB", borderBottom: "1 solid #E7DCCB" }}>
+            <Text style={{ fontSize: 8, fontWeight: 700, color: "#29242B" }}>{sanitizePdfText(column)}</Text>
+          </View>
+        ))}
+      </View>
+      {table.rows.map((row, rowIndex) => (
+        <View key={rowIndex} style={{ flexDirection: "row", backgroundColor: rowIndex % 2 ? "#F7F1E8" : "#FFFDF9" }} wrap={false}>
+          {row.map((cell, columnIndex) => (
+            <View key={columnIndex} style={{ width, padding: 7, borderRight: "1 solid #E7DCCB", borderBottom: "1 solid #E7DCCB" }}>
+              <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: "#5E554E" }}>{sanitizePdfText(cell) || "—"}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -482,9 +508,9 @@ export function ModulePdfSummary({
                   <Text style={styles.chapterTitle}>{sanitizePdfText(submodule.title)}</Text>
                 </View>
                 {submodule.highlights.map((item, index) => (
-                  <View key={`${item.label}-${index}`} style={styles.detail} wrap={false}>
+                  <View key={`${item.label}-${index}`} style={styles.detail} wrap={Boolean(item.table)}>
                     <Text style={styles.detailLabel} minPresenceAhead={24}>{sanitizePdfText(item.label)}</Text>
-                    {item.colors?.length ? (
+                    {item.table ? <PdfAnswerTable table={item.table} /> : item.colors?.length ? (
                       <PdfPalette colors={item.colors} />
                     ) : (
                       <Text style={styles.detailValue}>{sanitizePdfText(item.value)}</Text>

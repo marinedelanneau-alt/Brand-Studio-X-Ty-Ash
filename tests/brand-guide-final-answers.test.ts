@@ -36,6 +36,12 @@ const candidates: Candidate[] = [
 ];
 
 describe("brand guide final answer selection", () => {
+  it("rejects preparatory prompts and prefers explicitly final answers", () => {
+    const drafts = [{ label: "Comment améliorer ton positionnement ?", type: "prompt_open" }];
+    expect(findFinalAnswerCandidate(drafts, "positioning")).toBeUndefined();
+    const final = { label: "Ton positionnement final", type: "prompt_open" };
+    expect(findFinalAnswerCandidate([...drafts, { label: "Ton positionnement", type: "prompt_open" }, final], "positioning")).toBe(final);
+  });
   it("selects only the final promise answer", () => {
     expect(findFinalAnswerCandidate(candidates, "promise")?.answer).toBe(
       "Promesse finale uniquement",

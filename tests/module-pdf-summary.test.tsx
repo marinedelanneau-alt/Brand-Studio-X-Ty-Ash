@@ -62,6 +62,16 @@ const shareData: ModuleShareData = {
 };
 
 describe("module PDF summary", () => {
+  it("renders structured values tables across pages", async () => {
+    const tableSummary = { ...summary, submoduleRecaps: [{ ...summary.submoduleRecaps[0], highlights: [{ label: "Tes valeurs en pratique", value: "Valeurs détaillées", table: { columns: ["Valeur", "Signification", "Concrètement", "Communication"], rows: Array.from({ length: 12 }, (_, index) => [`Valeur ${index + 1}`, "Comprendre chaque projet et chaque personne.", "Je questionne, j’échange et je construis en collaboration.", "Un discours humain, rassurant et attentif."]) } }] }] };
+    const buffer = await renderToBuffer(<ModulePdfSummary summary={tableSummary} shareData={shareData} />);
+    expect(buffer.subarray(0, 4).toString()).toBe("%PDF");
+    expect(buffer.length).toBeGreaterThan(5000);
+  });
+  it("removes raw and encoded HTML in PDF text", () => {
+    expect(sanitizePdfText("<P>TA MISSION</P><P>Test&nbsp;: est-elle alignée ?</P>")).toBe("TA MISSION Test : est-elle alignée ?");
+    expect(sanitizePdfText("&lt;p&gt;L&rsquo;écoute&lt;/p&gt;")).toBe("L’écoute");
+  });
   it("removes unsupported pictograms without damaging French text", () => {
     expect(sanitizePdfText("📝 Baseline : comment je me résume en une phrase")).toBe(
       "Baseline : comment je me résume en une phrase",

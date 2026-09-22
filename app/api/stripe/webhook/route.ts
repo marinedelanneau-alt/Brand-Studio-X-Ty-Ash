@@ -8,6 +8,8 @@ import { deliverActivationEmail } from "@/lib/activation-email-delivery";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
+import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
+import { fulfillCommercialOrder } from "@/lib/commercial-order-fulfillment";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -188,7 +190,11 @@ export async function POST(request: Request) {
     switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
-        await handleCheckoutCompleted(event.data.object);
+        if (event.data.object.metadata?.offer_version === BRAND_STUDIO_OFFER.version) {
+          await fulfillCommercialOrder(event.data.object, event);
+        } else {
+          await handleCheckoutCompleted(event.data.object);
+        }
         break;
       case "customer.subscription.created":
       case "customer.subscription.updated":

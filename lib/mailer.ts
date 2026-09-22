@@ -15,6 +15,7 @@ type SendPasswordResetEmailInput = {
 };
 
 type SendAccountActivationEmailInput = {
+  orderConfirmation?: string;
   email: string;
   clientName: string;
   activationToken: string;
@@ -38,6 +39,17 @@ function getBrevoConfig() {
     replyToEmail,
     replyToName,
   };
+}
+
+export async function sendWithdrawalReceipt(input: { email: string; text: string }) {
+  const config = getBrevoConfig();
+  const brevo = new BrevoClient({ apiKey: config.apiKey, timeoutInSeconds: 15, maxRetries: 1 });
+  await brevo.transactionalEmails.sendTransacEmail({
+    subject: "Accusé de réception de votre rétractation Brand Studio",
+    sender: { email: config.senderEmail, name: config.senderName },
+    to: [{ email: input.email }], textContent: input.text,
+    replyTo: config.replyToEmail ? { email: config.replyToEmail } : undefined,
+  });
 }
 
 export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
@@ -200,6 +212,7 @@ export async function sendAccountActivationEmail(
 
   await brevo.transactionalEmails.sendTransacEmail({
     subject: "Bienvenue dans ton Brand Studio ✨",
+    attachment: input.orderConfirmation ? [{ name: "confirmation-brand-studio.txt", content: Buffer.from(input.orderConfirmation, "utf8").toString("base64") }] : undefined,
     sender: {
       email: config.senderEmail,
       name: config.senderName,

@@ -3,6 +3,7 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useActionState, useState } from "react";
 import { registerAccount } from "../register-account";
+import Link from "next/link";
 
 type RegisterState = {
   status: "idle" | "error";
@@ -20,9 +21,13 @@ const inputClassName =
 export default function RegisterForm({
   registrationToken,
   email,
+  termsId,
+  legalEnabled = false,
 }: {
   registrationToken: string;
   email: string;
+  termsId?: string;
+  legalEnabled?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     registerAccount,
@@ -135,6 +140,7 @@ export default function RegisterForm({
         </p>
       </div>
 
+      {termsId ? <label className="flex items-start gap-3 text-sm leading-6"><input type="hidden" name="termsId" value={termsId} /><input type="checkbox" name="acceptedTerms" required className="mt-1" /><span>J’ai lu et j’accepte les <Link href="/conditions-generales-utilisation" target="_blank" className="underline">conditions générales d’utilisation</Link>.</span></label> : null}
       <button
         type="submit"
         disabled={pending}
@@ -142,6 +148,7 @@ export default function RegisterForm({
       >
         {pending ? "Création du compte..." : "Créer mon compte"}
       </button>
+      {legalEnabled ? <p className="text-sm leading-6 text-[#6a5d53]">Les informations du compte servent à fournir votre accès et à sauvegarder vos projets. Consultez la <Link href="/politique-confidentialite" className="underline">politique de confidentialité</Link> et les <Link href="/conditions-generales-utilisation" className="underline">CGU</Link>. L’inscription ne vaut pas consentement à recevoir de la prospection commerciale.</p> : null}
 
       <div className="min-h-7">
         {state.message ? (

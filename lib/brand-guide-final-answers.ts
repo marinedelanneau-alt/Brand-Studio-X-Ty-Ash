@@ -18,7 +18,7 @@ export function findFinalAnswerCandidate<T extends FinalAnswerCandidate>(
   candidates: T[],
   concept: FinalAnswerConcept,
 ) {
-  return candidates.find((candidate) => {
+  const matches = candidates.filter((candidate) => {
     const label = normalizeForSearch(candidate.label);
 
     if (concept === "promise") {
@@ -26,7 +26,6 @@ export function findFinalAnswerCandidate<T extends FinalAnswerCandidate>(
         (label === "ta promesse" || label.includes("promesse finale"));
     }
 
-    const isPositioningLabel = label.includes("positionnement");
     const isExplicitlyFinal =
       label.includes("positionnement final") ||
       label.includes("positionnement formule") ||
@@ -34,7 +33,10 @@ export function findFinalAnswerCandidate<T extends FinalAnswerCandidate>(
       label === "ton positionnement" ||
       label === "ta phrase de positionnement";
 
-    return isPositioningLabel &&
-      (candidate.type === "prompt_open" || isExplicitlyFinal);
+    return ["open", "prompt_open", "group_open", "fill_blank"].includes(candidate.type) && isExplicitlyFinal;
   });
+  return matches.sort((left, right) => {
+    const score = (candidate: T) => /\bfinale?\b/.test(normalizeForSearch(candidate.label)) ? 1 : 0;
+    return score(right) - score(left);
+  })[0];
 }

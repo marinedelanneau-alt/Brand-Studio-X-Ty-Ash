@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import RegisterForm from "../ui/register-form";
 import { findActivationCodeByToken, findUsableActivationCodeByToken } from "@/lib/activation-codes";
+import { getPublishedLegalDocument } from "@/lib/legal";
+import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 
 const values = [
   "Lien personnel reçu après paiement",
@@ -128,7 +130,7 @@ export default async function RegisterPage({
 
               <div className="mt-7">
                 {activation ? (
-                  <RegisterForm registrationToken={activation.code} email={activation.email} />
+                  <RegisterForm registrationToken={activation.code} email={activation.email} legalEnabled={activation.offer_version === BRAND_STUDIO_OFFER.version} termsId={activation.offer_version === BRAND_STUDIO_OFFER.version ? (await getPublishedLegalDocument("terms_of_use"))?.id : undefined} />
                 ) : accountAlreadyCreated ? (
                   <Link href="/" className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgba(227,175,64,0.24)]">
                     Me connecter
