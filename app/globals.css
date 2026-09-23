@@ -7,15 +7,15 @@
   --bs-border: #e5ded3;
   --bs-ink: #15213b;
   --bs-copy: #5d5a57;
-  --bs-orange: #ec681c;
-  --bs-yellow: #e8bd3f;
+  --bs-orange: #7a2d46;
+  --bs-yellow: #7a2d46;
   --surface: var(--bs-surface);
   --surface-secondary: var(--bs-surface-muted);
   --card: #ffffff;
   --muted-foreground: #7b7068;
   --border: var(--bs-border);
   --input: #ffffff;
-  --primary: #df9b39;
+  --primary: #7a2d46;
   --primary-foreground: #ffffff;
   --accent: var(--bs-orange);
   --heading-color: var(--bs-ink);
@@ -45,17 +45,17 @@ html[data-theme="dark"] {
   --bs-border: #3a393b;
   --bs-ink: #f5efe6;
   --bs-copy: #c9c0b6;
-  --bs-orange: #e8682a;
-  --bs-yellow: #e8b94a;
+  --bs-orange: #7a2d46;
+  --bs-yellow: #7a2d46;
   --surface: #202126;
   --surface-secondary: #25262c;
   --card: #25262c;
   --muted-foreground: #98928b;
   --border: #3a393b;
   --input: #1e1f24;
-  --primary: #df9b39;
+  --primary: #7a2d46;
   --primary-foreground: #f5efe6;
-  --accent: #e8682a;
+  --accent: #7a2d46;
   --heading-color: #f5efe6;
   --text-primary: #d6cec5;
   --text-secondary: #b8b0a8;
@@ -510,8 +510,8 @@ input {
 }
 
 .bs-button-primary {
-  background-color: #df9b39;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  background-color: #7a2d46;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62);
   color: #ffffff !important;
   opacity: 1;
   transition:
@@ -521,21 +521,21 @@ input {
 }
 
 .bs-button-primary:hover:not(:disabled) {
-  background-color: #df9b39;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  background-color: #7a2d46;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62);
   color: #ffffff !important;
   transform: translateY(-1px);
   filter: brightness(1.02);
 }
 
 .bs-button-primary:focus-visible {
-  outline: 2px solid #f0cf55;
+  outline: 2px solid #7a2d46;
   outline-offset: 3px;
 }
 
 .bs-button-primary:active:not(:disabled) {
-  background-color: #df9b39;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  background-color: #7a2d46;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62);
   filter: brightness(0.98);
   transform: translateY(0);
 }
@@ -543,8 +543,8 @@ input {
 .bs-button-primary:disabled,
 .bs-button-primary[aria-disabled="true"] {
   cursor: not-allowed;
-  background-color: #df9b39;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56);
+  background-color: #7a2d46;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62);
   color: #ffffff !important;
   opacity: 0.5;
   filter: none;
@@ -596,8 +596,8 @@ button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"],
 a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
-  background-color: #df9b39 !important;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56) !important;
+  background-color: #7a2d46 !important;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62) !important;
   color: #ffffff !important;
 }
 
@@ -605,8 +605,8 @@ button[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover:not(:disabled),
 a[class*="linear-gradient(135deg,#df9b39,#f1cc56)"]:hover,
 button[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover:not(:disabled),
 a[class*="linear-gradient(135deg,#e19b34,#f2cf58)"]:hover {
-  background-color: #df9b39 !important;
-  background-image: linear-gradient(135deg, #df9b39, #f1cc56) !important;
+  background-color: #7a2d46 !important;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62) !important;
 }
 
 textarea,
