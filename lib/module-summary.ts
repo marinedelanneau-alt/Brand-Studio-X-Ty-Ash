@@ -972,66 +972,45 @@ function findSemanticHighlight(
 }
 
 function findValuesHighlight(module: WorkspaceModule) {
-  const match = module.exercises.find((exercise) => {
-    const normalizedQuestion = normalizeForSearch(exercise.question);
-    return (
-      normalizedQuestion.includes("valeur")
-    );
-  });
+  const candidates = module.exercises.flatMap((exercise) => {
+    if (!isAnswerableExerciseType(exercise.type)) return [];
 
-  if (!match) {
-    return null;
-  }
+    const question = normalizeForSearch(getExerciseSummaryLabel(exercise));
+    const prompts = parseStoredExerciseQuestionConfig(exercise.type, exercise.options).items;
+    const values = module.answers[exercise.id] ?? [];
 
-  const values = module.answers[match.id] ?? [];
-  const summary =
-    match.type === "table"
-      ? buildTableValuesHighlight(match, values)
-      : summarizeExerciseAnswer(match, values);
-
-  if (!summary) {
-    return null;
-  }
-
-  return {
-    label: "Tes valeurs",
-    value: summary.value,
-  } satisfies ModuleSummaryHighlight;
-}
-
-function buildTableValuesHighlight(
-  exercise: WorkspaceModule["exercises"][number],
-  values: string[],
-) {
-  const tableConfig = parseStoredTableConfig(exercise.options);
-  const rowSummaries = Array.from({ length: tableConfig.rows }, (_, rowIndex) => {
-    const rowLabel = tableConfig.rowLabels[rowIndex] || `Ligne ${rowIndex + 1}`;
-    const rowValues = Array.from({ length: tableConfig.columns }, (_, columnIndex) => {
-      const cellIndex = rowIndex * tableConfig.columns + columnIndex;
-      const cellValue = compactText(values[cellIndex] ?? "");
-
-      if (!cellValue) {
-        return null;
-      }
-
-      const columnLabel =
-        tableConfig.columnLabels[columnIndex] || `Colonne ${columnIndex + 1}`;
-
-      return `${columnLabel}: ${cellValue}`;
-    }).filter((entry): entry is string => Boolean(entry));
-
-    if (rowValues.length === 0) {
-      return null;
+    // A grouped exercise can contain values alongside mission and vision.
+    // Read only the matching question instead of combining all its answers.
+    if (prompts.length > 0) {
+      const indexed = parseIndexedAnswerItems(values);
+      return prompts.flatMap((prompt, questionIndex) => {
+        if (!/\bvaleurs?\b/.test(normalizeForSearch(prompt))) return [];
+        const value = indexed.length > 0
+          ? indexed.filter((item) => item.questionIndex === questionIndex)
+            .sort((a, b) => a.valueIndex - b.valueIndex)
+            .map((item) => compactText(item.value)).filter(Boolean).join(", ")
+          : compactText(values[questionIndex] ?? "");
+        return value ? [{ label: "Tes valeurs", value, exerciseId: exercise.id, score: 2 }] : [];
+      });
     }
 
-    return `${rowLabel} - ${rowValues.join(", ")}`;
-  }).filter((entry): entry is string => Boolean(entry));
+    const table = exercise.type === "table" ? parseStoredTableConfig(exercise.options) : null;
+    const hasValuesColumn = table?.columnLabels.some((label) => /\bvaleurs?\b/.test(normalizeForSearch(label)));
+    if (!/\bvaleurs?\b/.test(question) && !hasValuesColumn) return [];
 
-  if (rowSummaries.length === 0) {
-    return null;
-  }
+    const summary = summarizeExerciseAnswer(exercise, values);
+    if (!summary) return [];
+    const direct = /^(?:(?:mes|tes|nos|vos|les) )?valeurs?\s*[.:!?]?$/.test(question);
+    return [{ ...summary, label: "Tes valeurs", exerciseId: exercise.id, score: table || direct ? 2 : 1 }];
+  });
 
-  return buildHighlight("Valeurs", rowSummaries.join(" | "));
+  const match = candidates.sort((a, b) => b.score - a.score)[0];
+  if (!match) return null;
+  return {
+    label: match.label,
+    value: match.value,
+    exerciseId: match.exerciseId,
+  } satisfies ModuleSummaryHighlight;
 }
 
 function collectFocusWords(module: WorkspaceModule) {

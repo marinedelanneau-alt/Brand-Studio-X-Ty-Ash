@@ -10,6 +10,32 @@ function summarize(rows: Array<{ question: string; values: string[]; type?: Modu
 }
 
 describe("module summary answer attribution", () => {
+  it("finds completed values after introductory content and an empty exercise", () => {
+    const summary = summarize([
+      { question: "Les valeurs de ta marque", type: "static_text", values: [] },
+      { question: "Quelles valeurs te parlent ?", values: [] },
+      { question: "Mes valeurs", values: ["Écoute, Créativité, Authenticité"] },
+    ]);
+    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
+    expect(summary.keyTakeaways.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
+  });
+
+  it("uses the values table instead of an earlier preparatory answer", () => {
+    const summary = summarize([
+      { question: "Pourquoi les valeurs sont-elles importantes ?", values: ["Pour guider mes choix"] },
+      { question: "Complète ce tableau", type: "table", options: ["__table_rows__:2", "__table_columns__:2", "__table_column__:Valeur", "__table_column__:Application"], values: ["Écoute", "Comprendre le besoin", "Créativité", "Explorer plusieurs pistes"] },
+    ]);
+    const values = summary.quickRecap.find((item) => item.label === "Tes valeurs");
+    expect(values?.value).toContain("Écoute");
+    expect(values?.value).toContain("Créativité");
+    expect(values?.value).not.toContain("Pour guider mes choix");
+  });
+
+  it("extracts only values from a grouped question", () => {
+    const summary = summarize([{ question: "Les fondations", type: "group_open", options: ["__question_item__:Ma mission", "__question_item__:Mes valeurs"], values: [serializeIndexedAnswerItem(0, 0, "Accompagner"), serializeIndexedAnswerItem(1, 1, "Respect"), serializeIndexedAnswerItem(1, 0, "Écoute")] }]);
+    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Respect");
+  });
+
   it("removes table configuration and placeholders throughout the document", () => {
     const summary = summarize([{ question: "Mes valeurs", type: "table", options: ["__table_rows__:2", "__table_columns__:2", "__table_column__:Valeur", "__table_column__:Application"], values: ["__table_rows__:3", "__table_placeholder__:Écoute", "Authenticité saisie", "Des échanges transparents"] }]);
     const document = JSON.stringify(summary);

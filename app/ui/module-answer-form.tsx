@@ -14,6 +14,7 @@ import {
 import type { Dispatch, SetStateAction } from "react";
 import { requestModuleAnswerAssistance } from "../generate-module-answer-assistance";
 import { saveModuleAnswers, saveModuleDraft } from "../save-module-answers";
+import { isMissingServerAction } from "@/lib/server-action-error";
 import { uploadExerciseImages } from "../upload-exercise-images";
 import BrandPersonaExercise from "./brand-persona-exercise";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
@@ -991,7 +992,7 @@ function writeBrowserAnswersDraft(
   persistedAnswers: AnswersByExercise,
 ) {
   if (typeof window === "undefined") {
-    return;
+    return false;
   }
 
   const updatedAt = Date.now();
@@ -1034,12 +1035,14 @@ function writeBrowserAnswersDraft(
       ),
   });
 
+  let stored = false;
   try {
     window.sessionStorage.setItem(getSessionAnswersDraftKey(module.id), payload);
     window.sessionStorage.setItem(
       getStableSessionAnswersDraftKey(module.position),
       stablePayload,
     );
+    stored = true;
   } catch {
     // Session storage is a browser-side convenience; server persistence remains primary.
   }
@@ -1050,9 +1053,11 @@ function writeBrowserAnswersDraft(
       getStableLocalAnswersDraftKey(module.position),
       stablePayload,
     );
+    stored = true;
   } catch {
     // Local storage is a durable backup when the network or a deployment interrupts a save.
   }
+  return stored;
 }
 
 function mergeBrowserAnswersDraft(module: WorkspaceModule, answers: AnswersByExercise) {
@@ -1452,6 +1457,10 @@ export default function ModuleAnswerForm({
   const saveIndicatorTimerRef = useRef<number | null>(null);
   const retryTimerRef = useRef<number | null>(null);
   const retryAttemptRef = useRef(0);
+  const needsPageRefresh = [state.message, autoSaveState.message, syncError ?? ""].some(
+    (message) => isMissingServerAction(message),
+  );
+  const [refreshError, setRefreshError] = useState("");
 
   const currentSubmodule = useMemo(
     () =>
@@ -2059,7 +2068,7 @@ export default function ModuleAnswerForm({
                     ? "⚠ Hors ligne — tes réponses sont enregistrées sur cet appareil."
                     : "⚠ Erreur de synchronisation"}
         </span>
-        {syncStatus === "error" ? (
+        {syncStatus === "error" && !needsPageRefresh ? (
           <button
             type="button"
             onClick={() => void retrySync()}
@@ -2088,7 +2097,7 @@ export default function ModuleAnswerForm({
         ) : null}
       </div>
       <div className="border-b border-[#eadfca] pb-3">
-        {state.status === "error" && state.message ? (
+        {state.status === "error" && state.message && !needsPageRefresh ? (
           <div className="mb-4 rounded-[1rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-4 text-sm leading-6 text-[#9d4e40]">
             {state.message}
           </div>
@@ -3505,7 +3514,7 @@ export default function ModuleAnswerForm({
         </div>
       </div>
 
-      {state.message ? (
+      {state.message && !needsPageRefresh ? (
         <p
           className={
             state.status === "error"
@@ -3519,7 +3528,30 @@ export default function ModuleAnswerForm({
         </p>
       ) : null}
 
-      {saveIndicator === "error" ? (
+      {needsPageRefresh ? (
+        <div role="alert" className="text-sm leading-6 text-[#b45247]">
+          <p>La page doit être actualisée pour reprendre l’enregistrement.</p>
+          <button
+            type="button"
+            className="underline underline-offset-4"
+            onClick={() => {
+              const stored = writeBrowserAnswersDraft(
+                moduleRef.current,
+                latestAnswersRef.current,
+                persistedAnswersRef.current,
+              );
+              if (stored) {
+                window.location.reload();
+              } else {
+                setRefreshError("Impossible de conserver le brouillon sur cet appareil. Copie ta réponse avant d’actualiser la page.");
+              }
+            }}
+          >
+            Conserver mes réponses et actualiser
+          </button>
+          {refreshError ? <p>{refreshError}</p> : null}
+        </div>
+      ) : saveIndicator === "error" ? (
         <p
           role="alert"
           className="text-sm leading-6 text-[#b45247]"

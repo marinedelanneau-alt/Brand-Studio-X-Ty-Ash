@@ -9,7 +9,11 @@ const nextConfig: NextConfig = {
       { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
     ] }] : [];
   },
-  deploymentId: process.env.DEPLOYMENT_VERSION,
+  deploymentId:
+    process.env.DEPLOYMENT_VERSION ||
+    process.env.NEXT_DEPLOYMENT_ID ||
+    process.env.VERCEL_DEPLOYMENT_ID ||
+    process.env.VERCEL_GIT_COMMIT_SHA,
   experimental: {
     serverActions: {
       bodySizeLimit: "25mb",
