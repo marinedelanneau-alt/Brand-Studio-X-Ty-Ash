@@ -144,7 +144,7 @@ export default async function MonEspacePage() {
     return (
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-5xl space-y-6">
-          <div className="border-b border-[#eadfca] pb-8">
+          <div className="border-b border-[var(--border)] pb-8">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <Image
@@ -155,21 +155,21 @@ export default async function MonEspacePage() {
                   className="h-auto w-[8rem]"
                   priority
                 />
-                <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[#4b4550] sm:text-[4.1rem]">
+                <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[var(--heading-color)] sm:text-[4.1rem]">
                   Ton accès Brand Studio
                 </h1>
-                <p className="mt-6 text-lg leading-8 text-[#6f645b]">
+                <p className="mt-6 text-lg leading-8 text-[var(--text-primary)]">
                   Ton paiement doit être confirmé par Stripe avant de débloquer
                   les modules de formation.
                 </p>
               </div>
 
-              <aside className="rounded-[1.6rem] border border-[#eadfca] bg-white p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] lg:w-[24rem]">
-                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+              <aside className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--card)] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] lg:w-[24rem]">
+                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
                   Statut
                 </p>
-                <p className="mt-4 text-2xl font-black text-[#4b4550]">{accessLabel}</p>
-                <p className="mt-3 text-sm leading-7 text-[#7b7068]">
+                <p className="mt-4 text-2xl font-black text-[var(--heading-color)]">{accessLabel}</p>
+                <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
                   {accessStatus?.status === "none"
                     ? "Débloque Brand Studio pour accéder aux modules."
                     : "Si tu viens de payer, l'accès apparaîtra dès que le webhook Stripe aura confirmé le paiement."}
@@ -177,7 +177,7 @@ export default async function MonEspacePage() {
                 <div className="mt-6 space-y-3">
                   <Link
                     href="/pricing"
-                    className="flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+                    className="flex h-12 items-center justify-center rounded-[0.95rem] bs-button-primary px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
                   >
                     Debloquer Brand Studio
                   </Link>
@@ -221,7 +221,7 @@ export default async function MonEspacePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <section className="mx-auto max-w-6xl space-y-6">
         <div
-          className={`border-b border-[#eadfca] pb-8 sm:pb-10 ${
+          className={`border-b border-[var(--border)] pb-8 sm:pb-10 ${
             workspace.project
               ? "lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-x-8"
               : ""
@@ -245,7 +245,7 @@ export default async function MonEspacePage() {
                   <img
                     src={workspace.project.logo_url}
                     alt={`Logo de ${workspaceTitle}`}
-                    className="h-16 w-16 rounded-[1rem] border border-[#eadfca] bg-white object-contain p-2"
+                    className="h-16 w-16 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] object-contain p-2"
                   />
                 ) : (
                   <Image
@@ -262,7 +262,7 @@ export default async function MonEspacePage() {
                 </span>
               </div>
               <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
-                <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[#2f2a33] sm:text-[4rem]">
+                <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[var(--heading-color)] sm:text-[4rem]">
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
@@ -278,22 +278,22 @@ export default async function MonEspacePage() {
                   : ""
               }`}
             >
-              <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-white/80 bg-[#fdfbf6]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+              <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-[var(--surface-highlight)]/80 bg-[var(--surface)]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[var(--border)]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgba(122,45,70,0.08),transparent_48%)]"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgb(var(--tyash-glow-rgb)/0.08),transparent_48%)]"
                 />
                 <LogoutButton
                   iconOnly
-                  className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--tyash-border)] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[var(--tyash-primary)] hover:bg-[var(--tyash-soft)] hover:text-[var(--tyash-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tyash-focus-ring)]"
+                  className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--tyash-border)] bg-[var(--card)] text-[var(--text-muted)] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[var(--tyash-primary)] hover:bg-[var(--tyash-soft)] hover:text-[var(--tyash-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tyash-focus-ring)]"
                 />
                 <div className="relative flex h-full flex-col gap-4">
                   {workspace.project && workspace.modules.length > 0 ? (
-                    <nav className="border-b border-[#f0e4d3] pb-3">
+                    <nav className="border-b border-[var(--border)] pb-3">
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-primary-dark)]">
                         Navigation
                       </p>
-                      <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[#4b4550]">
+                      <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[var(--heading-color)]">
                         Tes modules
                       </h3>
                       <div className="mt-2.5 flex flex-col gap-1.5">
@@ -303,8 +303,8 @@ export default async function MonEspacePage() {
                             href={getModuleHref(module)}
                             className={`w-full rounded-full border px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
-                                ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
-                                : "border-[var(--tyash-border)] bg-[var(--tyash-subtle)] text-[#586071] hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-primary-dark)]"
+                                ? "border-[#d6e8d8] bs-status-light bg-[#eef6eb] text-[var(--status-success-text)]"
+                                : "border-[var(--tyash-border)] bg-[var(--tyash-subtle)] text-[var(--text-primary)] hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-primary-dark)]"
                             }`}
                           >
                             {module.title}
@@ -320,7 +320,7 @@ export default async function MonEspacePage() {
                     </nav>
                   ) : null}
 
-                  <div className="border-b border-[#f0e4d3] pb-3">
+                  <div className="border-b border-[var(--border)] pb-3">
                     <CompanyNameForm currentCompanyName={workspaceTitle} />
                     {workspace.project ? (
                       <WorkspaceLogoForm
@@ -332,19 +332,19 @@ export default async function MonEspacePage() {
 
                     <div className="rounded-[1rem] border border-[var(--tyash-border)] bg-[var(--tyash-subtle)] p-2.5 shadow-[0_8px_18px_rgba(21,33,59,0.045)]">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[var(--tyash-primary)] ring-1 ring-[var(--tyash-border)]">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-[var(--card)] text-[var(--tyash-primary)] ring-1 ring-[var(--tyash-border)]">
                         <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-[0.6rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-primary-dark)]">
                           Fin de parcours
                         </p>
-                        <p className="mt-0.5 text-sm font-extrabold text-[#4b4550]">
+                        <p className="mt-0.5 text-sm font-extrabold text-[var(--heading-color)]">
                           Faisons le point ensemble
                         </p>
                       </div>
                     </div>
-                    <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-bold text-[#5f544a]">
+                    <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-bold text-[var(--text-primary)]">
                       <ClockIcon className="h-3.5 w-3.5 text-[var(--tyash-primary)]" aria-hidden="true" />
                       45 minutes en visioconférence
                     </p>
@@ -392,7 +392,7 @@ export default async function MonEspacePage() {
                 <div className="sm:col-span-2 lg:col-span-1">
                   <Link
                     href="/admin/modules"
-                    className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                    className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
                   >
                     Gérer les modules
                   </Link>
@@ -401,41 +401,41 @@ export default async function MonEspacePage() {
             </div>
           </div>
           <div
-            className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-5 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-6 ${
+            className={`relative mt-8 w-full overflow-hidden rounded-[2rem] border border-[var(--surface-highlight)]/80 bg-[var(--surface)]/95 p-5 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[var(--border)]/80 backdrop-blur-[2px] sm:p-6 ${
               workspace.project ? "lg:col-start-1 lg:row-start-2" : ""
             }`}
           >
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_46%)]"
+              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgb(var(--tyash-glow-rgb)/0.045),transparent_46%)]"
             />
             <div className="relative">
-              <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+              <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-label-text)]">
                 Introduction
               </p>
-              <div className="space-y-4 pt-4 text-[#6b625a]">
-                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+              <div className="space-y-4 pt-4 text-[var(--text-primary)]">
+                <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
                   Bienvenue dans le Brand Studio
                 </p>
-                <p className="rounded-[1.35rem] border border-[#e5ded3] bg-[#fbf8f1] px-5 py-3 text-[1.05rem] leading-7 italic text-[#505563] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                <p className="rounded-[1.35rem] border border-[var(--border)] bg-[var(--background)] px-5 py-3 text-[1.05rem] leading-7 italic text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.85)]">
                   Hello, ça y est, c&apos;est le grand moment ! Je te remercie
                   encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
                   belle mission de structurer ton identité de marque. Es-tu prêt
                   à entrer dans la peau d&apos;un Directeur Artistique ?
                 </p>
                 <div
-                  className={`grid gap-3 text-base leading-7 text-[#6f645b] ${
+                  className={`grid gap-3 text-base leading-7 text-[var(--text-primary)] ${
                     workspace.project ? "" : "lg:grid-cols-3 lg:gap-6"
                   }`}
                 >
                   <p className={`pb-3 ${workspace.project ? "" : "lg:pb-0 lg:pr-6"}`}>
                     Ce guide est le document de référence de ton identité,{" "}
-                    <span className="font-semibold italic text-[#5f544a]">
+                    <span className="font-semibold italic text-[var(--text-primary)]">
                       un kit clé en main pour poser les bases d&apos;une marque forte.
                     </span>
                   </p>
                   <p
-                    className={`border-t border-[#eadfca] py-3 ${
+                    className={`border-t border-[var(--border)] py-3 ${
                       workspace.project
                         ? ""
                         : "lg:border-l lg:border-t-0 lg:px-6 lg:py-0"
@@ -443,19 +443,19 @@ export default async function MonEspacePage() {
                   >
                     Il rassemble les fondations stratégiques et visuelles de ta
                     marque afin de garantir une communication{" "}
-                    <strong className="font-extrabold text-[#4b4550]">
+                    <strong className="font-extrabold text-[var(--heading-color)]">
                       cohérente, professionnelle et durable
                     </strong>
                     .
                   </p>
                   <p
-                    className={`border-t border-[#eadfca] pt-3 ${
+                    className={`border-t border-[var(--border)] pt-3 ${
                       workspace.project
                         ? ""
                         : "lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
                     }`}
                   >
-                    <span className="font-black text-[#cf7430]">Cadre de travail :</span>{" "}
+                    <span className="font-black text-[var(--tyash-label-text)]">Cadre de travail :</span>{" "}
                     utilise-le comme un repère pour créer, décliner et faire
                     évoluer ta marque en toute autonomie.
                   </p>
@@ -470,20 +470,20 @@ export default async function MonEspacePage() {
                     </Link>
                     <div className="w-full max-w-[13rem] sm:text-right">
                       <div className="flex items-end justify-between gap-3 sm:justify-end">
-                        <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Progression
                         </p>
-                        <p className="text-lg font-black leading-none text-[#4b4550]">
+                        <p className="text-lg font-black leading-none text-[var(--heading-color)]">
                           {workspace.progressPercent}%
                         </p>
                       </div>
-                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#f1ece5]">
+                      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
                         <div
-                          className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
+                          className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)]"
                           style={{ width: `${workspace.progressPercent}%` }}
                         />
                       </div>
-                      <p className="mt-1.5 text-[0.65rem] text-[#8a8077]">
+                      <p className="mt-1.5 text-[0.65rem] text-[var(--text-muted)]">
                         {workspace.completedModulesCount}/{workspace.totalModulesCount} modules terminés
                       </p>
                     </div>
@@ -493,30 +493,30 @@ export default async function MonEspacePage() {
             </div>
           </div>
         </div>
-        <div className="border-b border-[#eadfca] pb-8 pt-1 sm:pb-10">
-          <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[#5d5259] sm:text-[2.9rem] lg:text-[3.35rem]">
+        <div className="border-b border-[var(--border)] pb-8 pt-1 sm:pb-10">
+          <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[var(--text-primary)] sm:text-[2.9rem] lg:text-[3.35rem]">
             Ton histoire commence ici, écrivons-la ensemble !
           </p>
         </div>
 
         {!workspace.project ? (
-          <section className="rounded-[2rem] border border-[#eadfca] bg-white p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] sm:p-8">
+          <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--card)] p-6 shadow-[0_18px_46px_rgba(210,189,152,0.1)] sm:p-8">
             <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
               <div>
-                <p className="inline-flex rounded-full bg-[#f2eef7] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#7a7087]">
+                <p className="inline-flex rounded-full bs-status-light bg-[#f2eef7] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
                   Création
                 </p>
-                <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[#4b4550] sm:text-[3rem]">
+                <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[var(--heading-color)] sm:text-[3rem]">
                   Lance ton projet
                 </h2>
-                <p className="mt-4 max-w-xl text-base leading-8 text-[#7b7068]">
+                <p className="mt-4 max-w-xl text-base leading-8 text-[var(--text-muted)]">
                   Le projet commence simplement avec le nom de ton entreprise et
                   ton logo (si tu en as déjà un). Tu pourras ensuite suivre
                   l&apos;ensemble des modules et des exercices.
                 </p>
               </div>
 
-              <div className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffdf7] p-6">
+              <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] p-6">
                 <ProjectNameForm />
               </div>
             </div>
@@ -526,7 +526,7 @@ export default async function MonEspacePage() {
         {workspace.project ? (
           <section className="grid gap-6">
             {workspace.modules.length === 0 ? (
-              <div className="rounded-[1.6rem] border border-[#eadfca] bg-white p-6 text-base leading-8 text-[#7b7068] shadow-[0_18px_46px_rgba(210,189,152,0.1)]">
+              <div className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--card)] p-6 text-base leading-8 text-[var(--text-muted)] shadow-[0_18px_46px_rgba(210,189,152,0.1)]">
                 Aucun module n&apos;est encore publie. Un administrateur peut les
                 ajouter depuis l&apos;espace de gestion.
               </div>

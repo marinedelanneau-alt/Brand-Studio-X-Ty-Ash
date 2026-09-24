@@ -46,9 +46,9 @@ export default function CheckoutButton() {
       <div>
         <label
           htmlFor="checkout-email"
-          className="mb-2 block text-sm font-bold text-[#4b4550]"
+          className="mb-2 block text-sm font-bold text-[var(--heading-color)]"
         >
-          E-mail <span className="text-[#b84a33]">*</span>
+          E-mail <span className="text-[var(--status-error-text)]">*</span>
         </label>
         <input
           id="checkout-email"
@@ -61,17 +61,17 @@ export default function CheckoutButton() {
           onChange={(event) => setEmail(event.target.value)}
           disabled={isLoading}
           placeholder="email@exemple.com"
-          className="h-12 w-full rounded-[0.9rem] border border-[#dfd5c6] bg-white px-4 text-sm text-[#4b4550] outline-none transition placeholder:text-[#aaa098] focus:border-[#df9b39] focus:ring-2 focus:ring-[#df9b39]/20 disabled:cursor-wait disabled:opacity-70"
+          className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-sm text-[var(--heading-color)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--tyash-primary)] focus:ring-2 focus:ring-[var(--tyash-focus-ring)]/20 disabled:cursor-wait disabled:opacity-70"
         />
       </div>
       <button
         type="submit"
         disabled={isLoading}
-        className="flex h-14 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+        className="flex h-14 w-full items-center justify-center rounded-[1rem] bs-button-primary px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgb(var(--tyash-glow-rgb)/0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {isLoading ? "Ouverture..." : "Accéder à la formation"}
       </button>
-      {error ? <p className="text-sm font-semibold text-[#b84a33]">{error}</p> : null}
+      {error ? <p className="text-sm font-semibold text-[var(--status-error-text)]">{error}</p> : null}
     </form>
   );
 }

@@ -85,7 +85,7 @@ export default function BrandGuideLayout({
 
   return (
     <div
-      className="min-h-screen bg-[var(--guide-bg)] px-4 py-6 text-[var(--guide-text)] sm:px-6 lg:px-8 print:bg-white print:px-0 print:py-0"
+      className="bs-export-surface min-h-screen bg-[var(--guide-bg)] px-4 py-6 text-[var(--guide-text)] sm:px-6 lg:px-8 print:bg-[var(--card)] print:px-0 print:py-0"
       style={themeStyle}
     >
       <div className="mx-auto max-w-6xl">
@@ -93,7 +93,7 @@ export default function BrandGuideLayout({
           <div className="flex flex-wrap gap-3">
             <Link
               href={backHref}
-              className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+              className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
             >
               {backLabel}
             </Link>
@@ -142,7 +142,7 @@ export default function BrandGuideLayout({
           <article id="brand-guide-document" className="space-y-8 print:space-y-6">
             <GuideCover guide={guide} />
             <GuideSection kicker="Introduction" title="Comment utiliser ce guide">
-              <p className="max-w-3xl text-lg leading-9 text-[#625850]">
+              <p className="max-w-3xl text-lg leading-9 text-[var(--text-primary)]">
                 {guide.introduction}
               </p>
             </GuideSection>
@@ -235,8 +235,8 @@ function CompletionBanner({
           <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--guide-accent)]">
             Etat du guide
           </p>
-          <p className="mt-2 text-lg font-semibold text-[#4b4550]">{warning}</p>
-          <p className="mt-2 text-sm leading-6 text-[#7b7068]">
+          <p className="mt-2 text-lg font-semibold text-[var(--heading-color)]">{warning}</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
             {latestGeneratedAt
               ? `Dernière génération sauvegardée : ${formatDate(latestGeneratedAt)}`
               : "Aucun snapshot sauvegarde pour le moment."}
@@ -253,17 +253,17 @@ function CompletionBanner({
             href={item.moduleHref ?? "/brand-guide"}
             className={`rounded-full border px-3 py-2 text-xs font-extrabold uppercase tracking-[0.12em] ${
               item.status === "ok"
-                ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
+                ? "border-[#d6e8d8] bs-status-light bg-[#eef6eb] text-[var(--status-success-text)]"
                 : item.status === "optional"
-                  ? "border-[#eadfca] bg-[#fff8f1] text-[#7b7068]"
-                  : "border-[#efd7b8] bg-[#fff6e3] text-[#cf7430]"
+                  ? "border-[var(--border)] bg-[var(--tyash-subtle)] text-[var(--text-muted)]"
+                  : "border-[var(--tyash-border)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]"
             }`}
           >
             {item.label} : {item.status === "ok" ? "OK" : item.status === "optional" ? "optionnel" : "à compléter"}
           </Link>
         ))}
       </div>
-      {message ? <p className="mt-3 text-sm font-semibold text-[#5f8d63]">{message}</p> : null}
+      {message ? <p className="mt-3 text-sm font-semibold text-[var(--status-success-text)]">{message}</p> : null}
     </section>
   );
 }
@@ -280,20 +280,20 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
             <h1 className="mt-7 font-[family:var(--font-cormorant)] text-[3rem] leading-[0.92] text-[var(--guide-text)] sm:text-[4.5rem]">
               {guide.cover.title}
             </h1>
-            <p className="mt-6 max-w-2xl text-xl leading-8 text-[#6f645b]">
+            <p className="mt-6 max-w-2xl text-xl leading-8 text-[var(--text-primary)]">
               {guide.cover.subtitle}
             </p>
           </div>
           <div className="mt-10">
-            <p className="text-base italic leading-8 text-[#5f544a]">{guide.cover.introLine}</p>
-            <p className="mt-4 text-sm font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <p className="text-base italic leading-8 text-[var(--text-primary)]">{guide.cover.introLine}</p>
+            <p className="mt-4 text-sm font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Généré le {formatDate(guide.generatedAt)}
             </p>
           </div>
         </div>
         <div className="flex min-h-[22rem] items-center justify-center">
           {guide.brandAssets.logoUrl ? (
-            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-white/70 bg-white px-10 py-8">
+            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-[var(--surface-highlight)]/70 bg-[var(--card)] px-10 py-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={guide.brandAssets.logoUrl}
@@ -302,7 +302,7 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
               />
             </div>
           ) : (
-            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-white p-8 text-center text-sm font-semibold text-[#7b7068]">
+            <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-[var(--card)] p-8 text-center text-sm font-semibold text-[var(--text-muted)]">
               Ajoute ton logo pour personnaliser la couverture.
             </div>
           )}
@@ -345,10 +345,10 @@ export function GuideCard({
 }) {
   return (
     <article className={`${wide ? "mt-4" : ""} rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)] px-5 py-5`}>
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
         {label}
       </p>
-      <p className="mt-3 whitespace-pre-line text-[0.98rem] leading-7 text-[#5f544a]">
+      <p className="mt-3 whitespace-pre-line text-[0.98rem] leading-7 text-[var(--text-primary)]">
         {value}
       </p>
     </article>
@@ -374,11 +374,11 @@ export function GuideColorPalette({
         <article key={color.id} className="overflow-hidden rounded-[0.75rem] border border-[var(--guide-border)] bg-[var(--guide-card)]">
           <div className="h-24" style={{ background: color.css }} />
           <div className="p-4">
-            <p className="text-sm font-black text-[#4b4550]">{color.name}</p>
-            <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430]">
+            <p className="text-sm font-black text-[var(--heading-color)]">{color.name}</p>
+            <p className="mt-1 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)]">
               {color.hex}
             </p>
-            <p className="mt-2 text-sm leading-6 text-[#6f645b]">{color.usage}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">{color.usage}</p>
           </div>
         </article>
       ))}
@@ -392,12 +392,12 @@ export function GuideMoodboard({ items, backgroundColor }: { items: GuideMoodboa
   }
 
   return (
-    <div className="mx-auto mt-5 w-full max-w-3xl rounded-[1rem] border border-[var(--guide-border)] bg-[#f5eee4] p-3 shadow-[0_18px_44px_rgba(78,58,38,0.1)]">
+    <div className="mx-auto mt-5 w-full max-w-3xl rounded-[1rem] border border-[var(--guide-border)] bg-[var(--surface-secondary)] p-3 shadow-[0_18px_44px_rgba(78,58,38,0.1)]">
       <div className="relative aspect-[4/5] overflow-hidden rounded-[0.8rem]" style={{ backgroundColor }}>
         {items.slice().sort((left, right) => left.zIndex - right.zIndex).map((item) => (
           <div
             key={item.id}
-            className="absolute overflow-hidden rounded-[0.7rem] border border-white/80 bg-white shadow-[0_10px_24px_rgba(62,48,34,0.12)]"
+            className="absolute overflow-hidden rounded-[0.7rem] border border-[var(--surface-highlight)]/80 bg-[var(--card)] shadow-[0_10px_24px_rgba(62,48,34,0.12)]"
             style={{
               left: `${item.x}%`,
               top: `${item.y}%`,
@@ -439,13 +439,13 @@ export function GuideMoodboard({ items, backgroundColor }: { items: GuideMoodboa
 
 export function GuideChecklist({ title, items }: { title: string; items: string[] }) {
   return (
-    <article className="rounded-[0.75rem] border border-[#eadfca] bg-white px-5 py-5">
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+    <article className="rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-5 py-5">
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
         {title}
       </p>
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
-          <li key={item} className="flex gap-3 text-sm leading-6 text-[#5f544a]">
+          <li key={item} className="flex gap-3 text-sm leading-6 text-[var(--text-primary)]">
             <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--guide-accent)]" />
             <span>{item}</span>
           </li>
@@ -467,7 +467,7 @@ export function GuideSummary({
       <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--guide-accent)]">
         Synthèse express
       </p>
-      <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.98] text-[#3f3945]">
+      <h2 className="mt-3 font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.98] text-[var(--heading-color)]">
         {guide.brandName} en une page
       </h2>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -484,11 +484,11 @@ export function GuideSummary({
 
 export function EmptyGuideState() {
   return (
-    <section className="rounded-[1.4rem] border border-[#eadfca] bg-white p-8 text-center shadow-[0_18px_46px_rgba(210,189,152,0.08)]">
-      <p className="font-[family:var(--font-cormorant)] text-[2.5rem] leading-tight text-[#3f3945]">
+    <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-[0_18px_46px_rgba(210,189,152,0.08)]">
+      <p className="font-[family:var(--font-cormorant)] text-[2.5rem] leading-tight text-[var(--heading-color)]">
         Ton guide attend encore ses premières matières.
       </p>
-      <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[#6f645b]">
+      <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
         Complète au moins une réponse dans les modules Brand Studio pour générer un guide personnalisé.
       </p>
       <Link href="/mon-espace" className={`${primaryButtonClass} mt-6`}>
@@ -608,13 +608,13 @@ function getReadableTextColor(hex: string) {
 function tabClass(active: boolean) {
   return `inline-flex h-11 items-center justify-center rounded-[0.9rem] border px-5 text-xs font-extrabold uppercase tracking-[0.12em] ${
     active
-      ? "border-[#cf7430] bg-[#fff6e3] text-[#cf7430]"
-      : "border-[#eadfca] bg-white text-[#6b625a]"
+      ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]"
+      : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
   }`;
 }
 
 const primaryButtonClass =
-  "inline-flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgba(223,155,57,0.18)]";
+  "inline-flex h-11 items-center justify-center rounded-[0.9rem] bs-button-primary px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_26px_rgb(var(--tyash-glow-rgb)/0.18)]";
 
 const secondaryButtonClass =
-  "inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-60";
+  "inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-60";

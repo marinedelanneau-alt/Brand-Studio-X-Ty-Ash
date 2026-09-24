@@ -22,8 +22,8 @@ export type ModuleShareData = {
 const FALLBACK_COLORS = {
   background: "#fbf4ea",
   surface: "#fffdf8",
-  accent: "#cf7430",
-  accentSoft: "#f1cc56",
+  accent: "#7a2d46",
+  accentSoft: "#f5e4eb",
   text: "#332d35",
   muted: "#6f645b",
 };

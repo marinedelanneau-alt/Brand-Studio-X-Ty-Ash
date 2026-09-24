@@ -11,7 +11,7 @@ export default async function LegalDocumentPage({ type, title, preview }: { type
     await getAuthenticatedAdmin();
     document = (await getLegalDocumentsForAdmin()).find((item) => item.id === preview && item.document_type === type) ?? null;
   }
-  return <main className="mx-auto w-full max-w-3xl px-5 py-12 text-[#4b4550]">
+  return <main className="mx-auto w-full max-w-3xl px-5 py-12 text-[var(--heading-color)]">
     <Link href="/" className="underline">Retour à Brand Studio</Link>
     <h1 className="my-6 text-3xl font-semibold">{title}</h1>
     {preview ? <p className="mb-6 rounded-xl bg-amber-100 p-4">Prévisualisation administrateur — document non publié.</p> : null}

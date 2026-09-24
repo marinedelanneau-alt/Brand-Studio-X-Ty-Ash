@@ -114,10 +114,10 @@ export default function BrandPersonaAdminEditor({
   }
 
   return (
-    <div className="space-y-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf4] p-5">
+    <div className="space-y-5 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-5">
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_14rem]">
         <label className="space-y-2">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Libelle du bouton final
           </span>
           <input
@@ -126,16 +126,16 @@ export default function BrandPersonaAdminEditor({
             onChange={(event) =>
               onChange({ ...value, summaryCtaLabel: event.target.value })
             }
-            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
           />
         </label>
 
-        <label className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
+        <label className="flex items-center justify-between rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3">
           <span>
-            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Exercice actif
             </span>
-            <span className="mt-1 block text-sm leading-6 text-[#7b7068]">
+            <span className="mt-1 block text-sm leading-6 text-[var(--text-muted)]">
               Masque ou affiche ce persona cote utilisateur.
             </span>
           </span>
@@ -154,11 +154,11 @@ export default function BrandPersonaAdminEditor({
         {value.sections.map((section, sectionIndex) => (
           <div
             key={section.id}
-            className="rounded-[1.1rem] border border-[#eadfca] bg-white p-4 shadow-[0_8px_24px_rgba(210,189,152,0.08)]"
+            className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--card)] p-4 shadow-[0_8px_24px_rgba(210,189,152,0.08)]"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Section {sectionIndex + 1}
                 </p>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -172,7 +172,7 @@ export default function BrandPersonaAdminEditor({
                       }))
                     }
                     placeholder="Titre de section"
-                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf9] px-4"
+                    className="h-12 rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                   />
                   <input
                     type="text"
@@ -184,7 +184,7 @@ export default function BrandPersonaAdminEditor({
                       }))
                     }
                     placeholder="section_key"
-                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf9] px-4"
+                    className="h-12 rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                   />
                 </div>
                 <textarea
@@ -196,12 +196,12 @@ export default function BrandPersonaAdminEditor({
                     }))
                   }
                   placeholder="Courte explication visible cote utilisateur"
-                  className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf9] px-4 py-3"
+                  className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                 />
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-2 rounded-full border border-[#eadfca] bg-[#fff8f1] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+                <label className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
                   <span>Active</span>
                   <input
                     type="checkbox"
@@ -226,7 +226,7 @@ export default function BrandPersonaAdminEditor({
                       ),
                     })
                   }
-                  className="rounded-[0.75rem] border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-50"
+                  className="rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-50"
                 >
                   Monter
                 </button>
@@ -241,7 +241,7 @@ export default function BrandPersonaAdminEditor({
                       ),
                     })
                   }
-                  className="rounded-[0.75rem] border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-50"
+                  className="rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-50"
                 >
                   Descendre
                 </button>
@@ -255,7 +255,7 @@ export default function BrandPersonaAdminEditor({
                       ),
                     })
                   }
-                  className="px-2 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                  className="px-2 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                 >
                   Supprimer
                 </button>
@@ -266,14 +266,14 @@ export default function BrandPersonaAdminEditor({
               {section.questions.map((question, questionIndex) => (
                 <div
                   key={question.id}
-                  className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf9] p-4"
+                  className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       Question {questionIndex + 1}
                     </p>
                     <div className="flex flex-wrap items-center gap-2">
-                      <label className="flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#6b625a]">
+                      <label className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
                         <span>Obligatoire</span>
                         <input
                           type="checkbox"
@@ -287,7 +287,7 @@ export default function BrandPersonaAdminEditor({
                           className="h-4 w-4"
                         />
                       </label>
-                      <label className="flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#6b625a]">
+                      <label className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
                         <span>Active</span>
                         <input
                           type="checkbox"
@@ -313,7 +313,7 @@ export default function BrandPersonaAdminEditor({
                             ),
                           }))
                         }
-                        className="rounded-[0.75rem] border border-[#eadfca] bg-white px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-50"
+                        className="rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-50"
                       >
                         Monter
                       </button>
@@ -329,7 +329,7 @@ export default function BrandPersonaAdminEditor({
                             ),
                           }))
                         }
-                        className="rounded-[0.75rem] border border-[#eadfca] bg-white px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-50"
+                        className="rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-50"
                       >
                         Descendre
                       </button>
@@ -344,7 +344,7 @@ export default function BrandPersonaAdminEditor({
                             ),
                           }))
                         }
-                        className="px-2 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#b45247]"
+                        className="px-2 py-2 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                       >
                         Supprimer
                       </button>
@@ -353,7 +353,7 @@ export default function BrandPersonaAdminEditor({
 
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <label className="space-y-2 md:col-span-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Libelle
                       </span>
                       <input
@@ -365,12 +365,12 @@ export default function BrandPersonaAdminEditor({
                             label: event.target.value,
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Identifiant
                       </span>
                       <input
@@ -382,12 +382,12 @@ export default function BrandPersonaAdminEditor({
                             id: event.target.value.trim().toLowerCase().replace(/\s+/g, "_"),
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Type de champ
                       </span>
                       <select
@@ -398,7 +398,7 @@ export default function BrandPersonaAdminEditor({
                             fieldType: event.target.value as BrandPersonaFieldType,
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       >
                         {Object.entries(FIELD_TYPE_LABELS).map(([value, label]) => (
                           <option key={value} value={value}>
@@ -409,7 +409,7 @@ export default function BrandPersonaAdminEditor({
                     </label>
 
                     <label className="space-y-2 md:col-span-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Helper text
                       </span>
                       <textarea
@@ -420,12 +420,12 @@ export default function BrandPersonaAdminEditor({
                             helperText: event.target.value,
                           }))
                         }
-                        className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                        className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Placeholder
                       </span>
                       <input
@@ -437,12 +437,12 @@ export default function BrandPersonaAdminEditor({
                             placeholder: event.target.value,
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Exemple
                       </span>
                       <input
@@ -454,13 +454,13 @@ export default function BrandPersonaAdminEditor({
                             example: event.target.value,
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       />
                     </label>
 
                     {question.fieldType === "checkbox" || question.fieldType === "select" ? (
                       <label className="space-y-2 md:col-span-2">
-                        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                           Options, une ligne par choix
                         </span>
                         <textarea
@@ -474,7 +474,7 @@ export default function BrandPersonaAdminEditor({
                                 .filter(Boolean),
                             }))
                           }
-                          className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                          className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                           placeholder="Option 1&#10;Option 2&#10;Option 3"
                         />
                       </label>
@@ -494,7 +494,7 @@ export default function BrandPersonaAdminEditor({
                     ),
                   }))
                 }
-                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-dashed border-[#d9c7ab] bg-[#fff8f1] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-dashed border-[var(--border)] bg-[var(--tyash-subtle)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
               >
                 Ajouter une question
               </button>
@@ -514,7 +514,7 @@ export default function BrandPersonaAdminEditor({
             ]),
           })
         }
-        className="flex h-12 items-center justify-center rounded-[0.9rem] border border-dashed border-[#d9c7ab] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+        className="flex h-12 items-center justify-center rounded-[0.9rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
       >
         Ajouter une section
       </button>

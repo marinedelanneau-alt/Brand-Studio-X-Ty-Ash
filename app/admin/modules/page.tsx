@@ -65,24 +65,24 @@ export default async function AdminModulesPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[1.4rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] p-6 shadow-[0_16px_40px_rgba(210,189,152,0.1)]">
-        <p className="inline-flex rounded-full bg-[#fff6e3] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+      <section className="rounded-[1.4rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-6 shadow-[0_16px_40px_rgba(210,189,152,0.1)]">
+        <p className="inline-flex rounded-full bg-[var(--tyash-soft)] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
           Modules
         </p>
-        <h1 className="mt-5 font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.96] text-[#4b4550] sm:text-[3.2rem]">
+        <h1 className="mt-5 font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.96] text-[var(--heading-color)] sm:text-[3.2rem]">
           Gestion des modules
         </h1>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-[#7b7068]">
+        <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--text-muted)]">
           Tes modifications sont enregistrees dans une copie de travail visible
           uniquement dans ton espace Marine Communication. Les autres utilisateurs
           gardent la version publiee jusqu&apos;au deploiement global.
         </p>
         {controlledReleasesEnabled ? (
-          <div className="mt-5 rounded-2xl border border-[#d9e6d5] bg-[#f7fbf5] p-5">
-            <p className="font-bold text-[#55745a]">
+          <div className="mt-5 rounded-2xl border border-[#d9e6d5] bs-status-light bg-[#f7fbf5] p-5">
+            <p className="font-bold text-[var(--status-success-text)]">
               Brouillon ADMIN privé
             </p>
-            <p className="mt-2 text-sm leading-6 text-[#637466]">
+            <p className="mt-2 text-sm leading-6 text-[var(--status-success-text)]">
               Tes changements restent visibles uniquement par ton compte ADMIN.
               Publier crée une nouvelle version finale pour tous les utilisateurs.
             </p>
@@ -98,18 +98,18 @@ export default async function AdminModulesPage({
         ) : (
           <AdminDeploymentButton />
         )}
-        {!controlledReleasesEnabled ? <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 p-5">
-          <h2 className="text-lg font-semibold text-[#4b4550]">Programmer le déploiement</h2>
-          <p className="mt-1 text-sm text-[#7b7068]">La date et l’heure sont interprétées en heure de Paris.</p>
-          {activeSchedule ? <div className="mt-4 rounded-xl bg-[#fff6e3] p-4 text-sm"><strong>Programmé le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date(activeSchedule.scheduled_at))}</strong>{activeSchedule.notes ? <p className="mt-1">{activeSchedule.notes}</p> : null}<form action={cancelAdminDraftDeployment} className="mt-3"><button className="rounded-xl border border-[#cf7430] px-4 py-2 text-[#9b5424]">Annuler la programmation</button></form></div> :
+        {!controlledReleasesEnabled ? <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--card)]/70 p-5">
+          <h2 className="text-lg font-semibold text-[var(--heading-color)]">Programmer le déploiement</h2>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">La date et l’heure sont interprétées en heure de Paris.</p>
+          {activeSchedule ? <div className="mt-4 rounded-xl bg-[var(--tyash-soft)] p-4 text-sm"><strong>Programmé le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date(activeSchedule.scheduled_at))}</strong>{activeSchedule.notes ? <p className="mt-1">{activeSchedule.notes}</p> : null}<form action={cancelAdminDraftDeployment} className="mt-3"><button className="rounded-xl border border-[var(--tyash-primary)] px-4 py-2 text-[var(--tyash-label-text)]">Annuler la programmation</button></form></div> :
           <form action={scheduleAdminDraftDeployment} className="mt-4 flex flex-wrap items-end gap-3">
-            <label className="text-sm"><span className="mb-1 block">Date et heure</span><input required name="scheduledAt" type="datetime-local" className="h-11 rounded-xl border border-[#eadfca] bg-white px-3" /></label>
-            <label className="min-w-64 flex-1 text-sm"><span className="mb-1 block">Note facultative</span><input name="notes" className="h-11 w-full rounded-xl border border-[#eadfca] bg-white px-3" placeholder="Contenu de cette publication" /></label>
-            <button className="h-11 rounded-xl bg-[#d98632] px-5 font-bold text-white">Programmer</button>
+            <label className="text-sm"><span className="mb-1 block">Date et heure</span><input required name="scheduledAt" type="datetime-local" className="h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3" /></label>
+            <label className="min-w-64 flex-1 text-sm"><span className="mb-1 block">Note facultative</span><input name="notes" className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] px-3" placeholder="Contenu de cette publication" /></label>
+            <button className="h-11 rounded-xl bs-button-primary px-5 font-bold text-[var(--tyash-text-on-primary)]">Programmer</button>
           </form>}
         </div> : null}
         {message ? (
-          <p className="mt-5 text-sm leading-6 text-[#6b625a]">{message}</p>
+          <p className="mt-5 text-sm leading-6 text-[var(--text-primary)]">{message}</p>
         ) : null}
       </section>
 

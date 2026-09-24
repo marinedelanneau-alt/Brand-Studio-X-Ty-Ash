@@ -23,7 +23,7 @@ export default function ModulePreviewTrigger({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a] shadow-[0_10px_24px_rgba(210,189,152,0.12)] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)] shadow-[0_10px_24px_rgba(210,189,152,0.12)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
         aria-label="Afficher le texte du module"
         title="Afficher le texte du module"
       >

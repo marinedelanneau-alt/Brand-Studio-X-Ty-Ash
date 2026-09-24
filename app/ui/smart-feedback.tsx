@@ -9,31 +9,31 @@ import {
 
 const LEVEL_STYLES = {
   improve: {
-    border: "border-[#eadfca]",
-    bg: "bg-[#fffaf4]",
-    text: "text-[#7f6856]",
-    badge: "bg-[#f7ead7] text-[#b07b48]",
+    border: "border-[var(--border)]",
+    bg: "bg-[var(--tyash-subtle)]",
+    text: "text-[var(--text-primary)]",
+    badge: "bs-status-light bg-[#f7ead7] text-[var(--status-warning-text)]",
     label: "À ajuster",
   },
   warning: {
-    border: "border-[#e8dccb]",
-    bg: "bg-[#fffaf6]",
-    text: "text-[#7b6453]",
-    badge: "bg-[#f6e7db] text-[#b16f52]",
+    border: "border-[var(--border)]",
+    bg: "bg-[var(--tyash-subtle)]",
+    text: "text-[var(--text-primary)]",
+    badge: "bs-status-light bg-[#f6e7db] text-[var(--status-warning-text)]",
     label: "À préciser",
   },
   good: {
     border: "border-[#dde7df]",
-    bg: "bg-[#fbfdfb]",
+    bg: "bs-status-light bg-[#fbfdfb]",
     text: "text-[#5d6f61]",
-    badge: "bg-[#e9f1eb] text-[#5f8d63]",
+    badge: "bs-status-light bg-[#e9f1eb] text-[var(--status-success-text)]",
     label: "Bonne base",
   },
   excellent: {
     border: "border-[#e8dec7]",
-    bg: "bg-[#fffdf8]",
-    text: "text-[#6a5c44]",
-    badge: "bg-[#fff1d9] text-[#c08a2c]",
+    bg: "bg-[var(--surface)]",
+    text: "text-[var(--text-primary)]",
+    badge: "bs-status-light bg-[#fff1d9] text-[var(--status-warning-text)]",
     label: "Excellent",
   },
 } as const;
@@ -75,7 +75,7 @@ export default function SmartFeedback({
           {style.label}
         </span>
         {typeof feedback.clarityScore === "number" ? (
-          <span className="text-xs font-semibold text-[#8a8077]">
+          <span className="text-xs font-semibold text-[var(--text-muted)]">
             Clarté : {feedback.clarityScore}/100 ({getClarityLabel(feedback.clarityScore)})
           </span>
         ) : null}

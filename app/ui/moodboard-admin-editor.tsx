@@ -11,33 +11,33 @@ export default function MoodboardAdminEditor({
   onChange: (nextValue: MoodboardConfig) => void;
 }) {
   return (
-    <div className="space-y-4 rounded-[1rem] border border-[#eadfca] bg-[#fff8f1] p-4">
+    <div className="space-y-4 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Exercice Moodboard
           </p>
-          <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+          <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
             Configure une trame, le nombre de blocs et les actions autorisees.
           </p>
         </div>
         <button
           type="button"
           onClick={() => onChange(getDefaultMoodboardConfig())}
-          className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a]"
+          className="rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
         >
           Reinitialiser
         </button>
       </div>
 
       <label className="space-y-2">
-        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Template par defaut
         </span>
         <select
           value={value.templateId}
           onChange={(event) => onChange({ ...value, templateId: event.target.value })}
-          className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+          className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
         >
           {MOODBOARD_TEMPLATES.map((template) => (
             <option key={template.id} value={template.id}>
@@ -49,7 +49,7 @@ export default function MoodboardAdminEditor({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Nombre maximum d&apos;images
           </span>
           <input
@@ -63,11 +63,11 @@ export default function MoodboardAdminEditor({
                 maxImages: Math.min(Math.max(Number(event.target.value) || 1, 1), 12),
               })
             }
-            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
           />
         </label>
         <label className="space-y-2">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Nombre maximum de blocs texte
           </span>
           <input
@@ -81,7 +81,7 @@ export default function MoodboardAdminEditor({
                 maxTextBlocks: Math.min(Math.max(Number(event.target.value) || 0, 0), 6),
               })
             }
-            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
           />
         </label>
       </div>
@@ -137,8 +137,8 @@ function ToggleCard({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
-      <span className="text-sm font-semibold text-[#5f544a]">{label}</span>
+    <label className="flex items-center justify-between rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3">
+      <span className="text-sm font-semibold text-[var(--text-primary)]">{label}</span>
       <input
         type="checkbox"
         checked={checked}

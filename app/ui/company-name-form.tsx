@@ -35,7 +35,7 @@ export default function CompanyNameForm({
   if (shouldShowDisplay) {
     return (
       <div className="mt-3 space-y-1.5">
-        <p className="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]">
+        <p className="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Nom de l&apos;entreprise
         </p>
         <button
@@ -44,12 +44,12 @@ export default function CompanyNameForm({
             setEditVersion((current) => current + 1);
             setIsEditing(true);
           }}
-          className="group flex min-h-10 w-full items-center justify-between gap-3 rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-left text-sm text-[#6a5d53] transition hover:border-[#cf7430] hover:bg-white"
+          className="group flex min-h-10 w-full items-center justify-between gap-3 rounded-[0.8rem] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-left text-sm text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:bg-[var(--card)]"
           aria-label="Modifier le nom de l'entreprise"
           title="Modifier le nom de l'entreprise"
         >
           <span className="min-w-0 break-words">{companyName}</span>
-          <PencilSquareIcon className="h-4 w-4 shrink-0 text-[#cf7430] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" />
+          <PencilSquareIcon className="h-4 w-4 shrink-0 text-[var(--tyash-label-text)] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" />
         </button>
       </div>
     );
@@ -64,7 +64,7 @@ export default function CompanyNameForm({
       <div className="space-y-2">
         <label
           htmlFor="company-name"
-          className="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          className="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]"
         >
           Nom de l&apos;entreprise
         </label>
@@ -77,21 +77,21 @@ export default function CompanyNameForm({
           value={companyName}
           onChange={(event) => setCompanyName(event.target.value)}
           placeholder="Ex. Maison Lumiere"
-          className="h-12 w-full rounded-[0.95rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#6a5d53] outline-none transition focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+          className="h-12 w-full rounded-[0.95rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
         />
       </div>
 
       <button
         type="submit"
         disabled={pending}
-        className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430] disabled:cursor-wait disabled:opacity-70"
+        className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)] disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Mise à jour..." : "Enregistrer"}
       </button>
 
       {state.status === "error" && state.message ? (
         <p
-          className="text-sm leading-6 text-[#b45247]"
+          className="text-sm leading-6 text-[var(--status-error-text)]"
         >
           {state.message}
         </p>

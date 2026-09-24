@@ -3,14 +3,14 @@ import type { PersonaCv } from "@/lib/persona-summary";
 
 const styles = StyleSheet.create({
   page: { padding: 42, backgroundColor: "#fffaf2", color: "#403845", fontFamily: "Helvetica" },
-  eyebrow: { fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#cf7430", fontWeight: 700 },
+  eyebrow: { fontSize: 9, letterSpacing: 2, textTransform: "uppercase", color: "#7a2d46", fontWeight: 700 },
   title: { marginTop: 10, fontSize: 32, fontWeight: 700 },
   subtitle: { marginTop: 6, fontSize: 11, color: "#756a70" },
   grid: { marginTop: 24, flexDirection: "row", flexWrap: "wrap", gap: 10 },
   card: { width: "48%", padding: 13, border: "1 solid #eadfca", borderRadius: 8, backgroundColor: "#ffffff" },
   label: { fontSize: 8, letterSpacing: 1.2, textTransform: "uppercase", color: "#8a7080", fontWeight: 700 },
   value: { marginTop: 6, fontSize: 10.5, lineHeight: 1.5 },
-  quote: { marginTop: 18, padding: 14, borderLeft: "3 solid #cf7430", backgroundColor: "#fff3df", fontSize: 12, lineHeight: 1.5, fontStyle: "italic" },
+  quote: { marginTop: 18, padding: 14, borderLeft: "3 solid #7a2d46", backgroundColor: "#f5e4eb", fontSize: 12, lineHeight: 1.5, fontStyle: "italic" },
   section: { marginTop: 20 },
   sectionTitle: { paddingBottom: 6, borderBottom: "1 solid #eadfca", fontSize: 15, fontWeight: 700 },
   entry: { marginTop: 10 },

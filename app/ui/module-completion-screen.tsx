@@ -53,33 +53,33 @@ function CompletionHero({
   const progress = Math.max(0, Math.min(shareData.progress, 100));
 
   return (
-    <section className="bs-completion-hero relative overflow-hidden rounded-[1.75rem] border border-[#e5ded3] bg-[linear-gradient(135deg,#fdfbf6_0%,#fbf8f1_68%,#f7f1e6_100%)] px-6 py-7 shadow-[0_18px_44px_rgba(21,33,59,0.06)] sm:px-8 sm:py-9">
-      <div className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 rounded-full border border-white/70 bg-white/35 sm:block" />
+    <section className="bs-completion-hero relative overflow-hidden rounded-[1.75rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] px-6 py-7 shadow-[0_18px_44px_rgba(21,33,59,0.06)] sm:px-8 sm:py-9">
+      <div className="pointer-events-none absolute right-6 top-6 hidden h-28 w-28 rounded-full border border-[var(--surface-highlight)]/70 bg-white/35 sm:block" />
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
         <div>
-          <span className="inline-flex rounded-full border border-white/70 bg-white/75 px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+          <span className="inline-flex rounded-full border border-[var(--surface-highlight)]/70 bg-[var(--card)]/75 px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
             Module termine
           </span>
-          <h1 className="bs-completion-title mt-5 max-w-3xl font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.95] text-[#332d35] sm:text-[3.35rem]">
+          <h1 className="bs-completion-title mt-5 max-w-3xl font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.95] text-[var(--heading-color)] sm:text-[3.35rem]">
             Bravo, tu viens de terminer {summary.title}.
           </h1>
-          <p className="bs-completion-copy mt-5 max-w-2xl text-base leading-8 text-[#5f544a]">
+          <p className="bs-completion-copy mt-5 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
             Tu as posé une nouvelle base pour ta marque. Voici les éléments essentiels à garder, partager ou reprendre pour avancer.
           </p>
         </div>
 
-        <div className="bs-completion-progress rounded-[1.25rem] border border-white/75 bg-white/70 px-5 py-5">
+        <div className="bs-completion-progress rounded-[1.25rem] border border-[var(--surface-highlight)]/75 bg-[var(--card)]/70 px-5 py-5">
           <div className="flex items-end justify-between">
-            <p className="text-sm font-bold text-[#6f645b]">Progression du module</p>
-            <p className="text-4xl font-black text-[#332d35]">{progress}%</p>
+            <p className="text-sm font-bold text-[var(--text-primary)]">Progression du module</p>
+            <p className="text-4xl font-black text-[var(--heading-color)]">{progress}%</p>
           </div>
-          <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--card)]">
             <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#df9b39,#f1cc56)]"
+              className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)]"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="mt-4 text-sm leading-6 text-[#6f645b]">
+          <p className="mt-4 text-sm leading-6 text-[var(--text-primary)]">
             Une étape terminée, une vision plus nette.
           </p>
         </div>
@@ -94,7 +94,7 @@ function PaletteSummary({ colors }: { colors: ModuleSummaryColor[] }) {
       {colors.map((color, index) => (
         <div
           key={`${color.name}-${color.value}-${index}`}
-          className="flex min-w-[8.5rem] items-center gap-2 rounded-full border border-[#eadfca] bg-[#fffdf8] py-1.5 pl-1.5 pr-3"
+          className="flex min-w-[8.5rem] items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] py-1.5 pl-1.5 pr-3"
         >
           <span
             aria-hidden="true"
@@ -102,10 +102,10 @@ function PaletteSummary({ colors }: { colors: ModuleSummaryColor[] }) {
             style={{ background: color.background }}
           />
           <span className="min-w-0">
-            <span className="block truncate text-xs font-extrabold text-[#4f463f]">
+            <span className="block truncate text-xs font-extrabold text-[var(--text-primary)]">
               {color.name}
             </span>
-            <span className="block text-[0.68rem] font-semibold text-[#7a7087]">
+            <span className="block text-[0.68rem] font-semibold text-[var(--text-muted)]">
               {color.value}
             </span>
           </span>
@@ -117,14 +117,14 @@ function PaletteSummary({ colors }: { colors: ModuleSummaryColor[] }) {
 
 function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
   return (
-    <article className="rounded-[1.1rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_12px_28px_rgba(91,73,57,0.05)]">
-      <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[#7a7087]">
+    <article className="rounded-[1.1rem] border border-[var(--border)] bg-[var(--card)] px-5 py-5 shadow-[0_12px_28px_rgba(91,73,57,0.05)]">
+      <h3 className="text-sm font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
         {item.label}
       </h3>
       {item.colors && item.colors.length > 0 ? (
         <PaletteSummary colors={item.colors} />
       ) : (
-        <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[#6f645b]">
+        <p className="mt-3 whitespace-pre-wrap text-base font-semibold leading-7 text-[var(--text-primary)]">
           {item.value}
         </p>
       )}
@@ -167,10 +167,10 @@ function ModuleKeyTakeaways({
   return (
     <section className="space-y-5">
       <div>
-        <p className="text-sm font-black uppercase tracking-[0.16em] text-[#cf7430]">
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
           Synthese express
         </p>
-        <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
+        <h2 className="mt-2 text-2xl font-extrabold text-[var(--heading-color)]">
           Voici les éléments essentiels que tu viens de construire.
         </h2>
       </div>
@@ -199,27 +199,27 @@ function StorySharePreview({
   onShowBrandNameChange: (show: boolean) => void;
 }) {
   return (
-    <section className="grid gap-7 rounded-[1.5rem] border border-[#eadfca] bg-white px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)] lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-center">
+    <section className="grid gap-7 rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)] lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-center">
       <div className="space-y-5">
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-[#cf7430]">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
             Partager mon avancée
           </p>
-          <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
+          <h2 className="mt-2 text-2xl font-extrabold text-[var(--heading-color)]">
             Une story pour célébrer cette belle avancée 🎉
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6f645b]">
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-primary)]">
             Partage ton avancée pour commencer à communiquer sur ta marque :)
           </p>
         </div>
 
         <div className="space-y-4">
-          <label className="flex items-center gap-3 text-sm font-bold text-[#5f544a]">
+          <label className="flex items-center gap-3 text-sm font-bold text-[var(--text-primary)]">
             <input
               type="checkbox"
               checked={showBrandName}
               onChange={(event) => onShowBrandNameChange(event.target.checked)}
-              className="h-5 w-5 accent-[#cf7430]"
+              className="h-5 w-5 accent-[var(--tyash-primary)]"
             />
             Afficher le nom de ma marque
           </label>
@@ -232,7 +232,7 @@ function StorySharePreview({
             <ShareIcon className="h-4 w-4" />
             {isExportingStory ? "Préparation..." : "Partager en story Instagram"}
           </button>
-          <p className="max-w-md text-sm leading-6 text-[#7b7068]">
+          <p className="max-w-md text-sm leading-6 text-[var(--text-muted)]">
             {/* eslint-disable-next-line react/no-unescaped-entities */}
             Sur mobile, choisis Instagram dans le partage, puis ajoute l'image en story. Si l'option n'apparaît pas, la story sera téléchargée en PNG.
           </p>
@@ -281,12 +281,12 @@ function ModuleDetailAccordion({
   }
 
   return (
-    <section className="rounded-[1.5rem] border border-[#eadfca] bg-white px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)]">
+    <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)]">
       <div>
-        <p className="text-sm font-black uppercase tracking-[0.16em] text-[#cf7430]">
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
           Ce que tu as construit
         </p>
-        <h2 className="mt-2 text-2xl font-extrabold text-[#332d35]">
+        <h2 className="mt-2 text-2xl font-extrabold text-[var(--heading-color)]">
           Le détail par sous-module
         </h2>
       </div>
@@ -304,20 +304,20 @@ function ModuleDetailAccordion({
                 className="flex w-full items-center justify-between gap-4 text-left"
               >
                 <span className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff6e3] text-sm font-black text-[#cf7430]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--tyash-soft)] text-sm font-black text-[var(--tyash-label-text)]">
                     {submodule.position}
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-base font-extrabold leading-6 text-[#332d35]">
+                    <span className="block text-base font-extrabold leading-6 text-[var(--heading-color)]">
                       {submodule.title}
                     </span>
-                    <span className="mt-1 block text-sm text-[#7a7087]">
+                    <span className="mt-1 block text-sm text-[var(--text-muted)]">
                       {submodule.highlights.length} réponse{submodule.highlights.length > 1 ? "s" : ""}
                     </span>
                   </span>
                 </span>
                 <ChevronDownIcon
-                  className={`h-5 w-5 shrink-0 text-[#cf7430] transition ${isOpen ? "rotate-180" : ""}`}
+                  className={`h-5 w-5 shrink-0 text-[var(--tyash-label-text)] transition ${isOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -327,10 +327,10 @@ function ModuleDetailAccordion({
                     submodule.highlights.map((item, index) => (
                       <div
                         key={`${item.label}-${index}`}
-                        className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3"
+                        className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7a7087]">
+                          <p className="text-xs font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
                             {item.label}
                           </p>
                           {item.exerciseId !== undefined ? (
@@ -339,7 +339,7 @@ function ModuleDetailAccordion({
                               onClick={() => onAdjustAnswer(item.exerciseId!)}
                               aria-label="Ajuster ma réponse"
                               title="Ajuster ma réponse"
-                              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#eadfca]/80 bg-transparent text-[#a97955] opacity-70 transition hover:border-[#dfb98d] hover:bg-white hover:text-[#cf7430] hover:opacity-100"
+                              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--border)]/80 bg-transparent text-[var(--tyash-label-text)] opacity-70 transition hover:border-[var(--border)] hover:bg-[var(--card)] hover:text-[var(--tyash-label-text)] hover:opacity-100"
                             >
                               <PencilSquareIcon className="h-3 w-3" />
                             </button>
@@ -348,14 +348,14 @@ function ModuleDetailAccordion({
                         {item.table ? <SummaryAnswerTable table={item.table} /> : item.colors && item.colors.length > 0 ? (
                           <PaletteSummary colors={item.colors} />
                         ) : (
-                          <p className="mt-2 text-sm font-semibold leading-6 text-[#4f463f]">
+                          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--text-primary)]">
                             {item.value}
                           </p>
                         )}
                       </div>
                     ))
                   ) : (
-                    <p className="rounded-[1rem] border border-[#f0e4d3] bg-[#fffdf8] px-4 py-3 text-sm text-[#6f645b]">
+                    <p className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]">
                       Aucune réponse à afficher pour ce sous-module.
                     </p>
                   )}
@@ -391,11 +391,11 @@ function CompletionActions({
   onCopySummary: () => void;
 }) {
   const primaryClass = "bs-button-primary flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] px-5 text-sm font-extrabold sm:w-auto";
-  const secondaryClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold text-[#5f544a] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
-  const softClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[#efd7b8] bg-[#fff6e3] px-5 text-sm font-extrabold text-[#cf7430] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
+  const secondaryClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
+  const softClass = "flex h-12 w-full items-center justify-center gap-2 rounded-[0.95rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-5 text-sm font-extrabold text-[var(--tyash-label-text)] disabled:cursor-wait disabled:opacity-70 sm:w-auto";
 
   return (
-    <section className="rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf8] px-5 py-5">
+    <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] px-5 py-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {nextHref ? (
           <button
@@ -626,7 +626,7 @@ export default function ModuleCompletionScreen({
       />
 
       {statusMessage ? (
-        <p className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-3 text-sm font-bold text-[#5f544a]">
+        <p className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm font-bold text-[var(--text-primary)]">
           {statusMessage}
         </p>
       ) : null}
@@ -638,20 +638,20 @@ export default function ModuleCompletionScreen({
           aria-modal="true"
           aria-label="Ajuster ma réponse"
         >
-          <div className="mx-auto max-w-4xl rounded-[1.6rem] border border-[#eadfca] bg-[#fffdf8] p-5 shadow-[0_24px_70px_rgba(47,36,24,0.2)] sm:p-7">
+          <div className="mx-auto max-w-4xl rounded-[1.6rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_24px_70px_rgba(47,36,24,0.2)] sm:p-7">
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#cf7430]">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
                   Ajuster ma réponse
                 </p>
-                <h2 className="mt-2 text-xl font-extrabold text-[#332d35]">
+                <h2 className="mt-2 text-xl font-extrabold text-[var(--heading-color)]">
                   {adjustedSubmodule.title}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setAdjustedExerciseId(null)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a]"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                 aria-label="Fermer"
               >
                 <XMarkIcon className="h-5 w-5" />
@@ -668,7 +668,7 @@ export default function ModuleCompletionScreen({
               totalSubmodules={module.submodules.length}
             />
 
-            <div className="mt-5 flex justify-end border-t border-[#eadfca] pt-5">
+            <div className="mt-5 flex justify-end border-t border-[var(--border)] pt-5">
               <button
                 type="button"
                 disabled={isValidatingAdjustment}

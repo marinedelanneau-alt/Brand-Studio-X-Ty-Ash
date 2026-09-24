@@ -141,8 +141,8 @@ export default function SpectrumExercise({
   };
 
   return (
-    <div className="mt-4 space-y-4 rounded-[1.6rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff7ef)] p-5 shadow-[0_16px_40px_rgba(210,189,152,0.08)]">
-      <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[#5f544a]">
+    <div className="mt-4 space-y-4 rounded-[1.6rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-5 shadow-[0_16px_40px_rgba(210,189,152,0.08)]">
+      <div className="flex items-center justify-between gap-4 text-sm font-semibold text-[var(--text-primary)]">
         <span className="inline-flex items-center gap-2">
           {config.leftEmoji ? <span aria-hidden="true">{config.leftEmoji}</span> : null}
           <span>{config.leftLabel}</span>
@@ -155,9 +155,9 @@ export default function SpectrumExercise({
 
       <div className="space-y-5">
         <div ref={trackRef} className="relative px-1 py-5">
-          <div className="absolute inset-x-1 top-1/2 h-2 -translate-y-1/2 rounded-full bg-[#efe7db]" />
+          <div className="absolute inset-x-1 top-1/2 h-2 -translate-y-1/2 rounded-full bg-[var(--border)]" />
           <div
-            className="absolute left-1 top-1/2 h-2 -translate-y-1/2 rounded-full bg-[linear-gradient(90deg,#d7e6da,#eed9b7,#df9b39)]"
+            className="absolute left-1 top-1/2 h-2 -translate-y-1/2 rounded-full bg-[image:var(--tyash-progress-gradient)]"
             style={filledTrackStyle}
           />
 
@@ -189,13 +189,13 @@ export default function SpectrumExercise({
           />
 
           <div
-            className="pointer-events-none absolute top-1/2 z-20 h-6 w-6 -translate-y-1/2 rounded-full border border-white bg-[linear-gradient(135deg,#d88a2f,#f0cf55)] shadow-[0_12px_24px_rgba(207,116,48,0.28)] transition-[left,transform,box-shadow] duration-200"
+            className="pointer-events-none absolute top-1/2 z-20 h-6 w-6 -translate-y-1/2 rounded-full border border-[var(--surface-highlight)] bg-[image:var(--tyash-progress-gradient)] shadow-[0_12px_24px_rgb(var(--tyash-glow-rgb)/0.28)] transition-[left,transform,box-shadow] duration-200"
             style={{ left: `calc(${score}% - 0.75rem)` }}
           >
             {effectState?.type === "pulse" ? (
               <span
                 key={effectState.trigger}
-                className="absolute inset-[-0.55rem] rounded-full border border-[#f0cf55]/55 animate-[spectrum-pulse_900ms_ease-out]"
+                className="absolute inset-[-0.55rem] rounded-full border border-[var(--tyash-primary)]/55 animate-[spectrum-pulse_900ms_ease-out]"
               />
             ) : null}
             {effectState && effectState.type !== "pulse" ? (
@@ -221,10 +221,10 @@ export default function SpectrumExercise({
                       background:
                         effectState.type === "confetti"
                           ? `hsl(${36 + particle.hueShift} 82% 72%)`
-                          : "radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(240,207,85,0.95) 45%, rgba(240,207,85,0) 72%)",
+                          : "radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgb(var(--tyash-glow-rgb)/0.95) 45%, rgb(var(--tyash-glow-rgb)/0) 72%)",
                       boxShadow:
                         effectState.type === "sparkle"
-                          ? "0 0 18px rgba(240,207,85,0.42)"
+                          ? "0 0 18px rgb(var(--tyash-glow-rgb)/0.42)"
                           : undefined,
                     }}
                   />
@@ -235,38 +235,38 @@ export default function SpectrumExercise({
         </div>
 
         <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_15rem] md:items-start">
-          <div className="rounded-[1rem] border border-[#f0dfc6] bg-white px-4 py-4">
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+          <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
               Interpretation
             </p>
-            <p className="mt-2 text-sm leading-6 text-[#5f544a]">{answer.interpretation}</p>
-            <p className="mt-3 text-sm leading-6 text-[#8a8077]">{config.helperText}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">{answer.interpretation}</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{config.helperText}</p>
             {edgeMessage ? (
-              <p className="mt-3 rounded-[0.9rem] bg-[#fff7ec] px-3 py-3 text-sm leading-6 text-[#6f645b]">
+              <p className="mt-3 rounded-[0.9rem] bg-[var(--tyash-soft)] px-3 py-3 text-sm leading-6 text-[var(--text-primary)]">
                 {edgeMessage}
               </p>
             ) : null}
           </div>
 
-          <div className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-center">
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+          <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4 text-center">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
               Score
             </p>
-            <p className="mt-3 text-4xl font-black leading-none text-[#4b4550]">{score}</p>
+            <p className="mt-3 text-4xl font-black leading-none text-[var(--heading-color)]">{score}</p>
           </div>
         </div>
       </div>
 
       {config.enableJustification ? (
-        <label className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4">
-          <span className="block text-sm font-semibold leading-7 text-[#5f544a]">
+        <label className="block rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4">
+          <span className="block text-sm font-semibold leading-7 text-[var(--text-primary)]">
             Pourquoi ce positionnement ?
           </span>
           <textarea
             value={justification}
             onChange={(event) => setJustification(event.target.value)}
             rows={4}
-            className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf9] px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+            className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
             placeholder="Explique ce qui motive ce choix."
           />
         </label>

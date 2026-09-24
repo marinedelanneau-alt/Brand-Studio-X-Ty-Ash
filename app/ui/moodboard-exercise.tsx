@@ -212,7 +212,7 @@ function SafeMoodboardImage({
 
   if (failed || !src) {
     return (
-      <div className={`${className} flex items-center justify-center bg-[#f1ebe2] text-[#8a8077]`}>
+      <div className={`${className} flex items-center justify-center bg-[var(--surface-secondary)] text-[var(--text-muted)]`}>
         <PhotoIcon className="h-8 w-8" />
       </div>
     );
@@ -958,29 +958,29 @@ export default function MoodboardExercise({
 
   return (
     <div className="mt-4 space-y-5">
-      <section className="overflow-hidden rounded-[1.8rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff5ea)] shadow-[0_18px_44px_rgba(210,189,152,0.1)]">
-        <div className="border-b border-[#f0e1cb] px-5 py-5 sm:px-6">
+      <section className="overflow-hidden rounded-[1.8rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] shadow-[0_18px_44px_rgba(210,189,152,0.1)]">
+        <div className="border-b border-[var(--border)] px-5 py-5 sm:px-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
-              <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+              <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
                 Ton moodboard de marque
               </p>
-              <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
+              <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[var(--heading-color)]">
                 Compose ton univers visuel
               </h3>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#5f544a]">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--text-primary)]">
                 Rassemble ici les images, couleurs, mots et détails qui traduisent l’atmosphère de ta marque.
               </p>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-[#6f645b]">
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--text-primary)]">
                 Ce moodboard te servira de repère pour créer tes supports, choisir tes visuels et conserver une vraie cohérence dans ta communication.
               </p>
             </div>
 
-            <div className="rounded-[1.2rem] border border-[#eadfca] bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)]">
-              <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <div className="rounded-[1.2rem] border border-[var(--border)] bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)]">
+              <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Ambiance
               </p>
-              <p className="mt-3 max-w-56 text-sm leading-6 text-[#5f544a]">
+              <p className="mt-3 max-w-56 text-sm leading-6 text-[var(--text-primary)]">
                 {board.feedback || "Ton moodboard se construira ici, avec une lecture immédiate de son équilibre visuel."}
               </p>
             </div>
@@ -991,7 +991,7 @@ export default function MoodboardExercise({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={slotsLeft <= 0 || uploadState.status === "loading"}
-              className="inline-flex items-center gap-2 rounded-full bg-[#cf7430] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(207,116,48,0.22)] disabled:cursor-not-allowed disabled:opacity-55"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--tyash-primary)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--tyash-text-on-primary)] shadow-[0_16px_30px_rgb(var(--tyash-glow-rgb)/0.22)] disabled:cursor-not-allowed disabled:opacity-55"
             >
               <ArrowUpTrayIcon className="h-4 w-4" />
               Ajouter des images
@@ -999,7 +999,7 @@ export default function MoodboardExercise({
             <button
               type="button"
               onClick={() => addBlock({ id: `mood-keyword-${crypto.randomUUID()}`, type: "keyword", keyword: "Mot-clé", textColor: "#4B4550", fontSize: 18, x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
             >
               <PlusIcon className="h-4 w-4" />
               Ajouter un mot-clé
@@ -1007,7 +1007,7 @@ export default function MoodboardExercise({
             <button
               type="button"
               onClick={() => addBlock({ id: `mood-text-${crypto.randomUUID()}`, type: "text", text: "Une citation qui donne le ton", author: "", textColor: "#4B4550", fontSize: 28, x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
             >
               <ChatBubbleLeftRightIcon className="h-4 w-4" />
               Ajouter une citation
@@ -1015,7 +1015,7 @@ export default function MoodboardExercise({
             <button
               type="button"
               onClick={() => addBlock({ id: `mood-color-${crypto.randomUUID()}`, type: "color", color: signals.palette[0] ?? "#E9DDCF", label: "Couleur", usage: "", x: 0, y: 0, w: 0, h: 0, rotation: 0, zIndex: 1 })}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
             >
               <SwatchIcon className="h-4 w-4" />
               Ajouter une couleur
@@ -1023,7 +1023,7 @@ export default function MoodboardExercise({
             <button
               type="button"
               onClick={() => iconInputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
             >
               <StarIcon className="h-4 w-4" />
               Ajouter un pictogramme
@@ -1031,19 +1031,19 @@ export default function MoodboardExercise({
             <button
               type="button"
               onClick={() => updateBlocks(autoArrange(board.blocks, board.layoutStyle))}
-              className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
             >
               <ArrowPathIcon className="h-4 w-4" />
               Réorganiser
             </button>
             <div className="group relative">
-              <button type="button" className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]">
+              <button type="button" className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]">
                 <ArrowDownTrayIcon className="h-4 w-4" />
                 Exporter
               </button>
-              <div className="invisible absolute right-0 top-full z-30 mt-2 min-w-40 rounded-xl border border-[#eadfca] bg-white p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                <button type="button" onClick={() => void exportAsPng()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[#5f544a] hover:bg-[#fff8f1]">PNG</button>
-                <button type="button" onClick={() => void exportAsPdf()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[#5f544a] hover:bg-[#fff8f1]">PDF</button>
+              <div className="invisible absolute right-0 top-full z-30 mt-2 min-w-40 rounded-xl border border-[var(--border)] bg-[var(--card)] p-2 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <button type="button" onClick={() => void exportAsPng()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--tyash-subtle)]">PNG</button>
+                <button type="button" onClick={() => void exportAsPdf()} className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--tyash-subtle)]">PDF</button>
               </div>
             </div>
             <input
@@ -1088,15 +1088,15 @@ export default function MoodboardExercise({
                   onClick={() => changeStyle(style)}
                   className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.15em] transition ${
                     board.layoutStyle === style
-                      ? "bg-[#cf7430] text-white"
-                      : "border border-[#eadfca] bg-white text-[#6b625a]"
+                      ? "bg-[var(--tyash-primary)] text-[var(--tyash-text-on-primary)]"
+                      : "border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                   }`}
                 >
                   {style}
                 </button>
               ),
             )}
-            <label className="flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.15em] text-[#6b625a]">
+            <label className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-xs font-black uppercase tracking-[0.15em] text-[var(--text-primary)]">
               Fond
               <input
                 type="color"
@@ -1111,7 +1111,7 @@ export default function MoodboardExercise({
           {uploadState.message ? (
             <p
               className={`mt-4 text-sm leading-6 ${
-                uploadState.status === "error" ? "text-[#9d5f46]" : "text-[#7b7068]"
+                uploadState.status === "error" ? "text-[#9d5f46]" : "text-[var(--text-muted)]"
               }`}
             >
               {uploadState.message}
@@ -1122,13 +1122,13 @@ export default function MoodboardExercise({
         <div className="grid gap-5 px-5 py-6 sm:px-6 xl:grid-cols-[minmax(0,1.6fr)_20rem]">
           <div className="space-y-4">
             <div
-              className="relative overflow-hidden rounded-[1.8rem] border border-[#eadfca] p-4 shadow-[0_20px_44px_rgba(210,189,152,0.14)]"
+              className="relative overflow-hidden rounded-[1.8rem] border border-[var(--border)] p-4 shadow-[0_20px_44px_rgba(210,189,152,0.14)]"
               style={{ background: getBoardBackground(board.backgroundColor) }}
             >
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.42),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.2),transparent_36%)]" />
               <div
                 ref={boardCanvasRef}
-                className="relative aspect-[4/5] w-full touch-none rounded-[1.4rem] border border-white/60 bg-white/20 p-2 backdrop-blur-[1.5px]"
+                className="relative aspect-[4/5] w-full touch-none rounded-[1.4rem] border border-[var(--surface-highlight)]/60 bg-white/20 p-2 backdrop-blur-[1.5px]"
                 onDragOver={(event) => {
                   event.preventDefault();
                   event.dataTransfer.dropEffect = "copy";
@@ -1139,7 +1139,7 @@ export default function MoodboardExercise({
                 }}
               >
                 {board.blocks.length === 0 ? (
-                  <div className="flex h-full items-center justify-center rounded-[1.2rem] border border-dashed border-white/70 bg-white/30 px-6 text-center text-sm leading-7 text-[#5f544a]">
+                  <div className="flex h-full items-center justify-center rounded-[1.2rem] border border-dashed border-[var(--surface-highlight)]/70 bg-white/30 px-6 text-center text-sm leading-7 text-[var(--text-primary)]">
                     Glisse tes images ici ou utilise les actions ci-dessus pour commencer ta composition.
                   </div>
                 ) : null}
@@ -1160,8 +1160,8 @@ export default function MoodboardExercise({
                       onPointerCancel={endInteraction}
                       className={`group/block absolute cursor-move overflow-hidden rounded-[1.15rem] border text-left transition ${
                         selectedBlock?.id === block.id
-                          ? "border-[#cf7430] ring-2 ring-[#cf7430]/25"
-                          : "border-white/70"
+                          ? "border-[var(--tyash-primary)] ring-2 ring-[var(--tyash-focus-ring)]/25"
+                          : "border-[var(--surface-highlight)]/70"
                       }`}
                       style={{
                         left: `${block.x}%`,
@@ -1245,7 +1245,7 @@ export default function MoodboardExercise({
                           onPointerMove={moveInteraction}
                           onPointerUp={endInteraction}
                           onPointerCancel={endInteraction}
-                          className="absolute bottom-1 right-1 z-20 flex h-8 w-8 cursor-se-resize items-center justify-center rounded-full bg-white text-[#cf7430] shadow-md"
+                          className="absolute bottom-1 right-1 z-20 flex h-8 w-8 cursor-se-resize items-center justify-center rounded-full bg-[var(--card)] text-[var(--tyash-label-text)] shadow-md"
                         >
                           <CursorArrowRaysIcon className="h-4 w-4 rotate-90" />
                         </span>
@@ -1258,20 +1258,20 @@ export default function MoodboardExercise({
           </div>
 
           <aside className="space-y-4">
-            <div className="rounded-[1.4rem] border border-[#eadfca] bg-white p-5 shadow-[0_16px_34px_rgba(210,189,152,0.1)]">
-              <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+            <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_16px_34px_rgba(210,189,152,0.1)]">
+              <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
                 Retours
               </p>
-              <p className="mt-3 text-sm leading-7 text-[#5f544a]">
+              <p className="mt-3 text-sm leading-7 text-[var(--text-primary)]">
                 {board.feedback || "Le feedback intelligent s'affichera ici une fois la composition amorcee."}
               </p>
-              <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[#8a8077]">
+              <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
                 {imageCount}/{config.maxImages} blocs image
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] border border-[#eadfca] bg-white p-5 shadow-[0_16px_34px_rgba(210,189,152,0.1)]">
-              <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+            <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_16px_34px_rgba(210,189,152,0.1)]">
+              <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
                 Bloc sélectionné
               </p>
 
@@ -1280,42 +1280,42 @@ export default function MoodboardExercise({
                   {selectedBlock.type === "image" ? (
                     <>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Legende
                         </span>
                         <input
                           type="text"
                           value={selectedBlock.caption}
                           onChange={(event) => patchSelectedBlock({ caption: event.target.value })}
-                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+                          className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]"
                         />
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Texte alternatif
                         </span>
                         <textarea
                           value={selectedBlock.altText}
                           onChange={(event) => patchSelectedBlock({ altText: event.target.value })}
                           placeholder="Décris brièvement l’image"
-                          className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]"
+                          className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]"
                         />
                       </label>
-                      <div className="rounded-xl border border-[#eadfca] bg-[#fffdf7] p-3">
-                        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Recadrage</p>
-                        <label className="mt-3 block text-xs text-[#7b7068]">
+                      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+                        <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Recadrage</p>
+                        <label className="mt-3 block text-xs text-[var(--text-muted)]">
                           Horizontal
-                          <input type="range" min="0" max="100" value={selectedBlock.cropX} onChange={(event) => patchSelectedBlock({ cropX: Number(event.target.value) })} className="mt-1 w-full accent-[#cf7430]" />
+                          <input type="range" min="0" max="100" value={selectedBlock.cropX} onChange={(event) => patchSelectedBlock({ cropX: Number(event.target.value) })} className="mt-1 w-full accent-[var(--tyash-primary)]" />
                         </label>
-                        <label className="mt-2 block text-xs text-[#7b7068]">
+                        <label className="mt-2 block text-xs text-[var(--text-muted)]">
                           Vertical
-                          <input type="range" min="0" max="100" value={selectedBlock.cropY} onChange={(event) => patchSelectedBlock({ cropY: Number(event.target.value) })} className="mt-1 w-full accent-[#cf7430]" />
+                          <input type="range" min="0" max="100" value={selectedBlock.cropY} onChange={(event) => patchSelectedBlock({ cropY: Number(event.target.value) })} className="mt-1 w-full accent-[var(--tyash-primary)]" />
                         </label>
                       </div>
                       <button
                         type="button"
                         onClick={() => replaceInputRef.current?.click()}
-                        className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#6b625a]"
+                        className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-primary)]"
                       >
                         <ArrowUpTrayIcon className="h-4 w-4" />
                         Remplacer l’image
@@ -1326,18 +1326,18 @@ export default function MoodboardExercise({
                   {selectedBlock.type === "color" ? (
                     <>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Nom
                         </span>
                         <input
                           type="text"
                           value={selectedBlock.label}
                           onChange={(event) => patchSelectedBlock({ label: event.target.value })}
-                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+                          className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]"
                         />
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           HEX
                         </span>
                         <input
@@ -1346,17 +1346,17 @@ export default function MoodboardExercise({
                           onChange={(event) =>
                             patchSelectedBlock({ color: sanitizeHex(event.target.value, selectedBlock.color) })
                           }
-                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm uppercase text-[#5f544a]"
+                          className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm uppercase text-[var(--text-primary)]"
                         />
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Usage
                         </span>
                         <textarea
                           value={selectedBlock.usage}
                           onChange={(event) => patchSelectedBlock({ usage: event.target.value })}
-                          className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]"
+                          className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]"
                         />
                       </label>
                     </>
@@ -1365,24 +1365,24 @@ export default function MoodboardExercise({
                   {selectedBlock.type === "text" ? (
                     <>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Citation
                         </span>
                         <textarea
                           value={selectedBlock.text}
                           onChange={(event) => patchSelectedBlock({ text: event.target.value })}
-                          className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]"
+                          className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]"
                         />
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Signature
                         </span>
                         <input
                           type="text"
                           value={selectedBlock.author}
                           onChange={(event) => patchSelectedBlock({ author: event.target.value })}
-                          className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+                          className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]"
                         />
                       </label>
                     </>
@@ -1390,22 +1390,22 @@ export default function MoodboardExercise({
 
                   {selectedBlock.type === "keyword" ? (
                     <label className="block space-y-2">
-                      <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                      <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                         Mot-cle
                       </span>
                       <input
                         type="text"
                         value={selectedBlock.keyword}
                         onChange={(event) => patchSelectedBlock({ keyword: event.target.value })}
-                        className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+                        className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]"
                       />
                     </label>
                   ) : null}
 
                   {selectedBlock.type === "text" || selectedBlock.type === "keyword" ? (
-                    <div className="grid grid-cols-[1fr_5rem] gap-3 rounded-xl border border-[#eadfca] bg-[#fffdf7] p-3">
+                    <div className="grid grid-cols-[1fr_5rem] gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
                       <label className="block space-y-2">
-                        <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                        <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Taille maximale <span>{selectedBlock.fontSize}px</span>
                         </span>
                         <input
@@ -1415,19 +1415,19 @@ export default function MoodboardExercise({
                           step="1"
                           value={selectedBlock.fontSize}
                           onChange={(event) => patchSelectedBlock({ fontSize: Number(event.target.value) })}
-                          className="w-full accent-[#cf7430]"
+                          className="w-full accent-[var(--tyash-primary)]"
                         />
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Couleur</span>
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Couleur</span>
                         <input
                           type="color"
                           value={sanitizeHex(selectedBlock.textColor, "#4B4550")}
                           onChange={(event) => patchSelectedBlock({ textColor: event.target.value })}
-                          className="h-9 w-full cursor-pointer rounded-lg border border-[#eadfca] bg-white p-1"
+                          className="h-9 w-full cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--card)] p-1"
                         />
                       </label>
-                      <p className="col-span-2 text-[0.68rem] leading-4 text-[#7a7087]">
+                      <p className="col-span-2 text-[0.68rem] leading-4 text-[var(--text-muted)]">
                         Si le mot est trop long, sa taille s’adapte automatiquement pour rester entièrement visible.
                       </p>
                     </div>
@@ -1437,30 +1437,30 @@ export default function MoodboardExercise({
                     <>
                       {!selectedBlock.imageUrl ? (
                         <label className="block space-y-2">
-                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Pictogramme</span>
-                          <select value={selectedBlock.icon} onChange={(event) => patchSelectedBlock({ icon: event.target.value as typeof selectedBlock.icon })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]">
+                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Pictogramme</span>
+                          <select value={selectedBlock.icon} onChange={(event) => patchSelectedBlock({ icon: event.target.value as typeof selectedBlock.icon })} className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]">
                             <option value="spark">Étincelle</option><option value="star">Étoile</option><option value="leaf">Feuille</option><option value="circle">Cercle</option><option value="wave">Vague</option>
                           </select>
                         </label>
                       ) : null}
                       <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Légende</span>
-                        <input type="text" value={selectedBlock.label} onChange={(event) => patchSelectedBlock({ label: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]" />
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Légende</span>
+                        <input type="text" value={selectedBlock.label} onChange={(event) => patchSelectedBlock({ label: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]" />
                       </label>
                       {selectedBlock.imageUrl ? (
                         <label className="block space-y-2">
-                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Texte alternatif</span>
-                          <textarea value={selectedBlock.altText ?? ""} onChange={(event) => patchSelectedBlock({ altText: event.target.value })} className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3 text-sm text-[#5f544a]" />
+                          <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Texte alternatif</span>
+                          <textarea value={selectedBlock.altText ?? ""} onChange={(event) => patchSelectedBlock({ altText: event.target.value })} className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]" />
                         </label>
                       ) : <label className="block space-y-2">
-                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">Couleur</span>
-                        <input type="color" value={sanitizeHex(selectedBlock.color, "#4B4550")} onChange={(event) => patchSelectedBlock({ color: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-2" />
+                        <span className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Couleur</span>
+                        <input type="color" value={sanitizeHex(selectedBlock.color, "#4B4550")} onChange={(event) => patchSelectedBlock({ color: event.target.value })} className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-2" />
                       </label>}
                     </>
                   ) : null}
 
                   <label className="block space-y-2">
-                    <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                    <span className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                       Rotation <span>{selectedBlock.rotation}°</span>
                     </span>
                     <input
@@ -1470,21 +1470,21 @@ export default function MoodboardExercise({
                       step="1"
                       value={selectedBlock.rotation}
                       onChange={(event) => patchSelectedBlock({ rotation: Number(event.target.value) })}
-                      className="w-full accent-[#cf7430]"
+                      className="w-full accent-[var(--tyash-primary)]"
                     />
                   </label>
 
                   <button
                     type="button"
                     onClick={() => removeBlock(selectedBlock.id)}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#f1d6c8] bg-[#fff6f0] px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#9d5f46]"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#f1d6c8] bg-[var(--tyash-subtle)] px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#9d5f46]"
                   >
                     <TrashIcon className="h-4 w-4" />
                     Retirer ce bloc
                   </button>
                 </div>
               ) : (
-                <p className="mt-4 text-sm leading-7 text-[#7b7068]">
+                <p className="mt-4 text-sm leading-7 text-[var(--text-muted)]">
                   Sélectionne un bloc dans la composition pour l&apos;affiner.
                 </p>
               )}

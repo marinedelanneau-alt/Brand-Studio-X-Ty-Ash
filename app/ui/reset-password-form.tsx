@@ -11,7 +11,7 @@ type ActionState = {
 };
 
 const inputClassName =
-  "h-13 w-full rounded-[1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-[0.95rem] text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_22px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[#a19388] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/22";
+  "h-13 w-full rounded-[1rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] px-5 text-[0.95rem] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.9),0_12px_22px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[var(--text-muted)] focus:-translate-y-0.5 focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/22";
 
 export default function ResetPasswordForm({
   hasCallbackError = false,
@@ -130,7 +130,7 @@ export default function ResetPasswordForm({
       {linkError ? (
         <div
           role="alert"
-          className="rounded-[1rem] border border-[#efc8c1] bg-[#fff4f1] p-4 text-sm font-medium leading-6 text-[#a94940]"
+          className="rounded-[1rem] border border-[#efc8c1] bs-status-light bg-[#fff4f1] p-4 text-sm font-medium leading-6 text-[var(--status-error-text)]"
         >
           Ce lien de réinitialisation est invalide ou a expiré. Demande un
           nouveau lien depuis la page de connexion.
@@ -138,7 +138,7 @@ export default function ResetPasswordForm({
       ) : null}
 
       <label className="block space-y-2">
-        <span className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]">
+        <span className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Nouveau mot de passe
         </span>
         <input
@@ -156,7 +156,7 @@ export default function ResetPasswordForm({
       <button
         type="submit"
         disabled={pending || linkError || !sessionReady}
-        className="flex h-13 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.92rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_24px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+        className="flex h-13 w-full items-center justify-center rounded-[1rem] bs-button-primary px-6 text-[0.92rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_24px_rgb(var(--tyash-glow-rgb)/0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending
           ? "Mise à jour…"
@@ -168,7 +168,7 @@ export default function ResetPasswordForm({
       {linkError ? (
         <Link
           href="/"
-          className="flex h-13 w-full items-center justify-center rounded-[1rem] border border-[#eadfca] bg-white px-6 text-center text-[0.82rem] font-extrabold uppercase tracking-[0.12em] text-[#9f5526] transition hover:-translate-y-0.5"
+          className="flex h-13 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-6 text-center text-[0.82rem] font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)] transition hover:-translate-y-0.5"
         >
           Demander un nouveau lien
         </Link>
@@ -180,8 +180,8 @@ export default function ResetPasswordForm({
             aria-live="polite"
             className={
               state.status === "error"
-                ? "text-sm font-medium leading-6 text-[#b45247]"
-                : "text-sm font-medium leading-6 text-[#5f8d63]"
+                ? "text-sm font-medium leading-6 text-[var(--status-error-text)]"
+                : "text-sm font-medium leading-6 text-[var(--status-success-text)]"
             }
           >
             {state.message}

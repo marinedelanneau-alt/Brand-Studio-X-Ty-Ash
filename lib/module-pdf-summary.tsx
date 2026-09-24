@@ -24,8 +24,8 @@ const palette = {
   body: "#5E554E",
   quiet: "#85796E",
   line: "#E7DCCB",
-  accent: "#C96B2C",
-  accentPale: "#F9E8D8",
+  accent: "#7A2D46",
+  accentPale: "#F5E4EB",
   white: "#FFFFFF",
 };
 
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   eyebrow: {
-    color: "#F2B27D",
+    color: "#EDC4D1",
     fontSize: 8.5,
     fontWeight: 700,
     letterSpacing: 2.1,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     maxWidth: 420,
   },
   brandName: {
-    color: "#F1D8C4",
+    color: "#F5E4EB",
     fontSize: 12,
     marginTop: 9,
   },
@@ -385,7 +385,7 @@ function PdfAnswerTable({ table }: { table: NonNullable<ModuleSummaryHighlight["
   const width = `${100 / table.columns.length}%`;
   return (
     <View style={{ marginTop: 8, borderTop: "1 solid #E7DCCB", borderLeft: "1 solid #E7DCCB" }}>
-      <View style={{ flexDirection: "row", backgroundColor: "#F9E8D8" }} wrap={false} minPresenceAhead={45}>
+      <View style={{ flexDirection: "row", backgroundColor: "#F5E4EB" }} wrap={false} minPresenceAhead={45}>
         {table.columns.map((column, index) => (
           <View key={index} style={{ width, padding: 7, borderRight: "1 solid #E7DCCB", borderBottom: "1 solid #E7DCCB" }}>
             <Text style={{ fontSize: 8, fontWeight: 700, color: "#29242B" }}>{sanitizePdfText(column)}</Text>

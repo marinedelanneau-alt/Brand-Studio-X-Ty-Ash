@@ -11,12 +11,12 @@ export default function ContentPreviewBanner({
 
   return (
     <aside
-      className="print:hidden sticky top-0 z-[100] border-b border-[#df9b39] bg-[#fff6e3] px-4 py-3 text-[#5f4937]"
+      className="print:hidden sticky top-0 z-[100] border-b border-[var(--tyash-primary)] bg-[var(--tyash-soft)] px-4 py-3 text-[var(--text-primary)]"
       data-content-preview-banner
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#b45f26]">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             Mode brouillon — visible uniquement par les administrateurs
           </p>
           <p className="mt-1 text-sm">
@@ -29,7 +29,7 @@ export default function ContentPreviewBanner({
         <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/releases"
-            className="rounded-xl border border-[#d9b98d] bg-white px-4 py-2 text-sm font-bold"
+            className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-sm font-bold"
           >
             Retour à l’administration
           </Link>

@@ -32,12 +32,12 @@ export default function AdminShell({
   const pathname = usePathname();
 
   return (
-    <div className="bs-admin-shell min-h-screen bg-[#f5f1e8] text-[#4b4550]">
+    <div className="bs-admin-shell min-h-screen bg-[var(--background)] text-[var(--heading-color)]">
       <div className="flex min-h-screen flex-col lg:flex-row">
-        <aside className="w-full border-b border-[#ddd1bf] bg-[#1f2937] text-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
+        <aside className="bs-inverse-surface w-full border-b border-[var(--border)] bg-[var(--surface-dark)] text-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
           <div className="flex h-full flex-col px-5 py-6">
-            <div className="rounded-[0.9rem] border border-white/10 bg-white/5 p-4">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#f0cf55]">
+            <div className="rounded-[0.9rem] border border-[var(--surface-highlight)]/10 bg-white/5 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--tyash-on-dark-accent)]">
                 Administration
               </p>
               <p className="mt-3 text-xl font-semibold">Brand Studio</p>
@@ -57,7 +57,7 @@ export default function AdminShell({
                     href={item.href}
                     className={`flex items-center gap-3 rounded-[0.8rem] px-4 py-3 text-sm font-semibold transition ${
                       isActive
-                        ? "bg-[#f0cf55] text-[#1f2937]"
+                        ? "bg-[var(--tyash-primary)] text-[var(--tyash-text-on-primary)]"
                         : "text-white/80 hover:bg-white/8 hover:text-white"
                     }`}
                   >
@@ -68,9 +68,9 @@ export default function AdminShell({
               })}
             </nav>
 
-            <div className="mt-6 rounded-[0.9rem] border border-white/10 bg-white/5 p-4">
+            <div className="mt-6 rounded-[0.9rem] border border-[var(--surface-highlight)]/10 bg-white/5 p-4">
               <div className="flex items-start gap-3">
-                <span className="flex size-11 items-center justify-center rounded-[0.8rem] bg-[#f0cf55] text-sm font-black text-[#1f2937]">
+                <span className="flex size-11 items-center justify-center rounded-[0.8rem] bg-[var(--tyash-primary)] text-sm font-black text-[var(--tyash-text-on-primary)]">
                   {adminName.slice(0, 1).toUpperCase()}
                 </span>
                 <div className="min-w-0">
@@ -98,17 +98,17 @@ export default function AdminShell({
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="border-b border-[#ddd1bf] bg-[#fbf8f2] px-5 py-4 sm:px-8">
+          <header className="border-b border-[var(--border)] bg-[var(--background)] px-5 py-4 sm:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
                   Console
                 </p>
-                <p className="mt-2 text-lg font-semibold text-[#4b4550]">
+                <p className="mt-2 text-lg font-semibold text-[var(--heading-color)]">
                   Gestion de la formation
                 </p>
               </div>
-              <div className="inline-flex items-center rounded-[0.8rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#6b625a]">
+              <div className="inline-flex items-center rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--text-primary)]">
                 Session admin active
               </div>
             </div>

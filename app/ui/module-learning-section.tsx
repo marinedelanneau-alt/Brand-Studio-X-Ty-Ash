@@ -49,9 +49,9 @@ export default function ModuleLearningSection({
     module.submodules.length > 1 ? (
       <nav
         aria-label="Sous-modules du module"
-        className="border-t border-[#eadfca] pt-6"
+        className="border-t border-[var(--border)] pt-6"
       >
-        <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+        <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Sous-modules
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
@@ -66,8 +66,8 @@ export default function ModuleLearningSection({
                 aria-current={isActive ? "step" : undefined}
                 className={`bs-submodule-tab min-h-11 rounded-full border px-4 py-2 text-left text-xs font-black uppercase tracking-[0.12em] transition sm:text-sm ${
                   isActive
-                    ? "border-[#cf7430] bg-[#fff6e3] text-[#cf7430]"
-                    : "border-[#eadfca] bg-white text-[#6b625a] hover:border-[#cf7430] hover:text-[#cf7430]"
+                    ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]"
+                    : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)] hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
                 }`}
               >
                 <span className="block text-[0.64rem] leading-4 opacity-75">
@@ -106,7 +106,7 @@ export default function ModuleLearningSection({
     <div className="relative mt-8">
       {submoduleNavigation}
 
-      <div className={`${submoduleNavigation ? "mt-6" : ""} border-t border-[#eadfca] pt-6`}>
+      <div className={`${submoduleNavigation ? "mt-6" : ""} border-t border-[var(--border)] pt-6`}>
         <div>
           <ModuleAnswerForm
             module={module}

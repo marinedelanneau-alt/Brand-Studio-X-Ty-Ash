@@ -75,38 +75,38 @@ export default function TypographyExercise({ exercise, answers, onChange }: {
   }
 
   return (
-    <section className="rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf8] p-5 sm:p-7">
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-[#cf7430]">Ton système typographique</p>
-      <h3 className="mt-3 font-serif text-3xl text-[#4b4550]">Choisis jusqu’à trois typographies.</h3>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-[#746961]">Associe une police à chaque rôle. Toutes les polices proposées sont libres de droit. Tu peux aussi importer tes propres fichiers si leur licence t’autorise à les utiliser.</p>
+    <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-7">
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Ton système typographique</p>
+      <h3 className="mt-3 font-serif text-3xl text-[var(--heading-color)]">Choisis jusqu’à trois typographies.</h3>
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-muted)]">Associe une police à chaque rôle. Toutes les polices proposées sont libres de droit. Tu peux aussi importer tes propres fichiers si leur licence t’autorise à les utiliser.</p>
       <div className="mt-7 grid gap-5">
         {ROLES.map((role) => {
           const selected = choices.find((choice) => choice.role === role.id);
           return (
-            <article key={role.id} className="rounded-[1.2rem] border border-[#eadfca] bg-white p-5">
+            <article key={role.id} className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-5">
               <div className="grid gap-4 md:grid-cols-[180px_1fr]">
                 <div>
-                  <label className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]" htmlFor={`font-${role.id}`}>{role.label}</label>
-                  <select id={`font-${role.id}`} value={selected?.source === "library" ? selected.family : ""} onChange={(event) => event.target.value && updateChoice({ role: role.id, family: event.target.value, source: "library" })} className="mt-2 w-full rounded-xl border border-[#dfd2c0] bg-white px-3 py-3 text-sm text-[#4b4550]">
+                  <label className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]" htmlFor={`font-${role.id}`}>{role.label}</label>
+                  <select id={`font-${role.id}`} value={selected?.source === "library" ? selected.family : ""} onChange={(event) => event.target.value && updateChoice({ role: role.id, family: event.target.value, source: "library" })} className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-3 text-sm text-[var(--heading-color)]">
                     <option value="">Choisir une police</option>
                     {OPEN_SOURCE_FONT_LIBRARY.map((font) => <option key={font.family} value={font.family}>{font.family} — {font.category}</option>)}
                   </select>
-                  <label className="mt-3 block cursor-pointer rounded-xl border border-dashed border-[#d6b992] px-3 py-3 text-center text-xs font-bold text-[#b56c2b]">
+                  <label className="mt-3 block cursor-pointer rounded-xl border border-dashed border-[var(--border)] px-3 py-3 text-center text-xs font-bold text-[var(--tyash-label-text)]">
                     {uploadingRole === role.id ? "Import en cours…" : "Importer ma police"}
                     <input className="sr-only" type="file" accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf" disabled={uploadingRole !== null} onChange={(event) => void upload(role.id, event.target.files?.[0])} />
                   </label>
                 </div>
-                <div className="min-h-32 rounded-xl bg-[#f7f1e8] p-5">
-                  <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[#998d83]">{selected ? selected.family : "Aperçu"}</p>
-                  <p className="mt-4 break-words text-[#403a40]" style={{ fontFamily: selected ? `"${selected.family}", sans-serif` : "inherit", fontSize: role.id === "title" ? 30 : role.id === "subtitle" ? 22 : 16, lineHeight: 1.25 }}>{role.sample}</p>
+                <div className="min-h-32 rounded-xl bg-[var(--background)] p-5">
+                  <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)]">{selected ? selected.family : "Aperçu"}</p>
+                  <p className="mt-4 break-words text-[var(--heading-color)]" style={{ fontFamily: selected ? `"${selected.family}", sans-serif` : "inherit", fontSize: role.id === "title" ? 30 : role.id === "subtitle" ? 22 : 16, lineHeight: 1.25 }}>{role.sample}</p>
                 </div>
               </div>
             </article>
           );
         })}
       </div>
-      {message ? <p className="mt-4 text-sm text-[#a34e42]">{message}</p> : null}
-      <p className="mt-5 text-xs text-[#8a8077]">{choices.length}/3 rôles renseignés</p>
+      {message ? <p className="mt-4 text-sm text-[var(--status-error-text)]">{message}</p> : null}
+      <p className="mt-5 text-xs text-[var(--text-muted)]">{choices.length}/3 rôles renseignés</p>
     </section>
   );
 }

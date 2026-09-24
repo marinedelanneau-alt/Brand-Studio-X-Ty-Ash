@@ -187,14 +187,14 @@ export default function BrandPersonaExercise({
 
   return (
     <div className="mt-4 space-y-5">
-      <section className="overflow-hidden rounded-[1.8rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff5ea)] shadow-[0_18px_44px_rgba(210,189,152,0.1)]">
-        <div className="border-b border-[#f0e1cb] px-5 py-5 sm:px-6">
+      <section className="overflow-hidden rounded-[1.8rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] shadow-[0_18px_44px_rgba(210,189,152,0.1)]">
+        <div className="border-b border-[var(--border)] px-5 py-5 sm:px-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
-              <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+              <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
                 Persona de marque
               </p>
-              <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[#4b4550]">
+              <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[var(--heading-color)]">
                 {exercise.question || "Crée le persona incarné de ta marque"}
               </h3>
               <PedagogicalContent
@@ -202,7 +202,7 @@ export default function BrandPersonaExercise({
                   exercise.explanation ||
                   "Imagine ta marque comme une vraie personne. Cet exercice va t'aider a definir sa personnalite, sa maniere de parler, son attitude et son univers."
                 }
-                className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+                className="mt-5 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4"
               />
               {false ? (
               <p>
@@ -212,27 +212,27 @@ export default function BrandPersonaExercise({
               ) : null}
             </div>
 
-            <div className="min-w-56 rounded-[1.2rem] border border-[#eadfca] bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)]">
-              <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <div className="min-w-56 rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)]/80 px-4 py-4 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)]">
+              <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Progression
               </p>
-              <p className="mt-3 text-3xl font-black leading-none text-[#4b4550]">
+              <p className="mt-3 text-3xl font-black leading-none text-[var(--heading-color)]">
                 {overallCompletion}%
               </p>
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
                 <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)] transition-[width]"
+                  className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)] transition-[width]"
                   style={{ width: `${overallCompletion}%` }}
                 />
               </div>
-              <p className="mt-3 text-sm leading-6 text-[#7b7068]">
+              <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
                 {completedRequiredCount}/{requiredFields.length} réponses essentielles complétées
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-b border-[#f0e1cb] px-5 py-4 sm:px-6">
+        <div className="border-b border-[var(--border)] px-5 py-4 sm:px-6">
           <div className="flex flex-wrap gap-2">
             {sections.map((section, sectionIndex) => (
               <button
@@ -241,8 +241,8 @@ export default function BrandPersonaExercise({
                 onClick={() => setActiveSectionIndex(sectionIndex)}
                 className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition ${
                   sectionIndex === activeSectionIndex
-                    ? "bg-[#cf7430] text-white"
-                    : "border border-[#eadfca] bg-white text-[#6b625a]"
+                    ? "bg-[var(--tyash-primary)] text-[var(--tyash-text-on-primary)]"
+                    : "border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                 }`}
               >
                 {section.title}
@@ -253,15 +253,15 @@ export default function BrandPersonaExercise({
 
         {activeSection ? (
           <div className="px-5 py-6 sm:px-6">
-            <div className="rounded-[1.5rem] border border-[#eadfca] bg-white px-5 py-5 shadow-[0_14px_34px_rgba(210,189,152,0.08)]">
-              <div className="border-b border-[#f0e4d3] pb-4">
-                <p className="text-[0.74rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+            <div className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-5 py-5 shadow-[0_14px_34px_rgba(210,189,152,0.08)]">
+              <div className="border-b border-[var(--border)] pb-4">
+                <p className="text-[0.74rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Section {activeSectionIndex + 1} sur {sections.length}
                 </p>
-                <h4 className="mt-2 text-xl font-semibold text-[#4b4550]">
+                <h4 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">
                   {activeSection.title}
                 </h4>
-                <p className="mt-2 text-sm leading-7 text-[#7b7068]">
+                <p className="mt-2 text-sm leading-7 text-[var(--text-muted)]">
                   {activeSection.description}
                 </p>
               </div>
@@ -275,18 +275,18 @@ export default function BrandPersonaExercise({
                   return (
                     <label
                       key={question.id}
-                      className="block rounded-[1.1rem] border border-[#eadfca] bg-[#fffdf9] px-4 py-4"
+                      className="block rounded-[1.1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <span className="block text-base font-semibold leading-7 text-[#4b4550]">
+                          <span className="block text-base font-semibold leading-7 text-[var(--heading-color)]">
                             {replacePersonaFirstNameToken(
                               question.label,
                               summary.firstName,
                             )}
                           </span>
                           {question.helperText ? (
-                            <span className="mt-1 block text-sm leading-6 text-[#7b7068]">
+                            <span className="mt-1 block text-sm leading-6 text-[var(--text-muted)]">
                               {question.helperText}
                             </span>
                           ) : null}
@@ -301,7 +301,7 @@ export default function BrandPersonaExercise({
                           onChange={(event) =>
                             onChange(setFieldValues(answers, fieldIndex, [event.target.value]))
                           }
-                          className="mt-3 h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                          className="mt-3 h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                           placeholder={question.placeholder || undefined}
                         />
                       ) : null}
@@ -314,7 +314,7 @@ export default function BrandPersonaExercise({
                           }
                           onInput={(event) => autoResizeTextarea(event.currentTarget)}
                           rows={3}
-                          className="mt-3 w-full resize-none overflow-hidden rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                          className="mt-3 w-full resize-none overflow-hidden rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                           placeholder={question.placeholder || undefined}
                         />
                       ) : null}
@@ -325,7 +325,7 @@ export default function BrandPersonaExercise({
                           onChange={(event) =>
                             onChange(setFieldValues(answers, fieldIndex, [event.target.value]))
                           }
-                          className="mt-3 h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                          className="mt-3 h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                         >
                           <option value="">Choisir une option</option>
                           {question.options.map((option) => (
@@ -346,8 +346,8 @@ export default function BrandPersonaExercise({
                                 key={option}
                                 className={`flex items-center gap-3 rounded-[0.9rem] border px-4 py-3 text-sm leading-6 ${
                                   isChecked
-                                    ? "border-[#cf7430] bg-[#fff6ec] text-[#4b4550]"
-                                    : "border-[#eadfca] bg-white text-[#5f544a]"
+                                    ? "border-[var(--tyash-primary)] bg-[var(--tyash-subtle)] text-[var(--heading-color)]"
+                                    : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                                 }`}
                               >
                                 <input
@@ -378,7 +378,7 @@ export default function BrandPersonaExercise({
                     setActiveSectionIndex((current) => Math.max(current - 1, 0))
                   }
                   disabled={activeSectionIndex === 0}
-                  className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:opacity-50"
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:opacity-50"
                 >
                   Section precedente
                 </button>
@@ -390,7 +390,7 @@ export default function BrandPersonaExercise({
                     )
                   }
                   disabled={activeSectionIndex >= sections.length - 1}
-                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] bs-button-primary px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
                 >
                   Question suivante
                 </button>
@@ -400,19 +400,19 @@ export default function BrandPersonaExercise({
         ) : null}
       </section>
 
-      <section className="rounded-[1.8rem] border border-[#eadfca] bg-white p-5 shadow-[0_16px_40px_rgba(210,189,152,0.08)] sm:p-6">
+      <section className="rounded-[1.8rem] border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_16px_40px_rgba(210,189,152,0.08)] sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+            <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
               Ton persona de marque
             </p>
-            <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.94] text-[#4b4550]">
+            <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.94] text-[var(--heading-color)]">
               {summary.firstName || "Le portrait prend forme"}
             </h3>
           </div>
           <button
             type="button"
-            className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+            className="flex h-12 items-center justify-center rounded-[0.9rem] bs-button-primary px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
           >
             {config.summaryCtaLabel}
           </button>
@@ -427,22 +427,22 @@ export default function BrandPersonaExercise({
           <SummaryCard title="Citation finale" content={summary.quote} />
         </div>
 
-        <div className="mt-5 rounded-[1.2rem] border border-[#f0dfc6] bg-[#fff8f1] px-5 py-4 text-sm leading-7 text-[#6f645b]">
+        <div className="mt-5 rounded-[1.2rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-5 py-4 text-sm leading-7 text-[var(--text-primary)]">
           Quand tu crees du contenu, demande-toi : comment {personaFirstName} communiquerait-elle ce message ?
         </div>
         {overallCompletion === 100 ? (
-          <div className="mt-6 rounded-[1.4rem] border border-[#eadfca] bg-[#fffaf2] p-5">
+          <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-5">
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <div>
-                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Fiche terminée</p>
-                <h4 className="mt-2 text-xl font-semibold text-[#4b4550]">Télécharge ou partage ton persona</h4>
-                <p className="mt-2 text-sm leading-7 text-[#6f645b]">Télécharge le CV complet de ton persona en PDF ou partage sa version courte au format Story.</p>
+                <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Fiche terminée</p>
+                <h4 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">Télécharge ou partage ton persona</h4>
+                <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">Télécharge le CV complet de ton persona en PDF ou partage sa version courte au format Story.</p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <a href="/mon-espace/persona/download" className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#4b4550] bg-white px-4 text-sm font-bold text-[#4b4550]"><DocumentArrowDownIcon className="size-5" />PDF complet</a>
-                  <button type="button" onClick={() => void downloadPersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#d98632] bg-white px-4 text-sm font-bold text-[#9b5424] disabled:opacity-50"><ArrowDownTrayIcon className="size-5" />{isExporting ? "Préparation..." : "Télécharger"}</button>
-                  <button type="button" onClick={() => void sharePersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#d98632] px-4 text-sm font-bold text-white disabled:opacity-50"><ShareIcon className="size-5" />Partager en story</button>
+                  <a href="/mon-espace/persona/download" className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#4b4550] bg-[var(--card)] px-4 text-sm font-bold text-[var(--heading-color)]"><DocumentArrowDownIcon className="size-5" />PDF complet</a>
+                  <button type="button" onClick={() => void downloadPersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl border border-[var(--tyash-primary)] bg-[var(--card)] px-4 text-sm font-bold text-[var(--tyash-label-text)] disabled:opacity-50"><ArrowDownTrayIcon className="size-5" />{isExporting ? "Préparation..." : "Télécharger"}</button>
+                  <button type="button" onClick={() => void sharePersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl bg-[var(--tyash-primary)] px-4 text-sm font-bold text-[var(--tyash-text-on-primary)] disabled:opacity-50"><ShareIcon className="size-5" />Partager en story</button>
                 </div>
-                {shareMessage ? <p className="mt-3 text-sm text-[#6f645b]" role="status">{shareMessage}</p> : null}
+                {shareMessage ? <p className="mt-3 text-sm text-[var(--text-primary)]" role="status">{shareMessage}</p> : null}
               </div>
               <PersonaStoryCard ref={storyRef} summary={summary} />
             </div>
@@ -455,11 +455,11 @@ export default function BrandPersonaExercise({
 
 function SummaryCard({ title, content }: { title: string; content: string }) {
   return (
-    <div className="rounded-[1.2rem] border border-[#eadfca] bg-[#fffdf9] px-4 py-4">
-      <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+    <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4">
+      <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
         {title}
       </p>
-      <p className="mt-3 text-sm leading-7 text-[#5f544a]">
+      <p className="mt-3 text-sm leading-7 text-[var(--text-primary)]">
         {content || "À compléter dans l'exercice."}
       </p>
     </div>

@@ -24,12 +24,12 @@ export default async function Home({
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
       {paymentSucceeded ? <PaymentSuccessPopup /> : null}
-      <section className="bs-access-shell relative mx-auto w-full max-w-[84rem] overflow-hidden rounded-[2rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] shadow-[0_16px_44px_rgba(210,189,152,0.09)]">
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,rgba(243,198,35,0),rgba(243,198,35,0.72),rgba(246,178,107,0.42),rgba(243,198,35,0))]" />
+      <section className="bs-access-shell relative mx-auto w-full max-w-[84rem] overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] shadow-[0_16px_44px_rgba(210,189,152,0.09)]">
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,rgb(var(--tyash-glow-rgb)/0),rgb(var(--tyash-glow-rgb)/0.72),rgb(var(--tyash-glow-rgb)/0.42),rgb(var(--tyash-glow-rgb)/0))]" />
 
         <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
           <div className="bs-access-light-surface relative overflow-hidden px-7 py-8 sm:px-9 sm:py-9 lg:px-10 lg:py-10">
-            <div className="pointer-events-none absolute left-0 top-12 h-28 w-28 rounded-full bg-[#f3c623]/8 blur-3xl" />
+            <div className="pointer-events-none absolute left-0 top-12 h-28 w-28 rounded-full bg-[var(--tyash-primary)]/8 blur-3xl" />
 
             <div className="relative flex h-full flex-col gap-7">
               <div className="flex items-center gap-4">
@@ -41,8 +41,8 @@ export default async function Home({
                   className="h-auto w-[8rem]"
                   priority
                 />
-                <div className="hidden h-5 w-px bg-[#eadfca] lg:block" />
-                <p className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-5 py-3 text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+                <div className="hidden h-5 w-px bg-[var(--border)] lg:block" />
+                <p className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-5 py-3 text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
                   Espace de travail
                 </p>
               </div>
@@ -60,21 +60,21 @@ export default async function Home({
                 </div>
 
                 <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
-                  <h1 className="bs-text-on-light-primary max-w-full break-words font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[#4b4550] sm:text-[3.45rem] xl:text-[3.95rem]">
+                  <h1 className="bs-text-on-light-primary max-w-full break-words font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[3.45rem] xl:text-[3.95rem]">
                     {homeTitle}
                   </h1>
-                  <p className="bs-text-on-light-secondary mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[#7b7068]">
+                  <p className="bs-text-on-light-secondary mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
                     Un espace éditorial pour structurer ton parcours, accéder
                     à tes ressources et avancer avec plus de clarté.
                   </p>
 
-                  <div className="mt-6 grid gap-3 border-l border-[#eadfca] pl-5">
+                  <div className="mt-6 grid gap-3 border-l border-[var(--border)] pl-5">
                     {studioNotes.map((item) => (
                       <div
                         key={item}
-                        className="bs-text-on-light-secondary flex items-start gap-3 text-[0.9rem] leading-6 text-[#7b7068]"
+                        className="bs-text-on-light-secondary flex items-start gap-3 text-[0.9rem] leading-6 text-[var(--text-muted)]"
                       >
-                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#f0cf55]" />
+                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--tyash-medium)]" />
                         <span>{item}</span>
                       </div>
                     ))}
@@ -84,30 +84,30 @@ export default async function Home({
             </div>
           </div>
 
-          <div className="bs-access-light-surface border-t border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] px-6 py-6 sm:px-8 sm:py-7 lg:border-l lg:border-t-0 lg:px-8 lg:py-7">
+          <div className="bs-access-light-surface border-t border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] px-6 py-6 sm:px-8 sm:py-7 lg:border-l lg:border-t-0 lg:px-8 lg:py-7">
             <div className="flex h-full flex-col justify-center gap-5">
-              <div className="bs-access-dark-panel rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf7] p-4 shadow-[0_12px_24px_rgba(223,203,171,0.1)]">
-                <p className="inline-flex rounded-full bg-[#eef6eb] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#72806f]">
+              <div className="bs-access-dark-panel rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[0_12px_24px_rgba(223,203,171,0.1)]">
+                <p className="inline-flex rounded-full bs-status-light bg-[#eef6eb] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--status-success-text)]">
                   Nouveau client
                 </p>
-                <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[#8b7a70]">
+                <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[var(--text-muted)]">
                   Le paiement déclenche l&apos;envoi d&apos;un lien personnel
                   pour choisir ton mot de passe. Tu pourras ensuite créer ton
                   compte et choisir ton mot de passe.
                 </p>
                 <Link
                   href="/pricing"
-                  className="bs-access-dark-action mt-4 flex h-12 w-full items-center justify-center rounded-[1rem] border border-[#eadfca] bg-white px-5 text-[0.8rem] font-extrabold uppercase tracking-[0.12em] text-[#82766b] transition duration-200 hover:-translate-y-0.5"
+                  className="bs-access-dark-action mt-4 flex h-12 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-5 text-[0.8rem] font-extrabold uppercase tracking-[0.12em] text-[var(--text-muted)] transition duration-200 hover:-translate-y-0.5"
                 >
                   Souscrire à la formation
                 </Link>
               </div>
 
               <div>
-                <p className="bs-text-on-light-muted mt-3 text-sm font-extrabold text-[#4b4550]">
+                <p className="bs-text-on-light-muted mt-3 text-sm font-extrabold text-[var(--heading-color)]">
                   Déjà client ?
                 </p>
-                <p className="bs-text-on-light-secondary mt-1 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[#7b7068]">
+                <p className="bs-text-on-light-secondary mt-1 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[var(--text-muted)]">
                   Connecte-toi avec ton e-mail et ton mot de passe pour
                   retrouver ton espace de travail.
                 </p>
@@ -115,28 +115,28 @@ export default async function Home({
 
               <div>
                 {hasAccess ? (
-                  <div className="bs-access-dark-panel space-y-6 rounded-[1.9rem] border border-[#efe2d1] bg-[#fffdf7] p-6">
+                  <div className="bs-access-dark-panel space-y-6 rounded-[1.9rem] border border-[var(--border)] bg-[var(--surface)] p-6">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="bs-text-on-dark-primary text-xs font-black uppercase tracking-[0.22em] text-[#7a7087]">
+                      <p className="bs-text-on-dark-primary text-xs font-black uppercase tracking-[0.22em] text-[var(--text-muted)]">
                         Session active
                       </p>
-                      <span className="rounded-full bg-[#fff1c7] px-3 py-1 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+                      <span className="rounded-full bg-[var(--tyash-soft)] px-3 py-1 text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
                         active
                       </span>
                     </div>
-                    <p className="bs-text-on-dark-secondary text-base leading-7 text-[#7b7068]">
+                    <p className="bs-text-on-dark-secondary text-base leading-7 text-[var(--text-muted)]">
                       Ton accès est déjà reconnu. Ouvre directement ton
                       espace client.
                     </p>
                     <Link
                       href="/mon-espace"
-                      className="bs-access-primary-action flex h-16 w-full items-center justify-center rounded-[1.2rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5"
+                      className="bs-access-primary-action flex h-16 w-full items-center justify-center rounded-[1.2rem] bs-button-primary px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_22px_rgb(var(--tyash-glow-rgb)/0.18)] transition duration-200 hover:-translate-y-0.5"
                     >
                       Ouvrir mon espace
                     </Link>
                     <Link
                       href="/brand-guide"
-                      className="bs-access-guide-action flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[#efd7b8] bg-[#fff6e3] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[#cf7430] transition duration-200 hover:-translate-y-0.5"
+                      className="bs-access-guide-action flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)] transition duration-200 hover:-translate-y-0.5"
                     >
                       Générer mon Guide de Marque
                     </Link>

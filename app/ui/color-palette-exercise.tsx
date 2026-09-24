@@ -225,31 +225,31 @@ export default function ColorPaletteExercise({
 
   return (
     <>
-      <div className="mt-4 space-y-5 rounded-[1.7rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff7ef)] p-5 shadow-[0_18px_40px_rgba(210,189,152,0.1)]">
-        <div className="rounded-[1.3rem] border border-[#f0dfc6] bg-white px-5 py-5">
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+      <div className="mt-4 space-y-5 rounded-[1.7rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-5 shadow-[0_18px_40px_rgba(210,189,152,0.1)]">
+        <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--card)] px-5 py-5">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             Palette de couleurs
           </p>
-          <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.96] text-[#4b4550]">
+          <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.96] text-[var(--heading-color)]">
             {exercise.question || "Construis la palette de couleurs de ta marque"}
           </h3>
           {exercise.explanation ? (
             <PedagogicalContent
               content={exercise.explanation}
-              className="mt-5 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+              className="mt-5 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4"
             />
           ) : null}
-          <p className="mt-3 text-sm leading-7 text-[#8a8077]">{config.helperText}</p>
+          <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">{config.helperText}</p>
         </div>
 
         {config.exampleColors.length > 0 ? (
-          <div className="rounded-[1.2rem] border border-[#eadfca] bg-white px-4 py-4">
+          <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                   Inspirations rapides
                 </p>
-                <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+                <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
                   Clique sur un exemple pour l&apos;ajouter et l&apos;adapter.
                 </p>
               </div>
@@ -267,18 +267,18 @@ export default function ColorPaletteExercise({
                       usage: example.usage,
                     })
                   }
-                  className="flex items-center gap-3 rounded-full border border-[#eadfca] bg-[#fffdf8] px-3 py-2 text-left transition hover:border-[#cf7430]"
+                  className="flex items-center gap-3 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-left transition hover:border-[var(--tyash-primary)]"
                 >
                   <span
-                    className="h-8 w-8 rounded-full border border-white shadow-[0_0_0_1px_rgba(75,69,80,0.14)]"
+                    className="h-8 w-8 rounded-full border border-[var(--surface-highlight)] shadow-[0_0_0_1px_rgba(75,69,80,0.14)]"
                     style={{ background: example.hex }}
                     aria-hidden="true"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold leading-5 text-[#5f544a]">
+                    <span className="block text-sm font-semibold leading-5 text-[var(--text-primary)]">
                       {example.name}
                     </span>
-                    <span className="block text-xs leading-5 text-[#8a8077]">
+                    <span className="block text-xs leading-5 text-[var(--text-muted)]">
                       {example.usage || (example.type === "primary" ? "Principale" : "Secondaire")}
                     </span>
                   </span>
@@ -327,32 +327,32 @@ export default function ColorPaletteExercise({
           onClick={closeModal}
         >
           <div
-            className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[1.7rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff7ef)] p-6 shadow-[0_24px_70px_rgba(47,36,24,0.18)]"
+            className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[1.7rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-6 shadow-[0_24px_70px_rgba(47,36,24,0.18)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_22rem]">
               <div className="space-y-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                    <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
                       {draftState.bucket === "primary"
                         ? "Couleur principale"
                         : "Couleur secondaire"}
                     </p>
-                    <h4 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
+                    <h4 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[var(--heading-color)]">
                       {draftState.index === null ? "Ajouter une couleur" : "Modifier la couleur"}
                     </h4>
                   </div>
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                    className="rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                   >
                     Fermer
                   </button>
                 </div>
 
-                <div className="rounded-[1.3rem] border border-[#eadfca] bg-white p-5">
+                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--card)] p-5">
                   <div className="flex flex-wrap gap-2">
                     <ModeTab
                       active={draftState.value.mode === "solid"}
@@ -409,7 +409,7 @@ export default function ColorPaletteExercise({
                   <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem]">
                     <div className="space-y-4">
                       {config.allowColorPicker ? (
-                        <div className="rounded-[1.2rem] border border-[#f0dfc6] bg-[#fffdf8] p-4">
+                        <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] p-4">
                           {draftState.value.mode === "gradient" ? (
                             <div className="mb-4 flex flex-wrap gap-2">
                               <button
@@ -423,8 +423,8 @@ export default function ColorPaletteExercise({
                                 }
                                 className={`rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] ${
                                   draftState.activeGradientStop === "from"
-                                    ? "bg-[linear-gradient(135deg,#df9b39,#f1cc56)] text-white"
-                                    : "border border-[#eadfca] bg-white text-[#6b625a]"
+                                    ? "bs-button-primary text-white"
+                                    : "border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                                 }`}
                               >
                                 Couleur depart
@@ -440,8 +440,8 @@ export default function ColorPaletteExercise({
                                 }
                                 className={`rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] ${
                                   draftState.activeGradientStop === "to"
-                                    ? "bg-[linear-gradient(135deg,#df9b39,#f1cc56)] text-white"
-                                    : "border border-[#eadfca] bg-white text-[#6b625a]"
+                                    ? "bs-button-primary text-white"
+                                    : "border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                                 }`}
                               >
                                 Couleur arrivee
@@ -465,7 +465,7 @@ export default function ColorPaletteExercise({
 
                       <div className="grid gap-4 md:grid-cols-2">
                         <label className="space-y-2">
-                          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                             Nom de la couleur
                           </span>
                           <input
@@ -481,14 +481,14 @@ export default function ColorPaletteExercise({
                                   : current,
                               )
                             }
-                            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                             placeholder="Ex. Beige chaud"
                           />
                         </label>
 
                         {draftState.value.mode === "gradient" ? (
                           <label className="space-y-2">
-                            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                               Direction
                             </span>
                             <select
@@ -511,7 +511,7 @@ export default function ColorPaletteExercise({
                                     : current,
                                 )
                               }
-                              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                              className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                             >
                               <option value="horizontal">Horizontal</option>
                               <option value="vertical">Vertical</option>
@@ -573,7 +573,7 @@ export default function ColorPaletteExercise({
                         ) : null}
 
                         <label className="space-y-2 md:col-span-2">
-                          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                             Usage
                           </span>
                           <textarea
@@ -589,7 +589,7 @@ export default function ColorPaletteExercise({
                               )
                             }
                             rows={3}
-                            className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                            className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                             placeholder="Ex. Fond principal / bouton / accent / encart"
                           />
                         </label>
@@ -597,24 +597,24 @@ export default function ColorPaletteExercise({
                     </div>
 
                     <div className="space-y-4">
-                      <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-4">
-                        <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                      <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-4">
+                        <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                           Aperçu
                         </p>
                         <div
-                          className="mt-3 h-44 rounded-[1.1rem] border border-[#eadfca]"
+                          className="mt-3 h-44 rounded-[1.1rem] border border-[var(--border)]"
                           style={{
                             background: getPaletteColorCss(draftState.value),
                           }}
                         />
-                        <div className="mt-4 space-y-2 text-sm leading-6 text-[#6f645b]">
+                        <div className="mt-4 space-y-2 text-sm leading-6 text-[var(--text-primary)]">
                           <p>
                             {draftState.value.mode === "gradient"
                               ? `${draftState.value.from} -> ${draftState.value.to}`
                               : draftState.value.hex}
                           </p>
                           {config.enableColorMeaningHelper && currentDraftMeaning ? (
-                            <p className="rounded-[0.9rem] bg-[#fff7ec] px-3 py-3 text-sm leading-6 text-[#6f645b]">
+                            <p className="rounded-[0.9rem] bg-[var(--tyash-soft)] px-3 py-3 text-sm leading-6 text-[var(--text-primary)]">
                               Cette couleur peut évoquer...
                               <span className="block">{currentDraftMeaning.replace("Cette couleur peut évoquer ", "")}</span>
                             </p>
@@ -622,7 +622,7 @@ export default function ColorPaletteExercise({
                         </div>
                       </div>
 
-                      <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-4">
+                      <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-4">
                         <div className="flex flex-wrap gap-2">
                           {config.allowEyeDropper ? (
                             <button
@@ -634,7 +634,7 @@ export default function ColorPaletteExercise({
                                   ? "Prélever une couleur à l'écran"
                                   : "Non disponible sur ce navigateur"
                               }
-                              className="flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-60"
+                              className="flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
                             >
                               Utiliser la pipette
                             </button>
@@ -643,18 +643,18 @@ export default function ColorPaletteExercise({
                             type="button"
                             onClick={saveDraft}
                             disabled={!canSaveDraft(draftState.value, config)}
-                            className="flex h-11 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+                            className="flex h-11 items-center justify-center rounded-[0.9rem] bs-button-primary px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-white disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             Enregistrer la couleur
                           </button>
                         </div>
                         {eyeDropperMessage ? (
-                          <p className="mt-3 text-sm leading-6 text-[#8a8077]">
+                          <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
                             {eyeDropperMessage}
                           </p>
                         ) : null}
                         {!canSaveDraft(draftState.value, config) ? (
-                          <p className="mt-3 text-sm leading-6 text-[#8a8077]">
+                          <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
                             Renseigne un nom, une couleur valide et{config.requireUsage ? " un usage" : ""} pour enregistrer cet element.
                           </p>
                         ) : null}
@@ -710,19 +710,19 @@ function PaletteSection({
   const canAdd = items.length < maxItems;
 
   return (
-    <div className="rounded-[1.3rem] border border-[#eadfca] bg-white p-5">
+    <div className="rounded-[1.3rem] border border-[var(--border)] bg-[var(--card)] p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
             {title}
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#8a8077]">{helper}</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{helper}</p>
         </div>
         <button
           type="button"
           onClick={onAdd}
           disabled={!canAdd}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[0.9rem] border border-[#eadfca] bg-[#fff8f1] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <PlusIcon className="h-4 w-4" />
           Ajouter une couleur
@@ -730,7 +730,7 @@ function PaletteSection({
       </div>
 
       {items.length === 0 ? (
-        <div className="mt-4 rounded-[1rem] border border-dashed border-[#eadfca] bg-[#fffdf9] px-4 py-5 text-sm leading-6 text-[#8a8077]">
+        <div className="mt-4 rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-5 text-sm leading-6 text-[var(--text-muted)]">
           Aucune couleur ajoutee pour le moment.
         </div>
       ) : (
@@ -741,33 +741,33 @@ function PaletteSection({
             return (
               <div
                 key={item.id}
-                className="grid gap-4 rounded-[1rem] border border-[#eadfca] bg-[#fffdf9] p-4 md:grid-cols-[5rem_minmax(0,1fr)_auto]"
+                className="grid gap-4 rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] p-4 md:grid-cols-[5rem_minmax(0,1fr)_auto]"
               >
                 <div
-                  className="h-16 rounded-[1rem] border border-[#eadfca]"
+                  className="h-16 rounded-[1rem] border border-[var(--border)]"
                   style={{ background: getPaletteColorCss(item) }}
                   aria-label={`Aperçu ${item.mode === "gradient" ? "du dégradé" : "de la couleur"} ${item.name || index + 1}`}
                 />
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-base font-semibold leading-6 text-[#5f544a]">
+                    <p className="text-base font-semibold leading-6 text-[var(--text-primary)]">
                       {item.name || "Couleur sans nom"}
                     </p>
-                    <span className="rounded-full bg-[#f7efe1] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#8a8077]">
+                    <span className="rounded-full bg-[var(--surface-secondary)] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
                       {item.mode === "gradient" ? "Degrade" : "Unie"}
                     </span>
                     {!isComplete ? (
-                      <span className="rounded-full bg-[#fff7ec] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#cf7430]">
+                      <span className="rounded-full bg-[var(--tyash-soft)] px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[var(--tyash-label-text)]">
                         À compléter
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+                  <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
                     {item.mode === "gradient"
                       ? `${item.from} -> ${item.to}`
                       : item.hex}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-[#6f645b]">
+                  <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">
                     {item.usage || "Usage non renseigne"}
                   </p>
                 </div>
@@ -775,7 +775,7 @@ function PaletteSection({
                   <button
                     type="button"
                     onClick={() => onEdit(index, item)}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a]"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                     aria-label={`Modifier ${item.name || "la couleur"}`}
                   >
                     <PencilSquareIcon className="h-4 w-4" />
@@ -783,7 +783,7 @@ function PaletteSection({
                   <button
                     type="button"
                     onClick={() => onDelete(index)}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#b45247]"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--status-error-text)]"
                     aria-label={`Supprimer ${item.name || "la couleur"}`}
                   >
                     <TrashIcon className="h-4 w-4" />
@@ -814,14 +814,14 @@ function CompletionPanel({
   const completedCount = items.filter((item) => isPaletteColorComplete(item, requireUsage)).length;
 
   return (
-    <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-4">
-      <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[#7a7087]">
+    <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-4">
+      <p className="text-[0.72rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
         {title}
       </p>
-      <p className="mt-3 text-3xl font-black leading-none text-[#4b4550]">
+      <p className="mt-3 text-3xl font-black leading-none text-[var(--heading-color)]">
         {currentCount}/{maxCount}
       </p>
-      <p className="mt-2 text-sm leading-6 text-[#8a8077]">
+      <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
         {completedCount} element{completedCount > 1 ? "s" : ""} complet
         {completedCount > 1 ? "s" : ""}.
       </p>
@@ -844,8 +844,8 @@ function ModeTab({
       onClick={onClick}
       className={`rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] ${
         active
-          ? "bg-[linear-gradient(135deg,#df9b39,#f1cc56)] text-white"
-          : "border border-[#eadfca] bg-white text-[#6b625a]"
+          ? "bs-button-primary text-white"
+          : "border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
       }`}
     >
       {label}
@@ -864,18 +864,18 @@ function HexInput({
 }) {
   return (
     <label className="space-y-2">
-      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
         {label}
       </span>
       <input
         type="text"
         value={value}
         onChange={(event) => onChange(event.target.value.toUpperCase())}
-        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 uppercase"
+        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 uppercase"
         aria-label={label}
       />
       {!isValidHexColor(value) ? (
-        <p className="text-xs leading-5 text-[#8a8077]">Format attendu : `#RRGGBB`.</p>
+        <p className="text-xs leading-5 text-[var(--text-muted)]">Format attendu : `#RRGGBB`.</p>
       ) : null}
     </label>
   );

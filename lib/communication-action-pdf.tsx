@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
   },
   eyebrow: {
-    color: "#CF7430",
+    color: "#7A2D46",
     fontSize: 8,
     fontWeight: 700,
     letterSpacing: 1.8,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   year: {
-    color: "#CF7430",
+    color: "#7A2D46",
     fontSize: 22,
     fontWeight: 700,
     marginTop: 3,
@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   monthActive: {
-    backgroundColor: "#FFF1D5",
-    border: "1 solid #E8A957",
+    backgroundColor: "#F5E4EB",
+    border: "1 solid #E8D1DC",
   },
   monthName: {
     color: "#6F645B",
@@ -120,13 +120,13 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   monthCount: {
-    color: "#CF7430",
+    color: "#7A2D46",
     fontSize: 8,
     fontWeight: 700,
     marginTop: 2,
   },
   sectionTitle: {
-    color: "#CF7430",
+    color: "#7A2D46",
     fontSize: 7,
     fontWeight: 700,
     letterSpacing: 1.3,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     width: "24%",
   },
   undatedLabel: {
-    color: "#CF7430",
+    color: "#7A2D46",
     fontSize: 6.2,
     fontWeight: 700,
     textTransform: "uppercase",

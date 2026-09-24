@@ -31,9 +31,9 @@ export default function AdminGuideDownload({ userId }: { userId: number }) {
     }
   }
   return <div className="space-y-2">
-    <button type="button" onClick={download} disabled={pending} className="rounded-xl border border-[#d7c8b7] bg-[#f8f1e6] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-[#17213b] disabled:cursor-wait disabled:opacity-60">
+    <button type="button" onClick={download} disabled={pending} className="rounded-xl border border-[var(--border)] bg-[var(--surface-secondary)] px-5 py-3 text-xs font-black uppercase tracking-[0.12em] text-[var(--heading-color)] disabled:cursor-wait disabled:opacity-60">
       {pending ? "Génération du PDF…" : "Télécharger le Guide de Marque (PDF)"}
     </button>
-    <p role="status" aria-live="polite" className="max-w-lg text-sm text-[#5d5752]">{message}</p>
+    <p role="status" aria-live="polite" className="max-w-lg text-sm text-[var(--text-primary)]">{message}</p>
   </div>;
 }

@@ -25,13 +25,13 @@ export default function ColorPaletteAdminEditor({
   onChange: (nextValue: ColorPaletteConfig) => void;
 }) {
   return (
-    <div className="space-y-4 rounded-[1rem] border border-[#eadfca] bg-[#fff8f1] p-4">
+    <div className="space-y-4 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Exercice Palette de couleurs
           </p>
-          <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+          <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
             Configure le picker visuel, les limites de palette et les couleurs
             d&apos;exemple proposées a l&apos;utilisateur.
           </p>
@@ -39,26 +39,26 @@ export default function ColorPaletteAdminEditor({
         <button
           type="button"
           onClick={() => onChange(getDefaultColorPaletteConfig())}
-          className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a]"
+          className="rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
         >
           Reinitialiser
         </button>
       </div>
 
       <label className="space-y-2">
-        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Helper text
         </span>
         <textarea
           value={value.helperText}
           onChange={(event) => onChange({ ...value, helperText: event.target.value })}
-          className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+          className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
         />
       </label>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Couleurs principales max
           </span>
           <input
@@ -75,11 +75,11 @@ export default function ColorPaletteAdminEditor({
                 ),
               })
             }
-            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
           />
         </label>
         <label className="space-y-2">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             Couleurs secondaires max
           </span>
           <input
@@ -96,13 +96,13 @@ export default function ColorPaletteAdminEditor({
                 ),
               })
             }
-            className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+            className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
           />
         </label>
       </div>
 
       <label className="space-y-2">
-        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Mode par defaut
         </span>
         <select
@@ -113,7 +113,7 @@ export default function ColorPaletteAdminEditor({
               defaultMode: event.target.value === "gradient" ? "gradient" : "solid",
             })
           }
-          className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+          className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
         >
           {MODE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -161,10 +161,10 @@ export default function ColorPaletteAdminEditor({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Couleurs d&apos;exemple
             </p>
-            <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+            <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
               Ces exemples servent d&apos;inspiration rapide dans l&apos;exercice.
             </p>
           </div>
@@ -185,7 +185,7 @@ export default function ColorPaletteAdminEditor({
                 ],
               })
             }
-            className="rounded-full border border-[#eadfca] bg-white px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[#6b625a]"
+            className="rounded-full border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
           >
             Ajouter une couleur
           </button>
@@ -195,21 +195,21 @@ export default function ColorPaletteAdminEditor({
           {value.exampleColors.map((example, index) => (
             <div
               key={example.id}
-              className="rounded-[1rem] border border-[#eadfca] bg-white p-4"
+              className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] p-4"
             >
               <div className="grid gap-4 md:grid-cols-[5rem_minmax(0,1.2fr)_minmax(0,1fr)_10rem_auto]">
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Aperçu
                   </span>
                   <span
-                    className="block h-12 rounded-[0.9rem] border border-[#eadfca]"
+                    className="block h-12 rounded-[0.9rem] border border-[var(--border)]"
                     style={{ background: normalizeHexColor(example.hex) ?? "#EFE8D0" }}
                   />
                 </label>
 
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Nom
                   </span>
                   <input
@@ -223,12 +223,12 @@ export default function ColorPaletteAdminEditor({
                         ),
                       })
                     }
-                    className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
                 </label>
 
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Usage
                   </span>
                   <input
@@ -242,13 +242,13 @@ export default function ColorPaletteAdminEditor({
                         ),
                       })
                     }
-                    className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
                 </label>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="space-y-2">
-                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       HEX
                     </span>
                     <input
@@ -262,12 +262,12 @@ export default function ColorPaletteAdminEditor({
                           ),
                         })
                       }
-                      className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 uppercase"
+                      className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 uppercase"
                     />
                   </label>
 
                   <label className="space-y-2">
-                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       Type
                     </span>
                     <select
@@ -288,7 +288,7 @@ export default function ColorPaletteAdminEditor({
                           ),
                         })
                       }
-                      className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                      className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                     >
                       {TYPE_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -310,14 +310,14 @@ export default function ColorPaletteAdminEditor({
                         ),
                       })
                     }
-                    className="text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                    className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                   >
                     Supprimer
                   </button>
                 </div>
               </div>
 
-              <p className="mt-3 text-xs leading-5 text-[#8a8077]">
+              <p className="mt-3 text-xs leading-5 text-[var(--text-muted)]">
                 Exemple {index + 1}
               </p>
             </div>
@@ -338,8 +338,8 @@ function ToggleCard({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
-      <span className="text-sm font-semibold text-[#5f544a]">{label}</span>
+    <label className="flex items-center justify-between rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3">
+      <span className="text-sm font-semibold text-[var(--text-primary)]">{label}</span>
       <input
         type="checkbox"
         checked={checked}

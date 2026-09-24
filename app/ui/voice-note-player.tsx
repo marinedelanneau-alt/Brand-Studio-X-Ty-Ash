@@ -66,19 +66,19 @@ export default function VoiceNotePlayer({
   const hasSubtitles = normalizedSubtitles.length > 0;
 
   return (
-    <div className="bs-audio-card relative overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[#fffdf7] shadow-[0_14px_34px_rgba(126,102,78,0.08)]">
+    <div className="bs-audio-card relative overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] shadow-[0_14px_34px_rgba(126,102,78,0.08)]">
       {hasSubtitles ? (
         <button
           type="button"
           onClick={() => setShowSubtitles((current) => !current)}
-          className="absolute right-4 top-4 z-10 rounded-full border border-[#eadfca] bg-white/92 px-4 py-2 text-[0.7rem] font-black uppercase tracking-[0.14em] text-[#6b625a] shadow-[0_8px_20px_rgba(126,102,78,0.1)] transition hover:border-[#d88a2f] hover:text-[#cf7430] focus:outline-none focus:ring-4 focus:ring-[#f0cf55]/25"
+          className="absolute right-4 top-4 z-10 rounded-full border border-[var(--border)] bg-[var(--card)]/92 px-4 py-2 text-[0.7rem] font-black uppercase tracking-[0.14em] text-[var(--text-primary)] shadow-[0_8px_20px_rgba(126,102,78,0.1)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)] focus:outline-none focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/25"
           aria-expanded={showSubtitles}
         >
           {showSubtitles ? "Masquer" : "Sous-titres"}
         </button>
       ) : null}
       <div className="grid md:grid-cols-[minmax(15rem,22rem)_1fr]">
-        <div className="bs-audio-portrait relative min-h-[20rem] bg-[#f4efe9] md:min-h-[24rem]">
+        <div className="bs-audio-portrait relative min-h-[20rem] bg-[var(--surface-secondary)] md:min-h-[24rem]">
           <Image
             src={audioHostVisual}
             alt="Portrait Brand Studio"
@@ -88,17 +88,17 @@ export default function VoiceNotePlayer({
           />
         </div>
 
-        <div className="bs-light-surface flex min-w-0 flex-col justify-center gap-5 bg-[linear-gradient(180deg,#fffdf7,#fff8f1)] px-5 py-16 sm:px-7 md:py-6 md:pr-8">
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+        <div className="bs-light-surface flex min-w-0 flex-col justify-center gap-5 bg-[image:var(--tyash-surface-gradient)] px-5 py-16 sm:px-7 md:py-6 md:pr-8">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             {eyebrow}
           </p>
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
+            <h3 className="font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[var(--heading-color)]">
               {title}
             </h3>
             <div
               aria-hidden="true"
-              className="flex h-8 items-center gap-1 text-[#2f2c2b]"
+              className="flex h-8 items-center gap-1 text-[var(--heading-color)]"
             >
               {[12, 22, 14, 28, 18, 34, 15, 26, 12].map((height, index) => (
                 <span
@@ -114,7 +114,7 @@ export default function VoiceNotePlayer({
             Ton navigateur ne peut pas lire cette note vocale.
           </audio>
           {showSubtitles && hasSubtitles ? (
-            <div className="max-h-44 overflow-y-auto rounded-[1rem] border border-[#eadfca] bg-white/84 px-4 py-3 text-sm leading-7 text-[#5f544a] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+            <div className="max-h-44 overflow-y-auto rounded-[1rem] border border-[var(--border)] bg-[var(--card)]/84 px-4 py-3 text-sm leading-7 text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.8)]">
               <p className="whitespace-pre-line">{normalizedSubtitles}</p>
             </div>
           ) : null}

@@ -50,11 +50,11 @@ export default function SmartFeedbackAdminEditor({
   };
 
   return (
-    <div className="space-y-4 rounded-[1rem] border border-[#eadfca] bg-[#fffaf4] p-4">
-      <div className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
+    <div className="space-y-4 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-4">
+      <div className="flex items-center justify-between rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3">
         <div>
-          <p className="text-sm font-semibold text-[#4b4550]">Feedback intelligent</p>
-          <p className="text-sm leading-6 text-[#7b7068]">
+          <p className="text-sm font-semibold text-[var(--heading-color)]">Feedback intelligent</p>
+          <p className="text-sm leading-6 text-[var(--text-muted)]">
             Affiche un conseil doux et utile sous la réponse utilisateur.
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function SmartFeedbackAdminEditor({
         <>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Type de feedback
               </span>
               <select
@@ -83,7 +83,7 @@ export default function SmartFeedbackAdminEditor({
                     type: event.target.value as SmartFeedbackType,
                   })
                 }
-                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
               >
                 {FEEDBACK_TYPES.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -93,8 +93,8 @@ export default function SmartFeedbackAdminEditor({
               </select>
             </label>
 
-            <label className="flex items-center justify-between rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3">
-              <span className="text-sm font-semibold text-[#5f544a]">
+            <label className="flex items-center justify-between rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3">
+              <span className="text-sm font-semibold text-[var(--text-primary)]">
                 Afficher un score de clarté
               </span>
               <input
@@ -113,7 +113,7 @@ export default function SmartFeedbackAdminEditor({
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Longueur minimale recommandee
               </span>
               <input
@@ -126,12 +126,12 @@ export default function SmartFeedbackAdminEditor({
                     minLength: Math.max(0, Number(event.target.value) || 0),
                   })
                 }
-                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
               />
             </label>
 
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Longueur maximale recommandee
               </span>
               <input
@@ -144,14 +144,14 @@ export default function SmartFeedbackAdminEditor({
                     maxLength: Math.max(0, Number(event.target.value) || 0),
                   })
                 }
-                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
               />
             </label>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Mots génériques à éviter
               </span>
               <textarea
@@ -162,13 +162,13 @@ export default function SmartFeedbackAdminEditor({
                     forbiddenKeywords: parseLineList(event.target.value),
                   })
                 }
-                className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                 placeholder={DEFAULT_GENERIC_WORDS.join("\n")}
               />
             </label>
 
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Mots cles attendus
               </span>
               <textarea
@@ -179,14 +179,14 @@ export default function SmartFeedbackAdminEditor({
                     requiredKeywords: parseLineList(event.target.value),
                   })
                 }
-                className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
             </label>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Message si réponse trop courte
               </span>
               <textarea
@@ -197,12 +197,12 @@ export default function SmartFeedbackAdminEditor({
                     improvementMessage: event.target.value,
                   })
                 }
-                className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
             </label>
 
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Message si réponse trop vague
               </span>
               <textarea
@@ -213,12 +213,12 @@ export default function SmartFeedbackAdminEditor({
                     neutralMessage: event.target.value,
                   })
                 }
-                className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
             </label>
 
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Message si réponse correcte
               </span>
               <textarea
@@ -229,12 +229,12 @@ export default function SmartFeedbackAdminEditor({
                     positiveMessage: event.target.value,
                   })
                 }
-                className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
             </label>
 
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Message si réponse excellente
               </span>
               <textarea
@@ -245,15 +245,15 @@ export default function SmartFeedbackAdminEditor({
                     excellentMessage: event.target.value,
                   })
                 }
-                className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
             </label>
           </div>
 
           {normalizedValue.type === "rule_based" ? (
-            <div className="space-y-3 rounded-[0.9rem] border border-[#eadfca] bg-white p-4">
+            <div className="space-y-3 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] p-4">
               <div className="flex items-center justify-between gap-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   Regles personnalisees
                 </span>
                 <button
@@ -273,7 +273,7 @@ export default function SmartFeedbackAdminEditor({
                       ],
                     })
                   }
-                  className="rounded-[0.8rem] border border-[#eadfca] bg-[#fff8f1] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                  className="rounded-[0.8rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                 >
                   Ajouter une regle
                 </button>
@@ -282,11 +282,11 @@ export default function SmartFeedbackAdminEditor({
               {normalizedValue.rules.map((rule) => (
                 <div
                   key={rule.id}
-                  className="grid gap-3 rounded-[0.9rem] border border-[#f0e4d3] bg-[#fffdf9] p-4"
+                  className="grid gap-3 rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] p-4"
                 >
                   <div className="grid gap-3 md:grid-cols-3">
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Condition
                       </span>
                       <select
@@ -304,7 +304,7 @@ export default function SmartFeedbackAdminEditor({
                             ),
                           })
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       >
                         {RULE_CONDITIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -315,7 +315,7 @@ export default function SmartFeedbackAdminEditor({
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Niveau
                       </span>
                       <select
@@ -333,7 +333,7 @@ export default function SmartFeedbackAdminEditor({
                             ),
                           })
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       >
                         {FEEDBACK_LEVELS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -351,14 +351,14 @@ export default function SmartFeedbackAdminEditor({
                           rules: normalizedValue.rules.filter((item) => item.id !== rule.id),
                         })
                       }
-                      className="self-end text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                      className="self-end text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                     >
                       Supprimer la regle
                     </button>
                   </div>
 
                   <label className="space-y-2">
-                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       Valeur
                     </span>
                     <input
@@ -398,12 +398,12 @@ export default function SmartFeedbackAdminEditor({
                           ),
                         })
                       }
-                      className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                      className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                     />
                   </label>
 
                   <label className="space-y-2">
-                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       Message
                     </span>
                     <textarea
@@ -418,7 +418,7 @@ export default function SmartFeedbackAdminEditor({
                           ),
                         })
                       }
-                      className="min-h-20 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                      className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                     />
                   </label>
                 </div>

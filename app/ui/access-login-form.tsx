@@ -19,7 +19,7 @@ const initialState: ActionState = {
 };
 
 const inputClassName =
-  "h-12 w-full rounded-[1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffef9,#fff8dc)] px-5 text-[0.92rem] text-[#6a5d53] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_20px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[#a19388] focus:-translate-y-0.5 focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/22";
+  "h-12 w-full rounded-[1rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] px-5 text-[0.92rem] text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.9),0_10px_20px_rgba(223,203,171,0.1)] outline-none transition duration-200 placeholder:text-[var(--text-muted)] focus:-translate-y-0.5 focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/22";
 
 export default function AccessLoginForm() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function AccessLoginForm() {
       <div className="space-y-2">
         <label
           htmlFor="email"
-          className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]"
         >
           E-mail
         </label>
@@ -68,7 +68,7 @@ export default function AccessLoginForm() {
       <div className="space-y-2">
         <label
           htmlFor="password"
-          className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          className="block text-[0.82rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]"
         >
           Mot de passe
         </label>
@@ -105,7 +105,7 @@ export default function AccessLoginForm() {
               }
             }}
             onBlur={() => setIsPasswordVisible(false)}
-            className="absolute inset-y-0 right-1 flex w-12 touch-none select-none items-center justify-center rounded-[0.8rem] text-[#8b7a70] transition hover:bg-[#f6eddc] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
+            className="absolute inset-y-0 right-1 flex w-12 touch-none select-none items-center justify-center rounded-[0.8rem] text-[var(--text-muted)] transition hover:bg-[var(--surface-secondary)] hover:text-[var(--tyash-label-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tyash-focus-ring)]"
           >
             {isPasswordVisible ? (
               <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
@@ -119,7 +119,7 @@ export default function AccessLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="bs-access-primary-action flex h-12 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#e19b34,#f2cf58)] px-6 text-[0.86rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_22px_rgba(227,175,64,0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
+        className="bs-access-primary-action flex h-12 w-full max-w-[41rem] items-center justify-center rounded-[1rem] bs-button-primary px-6 text-[0.86rem] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_22px_rgb(var(--tyash-glow-rgb)/0.18)] transition duration-200 hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Connexion..." : "Entrer"}
       </button>
@@ -129,7 +129,7 @@ export default function AccessLoginForm() {
         formAction={resetAction}
         formNoValidate
         disabled={resetPending}
-        className="w-full max-w-[41rem] text-center text-sm font-extrabold uppercase tracking-[0.12em] text-[#cf7430] transition hover:text-[#9f5526] disabled:cursor-wait disabled:opacity-70"
+        className="w-full max-w-[41rem] text-center text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)] transition hover:text-[var(--tyash-label-text)] disabled:cursor-wait disabled:opacity-70"
       >
         {resetPending ? "Envoi en cours..." : "Mot de passe oublie ?"}
       </button>
@@ -140,8 +140,8 @@ export default function AccessLoginForm() {
             aria-live="polite"
             className={
               visibleState.status === "error"
-                ? "text-sm font-medium leading-6 text-[#b45247]"
-                : "text-sm font-medium leading-6 text-[#5f8d63]"
+                ? "text-sm font-medium leading-6 text-[var(--status-error-text)]"
+                : "text-sm font-medium leading-6 text-[var(--status-success-text)]"
             }
           >
             {visibleState.message}

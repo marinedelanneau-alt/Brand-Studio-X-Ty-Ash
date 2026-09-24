@@ -82,18 +82,18 @@ function cx(...classes: Array<string | false | null | undefined>) {
 }
 
 function getPriorityClass(priority?: string | null) {
-  if (priority === "À lancer en priorité") return "border-[#d7ead5] bg-[#f1f8ed] text-[#4f7c55]";
-  if (priority === "À préparer") return "border-[#f0dfba] bg-[#fff7e7] text-[#9a641f]";
-  if (priority === "À reconsidérer") return "border-[#efd2cc] bg-[#fff1ee] text-[#9d4e40]";
-  return "border-[#eadfca] bg-white text-[#6b625a]";
+  if (priority === "À lancer en priorité") return "border-[#d7ead5] bs-status-light bg-[#f1f8ed] text-[var(--status-success-text)]";
+  if (priority === "À préparer") return "border-[#f0dfba] bs-status-light bg-[#fff7e7] text-[#9a641f]";
+  if (priority === "À reconsidérer") return "border-[#efd2cc] bs-status-light bg-[#fff1ee] text-[var(--status-error-text)]";
+  return "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]";
 }
 
 function getStatusClass(status: ActionStatus) {
-  if (status === "Terminée") return "border-[#d7ead5] bg-[#eef8ec] text-[#4f7c55]";
-  if (status === "En cours") return "border-[#d9e6f5] bg-[#eff6ff] text-[#416f9d]";
-  if (status === "Planifiée") return "border-[#f0dfba] bg-[#fff7e7] text-[#9a641f]";
-  if (status === "En pause") return "border-[#e2dbe9] bg-[#f8f4fb] text-[#756387]";
-  return "border-[#eadfca] bg-white text-[#6b625a]";
+  if (status === "Terminée") return "border-[#d7ead5] bs-status-light bg-[#eef8ec] text-[var(--status-success-text)]";
+  if (status === "En cours") return "border-[#d9e6f5] bs-status-light bg-[#eff6ff] text-[#416f9d]";
+  if (status === "Planifiée") return "border-[#f0dfba] bs-status-light bg-[#fff7e7] text-[#9a641f]";
+  if (status === "En pause") return "border-[#e2dbe9] bs-status-light bg-[#f8f4fb] text-[#756387]";
+  return "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]";
 }
 
 function filterActions(actions: CommunicationAction[], filters: Filters) {
@@ -130,18 +130,18 @@ function ActionCard({
   onStatus: (id: string, status: ActionStatus) => void;
 }) {
   return (
-    <article className="rounded-[1.15rem] border border-[#eadfca] bg-white p-4 shadow-[0_12px_28px_rgba(126,102,78,0.06)]">
+    <article className="rounded-[1.15rem] border border-[var(--border)] bg-[var(--card)] p-4 shadow-[0_12px_28px_rgba(126,102,78,0.06)]">
       <div className="flex items-start justify-between gap-3">
         <button type="button" onClick={() => onOpen(action)} className="min-w-0 text-left">
-          <p className="text-lg font-semibold leading-6 text-[#2f2a36]">{action.title}</p>
-          <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#6f645b]">
+          <p className="text-lg font-semibold leading-6 text-[var(--heading-color)]">{action.title}</p>
+          <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--text-primary)]">
             {action.description || action.first_step || "Action à préciser."}
           </p>
         </button>
         <button
           type="button"
           onClick={() => onEdit(action)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#eadfca] text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
           aria-label="Modifier l'action"
         >
           <PencilSquareIcon className="h-4 w-4" />
@@ -168,9 +168,9 @@ function ActionCard({
         </select>
       </div>
       {action.first_step ? (
-        <div className="mt-4 rounded-[0.95rem] border border-[#f0e4d3] bg-[#fffaf4] px-3 py-3">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">Première étape</p>
-          <p className="mt-1 text-sm leading-6 text-[#5f544a]">{action.first_step}</p>
+        <div className="mt-4 rounded-[0.95rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-3">
+          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">Première étape</p>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-primary)]">{action.first_step}</p>
         </div>
       ) : null}
       <div className="mt-4 flex justify-end gap-2">
@@ -187,7 +187,7 @@ function ActionCard({
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-[#eadfca] bg-[#fffdf8] px-3 py-1 text-xs font-semibold text-[#6f645b]">
+    <span className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--text-primary)]">
       {children}
     </span>
   );
@@ -207,7 +207,7 @@ function IconButton({
       type="button"
       onClick={onClick}
       title={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
     >
       {children}
     </button>
@@ -237,8 +237,8 @@ function MultiSelect({
             className={cx(
               "rounded-full border px-3 py-2 text-xs font-bold transition",
               selected
-                ? "border-[#cf7430] bg-[#fff1d5] text-[#cf7430]"
-                : "border-[#eadfca] bg-white text-[#6b625a]",
+                ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]"
+                : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]",
             )}
           >
             {option}
@@ -288,20 +288,20 @@ function CommunicationActionForm({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#2f2a36]/35 px-3 py-4 backdrop-blur-sm sm:px-6">
-      <div className="ml-auto flex h-full max-w-3xl flex-col overflow-hidden rounded-[1.4rem] border border-[#eadfca] bg-[#fffaf3] shadow-[0_24px_80px_rgba(47,42,54,0.22)]">
-        <div className="flex items-center justify-between border-b border-[#eadfca] bg-white px-5 py-4">
+      <div className="ml-auto flex h-full max-w-3xl flex-col overflow-hidden rounded-[1.4rem] border border-[var(--border)] bg-[var(--tyash-subtle)] shadow-[0_24px_80px_rgba(47,42,54,0.22)]">
+        <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <div>
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Action communication</p>
-            <p className="mt-1 text-lg font-semibold text-[#2f2a36]">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Action communication</p>
+            <p className="mt-1 text-lg font-semibold text-[var(--heading-color)]">
               {draft.id ? "Modifier l'action" : "Ajouter une action"}
             </p>
           </div>
-          <button type="button" onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white">
+          <button type="button" onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]">
             <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex gap-2 border-b border-[#eadfca] bg-[#fffdf8] px-5 py-3">
+        <div className="flex gap-2 border-b border-[var(--border)] bg-[var(--surface)] px-5 py-3">
           {["Action", "Objectif", "Public", "Type", "Planning", "Priorité"].map((label, index) => (
             <button
               key={label}
@@ -309,7 +309,7 @@ function CommunicationActionForm({
               onClick={() => setStep(index as FormStep)}
               className={cx(
                 "h-2 flex-1 rounded-full transition",
-                step >= index ? "bg-[#cf7430]" : "bg-[#eadfca]",
+                step >= index ? "bg-[var(--tyash-primary)]" : "bg-[var(--border)]",
               )}
               aria-label={label}
             />
@@ -318,7 +318,7 @@ function CommunicationActionForm({
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
           {formMessage ? (
-            <p className="mb-4 rounded-[0.9rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#9d4e40]">
+            <p className="mb-4 rounded-[0.9rem] border border-[#efc6bf] bs-status-light bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[var(--status-error-text)]">
               {formMessage}
             </p>
           ) : null}
@@ -330,13 +330,13 @@ function CommunicationActionForm({
                 value={draft.title}
                 onChange={(event) => setDraft({ ...draft, title: event.target.value })}
                 placeholder="Ex. lancer une newsletter mensuelle"
-                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-sm outline-none focus:border-[#cf7430]"
+                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-sm outline-none focus:border-[var(--tyash-primary)]"
               />
               <textarea
                 value={draft.description ?? ""}
                 onChange={(event) => setDraft({ ...draft, description: event.target.value })}
                 placeholder="Décris ton idée en quelques mots"
-                className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm outline-none focus:border-[#cf7430]"
+                className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm outline-none focus:border-[var(--tyash-primary)]"
               />
             </div>
           ) : null}
@@ -354,12 +354,12 @@ function CommunicationActionForm({
                   />
                 ))}
               </div>
-              <label className="block text-sm font-semibold text-[#6f645b]">
+              <label className="block text-sm font-semibold text-[var(--text-primary)]">
                 Objectif secondaire
                 <select
                   value={draft.secondary_objective ?? ""}
                   onChange={(event) => setDraft({ ...draft, secondary_objective: event.target.value || null })}
-                  className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-sm"
+                  className="mt-2 h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 text-sm"
                 >
                   <option value="">Aucun</option>
                   {ACTION_OBJECTIVES.map((objective) => (
@@ -401,7 +401,7 @@ function CommunicationActionForm({
             <div className="space-y-4">
               <Question title="Quand souhaites-tu lancer cette action ?" />
               <div className="grid gap-3 sm:grid-cols-3">
-                <label className="text-sm font-semibold text-[#6f645b]">
+                <label className="text-sm font-semibold text-[var(--text-primary)]">
                   Date précise
                   <input
                     type="date"
@@ -409,10 +409,10 @@ function CommunicationActionForm({
                     max={`${selectedYear}-12-31`}
                     value={draft.start_date ?? ""}
                     onChange={(event) => setDraft({ ...draft, start_date: event.target.value || null })}
-                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3"
+                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3"
                   />
                 </label>
-                <label className="text-sm font-semibold text-[#6f645b]">
+                <label className="text-sm font-semibold text-[var(--text-primary)]">
                   Mois
                   <input
                     type="month"
@@ -420,15 +420,15 @@ function CommunicationActionForm({
                     max={`${selectedYear}-12`}
                     value={draft.target_month ?? ""}
                     onChange={(event) => setDraft({ ...draft, target_month: event.target.value || null })}
-                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3"
+                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3"
                   />
                 </label>
-                <label className="text-sm font-semibold text-[#6f645b]">
+                <label className="text-sm font-semibold text-[var(--text-primary)]">
                   Trimestre
                   <select
                     value={draft.target_quarter ?? ""}
                     onChange={(event) => setDraft({ ...draft, target_quarter: event.target.value || null })}
-                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3"
+                    className="mt-2 h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3"
                   >
                     <option value="">Pas décidé</option>
                     <option value="T1">T1</option>
@@ -442,7 +442,7 @@ function CommunicationActionForm({
               <select
                 value={draft.recurrence ?? "Ponctuelle"}
                 onChange={(event) => setDraft({ ...draft, recurrence: event.target.value })}
-                className="h-11 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-sm"
+                className="h-11 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 text-sm"
               >
                 {["Ponctuelle", "Chaque semaine", "Chaque mois", "Chaque trimestre", "Fréquence personnalisée"].map((item) => (
                   <option key={item} value={item}>{item}</option>
@@ -481,30 +481,30 @@ function CommunicationActionForm({
                   value={draft.estimated_budget ?? ""}
                   onChange={(event) => setDraft({ ...draft, estimated_budget: event.target.value ? Number(event.target.value) : null })}
                   placeholder="Budget estimé"
-                  className="h-11 rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-sm"
+                  className="h-11 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 text-sm"
                 />
                 <input
                   value={draft.external_help_needed ?? ""}
                   onChange={(event) => setDraft({ ...draft, external_help_needed: event.target.value })}
                   placeholder="Aide extérieure utile"
-                  className="h-11 rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-sm"
+                  className="h-11 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 text-sm"
                 />
               </div>
               <textarea
                 value={draft.first_step ?? ""}
                 onChange={(event) => setDraft({ ...draft, first_step: event.target.value })}
                 placeholder="Quelle est la toute première chose à faire ?"
-                className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm"
+                className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm"
               />
             </div>
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-[#eadfca] bg-white px-5 py-4">
+        <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <button
             type="button"
             onClick={() => setStep(Math.max(0, step - 1) as FormStep)}
-            className="h-11 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+            className="h-11 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
             disabled={step === 0}
           >
             Retour
@@ -522,7 +522,7 @@ function CommunicationActionForm({
               type="button"
               onClick={save}
               disabled={!canSave || isPending}
-              className="h-11 rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-xs font-black uppercase tracking-[0.12em] text-white disabled:opacity-50"
+              className="h-11 rounded-[0.9rem] bs-button-primary px-5 text-xs font-black uppercase tracking-[0.12em] text-white disabled:opacity-50"
             >
               {isPending ? "Enregistrement..." : "Enregistrer"}
             </button>
@@ -535,7 +535,7 @@ function CommunicationActionForm({
 
 function Question({ title, small = false }: { title: string; small?: boolean }) {
   return (
-    <p className={cx("font-semibold text-[#2f2a36]", small ? "text-base" : "text-xl")}>{title}</p>
+    <p className={cx("font-semibold text-[var(--heading-color)]", small ? "text-base" : "text-xl")}>{title}</p>
   );
 }
 
@@ -546,7 +546,7 @@ function ChoiceCard({ selected, onClick, label }: { selected: boolean; onClick: 
       onClick={onClick}
       className={cx(
         "rounded-[1rem] border px-4 py-3 text-left text-sm font-semibold transition",
-        selected ? "border-[#cf7430] bg-[#fff1d5] text-[#2f2a36]" : "border-[#eadfca] bg-white text-[#6b625a]",
+        selected ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--heading-color)]" : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]",
       )}
     >
       {label}
@@ -561,7 +561,7 @@ function ChoicePill({ selected, onClick, children }: { selected: boolean; onClic
       onClick={onClick}
       className={cx(
         "rounded-full border px-4 py-2 text-sm font-bold",
-        selected ? "border-[#cf7430] bg-[#fff1d5] text-[#cf7430]" : "border-[#eadfca] bg-white text-[#6b625a]",
+        selected ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]" : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]",
       )}
     >
       {children}
@@ -689,23 +689,23 @@ export default function CommunicationActionPlan({
 
   if (!hasSeenIntro) {
     return (
-      <section className="rounded-[2rem] border border-[#eadfca] bg-white/92 p-6 shadow-[0_18px_46px_rgba(126,102,78,0.08)] sm:p-8">
-        <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">Mon plan d&apos;action communication</p>
-        <h1 className="mt-4 text-3xl font-semibold leading-tight text-[#2f2a36] sm:text-4xl">
+      <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--card)]/92 p-6 shadow-[0_18px_46px_rgba(126,102,78,0.08)] sm:p-8">
+        <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">Mon plan d&apos;action communication</p>
+        <h1 className="mt-4 text-3xl font-semibold leading-tight text-[var(--heading-color)] sm:text-4xl">
           Transforme tes idées en actions concrètes
         </h1>
-        <div className="mt-6 max-w-3xl space-y-4 text-base leading-8 text-[#6f645b]">
+        <div className="mt-6 max-w-3xl space-y-4 text-base leading-8 text-[var(--text-primary)]">
           <p>Tu as maintenant posé les bases de ta marque. Il est temps de décider comment tu vas la faire vivre et la faire connaître.</p>
           <p>Dans cet espace, tu vas construire ta feuille de route communication : les actions que tu souhaites lancer, leur objectif, leur priorité et le moment où tu souhaites les réaliser.</p>
           <p>Pas besoin d&apos;en faire trop. L&apos;objectif est de choisir les bonnes actions pour ta marque, puis de les organiser pour savoir exactement par quoi commencer.</p>
         </div>
-        <div className="mt-6 rounded-[1.1rem] border border-[#f0dfba] bg-[#fff8e8] px-5 py-4 text-sm leading-7 text-[#6f645b]">
-          <strong className="text-[#cf7430]">Conseil</strong> : Commence petit. Trois actions réellement mises en place auront toujours plus d&apos;impact qu&apos;une liste de vingt idées qui restent dans un carnet.
+        <div className="mt-6 rounded-[1.1rem] border border-[#f0dfba] bs-status-light bg-[#fff8e8] px-5 py-4 text-sm leading-7 text-[var(--text-primary)]">
+          <strong className="text-[var(--tyash-label-text)]">Conseil</strong> : Commence petit. Trois actions réellement mises en place auront toujours plus d&apos;impact qu&apos;une liste de vingt idées qui restent dans un carnet.
         </div>
         <button
           type="button"
           onClick={() => setHasSeenIntro(true)}
-          className="mt-7 inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+          className="mt-7 inline-flex h-12 items-center justify-center rounded-[0.95rem] bs-button-primary px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
         >
           Construire ma feuille de route
         </button>
@@ -715,22 +715,22 @@ export default function CommunicationActionPlan({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-[#eadfca] bg-white/92 p-5 shadow-[0_18px_46px_rgba(126,102,78,0.08)] sm:p-7">
+      <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--card)]/92 p-5 shadow-[0_18px_46px_rgba(126,102,78,0.08)] sm:p-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">Mon plan d&apos;action communication</p>
-            <h1 className="mt-3 text-3xl font-semibold text-[#2f2a36]">Ma feuille de route communication</h1>
-            <p className="mt-2 text-sm leading-6 text-[#6f645b]">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">Mon plan d&apos;action communication</p>
+            <h1 className="mt-3 text-3xl font-semibold text-[var(--heading-color)]">Ma feuille de route communication</h1>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">
               Tes prochaines actions pour {brandName}, organisées au même endroit.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <label className="flex h-11 items-center gap-2 rounded-full border border-[#eadfca] bg-[#fffdf8] px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+            <label className="flex h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
               Année
               <select
                 value={selectedYear}
                 onChange={(event) => setSelectedYear(Number(event.target.value))}
-                className="bg-transparent text-sm font-extrabold text-[#2f2a36] outline-none"
+                className="bg-transparent text-sm font-extrabold text-[var(--heading-color)] outline-none"
                 aria-label="Choisir l'année de la feuille de route"
               >
                 {yearOptions.map((year) => (
@@ -738,7 +738,7 @@ export default function CommunicationActionPlan({
                 ))}
               </select>
             </label>
-            <a href={`${pdfHref}?year=${selectedYear}`} className="inline-flex h-11 items-center gap-2 rounded-full border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">
+            <a href={`${pdfHref}?year=${selectedYear}`} className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
               <ArrowDownTrayIcon className="h-4 w-4" />
               Télécharger ma feuille de route
             </a>
@@ -752,7 +752,7 @@ export default function CommunicationActionPlan({
             </button>
           </div>
         </div>
-        {message ? <p className="mt-4 rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf8] px-4 py-3 text-sm text-[#6f645b]">{message}</p> : null}
+        {message ? <p className="mt-4 rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]">{message}</p> : null}
       </section>
 
       {yearActions.length > 0 ? (
@@ -764,10 +764,10 @@ export default function CommunicationActionPlan({
       ) : null}
 
       {nextAction ? (
-        <section className="rounded-[1.4rem] border border-[#eadfca] bg-[#fffdf8] p-5">
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Ta prochaine étape</p>
-          <h2 className="mt-2 text-xl font-semibold text-[#2f2a36]">{nextAction.title}</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6f645b]">Première action : {nextAction.first_step || "Préciser la première étape."}</p>
+        <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] p-5">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Ta prochaine étape</p>
+          <h2 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">{nextAction.title}</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">Première action : {nextAction.first_step || "Préciser la première étape."}</p>
           <button
             type="button"
             onClick={() => handleStatus(nextAction.id, "En cours")}
@@ -778,7 +778,7 @@ export default function CommunicationActionPlan({
         </section>
       ) : null}
 
-      <section className="rounded-[1.4rem] border border-[#eadfca] bg-white p-4">
+      <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {(["table", "kanban"] as ActionView[]).map((item) => (
@@ -786,7 +786,7 @@ export default function CommunicationActionPlan({
                 key={item}
                 type="button"
                 onClick={() => setView(item)}
-                className={cx("h-10 rounded-full border px-4 text-xs font-black uppercase tracking-[0.12em]", view === item ? "border-[#cf7430] bg-[#fff1d5] text-[#cf7430]" : "border-[#eadfca] bg-white text-[#6b625a]")}
+                className={cx("h-10 rounded-full border px-4 text-xs font-black uppercase tracking-[0.12em]", view === item ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]" : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]")}
               >
                 {item === "table" ? "Tableau" : "Kanban"}
               </button>
@@ -797,27 +797,27 @@ export default function CommunicationActionPlan({
             <FilterSelect value={filters.type} onChange={(type) => setFilters({ ...filters, type })} options={[["", "Type"], ...ACTION_TYPES.map((item) => [item, item] as [string, string])]} />
             <FilterSelect value={filters.objective} onChange={(objective) => setFilters({ ...filters, objective })} options={[["", "Objectif"], ...ACTION_OBJECTIVES.map((item) => [item, item] as [string, string])]} />
             <FilterSelect value={filters.priority} onChange={(priority) => setFilters({ ...filters, priority })} options={[["", "Priorité"], ["À lancer en priorité", "Prioritaire"], ["À préparer", "À préparer"], ["À planifier", "À planifier"], ["À reconsidérer", "À reconsidérer"]]} />
-            <button type="button" onClick={() => setFilters({ period: "", type: "", objective: "", priority: "", status: "" })} className="h-10 rounded-full border border-[#eadfca] bg-white px-3 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">Réinitialiser</button>
+            <button type="button" onClick={() => setFilters({ period: "", type: "", objective: "", priority: "", status: "" })} className="h-10 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">Réinitialiser</button>
           </div>
         </div>
       </section>
 
       {yearActions.length === 0 ? (
-        <section className="rounded-[1.4rem] border border-dashed border-[#eadfca] bg-white/80 p-8 text-center">
-          <ClipboardDocumentListIcon className="mx-auto h-10 w-10 text-[#cf7430]" />
-          <h2 className="mt-4 text-xl font-semibold text-[#2f2a36]">Ta feuille de route est prête à être construite.</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6f645b]">Ajoute une première action concrète pour savoir exactement par quoi commencer.</p>
+        <section className="rounded-[1.4rem] border border-dashed border-[var(--border)] bg-[var(--card)]/80 p-8 text-center">
+          <ClipboardDocumentListIcon className="mx-auto h-10 w-10 text-[var(--tyash-label-text)]" />
+          <h2 className="mt-4 text-xl font-semibold text-[var(--heading-color)]">Ta feuille de route est prête à être construite.</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">Ajoute une première action concrète pour savoir exactement par quoi commencer.</p>
         </section>
       ) : null}
 
       {view === "table" ? (
-        <div className="overflow-hidden rounded-[1.4rem] border border-[#eadfca] bg-white">
-          <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-[#eadfca] bg-[#fffdf8] px-4 py-3 text-xs font-black uppercase tracking-[0.12em] text-[#7a7087] lg:grid">
+        <div className="overflow-hidden rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)]">
+          <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-muted)] lg:grid">
             <span>Action</span><span>Objectif</span><span>Type</span><span>Date</span><span>Priorité</span><span>Statut</span>
           </div>
           {filteredActions.map((action) => (
-            <button key={action.id} type="button" onClick={() => setDetailAction(action)} className="grid w-full gap-2 border-b border-[#f0e4d3] px-4 py-4 text-left text-sm lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1fr]">
-              <strong className="text-[#2f2a36]">{action.title}</strong>
+            <button key={action.id} type="button" onClick={() => setDetailAction(action)} className="grid w-full gap-2 border-b border-[var(--border)] px-4 py-4 text-left text-sm lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_1fr]">
+              <strong className="text-[var(--heading-color)]">{action.title}</strong>
               <span>{action.objective || "-"}</span>
               <span>{action.action_type || "-"}</span>
               <span>{getActionPeriodLabel(action)}</span>
@@ -831,8 +831,8 @@ export default function CommunicationActionPlan({
       {view === "kanban" ? (
         <div className="grid gap-4 lg:grid-cols-5">
           {(["Idée", "À préparer", "Planifiée", "En cours", "Terminée"] as ActionStatus[]).map((status) => (
-            <section key={status} className="rounded-[1.2rem] border border-[#eadfca] bg-[#fffdf8] p-3">
-              <h3 className="px-2 py-2 text-sm font-black uppercase tracking-[0.12em] text-[#6b625a]">{status}</h3>
+            <section key={status} className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--surface)] p-3">
+              <h3 className="px-2 py-2 text-sm font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">{status}</h3>
               <div className="mt-2 space-y-3">
                 {filteredActions.filter((action) => action.status === status).map((action) => (
                   <ActionCard key={action.id} action={action} onEdit={setFormAction} onOpen={setDetailAction} onDelete={handleDelete} onDuplicate={handleDuplicate} onStatus={handleStatus} />
@@ -843,21 +843,21 @@ export default function CommunicationActionPlan({
         </div>
       ) : null}
 
-      <section className="rounded-[1.4rem] border border-[#eadfca] bg-white p-5">
+      <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-5">
         <div className="flex items-center gap-3">
-          <SparklesIcon className="h-6 w-6 text-[#cf7430]" />
+          <SparklesIcon className="h-6 w-6 text-[var(--tyash-label-text)]" />
           <div>
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Besoin d&apos;idées ?</p>
-            <p className="mt-1 text-sm text-[#6f645b]">D&apos;après les réponses déjà données dans Brand Studio, voici quelques pistes à explorer.</p>
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Besoin d&apos;idées ?</p>
+            <p className="mt-1 text-sm text-[var(--text-primary)]">D&apos;après les réponses déjà données dans Brand Studio, voici quelques pistes à explorer.</p>
           </div>
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {suggestions.map((suggestion) => (
-            <article key={suggestion.id} className="rounded-[1rem] border border-[#eadfca] bg-[#fffdf8] p-4">
-              <h3 className="text-lg font-semibold text-[#2f2a36]">{suggestion.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#6f645b]">{suggestion.description}</p>
-              <p className="mt-3 text-xs font-semibold text-[#7a7087]">{suggestion.rationale}</p>
-              <button type="button" onClick={() => prefillSuggestion(suggestion)} className="mt-4 h-10 rounded-full border border-[#cf7430] px-4 text-xs font-black uppercase tracking-[0.12em] text-[#cf7430]">
+            <article key={suggestion.id} className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] p-4">
+              <h3 className="text-lg font-semibold text-[var(--heading-color)]">{suggestion.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">{suggestion.description}</p>
+              <p className="mt-3 text-xs font-semibold text-[var(--text-muted)]">{suggestion.rationale}</p>
+              <button type="button" onClick={() => prefillSuggestion(suggestion)} className="mt-4 h-10 rounded-full border border-[var(--tyash-primary)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--tyash-label-text)]">
                 Ajouter à ma feuille de route
               </button>
             </article>
@@ -877,17 +877,17 @@ export default function CommunicationActionPlan({
 
       {detailAction ? (
         <div className="fixed inset-0 z-40 bg-[#2f2a36]/35 px-3 py-4 backdrop-blur-sm sm:px-6">
-          <div className="ml-auto h-full max-w-2xl overflow-y-auto rounded-[1.4rem] border border-[#eadfca] bg-white p-5 shadow-[0_24px_80px_rgba(47,42,54,0.22)]">
+          <div className="ml-auto h-full max-w-2xl overflow-y-auto rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_24px_80px_rgba(47,42,54,0.22)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">Détail de l&apos;action</p>
-                <h2 className="mt-2 text-2xl font-semibold text-[#2f2a36]">{detailAction.title}</h2>
+                <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Détail de l&apos;action</p>
+                <h2 className="mt-2 text-2xl font-semibold text-[var(--heading-color)]">{detailAction.title}</h2>
               </div>
-              <button type="button" onClick={() => setDetailAction(null)} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca]">
+              <button type="button" onClick={() => setDetailAction(null)} className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)]">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-            <div className="mt-6 space-y-4 text-sm leading-7 text-[#6f645b]">
+            <div className="mt-6 space-y-4 text-sm leading-7 text-[var(--text-primary)]">
               <DetailRow label="Description" value={detailAction.description} />
               <DetailRow label="Objectif" value={detailAction.objective} />
               <DetailRow label="Public" value={detailAction.target_audience.join(", ")} />
@@ -901,7 +901,7 @@ export default function CommunicationActionPlan({
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <button type="button" onClick={() => setFormAction(detailAction)} className="h-11 rounded-full bg-[#2f2a36] px-4 text-xs font-black uppercase tracking-[0.12em] text-white">Modifier</button>
-              <button type="button" className="h-11 rounded-full border border-[#eadfca] px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]">Créer des contenus associés</button>
+              <button type="button" className="h-11 rounded-full border border-[var(--border)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">Créer des contenus associés</button>
             </div>
           </div>
         </div>
@@ -920,17 +920,17 @@ export default function CommunicationActionPlan({
             aria-modal="true"
             aria-labelledby="delete-action-title"
             aria-describedby="delete-action-description"
-            className="w-full max-w-md rounded-[1.5rem] border border-[#e8ddcc] bg-[#fffdf9] p-6 shadow-[0_24px_70px_rgba(47,42,54,0.22)] sm:p-7"
+            className="w-full max-w-md rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_24px_70px_rgba(47,42,54,0.22)] sm:p-7"
           >
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f8e9e4] text-[#a94f43]">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bs-status-light bg-[#f8e9e4] text-[var(--status-error-text)]">
                 <TrashIcon className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <h2 id="delete-action-title" className="text-[1.4rem] font-semibold leading-tight text-[#2f2a36]">
+                <h2 id="delete-action-title" className="text-[1.4rem] font-semibold leading-tight text-[var(--heading-color)]">
                 Supprimer cette action ?
                 </h2>
-                <p id="delete-action-description" className="mt-2 text-sm leading-6 text-[#746960]">
+                <p id="delete-action-description" className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
                   L’action « {actionToDelete.title} » sera supprimée définitivement de ta feuille de route.
                 </p>
               </div>
@@ -940,7 +940,7 @@ export default function CommunicationActionPlan({
                   type="button"
                   disabled={isPending}
                   onClick={() => setActionToDelete(null)}
-                  className="h-11 rounded-xl border border-[#ddd1bf] bg-white px-5 text-sm font-semibold text-[#5f554d] transition hover:bg-[#faf6ef] disabled:opacity-60"
+                  className="h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-semibold text-[var(--text-muted)] transition hover:bg-[var(--background)] disabled:opacity-60"
                 >
                   Annuler
                 </button>
@@ -957,16 +957,16 @@ export default function CommunicationActionPlan({
         </div>
       ) : null}
 
-      {isPending ? <p className="text-sm text-[#7a7087]">Sauvegarde en cours...</p> : null}
+      {isPending ? <p className="text-sm text-[var(--text-muted)]">Sauvegarde en cours...</p> : null}
     </div>
   );
 }
 
 function SummaryTile({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-[1.2rem] border border-[#eadfca] bg-white p-5">
-      <p className="text-3xl font-black text-[#2f2a36]">{value}</p>
-      <p className="mt-1 text-sm font-semibold text-[#6f645b]">{label}</p>
+    <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-5">
+      <p className="text-3xl font-black text-[var(--heading-color)]">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">{label}</p>
     </div>
   );
 }
@@ -981,7 +981,7 @@ function FilterSelect({
   options: Array<[string, string]>;
 }) {
   return (
-    <select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-full border border-[#eadfca] bg-white px-3 text-xs font-bold text-[#6b625a]">
+    <select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-xs font-bold text-[var(--text-primary)]">
       {options.map(([optionValue, label]) => (
         <option key={`${label}-${optionValue}`} value={optionValue}>{label}</option>
       ))}
@@ -993,9 +993,9 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
 
   return (
-    <div className="rounded-[1rem] border border-[#eadfca] bg-[#fffdf8] px-4 py-3">
-      <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">{label}</p>
-      <p className="mt-1 text-[#5f544a]">{value}</p>
+    <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+      <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">{label}</p>
+      <p className="mt-1 text-[var(--text-primary)]">{value}</p>
     </div>
   );
 }

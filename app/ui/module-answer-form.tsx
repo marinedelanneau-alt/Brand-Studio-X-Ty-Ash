@@ -1345,15 +1345,15 @@ function PopupMessageCard({
   onClose?: () => void;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-[2rem] border border-[#e5ded3] bg-[linear-gradient(145deg,#fdfbf6,#fbf8f1_58%,#f7f1e6)] p-5 shadow-[0_22px_60px_rgba(21,33,59,0.08)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(240,207,85,0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(207,116,48,0.18),transparent_38%)]" />
-      <div className="relative rounded-[1.6rem] border border-white/80 bg-white/88 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-sm">
+    <div className="relative overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-5 shadow-[0_22px_60px_rgba(21,33,59,0.08)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgb(var(--tyash-glow-rgb)/0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgb(var(--tyash-glow-rgb)/0.18),transparent_38%)]" />
+      <div className="relative rounded-[1.6rem] border border-[var(--surface-highlight)]/80 bg-[var(--card)]/88 p-6 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.85)] backdrop-blur-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-label-text)]">
               Pause inspiration
             </p>
-            <p className="mt-2 font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.95] text-[#4b4550]">
+            <p className="mt-2 font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.95] text-[var(--heading-color)]">
               Un souffle pour la suite
             </p>
           </div>
@@ -1361,7 +1361,7 @@ function PopupMessageCard({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white/90 text-[#7b7068] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]/90 text-[var(--text-muted)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
               aria-label="Fermer la pop-up"
             >
               <XMarkIcon className="h-5 w-5" />
@@ -1369,14 +1369,14 @@ function PopupMessageCard({
           ) : null}
         </div>
 
-        <div className="mt-6 rounded-[1.5rem] bg-[linear-gradient(135deg,rgba(255,248,235,0.95),rgba(255,255,255,0.94))] px-6 py-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-          <p className="text-4xl leading-none text-[#cf7430]/60">“</p>
+        <div className="mt-6 rounded-[1.5rem] bg-[var(--card)]/95 px-6 py-7 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.9)]">
+          <p className="text-4xl leading-none text-[var(--tyash-label-text)]/60">“</p>
           <div
-            className="module-content mt-2 max-w-none font-[family:var(--font-cormorant)] text-[2rem] leading-[1.15] text-[#2f3d4f] sm:text-[2.35rem]"
+            className="module-content mt-2 max-w-none font-[family:var(--font-cormorant)] text-[2rem] leading-[1.15] text-[var(--heading-color)] sm:text-[2.35rem]"
             dangerouslySetInnerHTML={{ __html: getStaticTextHtml(question) }}
           />
           {explanation ? (
-            <p className="mt-5 text-sm font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <p className="mt-5 text-sm font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               {explanation}
             </p>
           ) : null}
@@ -1387,7 +1387,7 @@ function PopupMessageCard({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-[#eadfca] bg-white px-5 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+              className="rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
             >
               Fermer
             </button>
@@ -1998,7 +1998,7 @@ export default function ModuleAnswerForm({
 
   if (module.exercises.length === 0) {
     return (
-      <div className="rounded-[1rem] border border-dashed border-[#eadfca] bg-[#fffdf7] p-5 text-base leading-7 text-[#7b7068]">
+      <div className="rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--surface)] p-5 text-base leading-7 text-[var(--text-muted)]">
         Aucun exercice n&apos;est encore disponible pour ce module.
       </div>
     );
@@ -2052,8 +2052,8 @@ export default function ModuleAnswerForm({
         <span
           className={`text-xs font-semibold ${
             syncStatus === "error" || syncStatus === "offline"
-              ? "text-[#a95547]"
-              : "text-[#7a7087]"
+              ? "text-[var(--status-error-text)]"
+              : "text-[var(--text-muted)]"
           }`}
         >
           {!hasHydrated
@@ -2072,7 +2072,7 @@ export default function ModuleAnswerForm({
           <button
             type="button"
             onClick={() => void retrySync()}
-            className="text-xs font-bold text-[#a95547] underline underline-offset-2"
+            className="text-xs font-bold text-[var(--status-error-text)] underline underline-offset-2"
             title={syncError}
           >
             Réessayer
@@ -2082,8 +2082,8 @@ export default function ModuleAnswerForm({
           <span
             className={`text-xs font-semibold ${
               saveIndicator === "error" || saveIndicator === "offline"
-                ? "text-[#a95547]"
-                : "text-[#7a7087]"
+                ? "text-[var(--status-error-text)]"
+                : "text-[var(--text-muted)]"
             }`}
           >
             {saveIndicator === "saving"
@@ -2096,15 +2096,15 @@ export default function ModuleAnswerForm({
           </span>
         ) : null}
       </div>
-      <div className="border-b border-[#eadfca] pb-3">
+      <div className="border-b border-[var(--border)] pb-3">
         {state.status === "error" && state.message && !needsPageRefresh ? (
-          <div className="mb-4 rounded-[1rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-4 text-sm leading-6 text-[#9d4e40]">
+          <div className="mb-4 rounded-[1rem] border border-[#efc6bf] bs-status-light bg-[#fff4f1] px-4 py-4 text-sm leading-6 text-[var(--status-error-text)]">
             {state.message}
           </div>
         ) : null}
 
         <div className="flex items-center justify-between gap-4">
-          <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+          <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
             {visibleExerciseGroups.length > 0
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
@@ -2113,13 +2113,13 @@ export default function ModuleAnswerForm({
                 : `Question ${currentAnswerableExerciseIndex + 1} sur ${answerableExerciseGroups.length}`
               : "Aucun exercice dans ce sous-module"}
           </p>
-          <p className="text-sm text-[#8a8077]">
+          <p className="text-sm text-[var(--text-muted)]">
             {progressCount}/{totalAnswerableExercises} complétées
           </p>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
           <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)] transition-[width]"
+            className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)] transition-[width]"
             style={{
               width: `${
                 totalAnswerableExercises > 0
@@ -2133,12 +2133,12 @@ export default function ModuleAnswerForm({
 
       <div className="space-y-4">
         {currentSubmodule ? (
-          <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+          <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             {currentSubmodule.title}
           </p>
         ) : null}
         {!isPassiveContentType(currentExercise?.type) ? (
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-[#7a7087]">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
             {visibleExerciseGroups.length > 0
               ? `Exercice ${currentAnswerableExerciseIndex + 1}`
               : "Exercices à venir"}
@@ -2162,7 +2162,7 @@ export default function ModuleAnswerForm({
             cleanStoredExerciseQuestionText(currentExercise.question).length > 0 ? (
               <div className="mt-3 flex items-start gap-3">
                 <div
-                  className="module-content min-w-0 flex-1 text-base leading-7 text-[#5f544a]"
+                  className="module-content min-w-0 flex-1 text-base leading-7 text-[var(--text-primary)]"
                   dangerouslySetInnerHTML={{
                     __html: getStaticTextHtml(currentExercise.question),
                   }}
@@ -2184,7 +2184,7 @@ export default function ModuleAnswerForm({
             !isMultiQuestionExerciseGroup ? (
               <PedagogicalContent
                 content={currentExercise.explanation}
-                className="mt-3 rounded-[1.2rem] border border-[#eadfca] bg-white/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
+                className="mt-3 rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)]/78 px-5 py-5 shadow-[0_12px_30px_rgba(126,102,78,0.07)]"
               />
             ) : null}
 
@@ -2219,13 +2219,13 @@ export default function ModuleAnswerForm({
             ) : null}
 
             {currentExercise.type === "static_text" ? (
-              <div className="relative mt-4 overflow-hidden rounded-[2rem] border border-white/90 bg-white px-6 py-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgba(207,116,48,0.06)] ring-1 ring-[#f3e5d2]/80 sm:px-7 sm:py-7">
+              <div className="relative mt-4 overflow-hidden rounded-[2rem] border border-[var(--surface-highlight)]/90 bg-[var(--card)] px-6 py-6 shadow-[0_16px_38px_rgba(126,102,78,0.08),0_2px_10px_rgb(var(--tyash-glow-rgb)/0.06)] ring-1 ring-[#f3e5d2]/80 sm:px-7 sm:py-7">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgba(243,198,35,0.12),transparent_52%),radial-gradient(circle_at_top_right,rgba(207,116,48,0.08),transparent_44%)]"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_left,rgb(var(--tyash-glow-rgb)/0.12),transparent_52%),radial-gradient(circle_at_top_right,rgb(var(--tyash-glow-rgb)/0.08),transparent_44%)]"
                 />
                 <div
-                  className="module-content relative max-w-none text-[1rem] leading-8 text-[#5f544a] sm:text-[1.06rem]"
+                  className="module-content relative max-w-none text-[1rem] leading-8 text-[var(--text-primary)] sm:text-[1.06rem]"
                   dangerouslySetInnerHTML={{
                     __html: getStaticTextHtml(currentExercise.question),
                   }}
@@ -2233,7 +2233,7 @@ export default function ModuleAnswerForm({
                 {shouldShowExerciseExplanation(currentExercise) ? (
                   <PedagogicalContent
                     content={currentExercise.explanation}
-                    className="relative mt-5 rounded-[1.2rem] border border-[#eadfca] bg-[#fffaf2] px-5 py-5"
+                    className="relative mt-5 rounded-[1.2rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-5 py-5"
                   />
                 ) : null}
               </div>
@@ -2241,14 +2241,14 @@ export default function ModuleAnswerForm({
 
             {currentExercise.type === "popup_message" ? (
               <div className="mt-4 space-y-4">
-                <div className="rounded-[1.3rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff5e8)] p-5">
-                  <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+                <div className="rounded-[1.3rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-5">
+                  <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
                     Citation ou motivation
                   </p>
-                  <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
+                  <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[var(--heading-color)]">
                     Une pop-up inspirante s&apos;affiche sur cette etape
                   </h3>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-[#7b7068]">
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-muted)]">
                     L&apos;utilisateur peut la fermer librement puis continuer le parcours. Il peut
                     aussi la rouvrir s&apos;il souhaite relire le message.
                   </p>
@@ -2256,7 +2256,7 @@ export default function ModuleAnswerForm({
                     <button
                       type="button"
                       onClick={() => setIsPopupOpen(true)}
-                      className="rounded-full border border-[#eadfca] bg-white px-5 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#6b625a]"
+                      className="rounded-full border border-[var(--border)] bg-[var(--card)] px-5 py-2 text-xs font-black uppercase tracking-[0.18em] text-[var(--text-primary)]"
                     >
                       Ouvrir la pop-up
                     </button>
@@ -2326,10 +2326,10 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <label
                       key={`${currentExercise.id}-question-${questionIndex}`}
-                      className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="block rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
                       <span className="flex items-start gap-3">
-                        <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
+                        <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[var(--text-primary)]">
                           {prompt}
                         </span>
                         <ExerciseAiActions
@@ -2358,7 +2358,7 @@ export default function ModuleAnswerForm({
                             ),
                           }))
                         }
-                        className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                        className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                         placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                       />
                       <SmartFeedback
@@ -2387,7 +2387,7 @@ export default function ModuleAnswerForm({
                           [currentExercise.id]: [event.target.value],
                         }))
                       }
-                      className="mt-4 min-h-32 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                      className="mt-4 min-h-32 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                       placeholder={getAnswerPlaceholder(currentExercise)}
                     />
                     <SmartFeedback
@@ -2418,11 +2418,11 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <label
                       key={`${currentExercise.id}-prompt-${questionIndex}`}
-                      className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="block rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
                       <div className="flex items-start gap-3">
                         <div className="min-w-0 flex-1">
-                          <span className="mt-2 block font-[family:var(--font-cormorant)] text-[1.8rem] font-semibold leading-none text-[#20324a]">
+                          <span className="mt-2 block font-[family:var(--font-cormorant)] text-[1.8rem] font-semibold leading-none text-[var(--heading-color)]">
                             {prompt}
                           </span>
                         </div>
@@ -2452,7 +2452,7 @@ export default function ModuleAnswerForm({
                             ),
                           }))
                         }
-                        className="mt-3 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                        className="mt-3 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                         placeholder={getAnswerPlaceholder(currentExercise, prompt)}
                       />
                       <SmartFeedback
@@ -2472,9 +2472,9 @@ export default function ModuleAnswerForm({
                   ))}
                   </div>
                 ) : (
-                  <div className="mt-4 border-l border-[#eadfca] pl-4">
-                    <div className="flex flex-wrap items-center gap-3 text-[#20324a]">
-                      <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[#20324a] sm:text-[2.35rem]">
+                  <div className="mt-4 border-l border-[var(--border)] pl-4">
+                    <div className="flex flex-wrap items-center gap-3 text-[var(--heading-color)]">
+                      <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[var(--heading-color)] sm:text-[2.35rem]">
                         {getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question))}
                       </span>
                       <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">
@@ -2494,7 +2494,7 @@ export default function ModuleAnswerForm({
                             [currentExercise.id]: [nextValue],
                           }))
                         }
-                        className="min-h-12 w-full flex-auto rounded-[0.9rem] border border-[#eadfca] bg-[#fffaf4] px-4 py-3 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                        className="min-h-12 w-full flex-auto rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-3 text-base leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                         placeholder={getAnswerPlaceholder(
                           currentExercise,
                           getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question)),
@@ -2528,9 +2528,9 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <div
                       key={`${currentExercise.id}-single-${questionIndex}`}
-                      className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
-                      <p className="text-sm font-semibold leading-7 text-[#5f544a]">
+                      <p className="text-sm font-semibold leading-7 text-[var(--text-primary)]">
                         {prompt}
                       </p>
                       <div className="mt-3 space-y-3">
@@ -2546,9 +2546,9 @@ export default function ModuleAnswerForm({
                           return (
                             <div
                               key={`${questionIndex}-${option}`}
-                              className="border-b border-[#f0e5d4] px-1 py-3"
+                              className="border-b border-[var(--border)] px-1 py-3"
                             >
-                              <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                              <label className="flex items-start gap-3 text-sm leading-6 text-[var(--text-primary)]">
                                 <input
                                   type="radio"
                                   name={`visible-exercise-${currentExercise.id}-${questionIndex}`}
@@ -2597,7 +2597,7 @@ export default function ModuleAnswerForm({
                                     })
                                   }
                                   placeholder="Précise ta réponse"
-                                  className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
                             </div>
@@ -2617,9 +2617,9 @@ export default function ModuleAnswerForm({
                     return (
                       <div
                         key={option}
-                        className="border-b border-[#f0e5d4] px-1 py-3"
+                        className="border-b border-[var(--border)] px-1 py-3"
                       >
-                        <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                        <label className="flex items-start gap-3 text-sm leading-6 text-[var(--text-primary)]">
                           <input
                             type="radio"
                             name={`visible-exercise-${currentExercise.id}`}
@@ -2650,7 +2650,7 @@ export default function ModuleAnswerForm({
                               }))
                             }
                             placeholder="Précise ta réponse"
-                            className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
                       </div>
@@ -2673,16 +2673,16 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <div
                       key={`${currentExercise.id}-boolean-${questionIndex}`}
-                      className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
-                      <p className="text-sm font-semibold leading-7 text-[#5f544a]">
+                      <p className="text-sm font-semibold leading-7 text-[var(--text-primary)]">
                         {prompt}
                       </p>
                       <div className="mt-3 grid gap-3">
                         {currentVisibleOptions.map((option) => (
                           <label
                             key={`${questionIndex}-${option}`}
-                            className="flex items-center gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm font-semibold leading-6 text-[#5f544a]"
+                            className="flex items-center gap-3 border-b border-[var(--border)] px-1 py-3 text-sm font-semibold leading-6 text-[var(--text-primary)]"
                           >
                             <input
                               type="radio"
@@ -2719,7 +2719,7 @@ export default function ModuleAnswerForm({
                   {currentVisibleOptions.map((option) => (
                     <label
                       key={option}
-                      className="flex items-center gap-3 border-b border-[#f0e5d4] px-1 py-3 text-sm font-semibold leading-6 text-[#5f544a]"
+                      className="flex items-center gap-3 border-b border-[var(--border)] px-1 py-3 text-sm font-semibold leading-6 text-[var(--text-primary)]"
                     >
                       <input
                         type="radio"
@@ -2753,9 +2753,9 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <div
                       key={`${currentExercise.id}-multiple-${questionIndex}`}
-                      className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
-                      <p className="text-sm font-semibold leading-7 text-[#5f544a]">
+                      <p className="text-sm font-semibold leading-7 text-[var(--text-primary)]">
                         {prompt}
                       </p>
                       <div className="mt-3 space-y-3">
@@ -2772,9 +2772,9 @@ export default function ModuleAnswerForm({
                           return (
                             <div
                               key={`${questionIndex}-${option}`}
-                              className="border-b border-[#f0e5d4] px-1 py-3"
+                              className="border-b border-[var(--border)] px-1 py-3"
                             >
-                              <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                              <label className="flex items-start gap-3 text-sm leading-6 text-[var(--text-primary)]">
                                 <input
                                   type="checkbox"
                                   checked={isChecked}
@@ -2839,7 +2839,7 @@ export default function ModuleAnswerForm({
                                     })
                                   }
                                   placeholder="Précise ta réponse"
-                                  className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
                             </div>
@@ -2859,9 +2859,9 @@ export default function ModuleAnswerForm({
                     return (
                       <div
                         key={option}
-                        className="border-b border-[#f0e5d4] px-1 py-3"
+                        className="border-b border-[var(--border)] px-1 py-3"
                       >
-                        <label className="flex items-start gap-3 text-sm leading-6 text-[#5f544a]">
+                        <label className="flex items-start gap-3 text-sm leading-6 text-[var(--text-primary)]">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -2902,7 +2902,7 @@ export default function ModuleAnswerForm({
                               }))
                             }
                             placeholder="Précise ta réponse"
-                            className="mt-3 w-full rounded-[0.75rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#3f3747] outline-none transition focus:border-[#d99f2b]"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
                       </div>
@@ -2942,9 +2942,9 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <div
                       key={`${currentExercise.id}-color-${questionIndex}`}
-                      className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+                      className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
                     >
-                      <p className="text-sm font-semibold leading-7 text-[#5f544a]">
+                      <p className="text-sm font-semibold leading-7 text-[var(--text-primary)]">
                         {prompt}
                       </p>
                       <div className="mt-3 grid gap-3">
@@ -2962,8 +2962,8 @@ export default function ModuleAnswerForm({
                               key={`${questionIndex}-${option}`}
                               className={`flex cursor-pointer items-center gap-4 rounded-[1rem] border px-4 py-3 text-sm leading-6 transition ${
                                 isChecked
-                                  ? "border-[#cf7430] bg-[#fff3e2] text-[#5f544a]"
-                                  : "border-[#eadfca] bg-white text-[#5f544a]"
+                                  ? "border-[var(--tyash-primary)] bs-status-light bg-[#fff3e2] text-[var(--text-primary)]"
+                                  : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                               }`}
                             >
                               <input
@@ -2985,12 +2985,12 @@ export default function ModuleAnswerForm({
                                 className="sr-only"
                               />
                               <span
-                                className="h-12 w-12 rounded-full border border-white shadow-[0_0_0_1px_rgba(75,69,80,0.16)]"
+                                className="h-12 w-12 rounded-full border border-[var(--surface-highlight)] shadow-[0_0_0_1px_rgba(75,69,80,0.16)]"
                                 style={{ backgroundColor: colorOption.color }}
                               />
                               <span className="flex-1">
                                 <span className="block font-semibold">{colorOption.label}</span>
-                                <span className="block text-xs uppercase tracking-[0.14em] text-[#8a8077]">
+                                <span className="block text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
                                   {colorOption.color}
                                 </span>
                               </span>
@@ -3012,8 +3012,8 @@ export default function ModuleAnswerForm({
                         key={option}
                         className={`flex cursor-pointer items-center gap-4 rounded-[1rem] border px-4 py-3 text-sm leading-6 transition ${
                           isChecked
-                            ? "border-[#cf7430] bg-[#fff3e2] text-[#5f544a]"
-                            : "border-[#eadfca] bg-white text-[#5f544a]"
+                            ? "border-[var(--tyash-primary)] bs-status-light bg-[#fff3e2] text-[var(--text-primary)]"
+                            : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                         }`}
                       >
                         <input
@@ -3030,12 +3030,12 @@ export default function ModuleAnswerForm({
                           className="sr-only"
                         />
                         <span
-                          className="h-12 w-12 rounded-full border border-white shadow-[0_0_0_1px_rgba(75,69,80,0.16)]"
+                          className="h-12 w-12 rounded-full border border-[var(--surface-highlight)] shadow-[0_0_0_1px_rgba(75,69,80,0.16)]"
                           style={{ backgroundColor: colorOption.color }}
                         />
                         <span className="flex-1">
                           <span className="block font-semibold">{colorOption.label}</span>
-                          <span className="block text-xs uppercase tracking-[0.14em] text-[#8a8077]">
+                          <span className="block text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
                             {colorOption.color}
                           </span>
                         </span>
@@ -3101,10 +3101,10 @@ export default function ModuleAnswerForm({
                   {currentQuestionPrompts.map((prompt, questionIndex) => (
                     <div
                       key={`${currentExercise.id}-fill-${questionIndex}`}
-                      className="rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4 text-base leading-8 text-[#5f544a]"
+                      className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4 text-base leading-8 text-[var(--text-primary)]"
                     >
                       <div className="flex items-start gap-3">
-                        <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[#7a7087]">
+                        <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                           Complete la phrase
                         </p>
                         <ExerciseAiActions
@@ -3156,7 +3156,7 @@ export default function ModuleAnswerForm({
                                     };
                                   })
                                 }
-                                className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                                className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                                 placeholder={getFillBlankAnswerPlaceholder(
                                   currentExercise,
                                   prompt,
@@ -3186,9 +3186,9 @@ export default function ModuleAnswerForm({
                 ))}
                   </div>
                 ) : (
-                  <div className="mt-4 border-l border-[#eadfca] pl-4 text-base leading-8 text-[#5f544a]">
+                  <div className="mt-4 border-l border-[var(--border)] pl-4 text-base leading-8 text-[var(--text-primary)]">
                     <div className="flex items-start gap-3">
-                      <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[#7a7087]">
+                      <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                         Complete la phrase
                       </p>
                       <ExerciseAiActions
@@ -3224,7 +3224,7 @@ export default function ModuleAnswerForm({
                                   };
                                 })
                               }
-                              className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[#eadfca] bg-[#fffaf4] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                              className="min-w-28 max-w-full flex-none rounded-[0.8rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                               placeholder={getFillBlankAnswerPlaceholder(
                                 currentExercise,
                                 cleanStoredExerciseQuestionText(currentExercise.question),
@@ -3304,21 +3304,21 @@ export default function ModuleAnswerForm({
                           return (
                             <div key={`${currentExercise.id}-table-${questionIndex}`}>
                               {prompt ? (
-                                <p className="mb-3 text-sm font-semibold leading-7 text-[#5f544a]">
+                                <p className="mb-3 text-sm font-semibold leading-7 text-[var(--text-primary)]">
                                   {prompt}
                                 </p>
                               ) : null}
-                              <div className="overflow-x-auto rounded-[1rem] border border-[#eadfca] bg-white">
+                              <div className="overflow-x-auto rounded-[1rem] border border-[var(--border)] bg-[var(--card)]">
                                 <table className="min-w-full border-collapse">
                                   <thead>
-                                    <tr className="bg-[#fff8f1]">
-                                      <th className="border-b border-r border-[#eadfca] px-4 py-3 text-left text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+                                    <tr className="bg-[var(--tyash-subtle)]">
+                                      <th className="border-b border-r border-[var(--border)] px-4 py-3 text-left text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
                                         Lignes
                                       </th>
                                       {columnLabels.map((columnLabel, columnIndex) => (
                                         <th
                                           key={`${currentExercise.id}-${questionIndex}-column-${columnIndex}`}
-                                          className="min-w-40 border-b border-[#eadfca] px-4 py-3 text-left text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]"
+                                          className="min-w-40 border-b border-[var(--border)] px-4 py-3 text-left text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]"
                                         >
                                           {columnLabel || `Colonne ${columnIndex + 1}`}
                                         </th>
@@ -3331,7 +3331,7 @@ export default function ModuleAnswerForm({
                                         key={`${currentExercise.id}-${questionIndex}-row-${rowIndex}`}
                                         className="align-top"
                                       >
-                                        <th className="border-r border-t border-[#eadfca] bg-[#fffdf9] px-4 py-3 text-left text-sm font-semibold text-[#5f544a]">
+                                        <th className="border-r border-t border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                                           {rowLabel || `Ligne ${rowIndex + 1}`}
                                         </th>
                                         {Array.from(
@@ -3343,7 +3343,7 @@ export default function ModuleAnswerForm({
                                             return (
                                               <td
                                                 key={`${currentExercise.id}-${questionIndex}-${rowIndex}-${columnIndex}`}
-                                                className="border-t border-[#eadfca] px-3 py-3"
+                                                className="border-t border-[var(--border)] px-3 py-3"
                                               >
                                                 <textarea
                                                   value={questionValues[cellIndex] ?? ""}
@@ -3380,7 +3380,7 @@ export default function ModuleAnswerForm({
                                                     })
                                                   }
                                                   rows={3}
-                                                  className="min-h-24 w-full resize-y rounded-[0.8rem] border border-[#eadfca] bg-[#fffdf7] px-3 py-2 text-sm leading-6 text-[#5f544a] outline-none placeholder:text-[#b6aaa0] focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                                                  className="min-h-24 w-full resize-y rounded-[0.8rem] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm leading-6 text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                                                   placeholder={
                                                     tablePlaceholders[cellIndex] ||
                                                     getAnswerPlaceholder(currentExercise)
@@ -3400,7 +3400,7 @@ export default function ModuleAnswerForm({
                         })}
                       </div>
 
-                      <p className="text-sm leading-6 text-[#8a8077]">
+                      <p className="text-sm leading-6 text-[var(--text-muted)]">
                         Complete chaque case du tableau pour valider cet exercice.
                       </p>
                     </>
@@ -3410,7 +3410,7 @@ export default function ModuleAnswerForm({
             ) : null}
           </>
         ) : (
-          <div className="mt-3 rounded-[1rem] border border-dashed border-[#eadfca] bg-white px-5 py-6 text-base leading-7 text-[#7b7068]">
+          <div className="mt-3 rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-5 py-6 text-base leading-7 text-[var(--text-muted)]">
             Aucun exercice n&apos;est encore disponible pour ce sous-module.
           </div>
         )}
@@ -3518,10 +3518,10 @@ export default function ModuleAnswerForm({
         <p
           className={
             state.status === "error"
-              ? "text-sm leading-6 text-[#b45247]"
+              ? "text-sm leading-6 text-[var(--status-error-text)]"
               : state.status === "success"
-                ? "text-sm leading-6 text-[#5f8d63]"
-                : "text-sm leading-6 text-[#7b7068]"
+                ? "text-sm leading-6 text-[var(--status-success-text)]"
+                : "text-sm leading-6 text-[var(--text-muted)]"
           }
         >
           {state.message}
@@ -3529,7 +3529,7 @@ export default function ModuleAnswerForm({
       ) : null}
 
       {needsPageRefresh ? (
-        <div role="alert" className="text-sm leading-6 text-[#b45247]">
+        <div role="alert" className="text-sm leading-6 text-[var(--status-error-text)]">
           <p>La page doit être actualisée pour reprendre l’enregistrement.</p>
           <button
             type="button"
@@ -3554,7 +3554,7 @@ export default function ModuleAnswerForm({
       ) : saveIndicator === "error" ? (
         <p
           role="alert"
-          className="text-sm leading-6 text-[#b45247]"
+          className="text-sm leading-6 text-[var(--status-error-text)]"
         >
           {autoSaveState.message || "Sauvegarde interrompue. Nouvelle tentative à la reconnexion."}
         </p>
@@ -3581,14 +3581,14 @@ function MultiQuestionOpenExerciseGroup({
       {questions.map((question) => (
         <label
           key={question.id}
-          className="block rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+          className="block rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
         >
           <VoiceNotePlayer
             src={question.audio_url}
             subtitles={question.audio_transcript}
           />
           <span className="flex items-start gap-3">
-            <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[#5f544a]">
+            <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[var(--text-primary)]">
               {cleanStoredExerciseQuestionText(question.question)}
             </span>
             {supportsExerciseAi(question) ? (
@@ -3605,13 +3605,13 @@ function MultiQuestionOpenExerciseGroup({
           ]) ? (
             <PedagogicalContent
               content={question.explanation}
-              className="mt-3 rounded-[1rem] border border-[#eadfca] bg-[#fffaf2] px-4 py-4"
+              className="mt-3 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4"
             />
           ) : null}
           <textarea
             value={answers[question.id]?.[0] ?? ""}
             onChange={(event) => onChange(question.id, [event.target.value])}
-            className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+            className="mt-3 min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
             placeholder={getAnswerPlaceholder(question)}
           />
           <SmartFeedback
@@ -3711,26 +3711,26 @@ function ImageUploadExercise({
   }
 
   return (
-    <div className="mt-4 space-y-4 rounded-[1.4rem] border border-[#eadfca] bg-white px-5 py-5">
+    <div className="mt-4 space-y-4 rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] px-5 py-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             Tableau d&apos;inspiration
           </p>
-          <p className="mt-2 text-sm leading-7 text-[#6f645b]">
+          <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">
             Ajoute simplement les images demandees dans la question.
           </p>
         </div>
-        <p className="rounded-full border border-[#eadfca] bg-[#fff8f1] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#7a7087]">
+        <p className="rounded-full border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
           {imageUrls.length}/{config.maxImages} images
         </p>
       </div>
 
-      <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-[1rem] border border-dashed border-[#d9c4aa] bg-[#fffdf8] px-4 py-5 text-center transition hover:border-[#cf7430]">
-        <span className="text-sm font-black uppercase tracking-[0.16em] text-[#6b625a]">
+      <label className="flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--surface)] px-4 py-5 text-center transition hover:border-[var(--tyash-primary)]">
+        <span className="text-sm font-black uppercase tracking-[0.16em] text-[var(--text-primary)]">
           {isUploading ? "Upload en cours..." : "Ajouter des images"}
         </span>
-        <span className="mt-2 text-sm leading-6 text-[#8a8077]">
+        <span className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
           {remainingSlots > 0
             ? `${remainingSlots} image${remainingSlots > 1 ? "s" : ""} restante${remainingSlots > 1 ? "s" : ""}`
             : "Limite atteinte"}
@@ -3749,7 +3749,7 @@ function ImageUploadExercise({
       </label>
 
       {message ? (
-        <p className="rounded-[1rem] border border-[#efc6bf] bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[#9d4e40]">
+        <p className="rounded-[1rem] border border-[#efc6bf] bs-status-light bg-[#fff4f1] px-4 py-3 text-sm leading-6 text-[var(--status-error-text)]">
           {message}
         </p>
       ) : null}
@@ -3759,7 +3759,7 @@ function ImageUploadExercise({
           {imageUrls.map((imageUrl, index) => (
             <div
               key={`${imageUrl}-${index}`}
-              className="group relative aspect-square overflow-hidden rounded-[1rem] border border-[#eadfca] bg-[#fff8f1]"
+              className="group relative aspect-square overflow-hidden rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)]"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -3770,7 +3770,7 @@ function ImageUploadExercise({
               <button
                 type="button"
                 onClick={() => onChange(imageUrls.filter((_, itemIndex) => itemIndex !== index))}
-                className="absolute right-2 top-2 rounded-full bg-white/95 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#b45247] opacity-0 shadow-[0_8px_18px_rgba(47,36,24,0.14)] transition group-hover:opacity-100"
+                className="absolute right-2 top-2 rounded-full bg-[var(--card)]/95 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[var(--status-error-text)] opacity-0 shadow-[0_8px_18px_rgba(47,36,24,0.14)] transition group-hover:opacity-100"
               >
                 Retirer
               </button>
@@ -3805,7 +3805,7 @@ function ExerciseAiActions({
         <button
           type="button"
           disabled={isLoading}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#8a8077] shadow-[0_10px_24px_rgba(210,189,152,0.12)] transition hover:border-[#cf7430] hover:text-[#cf7430] focus:border-[#cf7430] focus:text-[#cf7430] focus:outline-none disabled:cursor-wait disabled:opacity-70"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-muted)] shadow-[0_10px_24px_rgba(210,189,152,0.12)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)] focus:border-[var(--tyash-primary)] focus:text-[var(--tyash-label-text)] focus:outline-none disabled:cursor-wait disabled:opacity-70"
           aria-label="Outils IA"
           title="Outils IA"
         >
@@ -3813,8 +3813,8 @@ function ExerciseAiActions({
         </button>
 
         <div className="pointer-events-none absolute right-0 top-11 z-20 w-72 translate-y-1 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
-          <div className="rounded-[1.1rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff6eb)] p-4 shadow-[0_18px_42px_rgba(120,92,56,0.14)]">
-            <p className="text-sm leading-6 text-[#6f645b]">
+          <div className="rounded-[1.1rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-4 shadow-[0_18px_42px_rgba(120,92,56,0.14)]">
+            <p className="text-sm leading-6 text-[var(--text-primary)]">
               L&apos;IA peut proposer une réponse ou retravailler ton texte.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -3822,7 +3822,7 @@ function ExerciseAiActions({
                 type="button"
                 onClick={onSuggest}
                 disabled={isLoading}
-                className="flex h-10 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-wait disabled:opacity-70"
+                className="flex h-10 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-70"
               >
                 {isLoading && state.mode === "suggest" ? "Génération..." : "Suggère"}
               </button>
@@ -3842,7 +3842,7 @@ function ExerciseAiActions({
       {state.message ? (
         <p
           className={`mt-2 max-w-56 text-xs leading-5 ${
-            state.status === "error" ? "text-[#b45247]" : "text-[#8a8077]"
+            state.status === "error" ? "text-[var(--status-error-text)]" : "text-[var(--text-muted)]"
           }`}
         >
           {state.message}
@@ -3927,10 +3927,10 @@ function ChecklistExerciseBlocks({
         return (
           <div
             key={`${exercise.id}-checklist-${questionIndex}`}
-            className="space-y-3 rounded-[1rem] border border-[#eadfca] bg-white px-4 py-4"
+            className="space-y-3 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4"
           >
             {prompt ? (
-              <p className="text-sm font-semibold leading-7 text-[#5f544a]">{prompt}</p>
+              <p className="text-sm font-semibold leading-7 text-[var(--text-primary)]">{prompt}</p>
             ) : null}
             {questionIndex === 0 ? (
               <VoiceNotePlayer
@@ -3973,7 +3973,7 @@ function ChecklistExerciseBlocks({
                   );
                   setDrafts((current) => ({ ...current, [draftKey]: "" }));
                 }}
-                className="h-12 flex-1 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-base leading-6 text-[#5f544a] outline-none focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+                className="h-12 flex-1 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-base leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
                 placeholder={getAnswerPlaceholder(
                   exercise,
                   prompt,
@@ -4002,14 +4002,14 @@ function ChecklistExerciseBlocks({
                   );
                   setDrafts((current) => ({ ...current, [draftKey]: "" }));
                 }}
-                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-[#fff8f1] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+                className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
               >
                 Ajouter
               </button>
             </div>
 
             {entries.length === 0 ? (
-              <div className="rounded-[1rem] border border-dashed border-[#eadfca] bg-white px-4 py-4 text-sm leading-6 text-[#8a8077]">
+              <div className="rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-4 py-4 text-sm leading-6 text-[var(--text-muted)]">
                 Ajoute tes mots ci-dessus pour construire ta checklist.
               </div>
             ) : null}
@@ -4019,8 +4019,8 @@ function ChecklistExerciseBlocks({
                 key={`${questionIndex}-${entry.label}-${entryIndex}`}
                 className={`flex cursor-pointer items-center gap-4 rounded-[1rem] border px-4 py-3 transition ${
                   entry.checked
-                    ? "border-[#cf7430] bg-[#fff5e8]"
-                    : "border-[#eadfca] bg-white"
+                    ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)]"
+                    : "border-[var(--border)] bg-[var(--card)]"
                 }`}
               >
                 <input
@@ -4043,11 +4043,11 @@ function ChecklistExerciseBlocks({
                         : serializeChecklistEntries(nextEntries),
                     );
                   }}
-                  className="h-4 w-4 rounded border-[#d7c5ae] text-[#cf7430] focus:ring-[#f0cf55]"
+                  className="h-4 w-4 rounded border-[var(--border)] text-[var(--tyash-label-text)] focus:ring-[var(--tyash-focus-ring)]"
                 />
                 <span
                   className={`text-sm leading-6 ${
-                    entry.checked ? "font-semibold text-[#4b4550]" : "text-[#5f544a]"
+                    entry.checked ? "font-semibold text-[var(--heading-color)]" : "text-[var(--text-primary)]"
                   }`}
                 >
                   {entry.label}
@@ -4069,7 +4069,7 @@ function ChecklistExerciseBlocks({
                         : serializeChecklistEntries(nextEntries),
                     );
                   }}
-                  className="ml-auto text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                  className="ml-auto text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                 >
                   Supprimer
                 </button>

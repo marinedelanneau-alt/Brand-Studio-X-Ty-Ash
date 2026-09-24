@@ -60,7 +60,7 @@ export default async function CommunicationActionPlanPage() {
       <section className="mx-auto max-w-6xl space-y-6">
         <Link
           href="/mon-espace"
-          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+          className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
         >
           Retour à mon espace
         </Link>

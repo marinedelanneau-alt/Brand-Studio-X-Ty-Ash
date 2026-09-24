@@ -11,7 +11,7 @@ export type BrandGuidePdfTheme = {
 export const brandGuidePdfTheme: BrandGuidePdfTheme = {
   page: { width: 595.28, height: 841.89, marginTop: 58, marginRight: 52, marginBottom: 52, marginLeft: 52 },
   grid: { columns: 12, gutter: 12 },
-  colors: { background: "#F7F1E8", paper: "#FFFDFC", text: "#282329", mutedText: "#756B64", border: "#D9CFC3", accent: "#C96C2D" },
+  colors: { background: "#F7F1E8", paper: "#FFFDFC", text: "#282329", mutedText: "#756B64", border: "#D9CFC3", accent: "#7A2D46" },
   typography: {
     display: { fontFamily: "Source Serif 4", fontSize: 48, lineHeight: 1.02 },
     h1: { fontFamily: "Source Serif 4", fontSize: 31, lineHeight: 1.08 },

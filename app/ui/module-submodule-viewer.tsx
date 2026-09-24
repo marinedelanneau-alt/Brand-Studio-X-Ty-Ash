@@ -102,27 +102,27 @@ function ColorSymbolismResource() {
   }
 
   return (
-    <figure className="mt-8 overflow-hidden rounded-[1.25rem] border border-[#eadfca] bg-[#fffdf8] p-3">
+    <figure className="mt-8 overflow-hidden rounded-[1.25rem] border border-[var(--border)] bg-[var(--surface)] p-3">
       <div className="group relative">
         <Image
           src={COLOR_SYMBOLISM_RESOURCE.href}
           alt={COLOR_SYMBOLISM_RESOURCE.title}
           width={1536}
           height={1024}
-          className="w-full rounded-[0.9rem] border border-[#f0e4d3] bg-white"
+          className="w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)]"
         />
         <button
           type="button"
           onClick={() => void downloadAsJpeg()}
           aria-label="Telecharger le visuel au format JPEG"
           title="Telecharger le visuel au format JPEG"
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white/95 text-[#b5661f] opacity-0 shadow-[0_10px_24px_rgba(91,73,57,0.14)] transition hover:bg-[#fff8f1] focus:opacity-100 group-hover:opacity-100"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)]/95 text-[var(--tyash-label-text)] opacity-0 shadow-[0_10px_24px_rgba(91,73,57,0.14)] transition hover:bg-[var(--tyash-subtle)] focus:opacity-100 group-hover:opacity-100"
         >
           <ArrowDownTrayIcon className="h-5 w-5" />
         </button>
       </div>
       <figcaption className="px-1 py-4">
-        <p className="text-sm font-semibold leading-6 text-[#5f544a]">
+        <p className="text-sm font-semibold leading-6 text-[var(--text-primary)]">
           {COLOR_SYMBOLISM_RESOURCE.title}
         </p>
       </figcaption>
@@ -165,7 +165,7 @@ export default function ModuleSubmoduleViewer({
 
   if (!currentSubmodule) {
     return (
-      <div className="rounded-[1.4rem] border border-dashed border-[#eadfca] bg-white px-5 py-6 text-sm leading-7 text-[#8a8077]">
+      <div className="rounded-[1.4rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-5 py-6 text-sm leading-7 text-[var(--text-muted)]">
         Aucun sous-module n&apos;est encore disponible.
       </div>
     );
@@ -173,25 +173,25 @@ export default function ModuleSubmoduleViewer({
 
   return (
     <div className="space-y-5">
-      <section className="bs-dark-card relative overflow-hidden rounded-[2rem] border border-white/80 bg-[#fdfbf6]/95 p-6 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:p-8">
+      <section className="bs-dark-card relative overflow-hidden rounded-[2rem] border border-[var(--surface-highlight)]/80 bg-[var(--surface)]/95 p-6 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[var(--border)]/80 backdrop-blur-[2px] sm:p-8">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_46%)]"
+          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(circle_at_top_right,rgb(var(--tyash-glow-rgb)/0.045),transparent_46%)]"
         />
         <div className="relative space-y-6">
-          <div className="border-b border-[#f0e4d3] pb-4">
+          <div className="border-b border-[var(--border)] pb-4">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Sous-module {currentIndex + 1} sur {submodules.length}
               </p>
-              <p className="text-sm text-[#8a8077]">
+              <p className="text-sm text-[var(--text-muted)]">
                 {answerableExerciseCount} exercice
                 {answerableExerciseCount > 1 ? "s" : ""}
               </p>
             </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1ece5]">
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
               <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)] transition-[width]"
+                className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)] transition-[width]"
                 style={{
                   width: `${Math.max(((currentIndex + 1) / submodules.length) * 100, 8)}%`,
                 }}
@@ -201,22 +201,22 @@ export default function ModuleSubmoduleViewer({
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Sous-module {currentSubmodule.position}
               </p>
-              <h2 className="mt-3 text-xl font-semibold text-[#4b4550] sm:text-[2rem] sm:leading-[1.02]">
+              <h2 className="mt-3 text-xl font-semibold text-[var(--heading-color)] sm:text-[2rem] sm:leading-[1.02]">
                 {currentSubmodule.title}
               </h2>
             </div>
-            <p className="rounded-full bg-[#fff6e3] px-4 py-2 text-[0.74rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+            <p className="rounded-full bg-[var(--tyash-soft)] px-4 py-2 text-[0.74rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
               {answerableExerciseCount} exercice
               {answerableExerciseCount > 1 ? "s" : ""}
             </p>
           </div>
 
           {currentSubmodule.video_url ? (
-            <div className="overflow-hidden rounded-[1.5rem] border border-[#f0e4d3] bg-white p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
-              <div className="aspect-video overflow-hidden rounded-[1rem] bg-[#f4efe9]">
+            <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] p-2 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.85)]">
+              <div className="aspect-video overflow-hidden rounded-[1rem] bg-[var(--surface-secondary)]">
                 <iframe
                   src={currentSubmodule.video_url}
                   title={currentSubmodule.title}
@@ -234,7 +234,7 @@ export default function ModuleSubmoduleViewer({
             subtitles={currentSubmodule.audio_transcript}
           />
 
-          <div className="bs-dark-subcard rounded-[1.5rem] border border-[#f0e4d3] bg-white px-6 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.82)] sm:px-7">
+          <div className="bs-dark-subcard rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-6 py-5 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)] sm:px-7">
             {showColorLibrary ? (
               <ColorLibrarySection recap={<ColorSymbolismResource />} />
             ) : showBaselineInspiration ? (
@@ -243,9 +243,9 @@ export default function ModuleSubmoduleViewer({
               <TypographyInspirationSection />
             ) : (
               <>
-                <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
+                <div className="module-content max-w-none text-[var(--text-primary)]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
                 {scentContent ? <ScentInspirationSection /> : null}
-                {scentContent?.after ? <div className="module-content max-w-none text-[#5f544a]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
+                {scentContent?.after ? <div className="module-content max-w-none text-[var(--text-primary)]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
               </>
             )}
             {showColorSymbolismResource && !showColorLibrary ? <ColorSymbolismResource /> : null}

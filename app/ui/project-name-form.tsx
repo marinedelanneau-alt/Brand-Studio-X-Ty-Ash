@@ -24,7 +24,7 @@ export default function ProjectNameForm() {
       <div className="space-y-2">
         <label
           htmlFor="brand-project-name"
-          className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]"
         >
           Nom du projet
         </label>
@@ -34,14 +34,14 @@ export default function ProjectNameForm() {
           type="text"
           required
           placeholder="Ex. Plateforme Brand Studio"
-          className="h-14 w-full rounded-[1rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-base text-[#6a5d53] outline-none transition focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+          className="h-14 w-full rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-base text-[var(--text-primary)] outline-none transition focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
         />
       </div>
 
       <div className="space-y-2">
         <label
           htmlFor="brand-project-logo"
-          className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[#8b7a70]"
+          className="block text-[0.9rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]"
         >
           Logo
         </label>
@@ -50,9 +50,9 @@ export default function ProjectNameForm() {
           name="logo"
           type="file"
           accept="image/*"
-          className="block w-full rounded-[1rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-4 text-sm text-[#6a5d53] outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-[#fff6e3] file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-[0.12em] file:text-[#cf7430] focus:border-[#f0cf55] focus:ring-4 focus:ring-[#f0cf55]/20"
+          className="block w-full rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-4 text-sm text-[var(--text-primary)] outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-[var(--tyash-soft)] file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-[0.12em] file:text-[var(--tyash-label-text)] focus:border-[var(--tyash-primary)] focus:ring-4 focus:ring-[var(--tyash-focus-ring)]/20"
         />
-        <p className="text-sm leading-6 text-[#8b7a70]">
+        <p className="text-sm leading-6 text-[var(--text-muted)]">
           Optionnel. PNG, JPG, SVG ou WebP, jusqu&apos;à 5 Mo.
         </p>
       </div>
@@ -60,13 +60,13 @@ export default function ProjectNameForm() {
       <button
         type="submit"
         disabled={pending}
-        className="flex h-14 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+        className="flex h-14 w-full items-center justify-center rounded-[1rem] bs-button-primary px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
       >
         {pending ? "Création..." : "Créer mon projet"}
       </button>
 
       {state.message ? (
-        <p className="text-sm leading-6 text-[#b45247]">{state.message}</p>
+        <p className="text-sm leading-6 text-[var(--status-error-text)]">{state.message}</p>
       ) : null}
     </form>
   );

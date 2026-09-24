@@ -50,8 +50,8 @@ function ToolbarButton({
       onClick={onClick}
       className={`rounded-[0.6rem] border px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition ${
         isActive
-          ? "border-[#cf7430] bg-[#fff1dc] text-[#cf7430]"
-          : "border-[#eadfca] bg-white text-[#6b625a]"
+          ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] text-[var(--tyash-label-text)]"
+          : "border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
       }`}
     >
       {label}
@@ -98,7 +98,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, {
     editorProps: {
       attributes: {
         class:
-          "tiptap-editor min-h-48 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-base leading-7 text-[#5f544a] outline-none",
+          "tiptap-editor min-h-48 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base leading-7 text-[var(--text-primary)] outline-none",
       },
     },
     onUpdate: ({ editor: currentEditor }) => {

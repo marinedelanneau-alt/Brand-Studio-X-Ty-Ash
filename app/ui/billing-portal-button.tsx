@@ -37,11 +37,11 @@ export default function BillingPortalButton() {
         type="button"
         onClick={openPortal}
         disabled={isLoading}
-        className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[#6b625a] transition disabled:cursor-wait disabled:opacity-70"
+        className="flex h-11 w-full items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)] transition disabled:cursor-wait disabled:opacity-70"
       >
         {isLoading ? "Ouverture..." : "Mettre à jour ma facturation"}
       </button>
-      {error ? <p className="text-xs font-semibold text-[#b84a33]">{error}</p> : null}
+      {error ? <p className="text-xs font-semibold text-[var(--status-error-text)]">{error}</p> : null}
     </div>
   );
 }

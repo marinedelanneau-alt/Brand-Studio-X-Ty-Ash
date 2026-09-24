@@ -740,16 +740,16 @@ function MoveToSubmoduleControl({
   }
 
   return (
-    <div className="mt-4 rounded-[0.9rem] border border-[#eadfca] bg-white p-4">
-      <p className="text-xs font-black uppercase tracking-[0.16em] text-[#7a7087]">
+    <div className="mt-4 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] p-4">
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
         {title}
       </p>
-      <p className="mt-1 text-sm leading-6 text-[#8a8077]">{helper}</p>
+      <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">{helper}</p>
       <div className="mt-3 flex flex-col gap-3 md:flex-row">
         <select
           value={resolvedTargetSubmoduleId}
           onChange={(event) => setTargetSubmoduleId(event.target.value)}
-          className="h-11 flex-1 rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 text-sm text-[#5f544a]"
+          className="h-11 flex-1 rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text-primary)]"
         >
           {availableTargets.map((target) => (
             <option key={target.id} value={target.id}>
@@ -761,7 +761,7 @@ function MoveToSubmoduleControl({
           type="button"
           disabled={!resolvedTargetSubmoduleId}
           onClick={() => onMove(resolvedTargetSubmoduleId)}
-          className="rounded-[0.8rem] border border-[#eadfca] bg-[#fff8f1] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[0.8rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {buttonLabel}
         </button>
@@ -787,13 +787,13 @@ function PositionControl({
 
   return (
     <label className="flex items-center gap-3">
-      <span className="text-xs font-black uppercase tracking-[0.12em] text-[#8a8077]">
+      <span className="text-xs font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
         {label}
       </span>
       <select
         value={String(value)}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="h-10 min-w-[9rem] rounded-[0.8rem] border border-[#eadfca] bg-white px-3 text-sm text-[#5f544a]"
+        className="h-10 min-w-[9rem] rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-3 text-sm text-[var(--text-primary)]"
       >
         {Array.from({ length: count }, (_, index) => (
           <option key={index} value={index}>
@@ -900,7 +900,7 @@ function QuestionCard({
 
   return (
     <>
-      <div className="rounded-[0.95rem] border border-[#eadfca] bg-[#fffdf7] p-4">
+      <div className="rounded-[0.95rem] border border-[var(--border)] bg-[var(--surface)] p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <button
             type="button"
@@ -908,7 +908,7 @@ function QuestionCard({
             className="min-w-0 flex-1 text-left"
             aria-expanded={isExpanded}
           >
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
               {question.type === "static_text"
                 ? "Pour t’éclairer"
                 : question.type === "popup_message"
@@ -916,10 +916,10 @@ function QuestionCard({
                   : `Question ${exerciseNumber}`}
             </p>
             <div
-              className="module-content mt-2 whitespace-normal break-words text-base font-semibold text-[#4b4550]"
+              className="module-content mt-2 whitespace-normal break-words text-base font-semibold text-[var(--heading-color)]"
               dangerouslySetInnerHTML={{ __html: getStaticTextHtml(questionSummary) }}
             />
-            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[#8a8077]">
+            <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[var(--text-muted)]">
               {EXERCISE_TYPE_LABELS[question.type]}
             </p>
           </button>
@@ -933,7 +933,7 @@ function QuestionCard({
             <button
               type="button"
               onClick={() => setIsExpanded((current) => !current)}
-              className="rounded-[0.7rem] border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+              className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
             >
               {isExpanded ? "Plier" : "Deplier"}
             </button>
@@ -941,7 +941,7 @@ function QuestionCard({
               type="button"
               disabled={questionIndex === 0}
               onClick={onMoveUp}
-              className="rounded-[0.7rem] border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Monter
             </button>
@@ -949,14 +949,14 @@ function QuestionCard({
               type="button"
               disabled={questionIndex === questionCount - 1}
               onClick={onMoveDown}
-              className="rounded-[0.7rem] border border-[#eadfca] bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Descendre
             </button>
             <button
               type="button"
               onClick={onDelete}
-              className="text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+              className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
             >
               Supprimer
             </button>
@@ -976,7 +976,7 @@ function QuestionCard({
         {isExpanded ? (
         <div className="mt-4 grid max-w-5xl gap-4">
           <label className="space-y-2">
-            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Type
             </span>
             <select
@@ -992,7 +992,7 @@ function QuestionCard({
                   audioUrl: current.audioUrl,
                 }));
               }}
-              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+              className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
             >
               {Object.entries(EXERCISE_TYPE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -1003,12 +1003,12 @@ function QuestionCard({
           </label>
 
           <div className="space-y-2">
-            <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               <span>{getQuestionLabel(question.type)}</span>
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-[#eadfca] bg-white px-3 py-1.5 text-[0.68rem] text-[#6b625a] transition hover:border-[#cf7430] hover:text-[#cf7430]"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-[0.68rem] text-[var(--text-primary)] transition hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-label-text)]"
                 aria-label={`Previsualiser la question ${questionIndex + 1}`}
                 title="Previsualiser le rendu"
               >
@@ -1031,23 +1031,23 @@ function QuestionCard({
                 type="text"
                 value={question.question}
                 onChange={(event) => onChange((current) => ({ ...current, question: event.target.value }))}
-                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
               />
             )}
             {getQuestionHint(question.type) ? (
-              <p className="text-sm leading-6 text-[#8a8077]">{getQuestionHint(question.type)}</p>
+              <p className="text-sm leading-6 text-[var(--text-muted)]">{getQuestionHint(question.type)}</p>
             ) : null}
             {usesRichTextEditor(question.type) &&
             !looksLikeHtml(question.question) &&
             question.question.trim() ? (
-              <p className="text-sm leading-6 text-[#8a8077]">
+              <p className="text-sm leading-6 text-[var(--text-muted)]">
                 Astuce : ce bloc accepte maintenant le texte enrichi, comme le contenu des modules.
               </p>
             ) : null}
           </div>
 
           <label className="space-y-2">
-            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Note vocale MP3 de la question
             </span>
             <input
@@ -1057,13 +1057,13 @@ function QuestionCard({
               onChange={(event) => {
                 void uploadQuestionVoiceNote(event.target.files?.[0] ?? null);
               }}
-              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+              className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
             />
-            <p className="text-sm leading-6 text-[#8a8077]">
+            <p className="text-sm leading-6 text-[var(--text-muted)]">
               Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
             </p>
             {voiceUploadMessage ? (
-              <p className="text-sm leading-6 text-[#6b625a]">{voiceUploadMessage}</p>
+              <p className="text-sm leading-6 text-[var(--text-primary)]">{voiceUploadMessage}</p>
             ) : null}
             {question.audioUrl ? (
               <VoiceNotePlayer
@@ -1074,7 +1074,7 @@ function QuestionCard({
           </label>
 
           <label className="space-y-2">
-            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+            <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Sous-titres de la note vocale
             </span>
             <textarea
@@ -1085,7 +1085,7 @@ function QuestionCard({
                   audioTranscript: event.target.value,
                 }))
               }
-              className="min-h-28 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+              className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               placeholder="Colle ici la transcription exacte de la note vocale."
             />
           </label>
@@ -1093,7 +1093,7 @@ function QuestionCard({
           {supportsExplanationField(question.type) ? (
             <>
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   {question.type === "popup_message"
                     ? "Auteur ou signature"
                     : question.type === "brand_persona"
@@ -1104,7 +1104,7 @@ function QuestionCard({
                   <textarea
                     value={question.explanation}
                     onChange={(event) => onChange((current) => ({ ...current, explanation: event.target.value }))}
-                    className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                    className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                   />
                 ) : (
                   <RichTextEditor
@@ -1120,7 +1120,7 @@ function QuestionCard({
               {supportsPlaceholderField(question.type) ? (
                 question.type === "fill_blank" ? (
                   <div className="space-y-2">
-                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                    <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                       Exemples de reponse (placeholders)
                     </span>
                     {getFillBlankPlaceholderValues(question).length > 0 ? (
@@ -1130,7 +1130,7 @@ function QuestionCard({
                             key={`${question.id}-fill-placeholder-${index}`}
                             className="space-y-1"
                           >
-                            <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#8a8077]">
+                            <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                               Champ a completer {index + 1}
                             </span>
                             <input
@@ -1148,23 +1148,23 @@ function QuestionCard({
                                 }))
                               }
                               placeholder={`Ex. reponse ${index + 1}`}
-                              className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                              className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                             />
                           </label>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm leading-6 text-[#8a8077]">
+                      <p className="text-sm leading-6 text-[var(--text-muted)]">
                         Ajoute au moins un `___` dans la question pour creer les placeholders.
                       </p>
                     )}
-                    <p className="text-sm leading-6 text-[#8a8077]">
+                    <p className="text-sm leading-6 text-[var(--text-muted)]">
                       Chaque exemple apparait dans le champ correspondant tant que l&apos;utilisateur n&apos;a rien saisi.
                     </p>
                   </div>
                 ) : (
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     {getPlaceholderFieldLabel(question.type)}
                   </span>
                   <input
@@ -1174,9 +1174,9 @@ function QuestionCard({
                       onChange((current) => ({ ...current, answerPlaceholder: event.target.value }))
                     }
                     placeholder={getPlaceholderFieldHint(question.type)}
-                    className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
-                  <p className="text-sm leading-6 text-[#8a8077]">
+                  <p className="text-sm leading-6 text-[var(--text-muted)]">
                     Ce texte apparaît en gris dans le champ de réponse tant que l&apos;utilisateur n&apos;a rien saisi.
                   </p>
                 </label>
@@ -1223,13 +1223,13 @@ function QuestionCard({
 
           {exerciseNeedsOptions(question.type) ? (
             <label className="space-y-2">
-              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 {question.type === "color" ? "Couleurs, une ligne par choix" : "Options, une ligne par choix"}
               </span>
               <textarea
                 value={question.optionsText}
                 onChange={(event) => onChange((current) => ({ ...current, optionsText: event.target.value }))}
-                className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
               />
               {question.type === "color" &&
               normalizeExerciseOptions(question.type, question.optionsText.split("\n")).length > 0 ? (
@@ -1240,15 +1240,15 @@ function QuestionCard({
                     return (
                       <div
                         key={option}
-                        className="flex items-center gap-3 rounded-[0.9rem] border border-[#eadfca] bg-white px-3 py-2"
+                        className="flex items-center gap-3 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-3 py-2"
                       >
                         <span
-                          className="h-8 w-8 rounded-full border border-white shadow-[0_0_0_1px_rgba(75,69,80,0.12)]"
+                          className="h-8 w-8 rounded-full border border-[var(--surface-highlight)] shadow-[0_0_0_1px_rgba(75,69,80,0.12)]"
                           style={{ backgroundColor: colorOption.color }}
                         />
-                        <div className="text-sm leading-5 text-[#5f544a]">
+                        <div className="text-sm leading-5 text-[var(--text-primary)]">
                           <p className="font-semibold">{colorOption.label}</p>
-                          <p className="text-xs uppercase tracking-[0.12em] text-[#8a8077]">
+                          <p className="text-xs uppercase tracking-[0.12em] text-[var(--text-muted)]">
                             {colorOption.color}
                           </p>
                         </div>
@@ -1261,10 +1261,10 @@ function QuestionCard({
           ) : null}
 
           {question.type === "table" ? (
-            <div className="space-y-4 rounded-[0.9rem] border border-[#eadfca] bg-[#fff8f1] px-4 py-4">
+            <div className="space-y-4 rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Nombre de lignes
                   </span>
                   <input
@@ -1277,11 +1277,11 @@ function QuestionCard({
                         tableRows: Math.max(1, Number(event.target.value) || 1),
                       }))
                     }
-                    className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
                 </label>
                 <label className="space-y-2">
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Nombre de colonnes
                   </span>
                   <input
@@ -1294,13 +1294,13 @@ function QuestionCard({
                         tableColumns: Math.max(1, Number(event.target.value) || 1),
                       }))
                     }
-                    className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
                 </label>
               </div>
 
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   Intitules des lignes
                 </span>
                 <textarea
@@ -1308,12 +1308,12 @@ function QuestionCard({
                   onChange={(event) =>
                     onChange((current) => ({ ...current, tableRowLabelsText: event.target.value }))
                   }
-                  className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                  className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                 />
               </label>
 
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   Intitules des colonnes
                 </span>
                 <textarea
@@ -1321,23 +1321,23 @@ function QuestionCard({
                   onChange={(event) =>
                     onChange((current) => ({ ...current, tableColumnLabelsText: event.target.value }))
                   }
-                  className="min-h-24 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3"
+                  className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3"
                 />
               </label>
 
               <div className="space-y-3">
                 <div>
-                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                  <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Placeholders des reponses du tableau
                   </span>
-                  <p className="mt-1 text-sm leading-6 text-[#8a8077]">
+                  <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
                     Une ligne par element de reponse, dans l&apos;ordre des cases du tableau.
                   </p>
                 </div>
                 <div className="grid gap-3 md:grid-cols-3">
                   {getTablePlaceholderValues(question).map((placeholder, index) => (
                     <label key={`${question.id}-table-placeholder-${index}`} className="space-y-1">
-                      <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[#8a8077]">
+                      <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
                         Placeholder {index + 1}
                       </span>
                       <input
@@ -1358,7 +1358,7 @@ function QuestionCard({
                           })
                         }
                         placeholder={`Ex. reponse ${index + 1}`}
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                       />
                     </label>
                   ))}
@@ -1368,9 +1368,9 @@ function QuestionCard({
           ) : null}
 
           {question.type === "image_upload" ? (
-            <div className="space-y-4 rounded-[0.9rem] border border-[#eadfca] bg-[#fff8f1] px-4 py-4">
+            <div className="space-y-4 rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4">
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   Nombre maximum d&apos;images
                 </span>
                 <input
@@ -1383,10 +1383,10 @@ function QuestionCard({
                       imageUploadMax: Math.max(1, Number(event.target.value) || 1),
                     }))
                   }
-                  className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                  className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                 />
               </label>
-              <p className="text-sm leading-6 text-[#8a8077]">
+              <p className="text-sm leading-6 text-[var(--text-muted)]">
                 Exemple : 6 pour un mini moodboard, 12 pour un tableau plus riche.
               </p>
             </div>
@@ -1410,36 +1410,36 @@ function QuestionCard({
           onClick={() => setIsPreviewOpen(false)}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[1.6rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff7ef)] p-6 shadow-[0_24px_70px_rgba(47,36,24,0.18)]"
+            className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[1.6rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-6 shadow-[0_24px_70px_rgba(47,36,24,0.18)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Aperçu
                 </p>
-                <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[#4b4550]">
+                <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[var(--heading-color)]">
                   {question.type === "static_text"
                     ? "Pour t’éclairer"
                     : question.type === "popup_message"
                       ? "Inspiration"
                       : `Question ${exerciseNumber}`}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-[#7b7068]">
+                <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
                   Visualisation du rendu final cote utilisateur.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#6b625a]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)]"
                 aria-label="Fermer l'apercu"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="mt-6 rounded-[1.3rem] border border-[#eadfca] bg-[#fffdf9] p-5">
+            <div className="mt-6 rounded-[1.3rem] border border-[var(--border)] bg-[var(--surface)] p-5">
               <ExercisePreview exercise={toPreviewExercise(question)} />
             </div>
           </div>
@@ -1753,35 +1753,35 @@ function ModuleForm({
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[#eadfca] bg-[linear-gradient(180deg,#fffdfa,#fff8f1)] shadow-[0_18px_42px_rgba(210,189,152,0.1)]">
+    <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] shadow-[0_18px_42px_rgba(210,189,152,0.1)]">
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
         className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
       >
         <div className="min-w-0">
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#cf7430]">
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
             {module.id ? `Module ${module.position}` : "Nouveau module"}
           </p>
-          <h2 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[#4b4550]">
+          <h2 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[var(--heading-color)]">
             {moduleLabel}
           </h2>
-          <p className="mt-3 text-sm leading-6 text-[#7b7068]">
+          <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
             {module.submodules.length} sous-module{module.submodules.length > 1 ? "s" : ""}, {totalExercises} exercice{totalExercises > 1 ? "s" : ""}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`inline-flex rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.18em] ${module.isPublished ? "bg-[#eef6eb] text-[#5f8d63]" : "bg-[#f2eef7] text-[#7a7087]"}`}>
+          <span className={`inline-flex rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.18em] ${module.isPublished ? "bs-status-light bg-[#eef6eb] text-[var(--status-success-text)]" : "bs-status-light bg-[#f2eef7] text-[var(--text-muted)]"}`}>
             {module.isPublished ? "Publie" : "Brouillon"}
           </span>
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#eadfca] bg-white text-lg text-[#6b625a]">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-lg text-[var(--text-primary)]">
             {isOpen ? "-" : "+"}
           </span>
         </div>
       </button>
 
       {isOpen ? (
-        <div className="border-t border-[#eadfca] bg-[#fffdf7] px-4 py-6 sm:px-6">
+        <div className="border-t border-[var(--border)] bg-[var(--surface)] px-4 py-6 sm:px-6">
           <form
             ref={formRef}
             action={saveAdminModule}
@@ -1813,18 +1813,18 @@ function ModuleForm({
             />
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Titre du module</span>
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Titre du module</span>
                 <input
                   name="title"
                   type="text"
                   required
                   value={module.title}
                   onChange={(event) => onChange((current) => ({ ...current, title: event.target.value }))}
-                  className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                  className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                 />
               </label>
               <label className="space-y-2">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Position</span>
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Position</span>
                 <div className="flex flex-wrap gap-2">
                   <input
                     name="position"
@@ -1835,7 +1835,7 @@ function ModuleForm({
                     onChange={(event) =>
                       onChange((current) => ({ ...current, position: Math.max(1, Number(event.target.value) || 1) }))
                     }
-                    className="h-12 min-w-[7rem] flex-1 rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                    className="h-12 min-w-[7rem] flex-1 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                   />
                   <button
                     type="button"
@@ -1846,7 +1846,7 @@ function ModuleForm({
                         position: Math.max(1, current.position - 1),
                       }))
                     }
-                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-12 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Monter
                   </button>
@@ -1858,7 +1858,7 @@ function ModuleForm({
                         position: current.position + 1,
                       }))
                     }
-                    className="h-12 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                    className="h-12 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                   >
                     Descendre
                   </button>
@@ -1866,7 +1866,7 @@ function ModuleForm({
               </label>
             </div>
 
-            <label className="flex items-center gap-3 rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm text-[#5f544a]">
+            <label className="flex items-center gap-3 rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--text-primary)]">
               <input
                 name="isPublished"
                 type="checkbox"
@@ -1877,14 +1877,14 @@ function ModuleForm({
             </label>
 
             {module.id && moduleSaveMessage ? (
-              <p className="rounded-[0.9rem] border border-[#eadfca] bg-white px-4 py-3 text-sm leading-6 text-[#6b625a]">
+              <p className="rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm leading-6 text-[var(--text-primary)]">
                 {moduleSaveMessage}
               </p>
             ) : null}
 
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Sous-modules</span>
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Sous-modules</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -1896,7 +1896,7 @@ function ModuleForm({
                     }));
                     setActiveSubmoduleId(nextSubmodule.id);
                   }}
-                  className="rounded-[0.8rem] border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                  className="rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                 >
                   Ajouter un sous-module
                 </button>
@@ -1923,14 +1923,14 @@ function ModuleForm({
                             onClick={() => setActiveSubmoduleId(submodule.id)}
                             className={`w-full rounded-[1rem] border px-4 py-3 text-left transition sm:min-w-[14rem] ${
                               isActive
-                                ? "border-[#cf7430] bg-[#fff3e4] shadow-[0_10px_24px_rgba(210,189,152,0.12)]"
-                                : "border-[#eadfca] bg-white hover:border-[#d8c4a4]"
+                                ? "border-[var(--tyash-primary)] bg-[var(--tyash-soft)] shadow-[0_10px_24px_rgba(210,189,152,0.12)]"
+                                : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--border)]"
                             }`}
                           >
-                            <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                            <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                               Sous-module {submoduleIndex + 1}
                             </p>
-                            <p className="mt-1 whitespace-normal break-words text-sm font-semibold leading-5 text-[#4b4550]">
+                            <p className="mt-1 whitespace-normal break-words text-sm font-semibold leading-5 text-[var(--heading-color)]">
                               {submodule.title || `Sous-module ${submoduleIndex + 1}`}
                             </p>
                           </button>
@@ -1945,14 +1945,14 @@ function ModuleForm({
                       id={`submodule-panel-${activeSubmodule.id}`}
                       role="tabpanel"
                       aria-labelledby={`submodule-tab-${activeSubmodule.id}`}
-                      className="rounded-[1.2rem] border border-[#eadfca] bg-white p-5"
+                      className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--card)] p-5"
                     >
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">
+                      <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
                         Sous-module {resolvedActiveSubmoduleIndex + 1}
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-[#7b7068]">
+                      <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
                         {activeSubmodule.title || `Sous-module ${resolvedActiveSubmoduleIndex + 1}`}
                       </p>
                     </div>
@@ -1970,7 +1970,7 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        className="rounded-[0.7rem] border border-[#eadfca] bg-[#fff8f1] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         Monter
                       </button>
@@ -1987,7 +1987,7 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        className="rounded-[0.7rem] border border-[#eadfca] bg-[#fff8f1] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         Descendre
                       </button>
@@ -2004,7 +2004,7 @@ function ModuleForm({
                           }));
                           setActiveSubmoduleId(fallbackSubmodule?.id ?? "");
                         }}
-                        className="text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                        className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                       >
                         Supprimer
                       </button>
@@ -2013,7 +2013,7 @@ function ModuleForm({
 
                   <div className="mt-4 grid max-w-6xl gap-4">
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Titre du sous-module</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Titre du sous-module</span>
                       <input
                         type="text"
                         required
@@ -2026,12 +2026,12 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">URL vidéo</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">URL vidéo</span>
                       <input
                         type="url"
                         value={activeSubmodule.videoUrl}
@@ -2043,12 +2043,12 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                       />
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Note vocale MP3 d&apos;introduction</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Note vocale MP3 d&apos;introduction</span>
                       <input
                         type="file"
                         accept="audio/mpeg,audio/mp3,.mp3"
@@ -2060,13 +2060,13 @@ function ModuleForm({
                             event.target.files?.[0] ?? null,
                           );
                         }}
-                        className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4"
+                        className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                       />
-                      <p className="text-sm leading-6 text-[#8a8077]">
+                      <p className="text-sm leading-6 text-[var(--text-muted)]">
                         Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
                       </p>
                       {submoduleVoiceUploadMessages[activeSubmodule.id] ? (
-                        <p className="text-sm leading-6 text-[#6b625a]">
+                        <p className="text-sm leading-6 text-[var(--text-primary)]">
                           {submoduleVoiceUploadMessages[activeSubmodule.id]}
                         </p>
                       ) : null}
@@ -2080,7 +2080,7 @@ function ModuleForm({
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                         Sous-titres de la note vocale d&apos;introduction
                       </span>
                       <textarea
@@ -2095,13 +2095,13 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        className="min-h-32 w-full rounded-[0.9rem] border border-[#eadfca] bg-[#fffdf7] px-4 py-3"
+                        className="min-h-32 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                         placeholder="Colle ici la transcription exacte de cette note vocale."
                       />
                     </label>
 
                     <div className="space-y-3">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Contenu</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Contenu</span>
                       <RichTextEditor
                         ref={activeSubmoduleContentEditorRef}
                         value={activeSubmodule.contentHtml}
@@ -2117,9 +2117,9 @@ function ModuleForm({
                       />
                     </div>
 
-                    <div className="space-y-4 rounded-[1rem] border border-[#f0e6d7] bg-[#fffdf7] p-4">
+                    <div className="space-y-4 rounded-[1rem] border border-[var(--border)] bg-[var(--surface)] p-4">
                       <div className="flex flex-wrap items-center justify-between gap-4">
-                        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Exercices</span>
+                        <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Exercices</span>
                         <button
                           type="button"
                           onClick={() =>
@@ -2132,17 +2132,17 @@ function ModuleForm({
                               ),
                             }))
                           }
-                          className="rounded-[0.8rem] border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                          className="rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                         >
                           Ajouter un exercice
                         </button>
                       </div>
                       {activeSubmodule.exerciseGroups.map((group, groupIndex) => (
-                        <div key={group.id} className="rounded-[1rem] border border-[#eadfca] bg-white p-4">
+                        <div key={group.id} className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] p-4">
                           <div className="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                              <p className="text-sm font-black uppercase tracking-[0.14em] text-[#7a7087]">Exercice {groupIndex + 1}</p>
-                              <p className="mt-1 text-sm leading-6 text-[#7b7068]">{group.questions.length} question{group.questions.length > 1 ? "s" : ""}</p>
+                              <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">Exercice {groupIndex + 1}</p>
+                              <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">{group.questions.length} question{group.questions.length > 1 ? "s" : ""}</p>
                             </div>
                             <div className="flex flex-wrap items-center justify-end gap-3">
                               <PositionControl
@@ -2180,7 +2180,7 @@ function ModuleForm({
                                     ),
                                   }))
                                 }
-                                className="rounded-[0.7rem] border border-[#eadfca] bg-[#fff8f1] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 Monter
                               </button>
@@ -2197,7 +2197,7 @@ function ModuleForm({
                                     ),
                                   }))
                                 }
-                                className="rounded-[0.7rem] border border-[#eadfca] bg-[#fff8f1] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-[0.7rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 Descendre
                               </button>
@@ -2213,7 +2213,7 @@ function ModuleForm({
                                     ),
                                   }))
                                 }
-                                className="text-xs font-black uppercase tracking-[0.12em] text-[#b45247]"
+                                className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                               >
                                 Supprimer
                               </button>
@@ -2242,9 +2242,9 @@ function ModuleForm({
                             }
                           />
 
-                          <div className="mt-4 rounded-[0.9rem] border border-[#eadfca] bg-[#fff8f1] p-4">
+                          <div className="mt-4 rounded-[0.9rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-4">
                             <label className="space-y-2">
-                              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[#7a7087]">Nombre de questions</span>
+                              <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Nombre de questions</span>
                               <input
                                 type="number"
                                 min={1}
@@ -2272,10 +2272,10 @@ function ModuleForm({
                                     }),
                                   );
                                 }}
-                                className="h-12 w-full rounded-[0.9rem] border border-[#eadfca] bg-white px-4"
+                                className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
                               />
                             </label>
-                            <p className="mt-3 text-sm leading-6 text-[#8a8077]">Chaque question de cet exercice peut avoir son propre type.</p>
+                            <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">Chaque question de cet exercice peut avoir son propre type.</p>
                           </div>
 
                           <div className="mt-4 space-y-4">
@@ -2375,7 +2375,7 @@ function ModuleForm({
                                   })),
                                 )
                               }
-                              className="rounded-[0.8rem] border border-[#eadfca] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#6b625a]"
+                              className="rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--text-primary)]"
                             >
                               Ajouter une question
                             </button>
@@ -2388,7 +2388,7 @@ function ModuleForm({
                   ) : null}
                 </>
               ) : (
-                <div className="rounded-[1.2rem] border border-dashed border-[#eadfca] bg-white px-5 py-6 text-sm leading-6 text-[#8a8077]">
+                <div className="rounded-[1.2rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-5 py-6 text-sm leading-6 text-[var(--text-muted)]">
                   Aucun sous-module pour le moment.
                 </div>
               )}
@@ -2411,7 +2411,7 @@ function ModuleForm({
               {!module.id ? (
                 <button
                   type="submit"
-                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[linear-gradient(135deg,#df9b39,#f1cc56)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] bs-button-primary px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white"
                 >
                   {submitLabel}
                 </button>
@@ -2422,7 +2422,7 @@ function ModuleForm({
                   type="submit"
                   formAction={deleteAdminModule}
                   data-action="delete"
-                  className="text-sm font-extrabold uppercase tracking-[0.12em] text-[#b45247]"
+                  className="text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--status-error-text)]"
                 >
                   Supprimer ce module
                 </button>

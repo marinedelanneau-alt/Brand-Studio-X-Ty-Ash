@@ -124,38 +124,38 @@ export default async function WorkspaceModulePage({
         <div className="flex items-center gap-4">
           <Link
             href="/mon-espace"
-            className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[#eadfca] bg-white px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[#6b625a]"
+            className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
           >
             Retour à mon espace
           </Link>
         </div>
 
-        <article className="border-t border-[#eadfca] pt-6 sm:pt-8">
+        <article className="border-t border-[var(--border)] pt-6 sm:pt-8">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start lg:gap-8">
             <div className="min-w-0">
-              <span className="inline-flex rounded-full bg-[#fff6e3] px-4 py-2 text-[0.74rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+              <span className="inline-flex rounded-full bg-[var(--tyash-soft)] px-4 py-2 text-[0.74rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
                 Module {currentModule.position}
               </span>
-              <h1 className="mt-4 text-2xl font-semibold text-[#15213b] sm:text-3xl">
+              <h1 className="mt-4 text-2xl font-semibold text-[var(--heading-color)] sm:text-3xl">
                 {currentModule.title}
               </h1>
             </div>
 
-            <div className="flex min-w-0 items-start gap-4 border-l border-[#eadfca] pl-5 lg:pl-6">
+            <div className="flex min-w-0 items-start gap-4 border-l border-[var(--border)] pl-5 lg:pl-6">
               <ModulePreviewTrigger
                 submodules={currentModule.submodules}
                 currentIndex={initialSubmoduleIndex}
               />
               <div className="min-w-0 flex-1">
-                <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[#7a7087]">
+                <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   Avancement du module
                 </p>
-                <p className="mt-4 text-4xl font-black leading-none text-[#15213b]">
+                <p className="mt-4 text-4xl font-black leading-none text-[var(--heading-color)]">
                   {currentModule.progress.completionPercent}%
                 </p>
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#f1ece5]">
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
                   <div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"
+                    className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)]"
                     style={{ width: `${currentModule.progress.completionPercent}%` }}
                   />
                 </div>
