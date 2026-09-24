@@ -118,14 +118,20 @@ function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
         ×
       </span>
 
-      <div className="flex shrink-0 items-center justify-center self-center">
+      {/* Frame the original artwork's whitespace without altering the logo. */}
+      <div
+        className={`relative aspect-[3.3/1] shrink-0 self-center overflow-hidden rounded-sm bg-white ${
+          compact ? "w-[7.5rem] sm:w-[8.5rem]" : "w-[8.5rem] sm:w-[10rem]"
+        }`}
+      >
         <Image
-          src="/tyash-logo.svg"
+          src="/tyash-logo.png"
           alt="Ty Ash Studio"
-          width={compact ? 120 : 150}
-          height={compact ? 72 : 84}
-          className={compact ? "h-[2.1rem] w-auto object-contain sm:h-[2.4rem]" : "h-[2.4rem] w-auto object-contain sm:h-[2.8rem]"}
-          priority
+          width={7501}
+          height={7500}
+          sizes={compact ? "(min-width: 640px) 164px, 144px" : "(min-width: 640px) 192px, 164px"}
+          className="absolute left-[-10%] top-1/2 h-auto w-[120%] max-w-none -translate-y-1/2"
+          preload
         />
       </div>
     </div>
@@ -267,7 +273,7 @@ export default async function MonEspacePage() {
                 workspace.project ? "lg:col-start-1 lg:row-start-1" : ""
               }`}
             >
-              <div className="flex w-full items-center justify-between gap-4">
+              <div className="flex w-full flex-wrap items-center justify-between gap-4">
                 <div className="min-w-0 shrink-0">
                   {workspace.project?.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -281,7 +287,7 @@ export default async function MonEspacePage() {
                   )}
                 </div>
 
-                <span className="ml-6 inline-flex shrink-0 rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
+                <span className="inline-flex shrink-0 rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Espace de travail
                 </span>
               </div>
