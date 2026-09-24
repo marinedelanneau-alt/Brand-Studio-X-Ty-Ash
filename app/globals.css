@@ -8,7 +8,7 @@
   --bs-ink: #15213b;
   --bs-copy: #5d5a57;
   --bs-orange: #7a2d46;
-  --bs-yellow: #7a2d46;
+  --bs-yellow: #b57a92;
   --surface: var(--bs-surface);
   --surface-secondary: var(--bs-surface-muted);
   --card: #ffffff;
@@ -46,7 +46,7 @@ html[data-theme="dark"] {
   --bs-ink: #f5efe6;
   --bs-copy: #c9c0b6;
   --bs-orange: #7a2d46;
-  --bs-yellow: #7a2d46;
+  --bs-yellow: #b57a92;
   --surface: #202126;
   --surface-secondary: #25262c;
   --card: #25262c;
@@ -507,6 +507,29 @@ a {
 button,
 input {
   font: inherit;
+}
+
+[class*="text-[#cf7430]"],
+[class*="border-[#cf7430]"],
+[class*="bg-[#cf7430]"],
+[class*="hover:text-[#cf7430]"],
+[class*="hover:border-[#cf7430]"],
+[class*="focus:border-[#cf7430]"],
+[class*="ring-[#cf7430]"],
+[class*="accent-[#cf7430]"],
+[class*="bg-[linear-gradient(90deg,#cf7430,#f0cf55)]"],
+[class*="bg-[linear-gradient(135deg,#df9b39,#f1cc56)]"],
+[class*="linear-gradient(90deg,#d88a2f,#f0cf55)"],
+[class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
+[class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
+  color: #7a2d46 !important;
+  border-color: #7a2d46 !important;
+  background-color: #7a2d46 !important;
+  background-image: linear-gradient(135deg, #7a2d46, #9d4d62) !important;
+}
+
+[class*="bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"] {
+  background-image: linear-gradient(90deg, #7a2d46, #9d4d62) !important;
 }
 
 .bs-button-primary {
