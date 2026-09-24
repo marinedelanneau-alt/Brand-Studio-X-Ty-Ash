@@ -257,7 +257,7 @@ export default async function MonEspacePage() {
                     priority
                   />
                 )}
-                <span className="inline-flex rounded-full border border-[#efd7b8] bg-[#fff6e3] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                <span className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Espace de travail
                 </span>
               </div>
@@ -265,7 +265,7 @@ export default async function MonEspacePage() {
                 <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[#2f2a33] sm:text-[4rem]">
                   {workspaceTitle}
                 </p>
-                <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[#cf7430]">
+                <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
                   En route vers ta nouvelle identité de marque
                 </p>
               </div>
@@ -281,16 +281,16 @@ export default async function MonEspacePage() {
               <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-white/80 bg-[#fdfbf6]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[#e5ded3]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgba(236,104,28,0.045),transparent_48%)]"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgba(122,45,70,0.08),transparent_48%)]"
                 />
                 <LogoutButton
                   iconOnly
-                  className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#eadfca] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[#cf7430] hover:bg-[#fff6e3] hover:text-[#cf7430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f0cf55]"
+                  className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--tyash-border)] bg-white text-[#7a7087] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[var(--tyash-primary)] hover:bg-[var(--tyash-soft)] hover:text-[var(--tyash-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tyash-focus-ring)]"
                 />
                 <div className="relative flex h-full flex-col gap-4">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[#f0e4d3] pb-3">
-                      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[#cf7430]">
+                      <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-primary-dark)]">
                         Navigation
                       </p>
                       <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[#4b4550]">
@@ -304,7 +304,7 @@ export default async function MonEspacePage() {
                             className={`w-full rounded-full border px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] transition ${
                               module.progress.isCompleted
                                 ? "border-[#d6e8d8] bg-[#eef6eb] text-[#5f8d63]"
-                                : "border-[#e5ded3] bg-[#fdfbf6] text-[#586071] hover:border-[#ec681c] hover:text-[#ec681c]"
+                                : "border-[var(--tyash-border)] bg-[var(--tyash-subtle)] text-[#586071] hover:border-[var(--tyash-primary)] hover:text-[var(--tyash-primary-dark)]"
                             }`}
                           >
                             {module.title}
@@ -312,7 +312,7 @@ export default async function MonEspacePage() {
                         ))}
                         <Link
                           href="/mon-espace/plan-action-communication"
-                          className="w-full rounded-full border border-[#ec681c] bg-[#fff8f2] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#d95d17] transition hover:bg-[#ec681c] hover:text-white"
+                          className="w-full rounded-full border border-[var(--tyash-primary)] bg-[var(--tyash-soft)] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[var(--tyash-primary-dark)] transition hover:bg-[var(--tyash-primary)] hover:text-[var(--tyash-text-on-primary)]"
                         >
                           Plan d&apos;action communication
                         </Link>
@@ -330,13 +330,13 @@ export default async function MonEspacePage() {
                     ) : null}
                   </div>
 
-                    <div className="rounded-[1rem] border border-[#e5ded3] bg-[#fbf8f1] p-2.5 shadow-[0_8px_18px_rgba(21,33,59,0.045)]">
+                    <div className="rounded-[1rem] border border-[var(--tyash-border)] bg-[var(--tyash-subtle)] p-2.5 shadow-[0_8px_18px_rgba(21,33,59,0.045)]">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[#cf7430] ring-1 ring-[#efd7b8]">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-white text-[var(--tyash-primary)] ring-1 ring-[var(--tyash-border)]">
                         <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="text-[0.6rem] font-black uppercase tracking-[0.16em] text-[#cf7430]">
+                        <p className="text-[0.6rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-primary-dark)]">
                           Fin de parcours
                         </p>
                         <p className="mt-0.5 text-sm font-extrabold text-[#4b4550]">
@@ -345,7 +345,7 @@ export default async function MonEspacePage() {
                       </div>
                     </div>
                     <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-bold text-[#5f544a]">
-                      <ClockIcon className="h-3.5 w-3.5 text-[#cf7430]" aria-hidden="true" />
+                      <ClockIcon className="h-3.5 w-3.5 text-[var(--tyash-primary)]" aria-hidden="true" />
                       45 minutes en visioconférence
                     </p>
                     <a
@@ -360,7 +360,7 @@ export default async function MonEspacePage() {
 
                   {workspace.project ? (
                     <div>
-                      <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[#cf7430]">
+                      <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-primary-dark)]">
                         Ton Guide de Marque
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">

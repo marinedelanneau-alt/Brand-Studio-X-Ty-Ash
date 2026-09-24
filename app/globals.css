@@ -1,23 +1,36 @@
 @import "tailwindcss";
 
 :root {
+  --tyash-primary: #7a2d46;
+  --tyash-primary-hover: #8a3955;
+  --tyash-primary-dark: #4a1d2d;
+  --tyash-soft: #f5e4eb;
+  --tyash-soft-hover: #ecd4df;
+  --tyash-subtle: #fbf2f7;
+  --tyash-ultra-light: #fffafc;
+  --tyash-border: #e8d1dc;
+  --tyash-label-bg: rgba(122, 45, 70, 0.08);
+  --tyash-label-text: #5e2f40;
+  --tyash-text-on-primary: #fffaf7;
+  --tyash-focus-ring: rgba(122, 45, 70, 0.24);
+
   --bs-paper: #fbf8f1;
   --bs-surface: #fdfbf6;
   --bs-surface-muted: #f7f1e6;
   --bs-border: #e5ded3;
   --bs-ink: #15213b;
   --bs-copy: #5d5a57;
-  --bs-orange: #7a2d46;
-  --bs-yellow: #b57a92;
+  --bs-orange: var(--tyash-primary);
+  --bs-yellow: var(--tyash-primary-hover);
   --surface: var(--bs-surface);
   --surface-secondary: var(--bs-surface-muted);
   --card: #ffffff;
   --muted-foreground: #7b7068;
   --border: var(--bs-border);
   --input: #ffffff;
-  --primary: #7a2d46;
-  --primary-foreground: #ffffff;
-  --accent: var(--bs-orange);
+  --primary: var(--tyash-primary);
+  --primary-foreground: var(--tyash-text-on-primary);
+  --accent: var(--tyash-primary);
   --heading-color: var(--bs-ink);
   --text-primary: var(--bs-copy);
   --text-secondary: #7b7068;
@@ -39,23 +52,36 @@
 }
 
 html[data-theme="dark"] {
+  --tyash-primary: #d998ab;
+  --tyash-primary-hover: #e9b4c3;
+  --tyash-primary-dark: #f7deea;
+  --tyash-soft: #3d2b34;
+  --tyash-soft-hover: #503a47;
+  --tyash-subtle: #261d22;
+  --tyash-ultra-light: #1b171a;
+  --tyash-border: #574953;
+  --tyash-label-bg: rgba(217, 152, 171, 0.14);
+  --tyash-label-text: #f7deea;
+  --tyash-text-on-primary: #201217;
+  --tyash-focus-ring: rgba(217, 152, 171, 0.32);
+
   --bs-paper: #17181d;
   --bs-surface: #202126;
   --bs-surface-muted: #25262c;
   --bs-border: #3a393b;
   --bs-ink: #f5efe6;
   --bs-copy: #c9c0b6;
-  --bs-orange: #7a2d46;
-  --bs-yellow: #b57a92;
+  --bs-orange: var(--tyash-primary);
+  --bs-yellow: var(--tyash-primary-hover);
   --surface: #202126;
   --surface-secondary: #25262c;
   --card: #25262c;
   --muted-foreground: #98928b;
   --border: #3a393b;
   --input: #1e1f24;
-  --primary: #7a2d46;
-  --primary-foreground: #f5efe6;
-  --accent: #7a2d46;
+  --primary: var(--tyash-primary);
+  --primary-foreground: var(--tyash-text-on-primary);
+  --accent: var(--tyash-primary);
   --heading-color: #f5efe6;
   --text-primary: #d6cec5;
   --text-secondary: #b8b0a8;
@@ -349,9 +375,9 @@ html[data-theme="dark"] .bs-submodule-tab:not([aria-current="step"]) > span:firs
 }
 
 html[data-theme="dark"] .bs-submodule-tab[aria-current="step"] {
-  border-color: #7a2d46 !important;
-  background-color: #fff1f5 !important;
-  color: #7a2d46 !important;
+  border-color: var(--tyash-primary) !important;
+  background-color: var(--tyash-soft) !important;
+  color: var(--tyash-primary-dark) !important;
 }
 
 html[data-theme="dark"] .bs-completion-hero {
@@ -534,15 +560,26 @@ input {
 [class*="linear-gradient(90deg,#d88a2f,#f0cf55)"],
 [class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 [class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
-  color: #7a2d46 !important;
-  border-color: #7a2d46 !important;
-  background-color: #7a2d46 !important;
-  background-image: linear-gradient(135deg, #7a2d46, #9d4d62) !important;
+  color: var(--tyash-primary-dark) !important;
+  border-color: var(--tyash-primary) !important;
+  background-color: var(--tyash-primary) !important;
+  background-image: linear-gradient(135deg, var(--tyash-primary), var(--tyash-primary-hover)) !important;
 }
 
 [class*="bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"],
 [class*="bg-[linear-gradient(90deg,#cf7430,#f0cf55)]"] {
-  background-image: linear-gradient(90deg, #7a2d46, #9d4d62) !important;
+  background-image: linear-gradient(90deg, var(--tyash-primary), var(--tyash-primary-hover)) !important;
+}
+
+[class*="bg-[#fff6e3]"],
+[class*="bg-[#fff1d5]"],
+[class*="bg-[#fff8f2]"],
+[class*="bg-[#fffaf4]"] {
+  background-color: var(--tyash-soft) !important;
+}
+
+[class*="focus:ring-[#f0cf55]"] {
+  --tw-ring-color: var(--tyash-focus-ring) !important;
 }
 
 .bs-button-primary {
