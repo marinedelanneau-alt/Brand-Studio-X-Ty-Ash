@@ -99,32 +99,34 @@ function getAccessLabel(status: string) {
 
 function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex items-center gap-3 sm:gap-4">
-      <div className="shrink-0">
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="flex shrink-0 items-center">
         <Image
           src="/logo.png"
           alt="Brand Studio"
-          width={compact ? 128 : 154}
-          height={compact ? 72 : 86}
-          className={compact ? "h-auto w-[5.6rem]" : "h-auto w-[7.4rem]"}
+          width={compact ? 120 : 150}
+          height={compact ? 72 : 84}
+          className="h-auto w-[5.8rem] object-contain sm:w-[7.2rem]"
           priority
         />
       </div>
 
       <span
         aria-hidden="true"
-        className="text-[1.8rem] font-black leading-none tracking-[-0.12em] text-[var(--tyash-primary)] sm:text-[2.4rem]"
+        className="text-[1.05rem] font-medium leading-none text-[var(--text-muted)] sm:text-[1.35rem]"
       >
-        X
+        ×
       </span>
 
-      <div className="shrink-0 rounded-[0.65rem] border border-[var(--tyash-border)] bg-[#050505] px-2 py-1 shadow-[0_12px_24px_rgba(0,0,0,0.2)]">
-        <span
-          aria-label="Ty Ash"
-          className="block font-black leading-none tracking-[-0.14em] text-[var(--tyash-primary)] text-[1.8rem] sm:text-[2.8rem]"
-        >
-          ASH
-        </span>
+      <div className="flex shrink-0 items-center">
+        <Image
+          src="/tyash-logo.svg"
+          alt="Ty Ash Studio"
+          width={compact ? 120 : 150}
+          height={compact ? 72 : 84}
+          className="h-auto w-[5.2rem] object-contain sm:w-[6.6rem]"
+          priority
+        />
       </div>
     </div>
   );
