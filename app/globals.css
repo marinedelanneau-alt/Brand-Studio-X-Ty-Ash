@@ -216,6 +216,8 @@ html[data-theme="dark"] .bs-completion-progress {
   background-color: var(--surface); color: var(--text-primary); color-scheme: dark;
 }
 .bs-inverse-surface { color: var(--text-primary); }
+/* Keep black lettering legible on dark surfaces without adding a background. */
+html[data-theme="dark"] .tyash-partner-logo { filter: invert(1) hue-rotate(180deg); }
 .bs-dark-card, .bs-dark-subcard { color: var(--text-primary); }
 html[data-theme="dark"] .bs-audio-card { background-color: var(--surface); border-color: var(--border); }
 .bs-access-guide-action:hover { background-color: var(--tyash-soft-hover); }

@@ -98,16 +98,20 @@ function getAccessLabel(status: string) {
 }
 
 function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
+  const logoHeight = compact ? "h-8 sm:h-10" : "h-10 sm:h-12";
+
   return (
     <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-3.5">
-      <div className="flex shrink-0 items-center justify-center self-center">
+      {/* Match the artwork heights, excluding each file's transparent margins. */}
+      <div className={`relative aspect-[272/166] shrink-0 overflow-hidden ${logoHeight}`}>
         <Image
           src="/logo.png"
           alt="Brand Studio"
-          width={compact ? 120 : 150}
-          height={compact ? 72 : 84}
-          className={compact ? "h-[2.2rem] w-auto object-contain sm:h-[2.6rem]" : "h-[2.6rem] w-auto object-contain sm:h-[3rem]"}
-          priority
+          width={280}
+          height={280}
+          sizes={compact ? "(min-width: 640px) 68px, 54px" : "(min-width: 640px) 81px, 68px"}
+          className="absolute left-[-1.1%] top-[-33.74%] h-auto w-[102.95%] max-w-none"
+          preload
         />
       </div>
 
@@ -118,19 +122,14 @@ function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
         ×
       </span>
 
-      {/* Frame the original artwork's whitespace without altering the logo. */}
-      <div
-        className={`relative aspect-[3.3/1] shrink-0 self-center overflow-hidden rounded-sm bg-white ${
-          compact ? "w-[7.5rem] sm:w-[8.5rem]" : "w-[8.5rem] sm:w-[10rem]"
-        }`}
-      >
+      <div className={`relative aspect-[1878/523] shrink-0 overflow-hidden ${logoHeight}`}>
         <Image
-          src="/tyash-logo.png"
+          src="/tyash-logo-transparent.png"
           alt="Ty Ash Studio"
-          width={7501}
-          height={7500}
-          sizes={compact ? "(min-width: 640px) 164px, 144px" : "(min-width: 640px) 192px, 164px"}
-          className="absolute left-[-10%] top-1/2 h-auto w-[120%] max-w-none -translate-y-1/2"
+          width={2122}
+          height={741}
+          sizes={compact ? "(min-width: 640px) 163px, 130px" : "(min-width: 640px) 195px, 163px"}
+          className="tyash-partner-logo absolute left-[-6.02%] top-[-24.67%] h-auto w-[113%] max-w-none"
           preload
         />
       </div>
