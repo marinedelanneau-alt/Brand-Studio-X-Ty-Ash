@@ -99,32 +99,32 @@ function getAccessLabel(status: string) {
 
 function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-      <div className="flex shrink-0 items-center">
+    <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-3.5">
+      <div className="flex shrink-0 items-center justify-center self-center">
         <Image
           src="/logo.png"
           alt="Brand Studio"
           width={compact ? 120 : 150}
           height={compact ? 72 : 84}
-          className="h-auto w-[5.8rem] object-contain sm:w-[7.2rem]"
+          className={compact ? "h-[2.2rem] w-auto object-contain sm:h-[2.6rem]" : "h-[2.6rem] w-auto object-contain sm:h-[3rem]"}
           priority
         />
       </div>
 
       <span
         aria-hidden="true"
-        className="text-[1.05rem] font-medium leading-none text-[var(--text-muted)] sm:text-[1.35rem]"
+        className="text-[0.9rem] font-medium leading-none text-[var(--text-muted)] opacity-80 sm:text-[1.1rem]"
       >
         ×
       </span>
 
-      <div className="flex shrink-0 items-center">
+      <div className="flex shrink-0 items-center justify-center self-center">
         <Image
           src="/tyash-logo.svg"
           alt="Ty Ash Studio"
           width={compact ? 120 : 150}
           height={compact ? 72 : 84}
-          className="h-auto w-[5.2rem] object-contain sm:w-[6.6rem]"
+          className={compact ? "h-[2.1rem] w-auto object-contain sm:h-[2.4rem]" : "h-[2.4rem] w-auto object-contain sm:h-[2.8rem]"}
           priority
         />
       </div>
@@ -267,18 +267,21 @@ export default async function MonEspacePage() {
                 workspace.project ? "lg:col-start-1 lg:row-start-1" : ""
               }`}
             >
-              <div className="flex items-center gap-4">
-                {workspace.project?.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={workspace.project.logo_url}
-                    alt={`Logo de ${workspaceTitle}`}
-                    className="h-16 w-16 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] object-contain p-2"
-                  />
-                ) : (
-                  <BrandStudioTyAshLockup />
-                )}
-                <span className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
+              <div className="flex w-full items-center justify-between gap-4">
+                <div className="min-w-0 shrink-0">
+                  {workspace.project?.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={workspace.project.logo_url}
+                      alt={`Logo de ${workspaceTitle}`}
+                      className="h-16 w-16 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] object-contain p-2"
+                    />
+                  ) : (
+                    <BrandStudioTyAshLockup />
+                  )}
+                </div>
+
+                <span className="ml-6 inline-flex shrink-0 rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Espace de travail
                 </span>
               </div>
