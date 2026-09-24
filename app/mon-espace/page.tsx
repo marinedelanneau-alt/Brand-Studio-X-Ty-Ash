@@ -97,6 +97,39 @@ function getAccessLabel(status: string) {
   return "Paiement en attente";
 }
 
+function BrandStudioTyAshLockup({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="flex items-center gap-3 sm:gap-4">
+      <div className="shrink-0">
+        <Image
+          src="/logo.png"
+          alt="Brand Studio"
+          width={compact ? 128 : 154}
+          height={compact ? 72 : 86}
+          className={compact ? "h-auto w-[5.6rem]" : "h-auto w-[7.4rem]"}
+          priority
+        />
+      </div>
+
+      <span
+        aria-hidden="true"
+        className="text-[1.8rem] font-black leading-none tracking-[-0.12em] text-[var(--tyash-primary)] sm:text-[2.4rem]"
+      >
+        X
+      </span>
+
+      <div className="shrink-0 rounded-[0.65rem] border border-[var(--tyash-border)] bg-[#050505] px-2 py-1 shadow-[0_12px_24px_rgba(0,0,0,0.2)]">
+        <span
+          aria-label="Ty Ash"
+          className="block font-black leading-none tracking-[-0.14em] text-[var(--tyash-primary)] text-[1.8rem] sm:text-[2.8rem]"
+        >
+          ASH
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default async function MonEspacePage() {
   let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
@@ -147,14 +180,7 @@ export default async function MonEspacePage() {
           <div className="border-b border-[var(--border)] pb-8">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
-                <Image
-                  src="/logo.png"
-                  alt="Brand Studio"
-                  width={154}
-                  height={86}
-                  className="h-auto w-[8rem]"
-                  priority
-                />
+                <BrandStudioTyAshLockup />
                 <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[var(--heading-color)] sm:text-[4.1rem]">
                   Ton accès Brand Studio
                 </h1>
@@ -248,14 +274,7 @@ export default async function MonEspacePage() {
                     className="h-16 w-16 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] object-contain p-2"
                   />
                 ) : (
-                  <Image
-                    src="/logo.png"
-                    alt="Brand Studio"
-                    width={154}
-                    height={86}
-                    className="h-auto w-[7.4rem]"
-                    priority
-                  />
+                  <BrandStudioTyAshLockup />
                 )}
                 <span className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
                   Espace de travail
@@ -533,13 +552,7 @@ export default async function MonEspacePage() {
             ) : workspace.modules.length > 0 ? (
               <div className="flex items-center justify-center py-6 sm:py-8">
                 <RevealOnScroll>
-                  <Image
-                    src="/logo.png"
-                    alt="Brand Studio"
-                    width={220}
-                    height={124}
-                    className="h-auto w-[10rem] drop-shadow-[0_14px_24px_rgba(92,78,63,0.14)] transition-transform duration-300 hover:-translate-y-1 hover:drop-shadow-[0_20px_34px_rgba(92,78,63,0.18)] sm:w-[12rem]"
-                  />
+                  <BrandStudioTyAshLockup compact />
                 </RevealOnScroll>
               </div>
             ) : null}
