@@ -98,9 +98,9 @@ body {
   background-image:
     linear-gradient(var(--background-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--background-grid) 1px, transparent 1px),
-    radial-gradient(circle at 14% 10%, rgba(232, 189, 63, 0.035), transparent 16%),
-    radial-gradient(circle at 84% 18%, rgba(219, 232, 216, 0.08), transparent 18%),
-    radial-gradient(circle at 72% 84%, rgba(236, 104, 28, 0.025), transparent 18%);
+    radial-gradient(circle at 14% 10%, rgba(122, 45, 70, 0.08), transparent 16%),
+    radial-gradient(circle at 84% 18%, rgba(181, 122, 146, 0.08), transparent 18%),
+    radial-gradient(circle at 72% 84%, rgba(122, 45, 70, 0.04), transparent 18%);
   background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%, 100% 100%;
   background-position: top left, top left, top left, top left, top left;
   color: var(--foreground);
@@ -254,7 +254,7 @@ html[data-theme="dark"] textarea::placeholder {
 html[data-theme="dark"] input:focus,
 html[data-theme="dark"] textarea:focus,
 html[data-theme="dark"] select:focus {
-  border-color: #e8682a !important;
+  border-color: #7a2d46 !important;
 }
 
 html[data-theme="dark"] .bs-button-secondary {
@@ -329,7 +329,7 @@ html[data-theme="dark"] .bs-light-surface [class*="text-[#6b625a]"] {
 }
 
 html[data-theme="dark"] .bs-light-surface [class*="text-[#cf7430]"] {
-  color: #cf7430 !important;
+  color: #7a2d46 !important;
 }
 
 html[data-theme="dark"] .bs-light-surface [class*="bg-white"] {
@@ -349,9 +349,9 @@ html[data-theme="dark"] .bs-submodule-tab:not([aria-current="step"]) > span:firs
 }
 
 html[data-theme="dark"] .bs-submodule-tab[aria-current="step"] {
-  border-color: #cf7430 !important;
-  background-color: #fff6e3 !important;
-  color: #cf7430 !important;
+  border-color: #7a2d46 !important;
+  background-color: #fff1f5 !important;
+  color: #7a2d46 !important;
 }
 
 html[data-theme="dark"] .bs-completion-hero {
@@ -441,7 +441,7 @@ html[data-theme="dark"] .bs-access-primary-action {
 html[data-theme="dark"] .bs-access-primary-action:focus-visible,
 html[data-theme="dark"] .bs-access-dark-action:focus-visible,
 html[data-theme="dark"] .bs-access-guide-action:focus-visible {
-  outline: 2px solid #f0cf55;
+  outline: 2px solid #7a2d46;
   outline-offset: 3px;
 }
 
@@ -510,15 +510,27 @@ input {
 }
 
 [class*="text-[#cf7430]"],
+[class*="text-[#f0cf55]"],
 [class*="border-[#cf7430]"],
+[class*="border-[#f0cf55]"],
+[class*="border-[#df9b39]"],
 [class*="bg-[#cf7430]"],
+[class*="bg-[#f0cf55]"],
 [class*="hover:text-[#cf7430]"],
+[class*="hover:text-[#f0cf55]"],
 [class*="hover:border-[#cf7430]"],
+[class*="hover:border-[#f0cf55]"],
 [class*="focus:border-[#cf7430]"],
+[class*="focus:border-[#f0cf55]"],
+[class*="focus:border-[#df9b39]"],
 [class*="ring-[#cf7430]"],
+[class*="ring-[#f0cf55]"],
 [class*="accent-[#cf7430]"],
+[class*="accent-[#f0cf55]"],
 [class*="bg-[linear-gradient(90deg,#cf7430,#f0cf55)]"],
 [class*="bg-[linear-gradient(135deg,#df9b39,#f1cc56)]"],
+[class*="bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"],
+[class*="bg-[linear-gradient(135deg,#e19b34,#f2cf58)]"],
 [class*="linear-gradient(90deg,#d88a2f,#f0cf55)"],
 [class*="linear-gradient(135deg,#df9b39,#f1cc56)"],
 [class*="linear-gradient(135deg,#e19b34,#f2cf58)"] {
@@ -528,7 +540,8 @@ input {
   background-image: linear-gradient(135deg, #7a2d46, #9d4d62) !important;
 }
 
-[class*="bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"] {
+[class*="bg-[linear-gradient(90deg,#d88a2f,#f0cf55)]"],
+[class*="bg-[linear-gradient(90deg,#cf7430,#f0cf55)]"] {
   background-image: linear-gradient(90deg, #7a2d46, #9d4d62) !important;
 }
 
@@ -594,7 +607,7 @@ input {
 }
 
 .bs-button-secondary:focus-visible {
-  outline: 2px solid #f0cf55;
+  outline: 2px solid #7a2d46;
   outline-offset: 3px;
 }
 
@@ -719,7 +732,7 @@ select {
 .tiptap-editor a,
 .module-content a,
 .pedagogical-content a {
-  color: #cf7430;
+  color: #7a2d46;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -786,8 +799,8 @@ select {
 
 .tiptap-editor [data-info-box="remember"],
 .pedagogical-content [data-info-box="remember"] {
-  border-color: #f0cf55;
-  background: #fff4ba;
+  border-color: #b57a92;
+  background: #f9edf2;
 }
 
 .tiptap-editor [data-info-box="note"],
