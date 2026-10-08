@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { isMissingServerAction } from "@/lib/server-action-error";
 import {
   publishAdminDraftToAllUsers,
   type AdminDeploymentState,
@@ -8,9 +9,23 @@ import {
 
 const initialState: AdminDeploymentState = { status: "idle", message: "" };
 
+async function publishWithRecovery(previousState: AdminDeploymentState): Promise<AdminDeploymentState> {
+  try {
+    return await publishAdminDraftToAllUsers(previousState);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "La publication a échoué.";
+    return {
+      status: "error",
+      message: isMissingServerAction(message)
+        ? "Une nouvelle version du site est disponible. Recharge cette page avant de relancer la publication."
+        : message,
+    };
+  }
+}
+
 export default function AdminDeploymentButton() {
   const [state, formAction, pending] = useActionState(
-    publishAdminDraftToAllUsers,
+    publishWithRecovery,
     initialState,
   );
   const [progress, setProgress] = useState(0);
@@ -76,6 +91,9 @@ export default function AdminDeploymentButton() {
         <div className="mt-4 rounded-[1rem] border border-[#efc6bf] bs-status-light bg-[#fff4f1] p-4" role="alert">
           <p className="text-sm font-semibold text-[var(--status-error-text)]">Le déploiement n’a pas abouti.</p>
           <p className="mt-1 text-sm leading-6 text-[var(--status-error-text)]">{state.message}</p>
+          <button type="button" onClick={() => window.location.reload()} className="mt-3 rounded-xl border px-4 py-2 font-bold">
+            Recharger la page
+          </button>
         </div>
       ) : null}
     </div>

@@ -4,6 +4,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { isMissingServerAction } from "@/lib/server-action-error";
 import {
   createAdminVoiceNoteUpload,
   deleteAdminModule,
@@ -1612,10 +1613,11 @@ function ModuleForm({
           nextMode = pendingSaveModeRef.current;
         }
       } catch (error) {
+        const message = error instanceof Error ? error.message : "Impossible d'enregistrer le module.";
         setModuleSaveMessage(
-          error instanceof Error
-            ? error.message
-            : "Impossible d'enregistrer le module.",
+          isMissingServerAction(message)
+            ? "Le site vient d’être mis à jour. Copie tes modifications non enregistrées, puis recharge la page avant de sauvegarder."
+            : message,
         );
       } finally {
         pendingSaveModeRef.current = null;

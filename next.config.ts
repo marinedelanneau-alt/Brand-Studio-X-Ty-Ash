@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
     ] }] : [];
   },
   deploymentId:
+    process.env.VERCEL_DEPLOYMENT_ID ||
     process.env.DEPLOYMENT_VERSION ||
     process.env.NEXT_DEPLOYMENT_ID ||
-    process.env.VERCEL_DEPLOYMENT_ID ||
     process.env.VERCEL_GIT_COMMIT_SHA,
   experimental: {
     serverActions: {
