@@ -1921,7 +1921,13 @@ export async function publishAdminModuleDraft(accountId: number) {
     throw new Error("Aucun brouillon admin a deployer.");
   }
 
-  const activeModuleIds = modules
+  // An open admin tab may still submit IDs from before the last publication.
+  // Snapshot the current published IDs so user answers survive repeated saves.
+  const publishedModules = (await getModulesWithExercises({
+    includeUnpublished: true,
+    includeInactiveBrandPersona: true,
+  })).filter((moduleItem) => moduleItem.position < PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
+  const activeModuleIds = publishedModules
     .map((moduleItem) => moduleItem.id)
     .filter((moduleId) => moduleId > 0);
   const userDataSnapshot = await snapshotPublishedUserData(activeModuleIds);
@@ -1949,7 +1955,7 @@ export async function publishAdminModuleDraft(accountId: number) {
   const moduleIdMap = new Map<number, number>();
   const exerciseIdMap = new Map<number, number>();
 
-  for (const previousModule of modules) {
+  for (const previousModule of publishedModules) {
     const stagedModule = stagedModuleByPosition.get(previousModule.position);
 
     if (!stagedModule || previousModule.id <= 0) {

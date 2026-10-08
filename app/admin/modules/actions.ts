@@ -26,6 +26,7 @@ import {
   createContentDraft,
   getApplicationReleaseState,
   isControlledAdminPublishingEnabled,
+  isControlledProductionContentEnabled,
   markContentReleaseReady,
   publishContentRelease,
   updateCurrentDraftSnapshot,
@@ -63,10 +64,11 @@ type EditorSubmodule = {
 function revalidateTrainingExperience(moduleId?: number) {
   revalidatePath("/admin/modules");
   revalidatePath("/mon-espace");
+  revalidatePath("/mon-espace", "layout");
   revalidatePath("/brand-guide");
   revalidatePath("/mon-espace/module/[moduleId]", "page");
-  revalidatePath("/mon-espace/module/[moduleId]/summary-pdf");
-  revalidatePath("/mon-espace/module/[moduleId]/complete");
+  revalidatePath("/mon-espace/module/[moduleId]/summary-pdf", "page");
+  revalidatePath("/mon-espace/module/[moduleId]/complete", "page");
   revalidatePath("/brand-guide/download");
 
   if (moduleId && Number.isFinite(moduleId) && moduleId > 0) {
@@ -115,9 +117,13 @@ async function syncAdminDraftRelease(accountId: number) {
   return releaseId;
 }
 
-export async function publishFinalVersionForAllUsers() {
-  const account = await getAuthenticatedAdmin();
-  const releaseId = await syncAdminDraftRelease(account.id);
+async function publishSavedAdminChanges(accountId: number) {
+  // Publish to the source read by users, even when admin previews use releases.
+  if (!isControlledProductionContentEnabled()) {
+    await publishAdminModuleDraftToUsers(accountId);
+    return;
+  }
+  const releaseId = await syncAdminDraftRelease(accountId);
   if (!releaseId) {
     throw new Error("Le déploiement contrôlé n’est pas activé.");
   }
@@ -129,6 +135,11 @@ export async function publishFinalVersionForAllUsers() {
 
   await markContentReleaseReady({ releaseId, notes });
   await publishContentRelease({ releaseId, notes });
+}
+
+export async function publishFinalVersionForAllUsers() {
+  const account = await getAuthenticatedAdmin();
+  await publishSavedAdminChanges(account.id);
   revalidateTrainingExperience();
   revalidatePath("/admin/releases");
   redirect("/admin/modules?status=published");
@@ -336,7 +347,7 @@ export async function saveAdminModule(formData: FormData) {
       isPublished,
       submodules,
     });
-    await syncAdminDraftRelease(account.id);
+    await publishSavedAdminChanges(account.id);
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
     redirect("/admin/modules?status=saved");
@@ -395,13 +406,13 @@ export async function saveAdminModuleDraft(formData: FormData) {
     }, {
       preserveOmittedContent: formData.get("saveMode") !== "manual",
     });
-    await syncAdminDraftRelease(account.id);
+    await publishSavedAdminChanges(account.id);
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
 
     return {
       status: "success",
-      message: "Modifications enregistrees.",
+      message: "Modifications enregistrées et appliquées aux utilisateurs.",
     };
   } catch (error) {
     return {
@@ -479,7 +490,7 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
             : undefined,
         audioUrl: url,
       });
-      await syncAdminDraftRelease(account.id);
+      await publishSavedAdminChanges(account.id);
     }
 
     revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
@@ -533,7 +544,7 @@ export async function deleteAdminModule(formData: FormData) {
     }
 
     await deleteAdminModuleDefinitionDraft(account.id, moduleId);
-    await syncAdminDraftRelease(account.id);
+    await publishSavedAdminChanges(account.id);
     revalidateTrainingExperience(moduleId);
     redirect("/admin/modules?status=deleted");
   } catch (error) {

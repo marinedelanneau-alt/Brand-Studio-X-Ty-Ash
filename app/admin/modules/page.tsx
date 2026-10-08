@@ -50,7 +50,7 @@ export default async function AdminModulesPage({
 
   const message =
     statusValue === "saved"
-      ? "Brouillon admin enregistre. Tes changements sont visibles dans ton espace Marine Communication uniquement."
+      ? "Modifications enregistrées et appliquées aux utilisateurs."
       : statusValue === "published"
         ? "La nouvelle version finale est publiée pour tous les utilisateurs. Ton brouillon ADMIN reste ton espace de travail privé."
         : statusValue === "scheduled"
@@ -73,18 +73,17 @@ export default async function AdminModulesPage({
           Gestion des modules
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--text-muted)]">
-          Tes modifications sont enregistrees dans une copie de travail visible
-          uniquement dans ton espace Marine Communication. Les autres utilisateurs
-          gardent la version publiee jusqu&apos;au deploiement global.
+          Tes modifications sont enregistrées automatiquement et appliquées
+          aux utilisateurs dès que l&apos;enregistrement est terminé.
         </p>
         {controlledReleasesEnabled ? (
           <div className="mt-5 rounded-2xl border border-[#d9e6d5] bs-status-light bg-[#f7fbf5] p-5">
             <p className="font-bold text-[var(--status-success-text)]">
-              Brouillon ADMIN privé
+              Publication automatique
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--status-success-text)]">
-              Tes changements restent visibles uniquement par ton compte ADMIN.
-              Publier crée une nouvelle version finale pour tous les utilisateurs.
+              Chaque enregistrement publie tes changements pour tous les utilisateurs.
+              Le bouton ci-dessous permet de republier la version enregistrée.
             </p>
             <form action={publishFinalVersionForAllUsers} className="mt-4">
               <button

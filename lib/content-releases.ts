@@ -89,6 +89,7 @@ export function isControlledProductionContentEnabled() {
 
 export function isControlledAdminPublishingEnabled() {
   return (
+    isControlledProductionContentEnabled() ||
     isAdminDraftPreviewEnabled() ||
     process.env.ENABLE_CONTROLLED_ADMIN_PUBLISHING === "true"
   );

@@ -2031,7 +2031,7 @@ function ModuleForm({
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">URL vidéo</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">URL vidéo (facultative)</span>
                       <input
                         type="url"
                         value={activeSubmodule.videoUrl}
@@ -2045,11 +2045,28 @@ function ModuleForm({
                         }
                         className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                       />
+                      {activeSubmodule.videoUrl ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onChange((current) => ({
+                              ...current,
+                              submodules: current.submodules.map((item) =>
+                                item.id === activeSubmodule.id ? { ...item, videoUrl: "" } : item,
+                              ),
+                            }))
+                          }
+                          className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)]"
+                        >
+                          Supprimer la vidéo
+                        </button>
+                      ) : null}
                     </label>
 
                     <label className="space-y-2">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Note vocale MP3 d&apos;introduction</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Note vocale MP3 d&apos;introduction (facultative)</span>
                       <input
+                        key={activeSubmodule.id + activeSubmodule.audioUrl}
                         type="file"
                         accept="audio/mpeg,audio/mp3,.mp3"
                         disabled={uploadingSubmoduleVoiceId === activeSubmodule.id}
@@ -2069,6 +2086,29 @@ function ModuleForm({
                         <p className="text-sm leading-6 text-[var(--text-primary)]">
                           {submoduleVoiceUploadMessages[activeSubmodule.id]}
                         </p>
+                      ) : null}
+                      {activeSubmodule.audioUrl ? (
+                        <button
+                          type="button"
+                          disabled={uploadingSubmoduleVoiceId === activeSubmodule.id}
+                          onClick={() => {
+                            onChange((current) => ({
+                              ...current,
+                              submodules: current.submodules.map((item) =>
+                                item.id === activeSubmodule.id
+                                  ? { ...item, audioUrl: "", audioTranscript: "" }
+                                  : item,
+                              ),
+                            }));
+                            setSubmoduleVoiceUploadMessages((current) => ({
+                              ...current,
+                              [activeSubmodule.id]: "Note vocale supprimée. La modification sera enregistrée automatiquement.",
+                            }));
+                          }}
+                          className="text-xs font-black uppercase tracking-[0.12em] text-[var(--status-error-text)] disabled:opacity-50"
+                        >
+                          Supprimer la note vocale
+                        </button>
                       ) : null}
                       {activeSubmodule.audioUrl ? (
                         <VoiceNotePlayer
