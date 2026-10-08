@@ -295,7 +295,7 @@ export default async function MonEspacePage() {
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
-                  En route vers ta nouvelle identité de marque
+                  De ton besoin à un projet qui a du sens
                 </p>
               </div>
             </div>
@@ -444,13 +444,12 @@ export default async function MonEspacePage() {
               </p>
               <div className="space-y-4 pt-4 text-[var(--text-primary)]">
                 <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
-                  Bienvenue dans le Brand Studio
+                  Bienvenue dans ton espace de réflexion
                 </p>
                 <p className="rounded-[1.35rem] border border-[var(--border)] bg-[var(--background)] px-5 py-3 text-[1.05rem] leading-7 italic text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.85)]">
-                  Hello, ça y est, c&apos;est le grand moment ! Je te remercie
-                  encore d&apos;avoir choisi ce pack pour t&apos;accompagner dans la
-                  belle mission de structurer ton identité de marque. Es-tu prêt
-                  à entrer dans la peau d&apos;un Directeur Artistique ?
+                  Hello, c’est parti ! Avant de parler caméra, format ou scénario,
+                  on va commencer par l’essentiel : comprendre ton entreprise,
+                  ta communication et ce que tu veux réellement faire passer.
                 </p>
                 <div
                   className={`grid gap-3 text-base leading-7 text-[var(--text-primary)] ${
@@ -458,9 +457,11 @@ export default async function MonEspacePage() {
                   }`}
                 >
                   <p className={`pb-3 ${workspace.project ? "" : "lg:pb-0 lg:pr-6"}`}>
-                    Ce guide est le document de référence de ton identité,{" "}
+                    Ce parcours a été conçu pour nous aider à poser les bonnes
+                    questions avant de passer à la création. Pas besoin d’arriver
+                    avec un brief parfaitement ficelé :{" "}
                     <span className="font-semibold italic text-[var(--text-primary)]">
-                      un kit clé en main pour poser les bases d&apos;une marque forte.
+                      c’est justement tout l’intérêt de cet outil.
                     </span>
                   </p>
                   <p
@@ -470,10 +471,11 @@ export default async function MonEspacePage() {
                         : "lg:border-l lg:border-t-0 lg:px-6 lg:py-0"
                     }`}
                   >
-                    Il rassemble les fondations stratégiques et visuelles de ta
-                    marque afin de garantir une communication{" "}
+                    À travers quelques étapes, tu vas prendre du recul sur ton
+                    entreprise, tes publics, ta communication actuelle et tes
+                    objectifs pour faire émerger un projet vidéo{" "}
                     <strong className="font-extrabold text-[var(--heading-color)]">
-                      cohérente, professionnelle et durable
+                      pertinent, cohérent et utile
                     </strong>
                     .
                   </p>
@@ -485,8 +487,9 @@ export default async function MonEspacePage() {
                     }`}
                   >
                     <span className="font-black text-[var(--tyash-label-text)]">Cadre de travail :</span>{" "}
-                    utilise-le comme un repère pour créer, décliner et faire
-                    évoluer ta marque en toute autonomie.
+                    réponds simplement et spontanément. Il n’y a pas de bonne ou
+                    de mauvaise réponse : tes réponses serviront de base à notre
+                    réflexion et à nos échanges pour construire la suite ensemble.
                   </p>
                 </div>
                 {workspace.modules.length > 0 ? (
@@ -495,7 +498,7 @@ export default async function MonEspacePage() {
                       href={ctaHref}
                       className="bs-button-primary inline-flex h-12 items-center justify-center rounded-[0.95rem] px-6 text-sm font-extrabold uppercase tracking-[0.12em] shadow-[0_12px_26px_rgba(21,33,59,0.17)] hover:shadow-[0_14px_28px_rgba(21,33,59,0.2)]"
                     >
-                      {hasStartedModules ? "Reprendre" : "Commencer"}
+                      {hasStartedModules ? "Reprendre" : "C’EST PARTI"}
                     </Link>
                     <div className="w-full max-w-[13rem] sm:text-right">
                       <div className="flex items-end justify-between gap-3 sm:justify-end">
