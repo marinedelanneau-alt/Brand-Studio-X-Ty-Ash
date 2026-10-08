@@ -172,6 +172,7 @@ type EditorSubmodule = {
 };
 type EditorModule = {
   id?: number;
+  updatedAt?: string;
   title: string;
   position: number;
   isPublished: boolean;
@@ -179,6 +180,8 @@ type EditorModule = {
 };
 type AdminModule = {
   id: number;
+  editorRevision?: string;
+  updated_at?: string;
   title: string;
   position: number;
   video_url: string;
@@ -290,7 +293,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
   const imageUploadConfig = parseStoredImageUploadConfig(exercise.options);
 
   return {
-    id: String(exercise.id ?? fallbackIndex + 1),
+    id: exercise.editorKey ?? String(exercise.id ?? fallbackIndex + 1),
     type: exercise.type,
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
@@ -330,11 +333,12 @@ function toEditorExerciseGroups(exercises: ModuleExercise[]) {
 function toEditorModule(module: AdminModule): EditorModule {
   return {
     id: module.id,
+    updatedAt: module.editorRevision ?? module.updated_at ?? "initial",
     title: module.title,
     position: module.position,
     isPublished: module.is_published,
     submodules: module.submodules.map((submodule, index) => ({
-      id: String(submodule.id ?? index + 1),
+      id: submodule.editorKey ?? String(submodule.id ?? index + 1),
       title: submodule.title,
       videoUrl: submodule.video_url,
       audioUrl: submodule.audio_url ?? "",
@@ -1465,6 +1469,7 @@ function ModuleForm({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const latestModuleRef = useRef(module);
+  const savedModuleUpdatedAtRef = useRef(module.updatedAt ?? "initial");
   const formRef = useRef<HTMLFormElement>(null);
   const submodulesInputRef = useRef<HTMLInputElement>(null);
   const activeSubmoduleContentEditorRef = useRef<RichTextEditorHandle>(null);
@@ -1549,6 +1554,7 @@ function ModuleForm({
     formData.set("title", currentModule.title);
     formData.set("position", String(currentModule.position));
     formData.set("saveMode", mode);
+    formData.set("expectedModuleUpdatedAt", savedModuleUpdatedAtRef.current);
 
     if (currentModule.isPublished) {
       formData.set("isPublished", "on");
@@ -1609,6 +1615,7 @@ function ModuleForm({
             return;
           }
 
+          if (result.updatedAt) savedModuleUpdatedAtRef.current = result.updatedAt;
           lastSavedModuleSignatureRef.current = signature;
           nextMode = pendingSaveModeRef.current;
         }
@@ -1646,6 +1653,7 @@ function ModuleForm({
 
     const handleFormData = (event: FormDataEvent) => {
       event.formData.set("submodulesJson", serializeLatestSubmodulesForSubmit());
+      event.formData.set("expectedModuleUpdatedAt", savedModuleUpdatedAtRef.current);
     };
 
     form.addEventListener("formdata", handleFormData);
@@ -1774,7 +1782,7 @@ function ModuleForm({
         </div>
         <div className="flex items-center gap-3">
           <span className={`inline-flex rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.18em] ${module.isPublished ? "bs-status-light bg-[#eef6eb] text-[var(--status-success-text)]" : "bs-status-light bg-[#f2eef7] text-[var(--text-muted)]"}`}>
-            {module.isPublished ? "Publie" : "Brouillon"}
+            {module.isPublished ? "Visible après publication" : "Masqué après publication"}
           </span>
           <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-lg text-[var(--text-primary)]">
             {isOpen ? "-" : "+"}
@@ -1875,7 +1883,7 @@ function ModuleForm({
                 checked={module.isPublished}
                 onChange={(event) => onChange((current) => ({ ...current, isPublished: event.target.checked }))}
               />
-              <span>Module publie</span>
+              <span>Inclure ce module dans la version publiée</span>
             </label>
 
             {module.id && moduleSaveMessage ? (

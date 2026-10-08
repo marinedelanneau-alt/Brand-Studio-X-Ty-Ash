@@ -160,83 +160,40 @@ export async function resolveActiveContentRelease(input: {
   account?: ViewerAccount | null;
   previewMode?: ContentPreviewMode | null;
 }): Promise<ActiveContentRelease> {
-  const initialIntent = resolveReleaseSelectionIntent({
+  if (!isControlledProductionContentEnabled()) {
+    throw new Error("Configuration de publication invalide : CONTENT_RELEASE_READ_MODE doit valoir controlled.");
+  }
+  const state = await getApplicationReleaseState();
+  const published = await getContentRelease(state.published_release_id);
+  if (!published || published.status !== "published") {
+    throw new Error("Release publiée officielle introuvable ou invalide.");
+  }
+  const intent = resolveReleaseSelectionIntent({
     viewerIsAdmin: isAdmin(input.account),
     adminPreviewEnabled: isAdminDraftPreviewEnabled(),
-    controlledProductionEnabled: isControlledProductionContentEnabled(),
+    controlledProductionEnabled: true,
     previewMode: input.previewMode ?? null,
-    publishedReleaseId: null,
-    draftReleaseId: null,
+    publishedReleaseId: state.published_release_id,
+    draftReleaseId: state.current_draft_release_id,
   });
-
-  if (initialIntent.source === "legacy") {
-    return {
-      source: "legacy",
-      release: null,
-      publishedReleaseId: null,
-      draftReleaseId: null,
-      isPreviewMode: false,
-      previewMode: null,
-      warning: null,
-    };
-  }
-
-  try {
-    const state = await getApplicationReleaseState();
-    const intent = resolveReleaseSelectionIntent({
-      viewerIsAdmin: isAdmin(input.account),
-      adminPreviewEnabled: isAdminDraftPreviewEnabled(),
-      controlledProductionEnabled: isControlledProductionContentEnabled(),
-      previewMode: input.previewMode ?? null,
-      publishedReleaseId: state.published_release_id,
-      draftReleaseId: state.current_draft_release_id,
-    });
-    const requestedReleaseId =
-      intent.requestedReleaseId ?? state.published_release_id;
-    const release = await getContentRelease(requestedReleaseId);
-    const validPreview =
-      intent.previewRequested &&
-      release !== null &&
-      (release.status === "draft" || release.status === "ready");
-
-    if (!release || (intent.previewRequested && !validPreview)) {
-      const published = await getContentRelease(state.published_release_id);
-      return {
-        source: "controlled",
-        release: published,
-        publishedReleaseId: state.published_release_id,
-        draftReleaseId: state.current_draft_release_id,
-        isPreviewMode: false,
-        previewMode: null,
-        warning: intent.previewRequested
-          ? "Le brouillon est absent ou invalide. La version publiée reste affichée."
-          : "La release publiée est introuvable.",
-      };
+  let release = published;
+  let isPreviewMode = false;
+  if (intent.previewRequested && state.current_draft_release_id) {
+    const draft = await getContentRelease(state.current_draft_release_id);
+    if (!draft || !["draft", "ready"].includes(draft.status)) {
+      throw new Error("Brouillon de prévisualisation introuvable ou invalide.");
     }
-
-    return {
-      source: "controlled",
-      release,
-      publishedReleaseId: state.published_release_id,
-      draftReleaseId: state.current_draft_release_id,
-      isPreviewMode: validPreview,
-      previewMode: validPreview ? input.previewMode ?? null : null,
-      warning: null,
-    };
-  } catch (error) {
-    return {
-      source: "legacy",
-      release: null,
-      publishedReleaseId: null,
-      draftReleaseId: null,
-      isPreviewMode: false,
-      previewMode: null,
-      warning:
-        error instanceof Error
-          ? `Système de releases indisponible : ${error.message}`
-          : "Système de releases indisponible.",
-    };
+    release = draft;
+    isPreviewMode = true;
   }
+  return {
+    source: "controlled", release,
+    publishedReleaseId: published.id,
+    draftReleaseId: state.current_draft_release_id,
+    isPreviewMode,
+    previewMode: isPreviewMode ? input.previewMode ?? null : null,
+    warning: null,
+  };
 }
 
 async function callAuthenticatedReleaseRpc(
@@ -315,13 +272,15 @@ export async function listContentReleaseSchedules() {
 
 export function updateCurrentDraftSnapshot(input: {
   releaseId: string;
+  expectedUpdatedAt: string;
   modules: unknown[];
   brandGuideSettings?: Record<string, unknown>;
   pdfSettings?: Record<string, unknown>;
   interfaceSettings?: Record<string, unknown>;
 }) {
-  return callAuthenticatedReleaseRpc("update_current_draft_snapshot", {
+  return callAuthenticatedReleaseRpc("update_current_draft_snapshot_if_unchanged", {
     target_release_id: input.releaseId,
+    expected_updated_at: input.expectedUpdatedAt,
     snapshot_schema_version: 1,
     snapshot_modules: input.modules,
     snapshot_brand_guide_settings: input.brandGuideSettings ?? {},

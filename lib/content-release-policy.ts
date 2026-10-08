@@ -19,14 +19,8 @@ export function resolveReleaseSelectionIntent(input: {
     input.adminPreviewEnabled &&
     input.previewMode !== null;
 
-  if (!previewRequested && !input.controlledProductionEnabled) {
-    return {
-      source: "legacy",
-      requestedReleaseId: null,
-      previewRequested: false,
-    };
-  }
-
+  // Configuration errors are rejected by the server resolver. They must never
+  // select a different content source here.
   return {
     source: "controlled",
     requestedReleaseId:

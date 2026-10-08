@@ -11,6 +11,8 @@ export type BrandProject = {
 };
 
 export type BrandModule = {
+  stableKey?: string;
+  editorRevision?: string;
   id: number;
   title: string;
   position: number;
@@ -24,6 +26,8 @@ export type BrandModule = {
 };
 
 export type BrandSubmodule = {
+  stableKey?: string;
+  editorKey?: string;
   id: number;
   module_id: number;
   title: string;
@@ -37,6 +41,8 @@ export type BrandSubmodule = {
 };
 
 export type ModuleExercise = {
+  stableKey?: string;
+  editorKey?: string;
   id: number;
   module_id: number;
   submodule_id: number | null;

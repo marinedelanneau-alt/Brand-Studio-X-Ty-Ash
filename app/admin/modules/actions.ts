@@ -15,23 +15,11 @@ import {
 import {
   createAdminVoiceNoteUploadTarget,
   deleteAdminModuleDefinitionDraft,
-  publishAdminModuleDraft as publishAdminModuleDraftToUsers,
   saveAdminModuleDefinitionDraft,
   saveAdminVoiceNoteToDraft,
 } from "@/lib/training";
 import { getAuthenticatedAdmin } from "@/lib/session";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getAdminWorkingModules } from "@/lib/training";
-import {
-  createContentDraft,
-  getApplicationReleaseState,
-  isControlledAdminPublishingEnabled,
-  isControlledProductionContentEnabled,
-  markContentReleaseReady,
-  publishContentRelease,
-  updateCurrentDraftSnapshot,
-} from "@/lib/content-releases";
-import { normalizeReleaseSnapshotModules } from "@/lib/content-release-diff";
+import { publishCurrentAdminRelease } from "@/lib/admin-content-release";
 
 type EditorExercise = {
   clientId: string;
@@ -78,68 +66,16 @@ function revalidateTrainingExperience(moduleId?: number) {
   }
 }
 
-async function syncAdminDraftRelease(accountId: number) {
-  if (!isControlledAdminPublishingEnabled()) return;
-
-  let state = await getApplicationReleaseState();
-  let releaseId = state.current_draft_release_id;
-
-  if (!releaseId) {
-    if (!state.published_release_id) {
-      throw new Error("Aucune version publiée ne peut servir de base au brouillon.");
-    }
-
-    try {
-      const createdReleaseId = await createContentDraft({
-        sourceReleaseId: state.published_release_id,
-        name: `Brouillon ADMIN du ${new Intl.DateTimeFormat("fr-FR", {
-          dateStyle: "short",
-          timeStyle: "short",
-          timeZone: "Europe/Paris",
-        }).format(new Date())}`,
-      });
-      releaseId = String(createdReleaseId);
-    } catch (creationError) {
-      // Les sauvegardes automatiques peuvent être simultanées. Si une autre
-      // requête vient de créer le brouillon, on réutilise celui-ci.
-      state = await getApplicationReleaseState();
-      releaseId = state.current_draft_release_id;
-      if (!releaseId) throw creationError;
-    }
-  }
-
-  const modules = await getAdminWorkingModules(accountId);
-  await updateCurrentDraftSnapshot({
-    releaseId,
-    modules: normalizeReleaseSnapshotModules(modules),
-  });
-
-  return releaseId;
-}
-
-async function publishSavedAdminChanges(accountId: number) {
-  // Publish to the source read by users, even when admin previews use releases.
-  if (!isControlledProductionContentEnabled()) {
-    await publishAdminModuleDraftToUsers(accountId);
-    return;
-  }
-  const releaseId = await syncAdminDraftRelease(accountId);
-  if (!releaseId) {
-    throw new Error("Le déploiement contrôlé n’est pas activé.");
-  }
-  const notes = `Déploiement ADMIN du ${new Intl.DateTimeFormat("fr-FR", {
-    dateStyle: "short",
-    timeStyle: "short",
-    timeZone: "Europe/Paris",
+async function publishSavedAdminChanges() {
+  const notes = `Publication ADMIN du ${new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "short", timeStyle: "short", timeZone: "Europe/Paris",
   }).format(new Date())}`;
-
-  await markContentReleaseReady({ releaseId, notes });
-  await publishContentRelease({ releaseId, notes });
+  await publishCurrentAdminRelease(notes);
 }
 
 export async function publishFinalVersionForAllUsers() {
-  const account = await getAuthenticatedAdmin();
-  await publishSavedAdminChanges(account.id);
+  await getAuthenticatedAdmin();
+  await publishSavedAdminChanges();
   revalidateTrainingExperience();
   revalidatePath("/admin/releases");
   redirect("/admin/modules?status=published");
@@ -346,14 +282,14 @@ export async function saveAdminModule(formData: FormData) {
       position,
       isPublished,
       submodules,
-    });
-    await publishSavedAdminChanges(account.id);
+    }, { expectedModuleUpdatedAt: String(formData.get("expectedModuleUpdatedAt") ?? "") });
 
-    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/releases");
     redirect("/admin/modules?status=saved");
   } catch (error) {
     unstable_rethrow(error);
-    redirect("/admin/modules?status=error");
+    redirect(`/admin/modules?${new URLSearchParams({ status: "error", message: error instanceof Error ? error.message : "Sauvegarde impossible." })}`);
   }
 }
 
@@ -397,7 +333,7 @@ export async function saveAdminModuleDraft(formData: FormData) {
       };
     }
 
-    await saveAdminModuleDefinitionDraft(account.id, {
+    const savedModule = await saveAdminModuleDefinitionDraft(account.id, {
       moduleId: Number.isFinite(moduleId) && moduleId !== 0 ? moduleId : undefined,
       title,
       position,
@@ -405,14 +341,16 @@ export async function saveAdminModuleDraft(formData: FormData) {
       submodules,
     }, {
       preserveOmittedContent: formData.get("saveMode") !== "manual",
+      expectedModuleUpdatedAt: String(formData.get("expectedModuleUpdatedAt") ?? ""),
     });
-    await publishSavedAdminChanges(account.id);
 
-    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/releases");
 
     return {
       status: "success",
-      message: "Modifications enregistrées et appliquées aux utilisateurs.",
+      message: "Brouillon enregistré. Les utilisateurs conservent la version publiée.",
+      updatedAt: savedModule.editorRevision ?? savedModule.updated_at,
     };
   } catch (error) {
     return {
@@ -490,10 +428,10 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
             : undefined,
         audioUrl: url,
       });
-      await publishSavedAdminChanges(account.id);
     }
 
-    revalidateTrainingExperience(Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/releases");
 
     return {
       status: "success",
@@ -513,10 +451,11 @@ export async function persistAdminVoiceNoteUrl(formData: FormData) {
 }
 
 export async function saveAdminSubmoduleContent(formData: FormData) {
+  void formData;
   try {
     await getAuthenticatedAdmin();
-    const moduleId = Number(formData.get("moduleId"));
-    revalidateTrainingExperience(moduleId);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/releases");
 
     return {
       status: "success",
@@ -544,12 +483,12 @@ export async function deleteAdminModule(formData: FormData) {
     }
 
     await deleteAdminModuleDefinitionDraft(account.id, moduleId);
-    await publishSavedAdminChanges(account.id);
-    revalidateTrainingExperience(moduleId);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/releases");
     redirect("/admin/modules?status=deleted");
   } catch (error) {
     unstable_rethrow(error);
-    redirect("/admin/modules?status=error");
+    redirect(`/admin/modules?${new URLSearchParams({ status: "error", message: error instanceof Error ? error.message : "Suppression impossible." })}`);
   }
 }
 
@@ -564,70 +503,24 @@ export async function publishAdminDraftToAllUsers(
 ): Promise<AdminDeploymentState> {
   void _previousState;
   try {
-    const account = await getAuthenticatedAdmin();
-    if (isControlledAdminPublishingEnabled()) {
-      return {
-        status: "error",
-        message:
-          "La publication historique est désactivée. Utilise « Versions et déploiements ».",
-      };
-    }
-
-    await publishAdminModuleDraftToUsers(account.id);
+    await getAuthenticatedAdmin();
+    await publishSavedAdminChanges();
     revalidateTrainingExperience();
-    return {
-      status: "success",
-      message: "Le déploiement est terminé. La nouvelle version est disponible pour tous les utilisateurs.",
-      completedAt: new Date().toISOString(),
-    };
+    revalidatePath("/admin/releases");
+    return { status: "success", message: "La nouvelle version officielle est publiée.", completedAt: new Date().toISOString() };
   } catch (error) {
     unstable_rethrow(error);
-    return {
-      status: "error",
-      message:
-        error instanceof Error
-          ? error.message
-          : "Impossible de déployer le brouillon.",
-    };
+    return { status: "error", message: error instanceof Error ? error.message : "Publication impossible." };
   }
 }
 
-export async function scheduleAdminDraftDeployment(formData: FormData) {
-  const account = await getAuthenticatedAdmin();
-  if (isControlledAdminPublishingEnabled()) {
-    redirect(
-      "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
-    );
-  }
-  const value = String(formData.get("scheduledAt") ?? "");
-  const scheduledAt = new Date(value);
-  if (!value || Number.isNaN(scheduledAt.valueOf()) || scheduledAt <= new Date()) {
-    redirect("/admin/modules?status=error&message=Choisis%20une%20date%20future.");
-  }
-  const modules = await getAdminWorkingModules(account.id);
-  const supabase = createSupabaseServerClient();
-  await supabase.from("admin_deployment_schedules").update({ status: "cancelled", updated_at: new Date().toISOString() })
-    .eq("account_id", account.id).eq("status", "scheduled");
-  const { error } = await supabase.from("admin_deployment_schedules").insert({
-    account_id: account.id, scheduled_at: scheduledAt.toISOString(), timezone: "Europe/Paris",
-    notes: String(formData.get("notes") ?? "").trim() || null, draft_snapshot: { version: 1, modules },
-  });
-  if (error) redirect(`/admin/modules?status=error&message=${encodeURIComponent(error.message)}`);
-  revalidatePath("/admin/modules");
-  redirect("/admin/modules?status=scheduled");
+export async function scheduleAdminDraftDeployment(_formData: FormData) {
+  void _formData;
+  await getAuthenticatedAdmin();
+  redirect("/admin/releases");
 }
 
 export async function cancelAdminDraftDeployment() {
-  const account = await getAuthenticatedAdmin();
-  if (isControlledAdminPublishingEnabled()) {
-    redirect(
-      "/admin/modules?status=error&message=La%20programmation%20historique%20est%20désactivée.",
-    );
-  }
-  const supabase = createSupabaseServerClient();
-  const { error } = await supabase.from("admin_deployment_schedules")
-    .update({ status: "cancelled", updated_at: new Date().toISOString() })
-    .eq("account_id", account.id).eq("status", "scheduled");
-  if (error) redirect(`/admin/modules?status=error&message=${encodeURIComponent(error.message)}`);
-  revalidatePath("/admin/modules"); redirect("/admin/modules?status=cancelled");
+  await getAuthenticatedAdmin();
+  redirect("/admin/releases");
 }

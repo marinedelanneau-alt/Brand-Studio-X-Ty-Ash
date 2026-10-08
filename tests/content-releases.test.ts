@@ -77,9 +77,8 @@ const releasesPage = readFileSync(
   "utf8",
 );
 const adminModuleActions = readFileSync(
-  new URL("../app/admin/modules/actions.ts", import.meta.url),
-  "utf8",
-);
+  new URL("../app/admin/modules/actions.ts", import.meta.url), "utf8",
+) + readFileSync(new URL("../lib/admin-content-release.ts", import.meta.url), "utf8");
 const adminModulesPage = readFileSync(
   new URL("../app/admin/modules/page.tsx", import.meta.url),
   "utf8",
@@ -120,7 +119,7 @@ describe("migration contrôlée des releases", () => {
     expect(migration).toContain("only the current draft can be updated");
   });
 
-  it("conserve le mode historique comme valeur par défaut", () => {
+  it("ne sélectionne jamais les tables historiques même si la configuration est désactivée", () => {
     expect(resolver).toContain(
       'process.env.CONTENT_RELEASE_READ_MODE === "controlled"',
     );
@@ -135,8 +134,8 @@ describe("migration contrôlée des releases", () => {
         draftReleaseId: "draft",
       }),
     ).toEqual({
-      source: "legacy",
-      requestedReleaseId: null,
+      source: "controlled",
+      requestedReleaseId: "published",
       previewRequested: false,
     });
   });
@@ -224,7 +223,7 @@ describe("déploiement global programmé", () => {
     expect(adminModuleActions).toContain("export async function publishFinalVersionForAllUsers");
     expect(adminModuleActions).toContain("markContentReleaseReady");
     expect(adminModuleActions).toContain("publishContentRelease");
-    expect(adminModulesPage).toContain("action={publishFinalVersionForAllUsers}");
+    expect(adminModulesPage).toContain("<AdminDeploymentButton />");
   });
 
   it("ne touche jamais au contenu historique ni aux réponses", () => {
@@ -262,7 +261,7 @@ describe("résolution centrale de la release active", () => {
     draftReleaseId: "draft-v2",
   };
 
-  it("la production historique reste la source par défaut", () => {
+  it("la sélection reste la publication officielle, jamais la source historique", () => {
     expect(
       resolveReleaseSelectionIntent({
         viewerIsAdmin: false,
@@ -272,8 +271,8 @@ describe("résolution centrale de la release active", () => {
         ...state,
       }),
     ).toEqual({
-      source: "legacy",
-      requestedReleaseId: null,
+      source: "controlled",
+      requestedReleaseId: "published-v1",
       previewRequested: false,
     });
   });

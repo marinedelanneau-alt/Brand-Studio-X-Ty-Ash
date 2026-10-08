@@ -1,3 +1,6 @@
+import { getEditorExerciseQuestion, getStoredExerciseGroupId, resolveExerciseType, type ExerciseType } from "./exercise-types";
+import { parseStoredSmartFeedbackConfig } from "./smart-feedback";
+
 export type ReleaseEntity = {
   stableKey: string;
   entityType: "module" | "submodule" | "exercise";
@@ -131,7 +134,7 @@ export function hydrateReleaseSnapshotModules(modules: unknown[]) {
     const moduleItem = objectValue(rawModule);
     const moduleStableKey = stableKey(moduleItem, "module_missing_key");
     const moduleId = numericId(
-      moduleItem.id,
+      moduleItem.id ?? moduleItem.legacyId,
       moduleStableKey,
       "module",
       usedModuleIds,
@@ -144,7 +147,7 @@ export function hydrateReleaseSnapshotModules(modules: unknown[]) {
             `${moduleStableKey}:submodule_missing_key`,
           );
           const submoduleId = numericId(
-            submodule.id,
+            submodule.id ?? submodule.legacyId,
             submoduleStableKey,
             "submodule",
             usedSubmoduleIds,
@@ -156,23 +159,32 @@ export function hydrateReleaseSnapshotModules(modules: unknown[]) {
                   exercise,
                   `${submoduleStableKey}:exercise_missing_key`,
                 );
+                const options = Array.isArray(exercise.options)
+                  ? exercise.options.filter((value): value is string => typeof value === "string")
+                  : [];
+                const storedQuestion = typeof exercise.question === "string" ? exercise.question : "";
+                const exerciseType = resolveExerciseType(exercise.type as ExerciseType, storedQuestion, options);
                 return {
                   ...exercise,
                   id: numericId(
-                    exercise.id,
+                    exercise.id ?? exercise.legacyId,
                     exerciseStableKey,
                     "exercise",
                     usedExerciseIds,
                   ),
                   module_id: moduleId,
                   submodule_id: submoduleId,
+                  type: exerciseType,
+                  question: getEditorExerciseQuestion(exerciseType, storedQuestion),
+                  exercise_group_id: exercise.exercise_group_id ?? getStoredExerciseGroupId(options) ?? null,
+                  feedback_config: exercise.feedback_config ?? parseStoredSmartFeedbackConfig(options),
                   answer_placeholder:
                     exercise.answer_placeholder ?? exercise.answerPlaceholder ?? null,
                   audio_url: exercise.audio_url ?? exercise.audioUrl ?? null,
                   audio_transcript:
                     exercise.audio_transcript ?? exercise.audioTranscript ?? null,
                   explanation: exercise.explanation ?? "",
-                  options: Array.isArray(exercise.options) ? exercise.options : [],
+                  options,
                 };
               })
             : [];

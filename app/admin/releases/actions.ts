@@ -9,11 +9,11 @@ import {
   createContentDraft,
   isAdminDraftPreviewEnabled,
   markContentReleaseReady,
-  publishContentRelease,
   scheduleContentRelease,
   updateDraftFeatureConfiguration,
   type ContentPreviewMode,
 } from "@/lib/content-releases";
+import { publishCurrentAdminRelease, verifyCurrentDraft } from "@/lib/admin-content-release";
 import { getAuthenticatedAdmin } from "@/lib/session";
 
 function requiredString(formData: FormData, name: string) {
@@ -90,6 +90,7 @@ export async function markReleaseReady(formData: FormData) {
   const releaseId = requiredString(formData, "releaseId");
   const notes = requiredString(formData, "notes");
   try {
+    await verifyCurrentDraft(releaseId);
     await markContentReleaseReady({ releaseId, notes });
   } catch (error) {
     releasesRedirect(
@@ -115,7 +116,7 @@ export async function publishReleaseForAllUsers(formData: FormData) {
   }
 
   try {
-    await publishContentRelease({ releaseId, notes });
+    await publishCurrentAdminRelease(notes, releaseId);
   } catch (error) {
     releasesRedirect(
       error instanceof Error ? error.message : "La publication a échoué.",
@@ -123,7 +124,9 @@ export async function publishReleaseForAllUsers(formData: FormData) {
     );
   }
   revalidatePath("/admin/releases");
-  revalidatePath("/mon-espace");
+  revalidatePath("/admin/modules");
+  revalidatePath("/mon-espace", "layout");
+  revalidatePath("/brand-guide");
   releasesRedirect("Release publiée atomiquement pour tous les utilisateurs.");
 }
 
@@ -144,6 +147,7 @@ export async function scheduleReleaseForAllUsers(formData: FormData) {
     releasesRedirect("Choisis une date de déploiement future.", "error");
   }
   try {
+    await verifyCurrentDraft(releaseId);
     await scheduleContentRelease({
       releaseId,
       notes,

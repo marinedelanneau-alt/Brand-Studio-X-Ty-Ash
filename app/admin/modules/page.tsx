@@ -1,4 +1,3 @@
-import { cancelAdminDraftDeployment, publishFinalVersionForAllUsers, scheduleAdminDraftDeployment } from "@/app/admin/modules/actions";
 import AdminDeploymentButton from "@/app/ui/admin-deployment-button";
 import AdminModuleEditor from "@/app/ui/admin-module-editor";
 import DatabaseErrorState from "@/app/ui/database-error-state";
@@ -6,8 +5,6 @@ import { getAuthenticatedAdmin } from "@/lib/session";
 import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isControlledAdminPublishingEnabled } from "@/lib/content-releases";
 
 export default async function AdminModulesPage({
   searchParams,
@@ -16,15 +13,10 @@ export default async function AdminModulesPage({
 }) {
   let modules: Awaited<ReturnType<typeof getAdminWorkingModules>> = [];
   let loadError = "";
-  let activeSchedule: { scheduled_at: string; notes: string | null } | null = null;
 
   try {
     const account = await getAuthenticatedAdmin();
     modules = await getAdminWorkingModules(account.id);
-    const { data } = await createSupabaseServerClient().from("admin_deployment_schedules")
-      .select("scheduled_at,notes").eq("account_id", account.id).eq("status", "scheduled")
-      .order("scheduled_at", { ascending: false }).limit(1).maybeSingle<{ scheduled_at: string; notes: string | null }>();
-    activeSchedule = data;
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
@@ -42,7 +34,6 @@ export default async function AdminModulesPage({
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const controlledReleasesEnabled = isControlledAdminPublishingEnabled();
   const status = resolvedSearchParams?.status;
   const errorMessage = resolvedSearchParams?.message;
   const statusValue = Array.isArray(status) ? status[0] : status;
@@ -50,9 +41,9 @@ export default async function AdminModulesPage({
 
   const message =
     statusValue === "saved"
-      ? "Modifications enregistrées et appliquées aux utilisateurs."
+      ? "Brouillon enregistré. La version publiée reste inchangée."
       : statusValue === "published"
-        ? "La nouvelle version finale est publiée pour tous les utilisateurs. Ton brouillon ADMIN reste ton espace de travail privé."
+        ? "La nouvelle version officielle est publiée pour tous les utilisateurs. Les prochaines modifications créeront un nouveau brouillon privé."
         : statusValue === "scheduled"
           ? "Déploiement programmé."
           : statusValue === "cancelled"
@@ -73,40 +64,18 @@ export default async function AdminModulesPage({
           Gestion des modules
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--text-muted)]">
-          Tes modifications sont enregistrées automatiquement et appliquées
-          aux utilisateurs dès que l&apos;enregistrement est terminé.
+          Tes modifications sont enregistrées automatiquement dans le brouillon privé.
+          Publie volontairement la version enregistrée pour la rendre visible aux utilisateurs.
         </p>
-        {controlledReleasesEnabled ? (
-          <div className="mt-5 rounded-2xl border border-[#d9e6d5] bs-status-light bg-[#f7fbf5] p-5">
-            <p className="font-bold text-[var(--status-success-text)]">
-              Publication automatique
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[var(--status-success-text)]">
-              Chaque enregistrement publie tes changements pour tous les utilisateurs.
-              Le bouton ci-dessous permet de republier la version enregistrée.
-            </p>
-            <form action={publishFinalVersionForAllUsers} className="mt-4">
-              <button
-                type="submit"
-                className="inline-flex rounded-xl bg-[#4b4550] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3f3943]"
-              >
-                Déployer la version finale
-              </button>
-            </form>
-          </div>
-        ) : (
-          <AdminDeploymentButton />
-        )}
-        {!controlledReleasesEnabled ? <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--card)]/70 p-5">
-          <h2 className="text-lg font-semibold text-[var(--heading-color)]">Programmer le déploiement</h2>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">La date et l’heure sont interprétées en heure de Paris.</p>
-          {activeSchedule ? <div className="mt-4 rounded-xl bg-[var(--tyash-soft)] p-4 text-sm"><strong>Programmé le {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(new Date(activeSchedule.scheduled_at))}</strong>{activeSchedule.notes ? <p className="mt-1">{activeSchedule.notes}</p> : null}<form action={cancelAdminDraftDeployment} className="mt-3"><button className="rounded-xl border border-[var(--tyash-primary)] px-4 py-2 text-[var(--tyash-label-text)]">Annuler la programmation</button></form></div> :
-          <form action={scheduleAdminDraftDeployment} className="mt-4 flex flex-wrap items-end gap-3">
-            <label className="text-sm"><span className="mb-1 block">Date et heure</span><input required name="scheduledAt" type="datetime-local" className="h-11 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3" /></label>
-            <label className="min-w-64 flex-1 text-sm"><span className="mb-1 block">Note facultative</span><input name="notes" className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--card)] px-3" placeholder="Contenu de cette publication" /></label>
-            <button className="h-11 rounded-xl bs-button-primary px-5 font-bold text-[var(--tyash-text-on-primary)]">Programmer</button>
-          </form>}
-        </div> : null}
+        <AdminDeploymentButton />
+        <a href="/admin/releases" className="mt-4 inline-block text-sm underline">
+          Versions, aperçu et déploiements programmés
+        </a>
+        <p className="mt-3 text-sm text-[var(--text-muted)]">
+          Attends la confirmation de sauvegarde avant de publier. Les déplacements,
+          suppressions et changements de type des éléments publiés sont protégés
+          pour conserver les réponses existantes.
+        </p>
         {message ? (
           <p className="mt-5 text-sm leading-6 text-[var(--text-primary)]">{message}</p>
         ) : null}

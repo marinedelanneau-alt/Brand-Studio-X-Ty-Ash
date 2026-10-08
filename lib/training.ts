@@ -1,14 +1,12 @@
 import "server-only";
+import { getAdminReleaseWorkspace, saveAdminReleaseModules } from "@/lib/admin-content-release";
+import { validateReleaseModules } from "@/lib/release-content-validation";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  findAccountById,
-  findWorkspaceAccountByIdentity,
-} from "@/lib/access-codes";
+import { findAccountById } from "@/lib/access-codes";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
-import { getExercisePublicationContent } from "@/lib/exercise-publication";
 import { getCompletedModuleIdsFromCookie } from "@/lib/module-completion-fallback";
 import type {
   AdminAccountSummary,
@@ -72,11 +70,6 @@ type ProjectExerciseAnswerRecord = {
   updated_at: string;
 };
 
-type DeployableExerciseAnswerRecord = Omit<ProjectExerciseAnswerRecord, "id"> & {
-  created_at: string;
-  updated_at: string;
-};
-
 type ProjectModuleStateRecord = {
   id: number;
   project_id: number;
@@ -90,12 +83,6 @@ type ProjectModuleStateRecord = {
 type DraftModule = BrandModule & {
   submodules: Array<BrandSubmodule & { exercises: ModuleExercise[] }>;
   exercises: ModuleExercise[];
-};
-
-type ModuleDraftSnapshot = {
-  version: 1;
-  modules: DraftModule[];
-  updatedAt: string;
 };
 
 type AnswerBackupSnapshot = {
@@ -141,27 +128,7 @@ const AUDIO_TRANSCRIPT_HTML_MARKER_PATTERN =
   /<!--\s*brand-studio-audio-transcript:([^]*?)\s*-->/;
 const ALL_AUDIO_TRANSCRIPT_HTML_MARKERS_PATTERN =
   /<!--\s*brand-studio-audio-transcript:[^]*?\s*-->/g;
-const ADMIN_MODULE_DRAFT_EXPORT_TYPE = "admin_module_draft";
 const ANSWER_BACKUP_EXPORT_TYPE = "answer_backup";
-const ADMIN_WORKSPACE_EMAIL =
-  process.env.ADMIN_WORKSPACE_EMAIL ?? "marine.delanneau@gmail.com";
-const ADMIN_WORKSPACE_KEYWORDS = ["marine", "communication"];
-const ADMIN_MODULE_DRAFT_STORAGE_BUCKET = "project-assets";
-const ADMIN_MODULE_DRAFT_CANONICAL_STORAGE_PATH =
-  "admin-module-drafts/current.json";
-
-function normalizeAdminWorkspaceLabel(value: string | null | undefined) {
-  return (value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLowerCase();
-}
-
-function hasAdminWorkspaceKeywords(value: string | null | undefined) {
-  const label = normalizeAdminWorkspaceLabel(value);
-  return ADMIN_WORKSPACE_KEYWORDS.every((keyword) => label.includes(keyword));
-}
 
 function parseAnswerBackupSnapshot(value: unknown): AnswerBackupSnapshot | null {
   if (!value || typeof value !== "object") {
@@ -311,7 +278,7 @@ function computeModuleAnswerMap(
       return values;
     }
 
-    const placeholder = exercise.answer_placeholder.trim();
+    const placeholder = (exercise.answer_placeholder ?? "").trim();
 
     if (!placeholder) {
       return values;
@@ -1086,15 +1053,6 @@ export async function getModulesWithExercises({
   }));
 }
 
-function isModuleDraftSnapshot(value: unknown): value is ModuleDraftSnapshot {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const snapshot = value as Partial<ModuleDraftSnapshot>;
-  return snapshot.version === 1 && Array.isArray(snapshot.modules);
-}
-
 function normalizeDraftModule(module: DraftModule): DraftModule {
   const submodules = [...(module.submodules ?? [])]
     .sort((left, right) => left.position - right.position)
@@ -1144,122 +1102,6 @@ function getNextDraftId(ids: number[]) {
   return negativeIds.length === 0 ? -1 : Math.min(...negativeIds) - 1;
 }
 
-function getAdminModuleDraftStoragePaths(projectId: number) {
-  return [
-    ADMIN_MODULE_DRAFT_CANONICAL_STORAGE_PATH,
-    `admin-module-drafts/${projectId}.json`,
-  ];
-}
-
-function isAdminWorkspaceAccount(
-  account:
-    | {
-        email?: string | null;
-        client_name?: string | null;
-        company_name?: string | null;
-      }
-    | null
-    | undefined,
-) {
-  const email = normalizeAdminWorkspaceLabel(account?.email);
-  const clientName = normalizeAdminWorkspaceLabel(account?.client_name);
-  const companyName = normalizeAdminWorkspaceLabel(account?.company_name);
-  const label = `${clientName} ${companyName}`.trim();
-
-  return (
-    email === normalizeAdminWorkspaceLabel(ADMIN_WORKSPACE_EMAIL) ||
-    hasAdminWorkspaceKeywords(label)
-  );
-}
-
-function isAdminWorkspaceProject(project: BrandProject | null | undefined) {
-  return hasAdminWorkspaceKeywords(project?.name);
-}
-
-async function findAdminWorkspaceAccount(fallbackAccountId: number) {
-  const fallbackAccount = await findAccountById(fallbackAccountId);
-  const configuredAccount = await findWorkspaceAccountByIdentity({
-    email: ADMIN_WORKSPACE_EMAIL,
-    keywords: ADMIN_WORKSPACE_KEYWORDS,
-  });
-
-  if (configuredAccount) {
-    return configuredAccount;
-  }
-
-  return fallbackAccount;
-}
-
-async function getAdminWorkspaceProject(accountId: number) {
-  const workspaceAccount = await findAdminWorkspaceAccount(accountId);
-
-  if (!workspaceAccount) {
-    return null;
-  }
-
-  return getProjectByAccountId(workspaceAccount.id);
-}
-
-async function getLatestAdminModuleDraftSnapshot(projectId?: number) {
-  const supabase = createSupabaseServerClient();
-  let query = supabase
-    .from("brand_exports")
-    .select("guide_snapshot")
-    .eq("export_type", ADMIN_MODULE_DRAFT_EXPORT_TYPE)
-    .order("generated_at", { ascending: false })
-    .limit(1);
-
-  if (projectId) {
-    query = query.eq("project_id", projectId);
-  }
-
-  const { data, error } = await query.maybeSingle<{ guide_snapshot: unknown }>();
-
-  if (error) {
-    if (isMissingDatabaseObject(error)) {
-      return projectId ? getAdminModuleDraftSnapshotFromStorage(projectId) : null;
-    }
-
-    throw new Error(error.message);
-  }
-
-  if (isModuleDraftSnapshot(data?.guide_snapshot)) {
-    return data.guide_snapshot;
-  }
-
-  return projectId ? getAdminModuleDraftSnapshotFromStorage(projectId) : null;
-}
-
-async function saveAdminModuleDraftSnapshot(projectId: number, modules: DraftModule[]) {
-  const supabase = createSupabaseServerClient();
-  const now = new Date().toISOString();
-  const snapshot: ModuleDraftSnapshot = {
-    version: 1,
-    modules: normalizeDraftModules(modules),
-    updatedAt: now,
-  };
-
-  const { error } = await supabase.from("brand_exports").insert({
-    project_id: projectId,
-    export_type: ADMIN_MODULE_DRAFT_EXPORT_TYPE,
-    file_url: null,
-    generated_at: now,
-    guide_snapshot: snapshot,
-  });
-
-  if (error) {
-    if (isMissingDatabaseObject(error)) {
-      await saveAdminModuleDraftSnapshotToStorage(projectId, snapshot);
-      return snapshot.modules;
-    }
-
-    throw new Error(error.message);
-  }
-
-  await saveAdminModuleDraftSnapshotToStorage(projectId, snapshot);
-  return snapshot.modules;
-}
-
 export async function uploadProjectExerciseFont(input: {
   projectId: number;
   exerciseId: number;
@@ -1290,199 +1132,17 @@ export async function updateProjectNameForAccount(input: {
   if (error) throw new Error(error.message);
 }
 
-function getDraftModuleIdentity(title: string) {
-  return title
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toLocaleLowerCase("fr-FR")
-    .replace(/\s+/g, " ");
-}
-
-async function restoreMissingPublishedModulesInDraft(
-  projectId: number,
-  modules: DraftModule[],
-) {
-  const publishedModules = await getModulesWithExercises({
-    includeUnpublished: true,
-    includeInactiveBrandPersona: true,
-  });
-  const seenTitles = new Set<string>();
-  const cleanedModules = modules.filter((moduleItem) => {
-    const titleKey = getDraftModuleIdentity(moduleItem.title);
-    if (!titleKey || !seenTitles.has(titleKey)) {
-      if (titleKey) seenTitles.add(titleKey);
-      return true;
-    }
-    return false;
-  });
-  const repairedModules = cleanedModules.map((draftModule) => {
-    const publishedModule = publishedModules.find(
-      (candidate) =>
-        candidate.id === draftModule.id ||
-        candidate.position === draftModule.position ||
-        getDraftModuleIdentity(candidate.title) === getDraftModuleIdentity(draftModule.title),
-    );
-    if (!publishedModule) return draftModule;
-
-    const knownSubmoduleIds = new Set(draftModule.submodules.map((submodule) => submodule.id));
-    const knownSubmoduleTitles = new Set(
-      draftModule.submodules.map((submodule) => getDraftModuleIdentity(submodule.title)),
-    );
-    const submodules = [...draftModule.submodules];
-    for (const publishedSubmodule of publishedModule.submodules) {
-      if (
-        knownSubmoduleIds.has(publishedSubmodule.id) ||
-        knownSubmoduleTitles.has(getDraftModuleIdentity(publishedSubmodule.title))
-      ) continue;
-      submodules.splice(
-        Math.max(0, Math.min(publishedSubmodule.position - 1, submodules.length)),
-        0,
-        publishedSubmodule,
-      );
-    }
-    const normalizedSubmodules = submodules.map((submodule, index) => ({
-      ...submodule,
-      position: index + 1,
-    }));
-    return {
-      ...draftModule,
-      submodules: normalizedSubmodules,
-      exercises: normalizedSubmodules.flatMap((submodule) => submodule.exercises),
-    };
-  });
-  const draftModuleIds = new Set(
-    repairedModules
-      .filter((moduleItem) => moduleItem.id > 0)
-      .map((moduleItem) => moduleItem.id),
-  );
-  const draftPositions = new Set(repairedModules.map((moduleItem) => moduleItem.position));
-  const draftTitles = new Set(
-    repairedModules.map((moduleItem) => getDraftModuleIdentity(moduleItem.title)),
-  );
-  const missingPublishedModules = publishedModules.filter(
-    (moduleItem) =>
-      moduleItem.id > 0 &&
-      !draftModuleIds.has(moduleItem.id) &&
-      !draftPositions.has(moduleItem.position) &&
-      !draftTitles.has(getDraftModuleIdentity(moduleItem.title)),
-  );
-
-  if (
-    missingPublishedModules.length === 0 &&
-    cleanedModules.length === modules.length &&
-    repairedModules.every((moduleItem, index) => moduleItem === cleanedModules[index])
-  ) {
-    return normalizeDraftModules(cleanedModules);
-  }
-
-  const restoredModules = normalizeDraftModules([
-    ...repairedModules,
-    ...missingPublishedModules,
-  ]);
-
-  await saveAdminModuleDraftSnapshot(projectId, restoredModules);
-  return restoredModules;
-}
-
-async function getAdminModuleDraftSnapshotFromStorage(projectId: number) {
-  const supabase = createSupabaseServerClient();
-  const paths = getAdminModuleDraftStoragePaths(projectId);
-
-  for (const path of paths) {
-    const { data, error } = await supabase.storage
-      .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
-      .download(path);
-
-    if (error) {
-      continue;
-    }
-
-    try {
-      const parsed = JSON.parse(await data.text()) as unknown;
-      if (isModuleDraftSnapshot(parsed)) {
-        return parsed;
-      }
-    } catch {
-      continue;
-    }
-  }
-
-  return null;
-}
-
-async function saveAdminModuleDraftSnapshotToStorage(
-  projectId: number,
-  snapshot: ModuleDraftSnapshot,
-) {
-  const supabase = createSupabaseServerClient();
-  const body = new Blob([JSON.stringify(snapshot)], {
-    type: "application/json",
-  });
-  const uploads = await Promise.all(
-    getAdminModuleDraftStoragePaths(projectId).map((path) =>
-      supabase.storage
-        .from(ADMIN_MODULE_DRAFT_STORAGE_BUCKET)
-        .upload(path, body, {
-          contentType: "application/json",
-          upsert: true,
-        }),
-    ),
-  );
-  const error = uploads.find((result) => result.error)?.error;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-async function getAdminDraftBase(accountId: number) {
-  const project = await getAdminWorkspaceProject(accountId);
-
-  if (!project) {
-    return {
-      project,
-      modules: await getModulesWithExercises({
-        includeUnpublished: true,
-        includeInactiveBrandPersona: true,
-      }),
-      hasDraft: false,
-    };
-  }
-
-  const projectDraft = await getLatestAdminModuleDraftSnapshot(project.id);
-  const legacyDraft = projectDraft ? null : await getLatestAdminModuleDraftSnapshot();
-  const draft = projectDraft ?? legacyDraft;
-
-  if (draft) {
-    if (!projectDraft && legacyDraft) {
-      await saveAdminModuleDraftSnapshot(project.id, legacyDraft.modules);
-    }
-    const modules = await restoreMissingPublishedModulesInDraft(
-      project.id,
-      draft.modules,
-    );
-
-    return {
-      project,
-      modules,
-      hasDraft: true,
-    };
-  }
-
+async function getAdminDraftBase(_accountId: number) {
+  void _accountId;
+  const workspace = await getAdminReleaseWorkspace();
   return {
-    project,
-    modules: await getModulesWithExercises({
-      includeUnpublished: true,
-      includeInactiveBrandPersona: true,
-    }),
-    hasDraft: false,
+    modules: workspace.modules as unknown as DraftModule[],
+    updatedAt: workspace.snapshot.updated_at,
   };
 }
 
 export async function getAdminWorkingModules(accountId: number) {
-  const { modules } = await getAdminDraftBase(accountId);
-  return modules;
+  return (await getAdminDraftBase(accountId)).modules;
 }
 
 function buildDraftModuleFromDefinition(
@@ -1540,7 +1200,7 @@ function buildDraftModuleFromDefinition(
     const existingSubmodule =
       (Number.isFinite(requestedSubmoduleId)
         ? existingSubmodules.find((item) => item.id === requestedSubmoduleId)
-        : undefined) ?? existingSubmodules[submoduleIndex];
+        : existingSubmodules.find((item) => item.editorKey === submodule.clientId));
     const submoduleId = existingSubmodule?.id ?? nextSubmoduleId--;
     const questions = submodule.exerciseGroups.flatMap((group) =>
       group.questions.map((question) => {
@@ -1549,10 +1209,12 @@ function buildDraftModuleFromDefinition(
           (Number.isFinite(requestedExerciseId)
             ? existingExercises.find((item) => item.id === requestedExerciseId)
             : undefined) ??
-          existingExercises.find((item) => item.position === globalExercisePosition);
+          existingExercises.find((item) => item.editorKey === question.clientId);
         const exerciseId = existingExercise?.id ?? nextExerciseId--;
 
         return {
+          ...existingExercise,
+          editorKey: existingExercise?.editorKey ?? question.clientId,
           id: exerciseId,
           module_id: moduleId,
           submodule_id: submoduleId,
@@ -1574,6 +1236,8 @@ function buildDraftModuleFromDefinition(
     );
 
     return {
+      ...existingSubmodule,
+      editorKey: existingSubmodule?.editorKey ?? submodule.clientId,
       id: submoduleId,
       module_id: moduleId,
       title: submodule.title,
@@ -1589,6 +1253,8 @@ function buildDraftModuleFromDefinition(
   });
 
   return normalizeDraftModule({
+    ...existingModule,
+    editorRevision: crypto.randomUUID(),
     id: moduleId,
     title: input.title,
     position: input.position,
@@ -1607,18 +1273,16 @@ function buildDraftModuleFromDefinition(
 export async function saveAdminModuleDefinitionDraft(
   accountId: number,
   input: Parameters<typeof saveModuleDefinition>[0],
-  options: { preserveOmittedContent?: boolean } = {},
+  options: { preserveOmittedContent?: boolean; expectedModuleUpdatedAt?: string } = {},
 ) {
-  const { project, modules } = await getAdminDraftBase(accountId);
-
-  if (!project) {
-    throw new Error("Cree d'abord ton projet Marine Communication pour utiliser le brouillon admin.");
-  }
+  const { modules, updatedAt } = await getAdminDraftBase(accountId);
 
   const existingModule = input.moduleId
-    ? modules.find((module) => module.id === input.moduleId) ??
-      modules.find((module) => module.position === input.position)
+    ? modules.find((module) => module.id === input.moduleId)
     : undefined;
+  if (existingModule && options.expectedModuleUpdatedAt !== (existingModule.editorRevision ?? existingModule.updated_at ?? "initial")) {
+    throw new Error("Ce module a changé depuis son chargement. Recharge l'éditeur avant de sauvegarder.");
+  }
   if (options.preserveOmittedContent && existingModule) {
     const submittedExerciseCount = input.submodules.reduce(
       (total, submodule) =>
@@ -1637,27 +1301,21 @@ export async function saveAdminModuleDefinitionDraft(
       );
     }
   }
+  if (input.moduleId && !existingModule) throw new Error("Module périmé : recharge l'éditeur.");
   const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
   const nextModules = existingModule
     ? reorderDraftModules(modules, nextModule)
     : reorderDraftModules([...modules, nextModule], nextModule);
 
-  await saveAdminModuleDraftSnapshot(project.id, nextModules);
+  await saveAdminReleaseModules(nextModules, updatedAt);
 
   return nextModule;
 }
 
 export async function deleteAdminModuleDefinitionDraft(accountId: number, moduleId: number) {
-  const { project, modules } = await getAdminDraftBase(accountId);
+  const { modules, updatedAt } = await getAdminDraftBase(accountId);
 
-  if (!project) {
-    throw new Error("Projet admin introuvable.");
-  }
-
-  await saveAdminModuleDraftSnapshot(
-    project.id,
-    modules.filter((module) => module.id !== moduleId),
-  );
+  await saveAdminReleaseModules(modules.filter((module) => module.id !== moduleId), updatedAt);
 }
 
 export async function saveAdminVoiceNoteToDraft(input: {
@@ -1669,18 +1327,12 @@ export async function saveAdminVoiceNoteToDraft(input: {
   targetPosition?: number;
   audioUrl: string;
 }) {
-  const { project, modules } = await getAdminDraftBase(input.accountId);
-
-  if (!project) {
-    throw new Error("Projet Marine Communication introuvable.");
-  }
+  const { modules, updatedAt } = await getAdminDraftBase(input.accountId);
 
   let didUpdate = false;
   const nextModules = modules.map((moduleItem) => {
     const isTargetModule =
-      moduleItem.id === input.moduleId ||
-      (Number.isFinite(input.modulePosition) &&
-        moduleItem.position === input.modulePosition);
+      moduleItem.id === input.moduleId;
 
     if (!isTargetModule) {
       return moduleItem;
@@ -1688,9 +1340,7 @@ export async function saveAdminVoiceNoteToDraft(input: {
 
     if (input.target === "submodule") {
       const submodules = moduleItem.submodules.map((submodule) =>
-        submodule.id === input.targetId ||
-        (Number.isFinite(input.targetPosition) &&
-          submodule.position === input.targetPosition)
+        submodule.id === input.targetId
           ? (() => {
               didUpdate = true;
               return { ...submodule, audio_url: input.audioUrl };
@@ -1699,9 +1349,7 @@ export async function saveAdminVoiceNoteToDraft(input: {
       );
       const targetIndex = submodules.findIndex(
         (submodule) =>
-          submodule.id === input.targetId ||
-          (Number.isFinite(input.targetPosition) &&
-            submodule.position === input.targetPosition),
+          submodule.id === input.targetId,
       );
 
       return normalizeDraftModule({
@@ -1738,263 +1386,18 @@ export async function saveAdminVoiceNoteToDraft(input: {
     throw new Error("La cible de la note vocale est introuvable dans le brouillon admin.");
   }
 
-  await saveAdminModuleDraftSnapshot(project.id, nextModules);
+  await saveAdminReleaseModules(nextModules, updatedAt);
 }
 
-function moduleDraftToDefinitionInput(module: DraftModule) {
-  return {
-    moduleId: module.id > 0 ? module.id : undefined,
-    title: module.title,
-    position: module.position,
-    isPublished: module.is_published,
-    submodules: module.submodules.map((submodule) => ({
-      clientId: String(submodule.id),
-      title: submodule.title,
-      position: submodule.position,
-      videoUrl: submodule.video_url,
-      audioUrl: submodule.audio_url ?? "",
-      audioTranscript: submodule.audio_transcript ?? "",
-      contentHtml: submodule.content_html,
-      exerciseGroups: groupExercisesByGroupId(submodule.exercises).map((group) => ({
-        groupId: group.id,
-        questions: group.questions.map((exercise) => ({
-          clientId: String(exercise.id),
-          type: exercise.type,
-          explanation: exercise.explanation,
-          answerPlaceholder: exercise.answer_placeholder,
-          audioUrl: exercise.audio_url ?? "",
-          audioTranscript: exercise.audio_transcript ?? "",
-          ...getExercisePublicationContent(exercise),
-          feedbackConfig: exercise.feedback_config ?? parseStoredSmartFeedbackConfig(exercise.options),
-        })),
-      })),
-    })),
-  };
+export async function publishAdminModuleDraft(_accountId: number): Promise<never> {
+  void _accountId;
+  throw new Error("Publication historique désactivée : utilise la publication contrôlée.");
 }
 
-const PUBLISHED_MODULE_STAGING_POSITION_OFFSET = 10000;
-
-async function deleteStagedPublishedModules() {
-  const supabase = createSupabaseServerClient();
-  const { error } = await supabase
-    .from("brand_modules")
-    .delete()
-    .gte("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-async function deleteActivePublishedModules() {
-  const supabase = createSupabaseServerClient();
-  const { error } = await supabase
-    .from("brand_modules")
-    .delete()
-    .lt("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-async function activateStagedPublishedModules() {
-  const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("brand_modules")
-    .select("id, position")
-    .gte("position", PUBLISHED_MODULE_STAGING_POSITION_OFFSET)
-    .returns<Array<{ id: number; position: number }>>();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const updates = await Promise.all(
-    (data ?? []).map((moduleItem) =>
-      supabase
-        .from("brand_modules")
-        .update({
-          position: moduleItem.position - PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
-        })
-        .eq("id", moduleItem.id),
-    ),
-  );
-  const updateError = updates.find((result) => result.error)?.error;
-
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-}
-
-async function snapshotPublishedUserData(moduleIds: number[]) {
-  const supabase = createSupabaseServerClient();
-
-  if (moduleIds.length === 0) {
-    return {
-      answers: [] as DeployableExerciseAnswerRecord[],
-      moduleStates: [] as Array<Omit<ProjectModuleStateRecord, "id">>,
-    };
-  }
-
-  const [answersResult, moduleStatesResult] = await Promise.all([
-    supabase
-      .from("project_exercise_answers")
-      .select(
-        "project_id,module_id,exercise_id,answer_text,selected_options,created_at,updated_at",
-      )
-      .in("module_id", moduleIds)
-      .returns<DeployableExerciseAnswerRecord[]>(),
-    supabase
-      .from("project_module_states")
-      .select(
-        "project_id,module_id,is_completed,completed_at,created_at,updated_at",
-      )
-      .in("module_id", moduleIds)
-      .returns<Array<Omit<ProjectModuleStateRecord, "id">>>(),
-  ]);
-
-  if (answersResult.error) {
-    throw new Error(answersResult.error.message);
-  }
-
-  if (moduleStatesResult.error && !isMissingDatabaseObject(moduleStatesResult.error)) {
-    throw new Error(moduleStatesResult.error.message);
-  }
-
-  return {
-    answers: answersResult.data ?? [],
-    moduleStates: isMissingDatabaseObject(moduleStatesResult.error)
-      ? []
-      : (moduleStatesResult.data ?? []),
-  };
-}
-
-async function restorePublishedUserData(input: {
-  snapshot: Awaited<ReturnType<typeof snapshotPublishedUserData>>;
-  moduleIdMap: Map<number, number>;
-  exerciseIdMap: Map<number, number>;
-}) {
-  const supabase = createSupabaseServerClient();
-  const answers = input.snapshot.answers.flatMap((answer) => {
-    const moduleId = input.moduleIdMap.get(answer.module_id);
-    const exerciseId = input.exerciseIdMap.get(answer.exercise_id);
-
-    return moduleId && exerciseId
-      ? [{ ...answer, module_id: moduleId, exercise_id: exerciseId }]
-      : [];
-  });
-  const moduleStates = input.snapshot.moduleStates.flatMap((state) => {
-    const moduleId = input.moduleIdMap.get(state.module_id);
-    return moduleId ? [{ ...state, module_id: moduleId }] : [];
-  });
-
-  if (answers.length > 0) {
-    const { error } = await supabase.from("project_exercise_answers").upsert(answers, {
-      onConflict: "project_id,exercise_id",
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  }
-
-  if (moduleStates.length > 0) {
-    const { error } = await supabase.from("project_module_states").upsert(moduleStates, {
-      onConflict: "project_id,module_id",
-    });
-
-    if (error && !isMissingDatabaseObject(error)) {
-      throw new Error(error.message);
-    }
-  }
-}
-
-export async function publishAdminModuleDraft(accountId: number) {
-  const { project, modules, hasDraft } = await getAdminDraftBase(accountId);
-
-  if (!project) {
-    throw new Error("Projet Marine Communication introuvable.");
-  }
-
-  if (!hasDraft) {
-    throw new Error("Aucun brouillon admin a deployer.");
-  }
-
-  // An open admin tab may still submit IDs from before the last publication.
-  // Snapshot the current published IDs so user answers survive repeated saves.
-  const publishedModules = (await getModulesWithExercises({
-    includeUnpublished: true,
-    includeInactiveBrandPersona: true,
-  })).filter((moduleItem) => moduleItem.position < PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
-  const activeModuleIds = publishedModules
-    .map((moduleItem) => moduleItem.id)
-    .filter((moduleId) => moduleId > 0);
-  const userDataSnapshot = await snapshotPublishedUserData(activeModuleIds);
-
-  await deleteStagedPublishedModules();
-
-  for (const moduleItem of modules) {
-    await saveModuleDefinition({
-      ...moduleDraftToDefinitionInput(moduleItem),
-      moduleId: undefined,
-      position: moduleItem.position + PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
-    });
-  }
-
-  const stagedModules = (await getModulesWithExercises({
-    includeUnpublished: true,
-    includeInactiveBrandPersona: true,
-  })).filter((moduleItem) => moduleItem.position >= PUBLISHED_MODULE_STAGING_POSITION_OFFSET);
-  const stagedModuleByPosition = new Map(
-    stagedModules.map((moduleItem) => [
-      moduleItem.position - PUBLISHED_MODULE_STAGING_POSITION_OFFSET,
-      moduleItem,
-    ]),
-  );
-  const moduleIdMap = new Map<number, number>();
-  const exerciseIdMap = new Map<number, number>();
-
-  for (const previousModule of publishedModules) {
-    const stagedModule = stagedModuleByPosition.get(previousModule.position);
-
-    if (!stagedModule || previousModule.id <= 0) {
-      continue;
-    }
-
-    moduleIdMap.set(previousModule.id, stagedModule.id);
-    previousModule.exercises.forEach((exercise, exerciseIndex) => {
-      const stagedExercise = stagedModule.exercises[exerciseIndex];
-
-      if (exercise.id > 0 && stagedExercise) {
-        exerciseIdMap.set(exercise.id, stagedExercise.id);
-      }
-    });
-  }
-
-  await deleteActivePublishedModules();
-  await activateStagedPublishedModules();
-  await restorePublishedUserData({
-    snapshot: userDataSnapshot,
-    moduleIdMap,
-    exerciseIdMap,
-  });
-
-  const refreshedModules = await getModulesWithExercises({
-    includeUnpublished: true,
-    includeInactiveBrandPersona: true,
-  });
-  await saveAdminModuleDraftSnapshot(project.id, refreshedModules);
-}
-
-export async function publishScheduledAdminModuleSnapshot(
-  accountId: number,
-  modules: DraftModule[],
-) {
-  const project = await getProjectByAccountId(accountId);
-  if (!project) throw new Error("Projet administrateur introuvable.");
-  await saveAdminModuleDraftSnapshot(project.id, modules.map(normalizeDraftModule));
-  await publishAdminModuleDraft(accountId);
+export async function publishScheduledAdminModuleSnapshot(_accountId: number, _modules: DraftModule[]): Promise<never> {
+  void _accountId;
+  void _modules;
+  throw new Error("Déploiement historique désactivé : utilise les releases contrôlées.");
 }
 
 export async function getWorkspaceData(accountId: number) {
@@ -2006,31 +1409,19 @@ export async function getWorkspaceData(accountId: number) {
     getRequestedPreviewMode,
     resolveActiveContentRelease,
   } = await import("@/lib/content-releases");
-  const { hydrateReleaseSnapshotModules } = await import(
-    "@/lib/content-release-diff"
-  );
   const previewMode = await getRequestedPreviewMode();
-  const contentPreview = await resolveActiveContentRelease({
-    account,
-    previewMode,
-  });
-  let modules: Awaited<ReturnType<typeof getModulesWithExercises>>;
-
-  if (contentPreview.source === "controlled" && contentPreview.release) {
-    const snapshot = await getContentReleaseSnapshot(contentPreview.release.id);
-    modules = snapshot
-      ? (hydrateReleaseSnapshotModules(
-          snapshot.modules,
-        ) as Awaited<ReturnType<typeof getModulesWithExercises>>)
-      : await getModulesWithExercises();
-  } else {
-    // Until the controlled cutover, clients always read the legacy published
-    // source. Admins only read the isolated legacy draft in preview environments.
-    modules =
-      (account?.role === "admin" || account?.is_admin) && previewMode
-        ? await getAdminWorkingModules(accountId)
-        : await getModulesWithExercises();
+  const contentPreview = await resolveActiveContentRelease({ account, previewMode });
+  if (contentPreview.source !== "controlled" || !contentPreview.release) {
+    throw new Error("Release publiée officielle introuvable.");
   }
+  const snapshot = await getContentReleaseSnapshot(contentPreview.release.id);
+  if (!snapshot || snapshot.schema_version !== 1) {
+    throw new Error("Snapshot publié introuvable ou incompatible. Aucun contenu historique n'est affiché.");
+  }
+  const validatedModules = validateReleaseModules(snapshot.modules) as unknown as DraftModule[];
+  const modules = contentPreview.isPreviewMode
+    ? validatedModules
+    : validatedModules.filter((item) => item.is_published);
 
   if (!project) {
     return {

@@ -46,7 +46,8 @@ test("aucune action éditoriale ne supprime les réponses", () => {
 test("les questions admin conservent leur identité lors d'un déplacement ou ajout", () => {
   assert.match(training, /requestedExerciseId = Number\(question\.clientId\)/);
   assert.match(training, /existingExercises\.find\(\(item\) => item\.id === requestedExerciseId\)/);
-  assert.match(training, /clientId: String\(exercise\.id\)/);
+  assert.match(training, /editorKey: existingExercise\?\.editorKey \?\? question\.clientId/);
+  assert.doesNotMatch(training, /existingExercises\.find\(\(item\) => item\.position === globalExercisePosition\)/);
 });
 
 test("une sauvegarde ancienne ne peut pas écraser une réponse plus récente", () => {
@@ -70,12 +71,8 @@ test("les réponses survivent au remplacement des identifiants lors d'un déploi
 });
 
 test("un ancien onglet admin ne recrée pas un module après un déploiement", () => {
-  assert.match(
-    training,
-    /modules\.find\(\(module\) => module\.id === input\.moduleId\) \?\?[\s\S]*modules\.find\(\(module\) => module\.position === input\.position\)/,
-  );
-  assert.match(training, /const seenTitles = new Set<string>\(\)/);
-  assert.match(training, /!draftPositions\.has\(moduleItem\.position\)/);
+  assert.match(training, /input\.moduleId && !existingModule/);
+  assert.match(training, /expectedModuleUpdatedAt !== \(existingModule\.editorRevision/);
 });
 
 test("une autosauvegarde admin incomplète ne supprime pas de questions", () => {
