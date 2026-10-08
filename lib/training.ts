@@ -8,6 +8,7 @@ import {
 } from "@/lib/access-codes";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
 import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+import { getExercisePublicationContent } from "@/lib/exercise-publication";
 import { getCompletedModuleIdsFromCookie } from "@/lib/module-completion-fallback";
 import type {
   AdminAccountSummary,
@@ -1763,8 +1764,7 @@ function moduleDraftToDefinitionInput(module: DraftModule) {
           answerPlaceholder: exercise.answer_placeholder,
           audioUrl: exercise.audio_url ?? "",
           audioTranscript: exercise.audio_transcript ?? "",
-          question: exercise.question,
-          options: exercise.options,
+          ...getExercisePublicationContent(exercise),
           feedbackConfig: exercise.feedback_config ?? parseStoredSmartFeedbackConfig(exercise.options),
         })),
       })),

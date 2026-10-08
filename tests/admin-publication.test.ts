@@ -41,6 +41,25 @@ import { persistAdminVoiceNoteUrl, publishFinalVersionForAllUsers, saveAdminModu
 describe("publication vers la source lue par les utilisateurs", () => {
   beforeEach(() => { vi.clearAllMocks(); mocks.controlled = false; });
 
+  it("refuse une question invalide sans retirer silencieusement des exercices", async () => {
+    const form = new FormData();
+    form.set("moduleId", "1");
+    form.set("title", "Mon entreprise");
+    form.set("position", "1");
+    form.set("submodulesJson", JSON.stringify([{
+      title: "Valeurs", contentHtml: "<p>Valeurs</p>",
+      exerciseGroups: [{ groupId: "values", questions: [
+        { type: "open", question: "Question valide", options: [] },
+        { type: "multiple", question: "Question sans choix", options: [] },
+      ] }],
+    }]));
+    const result = await saveAdminModuleDraft(form);
+    expect(result.status).toBe("error");
+    expect(result.message).toContain("au moins deux choix");
+    expect(mocks.saveDraft).not.toHaveBeenCalled();
+    expect(mocks.publishLegacy).not.toHaveBeenCalled();
+  });
+
   it("publie les tables historiques même si la prévisualisation admin utilise les releases", async () => {
     await expect(publishFinalVersionForAllUsers()).rejects.toThrow("status=published");
     expect(mocks.publishLegacy).toHaveBeenCalledWith(42);

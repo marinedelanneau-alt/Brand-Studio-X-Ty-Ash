@@ -191,17 +191,17 @@ function parseQuestion(rawQuestion: unknown) {
       type !== "color_palette"
       && type !== "typography"
     ) {
-      return null;
+      throw new Error("Un type de question n’est pas reconnu. Aucune modification n’a été enregistrée.");
     }
 
     const normalizedOptions = options;
     if (!question) {
-      return null;
+      throw new Error("Une question est vide. Complète-la avant d’enregistrer le module.");
     }
 
     if (type === "fill_blank") {
       if (getFillBlankCount(question) === 0) {
-        return null;
+        throw new Error("Une question à trous doit contenir au moins un emplacement ___ à compléter.");
       }
     }
 
@@ -222,7 +222,7 @@ function parseQuestion(rawQuestion: unknown) {
           type !== "color_palette"
           && type !== "typography"
       ) {
-        return null;
+        throw new Error(`La question « ${question.slice(0, 80)} » doit proposer au moins deux choix. Aucune question n’a été supprimée.`);
       }
     }
 
