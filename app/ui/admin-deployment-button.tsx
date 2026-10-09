@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { isMissingServerAction } from "@/lib/server-action-error";
+import { flushAdminDraftSaves } from "@/lib/admin-draft-save-coordinator";
 import {
   publishAdminDraftToAllUsers,
   type AdminDeploymentState,
@@ -11,6 +12,7 @@ const initialState: AdminDeploymentState = { status: "idle", message: "" };
 
 async function publishWithRecovery(previousState: AdminDeploymentState): Promise<AdminDeploymentState> {
   try {
+    await flushAdminDraftSaves();
     return await publishAdminDraftToAllUsers(previousState);
   } catch (error) {
     const message = error instanceof Error ? error.message : "La publication a échoué.";

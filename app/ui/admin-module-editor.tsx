@@ -1,4 +1,5 @@
 "use client";
+import { registerAdminDraftSaver } from "@/lib/admin-draft-save-coordinator";
 
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
@@ -1478,6 +1479,7 @@ function ModuleForm({
   const isSavingModuleRef = useRef(false);
   const pendingSaveModeRef = useRef<"auto" | "manual" | null>(null);
   const currentSavePromiseRef = useRef<Promise<void> | null>(null);
+  const lastSaveErrorRef = useRef<string | null>(null);
   const [activeSubmoduleId, setActiveSubmoduleId] = useState(module.submodules[0]?.id ?? "");
   const [moduleSaveMessage, setModuleSaveMessage] = useState("");
   const [isSavingModule, setIsSavingModule] = useState(false);
@@ -1584,6 +1586,7 @@ function ModuleForm({
 
     const saveTask = (async () => {
       isSavingModuleRef.current = true;
+      lastSaveErrorRef.current = null;
       setIsSavingModule(true);
 
       try {
@@ -1612,6 +1615,7 @@ function ModuleForm({
           setModuleSaveMessage(result.message);
 
           if (result.status !== "success") {
+            lastSaveErrorRef.current = result.message;
             return;
           }
 
@@ -1621,6 +1625,7 @@ function ModuleForm({
         }
       } catch (error) {
         const message = error instanceof Error ? error.message : "Impossible d'enregistrer le module.";
+        lastSaveErrorRef.current = message;
         setModuleSaveMessage(
           isMissingServerAction(message)
             ? "Le site vient d’être mis à jour. Copie tes modifications non enregistrées, puis recharge la page avant de sauvegarder."
@@ -1643,6 +1648,16 @@ function ModuleForm({
       }
     }
   }
+
+  useEffect(() => {
+    if (!module.id) return;
+    return registerAdminDraftSaver(String(module.id), async () => {
+      await saveLatestModule("auto");
+      if (lastSaveErrorRef.current) throw new Error(lastSaveErrorRef.current);
+    });
+    // The registered saver reads the latest form and revision from refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [module.id]);
 
   useEffect(() => {
     const form = formRef.current;

@@ -94,6 +94,47 @@ describe("brouillon privé et publication officielle sans mutation utilisateur",
       project_module_states: [{ id: 1, project_id: 10, module_id: 1, is_completed: true }], brand_exports: null, user_answers: [] };
   });
 
+  it("autosave creates the first controlled draft despite unchanged historical choices, then publishes that exact draft", async () => {
+    const moduleItem = store.snapshots.v1.modules[0] as { exercises: Array<{ type: string }>; submodules: Array<{ exercises: Array<{ type: string }> }> };
+    moduleItem.exercises[1].type = "multiple";
+    moduleItem.submodules[0].exercises[1].type = "multiple";
+    const answersBefore = structuredClone(store.rows);
+    expect(store.state.current_draft_release_id).toBeNull();
+    const form = await formForPublished();
+    form.set("saveMode", "auto");
+    const saved = await saveAdminModuleDraft(form);
+    expect(saved.status, saved.message).toBe("success");
+    const draftId = store.state.current_draft_release_id!;
+    expect(draftId).toBeTruthy();
+    expect((await getAdminWorkingModules(42))[0].exercises[0].question).toBe("Question 3 B");
+    expect((await getWorkspaceData(7)).modules[0].exercises[0].question).toBe("Question 3 A");
+    const savedSnapshot = structuredClone(store.snapshots[draftId]);
+    expect((await publishAdminDraftToAllUsers({ status: "idle", message: "" })).status).toBe("success");
+    expect(store.state.published_release_id).toBe(draftId);
+    expect(store.snapshots[draftId]).toEqual(savedSnapshot);
+    expect((await getWorkspaceData(7)).modules[0].exercises[0].question).toBe("Question 3 B");
+    expect(store.rows).toEqual(answersBefore);
+  });
+
+  it.each(["new", "cleared"])("still rejects %s choices with fewer than two options", async (mode) => {
+    if (mode === "cleared") {
+      const moduleItem = store.snapshots.v1.modules[0] as { exercises: Array<{ type: string; options: string[] }>; submodules: Array<{ exercises: Array<{ type: string; options: string[] }> }> };
+      moduleItem.exercises[1].type = "multiple";
+      moduleItem.exercises[1].options = ["Oui", "Non"];
+      moduleItem.submodules[0].exercises[1].type = "multiple";
+      moduleItem.submodules[0].exercises[1].options = ["Oui", "Non"];
+    }
+    const form = await formForPublished();
+    if (mode === "new") {
+      const subs = JSON.parse(String(form.get("submodulesJson")));
+      subs[0].exerciseGroups[0].questions.push({ clientId: "new", type: "multiple", question: "Nouvelle", options: [] });
+      form.set("submodulesJson", JSON.stringify(subs));
+    }
+    expect((await saveAdminModuleDraft(form)).status).toBe("error");
+    expect(store.state.current_draft_release_id).toBeNull();
+    expect(store.writes).toEqual([]);
+  });
+
   it("empty official snapshot: edit/save stays private, button publishes exactly the saved module/submodule/question", async () => {
     const published = structuredClone(store.snapshots.v1.modules);
     store.rows.bootstrapPublished = published;

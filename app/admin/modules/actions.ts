@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
 import {
   getFillBlankCount,
+  resolveStoredExerciseOptions,
   getPersistedExerciseQuestion,
   getStoredAnswerPlaceholderFromQuestion,
   type ExerciseType,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/smart-feedback";
 import {
   createAdminVoiceNoteUploadTarget,
+  getAdminWorkingModules,
   deleteAdminModuleDefinitionDraft,
   saveAdminModuleDefinitionDraft,
   saveAdminVoiceNoteToDraft,
@@ -81,7 +83,9 @@ export async function publishFinalVersionForAllUsers() {
   redirect("/admin/modules?status=published");
 }
 
-function parseQuestion(rawQuestion: unknown) {
+type ExistingExercises = Map<string, { type: ExerciseType; options: string[] }>;
+
+function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercises = new Map()) {
   const item = rawQuestion as Partial<EditorExercise>;
     const clientId =
       typeof item.clientId === "string" && item.clientId.trim()
@@ -141,7 +145,10 @@ function parseQuestion(rawQuestion: unknown) {
       }
     }
 
-    if (type !== "open" && normalizedOptions.length < 2) {
+    const existingExercise = existingExercises.get(clientId);
+    const existingChoices = existingExercise ? resolveStoredExerciseOptions(existingExercise.type, existingExercise.options).map(value => value.trim()) : [];
+    const preservesExistingSparseChoices = existingExercise?.type === type && existingChoices.length < 2 && JSON.stringify(existingChoices) === JSON.stringify(normalizedOptions);
+    if (type !== "open" && normalizedOptions.length < 2 && !preservesExistingSparseChoices) {
       if (
         type !== "static_text" &&
         type !== "popup_message" &&
@@ -175,7 +182,7 @@ function parseQuestion(rawQuestion: unknown) {
     } satisfies EditorExercise;
 }
 
-function parseExerciseGroups(rawValue: unknown) {
+function parseExerciseGroups(rawValue: unknown, existingExercises: ExistingExercises) {
   if (!Array.isArray(rawValue)) {
     throw new Error("Invalid exercise groups payload");
   }
@@ -188,7 +195,7 @@ function parseExerciseGroups(rawValue: unknown) {
         : crypto.randomUUID();
     const questions = Array.isArray(item.questions)
       ? item.questions
-          .map((question) => parseQuestion(question))
+          .map((question) => parseQuestion(question, existingExercises))
           .filter((question): question is EditorExercise => question !== null)
       : [];
 
@@ -203,7 +210,7 @@ function parseExerciseGroups(rawValue: unknown) {
   });
 }
 
-function parseSubmodules(rawValue: FormDataEntryValue | null) {
+function parseSubmodules(rawValue: FormDataEntryValue | null, existingExercises: ExistingExercises = new Map()) {
   if (typeof rawValue !== "string" || !rawValue.trim()) {
     return [] as EditorSubmodule[];
   }
@@ -229,7 +236,7 @@ function parseSubmodules(rawValue: FormDataEntryValue | null) {
       typeof item.audioTranscript === "string" ? item.audioTranscript.trim() : "";
     const contentHtml =
       typeof item.contentHtml === "string" ? item.contentHtml.trim() : "";
-    const exerciseGroups = parseExerciseGroups(item.exerciseGroups);
+    const exerciseGroups = parseExerciseGroups(item.exerciseGroups, existingExercises);
 
     if (!title || !contentHtml) {
       throw new Error("Invalid submodule");
@@ -267,7 +274,13 @@ export async function saveAdminModule(formData: FormData) {
     let submodules: EditorSubmodule[] = [];
 
     try {
-      submodules = parseSubmodules(formData.get("submodulesJson"));
+      const currentModule = Number.isFinite(moduleId) && moduleId !== 0 ? (await getAdminWorkingModules(account.id)).find(item => item.id === moduleId) : undefined;
+      const existingExercises: ExistingExercises = new Map();
+      for (const exercise of currentModule?.exercises ?? []) {
+        existingExercises.set(String(exercise.id), exercise);
+        if (exercise.editorKey) existingExercises.set(exercise.editorKey, exercise);
+      }
+      submodules = parseSubmodules(formData.get("submodulesJson"), existingExercises);
     } catch {
       redirect("/admin/modules?status=error");
     }
@@ -315,7 +328,13 @@ export async function saveAdminModuleDraft(formData: FormData) {
     let submodules: EditorSubmodule[] = [];
 
     try {
-      submodules = parseSubmodules(formData.get("submodulesJson"));
+      const currentModule = Number.isFinite(moduleId) && moduleId !== 0 ? (await getAdminWorkingModules(account.id)).find(item => item.id === moduleId) : undefined;
+      const existingExercises: ExistingExercises = new Map();
+      for (const exercise of currentModule?.exercises ?? []) {
+        existingExercises.set(String(exercise.id), exercise);
+        if (exercise.editorKey) existingExercises.set(exercise.editorKey, exercise);
+      }
+      submodules = parseSubmodules(formData.get("submodulesJson"), existingExercises);
     } catch (error) {
       return {
         status: "error",
