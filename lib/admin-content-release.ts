@@ -12,6 +12,7 @@ import {
 } from "./content-releases";
 import { normalizeReleaseSnapshotModules } from "./content-release-diff";
 import { assertReleaseAnswerCompatibility, validateReleaseModules } from "./release-content-validation";
+import { getBootstrapAdminSnapshot, getBootstrapPublishedModules } from "./legacy-release-bootstrap";
 
 export async function getAdminReleaseWorkspace() {
   const state = await getApplicationReleaseState();
@@ -26,6 +27,10 @@ export async function getAdminReleaseWorkspace() {
   }
   const snapshot = await getContentReleaseSnapshot(releaseId);
   if (!snapshot || snapshot.schema_version !== 1) throw new Error("Snapshot de release introuvable ou incompatible.");
+  if (!state.current_draft_release_id && Array.isArray(snapshot.modules) && snapshot.modules.length === 0) {
+    const bootstrap = await getBootstrapAdminSnapshot();
+    return { state, release, snapshot: { ...snapshot, modules: bootstrap.modules, updated_at: bootstrap.revision }, modules: bootstrap.modules };
+  }
   const modules = validateReleaseModules(snapshot.modules);
   return { state, release, snapshot, modules };
 }
@@ -38,7 +43,9 @@ export async function saveAdminReleaseModules(modules: unknown[], expectedUpdate
   const publishedSnapshot = await getContentReleaseSnapshot(workspace.state.published_release_id);
   if (!publishedSnapshot) throw new Error("Snapshot publié introuvable.");
   const normalized = normalizeReleaseSnapshotModules(modules);
-  assertReleaseAnswerCompatibility(publishedSnapshot.modules, normalized);
+  const publishedModules = Array.isArray(publishedSnapshot.modules) && publishedSnapshot.modules.length === 0
+    ? await getBootstrapPublishedModules() : publishedSnapshot.modules;
+  assertReleaseAnswerCompatibility(publishedModules, normalized);
   let releaseId = workspace.release.id;
   let snapshotUpdatedAt = workspace.snapshot.updated_at;
   if (workspace.release.status !== "draft") {
@@ -78,11 +85,20 @@ export async function verifyCurrentDraft(releaseId?: string): Promise<{
   }
   const publishedSnapshot = await getContentReleaseSnapshot(workspace.state.published_release_id);
   if (!publishedSnapshot) throw new Error("Snapshot publié introuvable.");
-  assertReleaseAnswerCompatibility(publishedSnapshot.modules, workspace.snapshot.modules);
+  const publishedModules = Array.isArray(publishedSnapshot.modules) && publishedSnapshot.modules.length === 0
+    ? await getBootstrapPublishedModules() : publishedSnapshot.modules;
+  assertReleaseAnswerCompatibility(publishedModules, workspace.snapshot.modules);
   return { releaseId: workspace.release.id, snapshot: workspace.snapshot, status: workspace.release.status };
 }
 
 export async function publishCurrentAdminRelease(notes: string, requestedReleaseId?: string) {
+  const workspace = await getAdminReleaseWorkspace();
+  if (!workspace.state.current_draft_release_id && !requestedReleaseId) {
+    const official = await getContentReleaseSnapshot(workspace.state.published_release_id);
+    if (Array.isArray(official?.modules) && official.modules.length === 0) {
+      await saveAdminReleaseModules(workspace.snapshot.modules, workspace.snapshot.updated_at);
+    }
+  }
   const draft = await verifyCurrentDraft(requestedReleaseId);
   if (draft.status === "draft") await markContentReleaseReady({ releaseId: draft.releaseId, notes });
   await publishContentRelease({ releaseId: draft.releaseId, notes });

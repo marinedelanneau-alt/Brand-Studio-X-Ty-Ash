@@ -4,15 +4,15 @@ import { createStripeReturnUrl } from "../lib/stripe-return-url";
 describe("Stripe return URLs", () => {
   it("uses the public request origin for checkout redirects", () => {
     const requestUrl =
-      "https://brand-studio-new.vercel.app/api/stripe/create-checkout-session";
+      "https://brand-studio-x-ty-ash.vercel.app/api/stripe/create-checkout-session";
 
     expect(createStripeReturnUrl(requestUrl, "/?payment=success")).toBe(
-      "https://brand-studio-new.vercel.app/?payment=success",
+      "https://brand-studio-x-ty-ash.vercel.app/?payment=success",
     );
     expect(
       createStripeReturnUrl(requestUrl, "/pricing?payment=cancelled"),
     ).toBe(
-      "https://brand-studio-new.vercel.app/pricing?payment=cancelled",
+      "https://brand-studio-x-ty-ash.vercel.app/pricing?payment=cancelled",
     );
   });
 

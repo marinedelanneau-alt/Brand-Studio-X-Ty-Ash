@@ -7,6 +7,10 @@ const store = vi.hoisted(() => ({
   rows: {} as Record<string, unknown>, reads: [] as string[], writes: [] as string[], audit: [] as string[],
   revision: 0, publishError: "",
 }));
+vi.mock("@/lib/legacy-release-bootstrap", () => ({
+  getBootstrapPublishedModules: async () => structuredClone(store.rows.bootstrapPublished),
+  getBootstrapAdminSnapshot: async () => ({ modules: structuredClone(store.rows.bootstrapAdmin), revision: "bootstrap-test" }),
+}));
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => { throw new Error(`redirect:${url}`); }, unstable_rethrow: vi.fn() }));
@@ -59,7 +63,7 @@ vi.mock("@/lib/content-releases", () => ({
   },
 }));
 
-import { saveAdminModuleDraft, publishFinalVersionForAllUsers } from "../app/admin/modules/actions";
+import { saveAdminModuleDraft, publishFinalVersionForAllUsers, publishAdminDraftToAllUsers } from "../app/admin/modules/actions";
 import { getAdminWorkingModules, getWorkspaceData, publishAdminModuleDraft } from "../lib/training";
 import { saveAdminReleaseModules } from "../lib/admin-content-release";
 
@@ -88,6 +92,44 @@ describe("brouillon privé et publication officielle sans mutation utilisateur",
     store.rows = { brand_projects: { id: 10, account_id: 7, name: "Projet existant" }, client_access_codes: { id: 7, role: "user" },
       project_exercise_answers: [{ id: 1, project_id: 10, module_id: 1, exercise_id: 3, answer_text: "Réponse A", selected_options: [], updated_at: "2026-09-23T12:00:00Z" }],
       project_module_states: [{ id: 1, project_id: 10, module_id: 1, is_completed: true }], brand_exports: null, user_answers: [] };
+  });
+
+  it("empty official snapshot: edit/save stays private, button publishes exactly the saved module/submodule/question", async () => {
+    const published = structuredClone(store.snapshots.v1.modules);
+    store.rows.bootstrapPublished = published;
+    store.rows.bootstrapAdmin = structuredClone(published);
+    store.snapshots.v1.modules = [];
+    const answersBefore = structuredClone(store.rows.project_exercise_answers);
+    const before = await getWorkspaceData(7);
+    expect(before.modules[0].title).toBe("Module A");
+    expect((await saveAdminModuleDraft(await formForPublished("B"))).status).toBe("success");
+    expect(store.snapshots.v1.modules).toEqual([]);
+    const privateDraft = structuredClone(store.snapshots[store.state.current_draft_release_id!].modules);
+    expect((await getAdminWorkingModules(42))[0].title).toBe("Module B");
+    expect((await getWorkspaceData(7)).modules[0].title).toBe("Module A");
+    const result = await publishAdminDraftToAllUsers({ status: "idle", message: "" });
+    expect(result.status).toBe("success");
+    expect(store.snapshots[store.state.published_release_id].modules).toEqual(privateDraft);
+    for (const accountId of [7, 8]) {
+      const after = await getWorkspaceData(accountId);
+      expect(after.modules[0].title).toBe("Module B");
+      expect(after.modules[0].submodules[0].title).toBe("Sous-module B");
+      expect(after.modules[0].exercises[0].question).toBe("Question 3 B");
+    }
+    expect(store.rows.project_exercise_answers).toEqual(answersBefore);
+    expect(store.reads).not.toContain("brand_modules");
+  });
+
+  it("first deployment publishes the already saved admin content without editing the empty official snapshot", async () => {
+    store.rows.bootstrapPublished = structuredClone(store.snapshots.v1.modules);
+    const saved = structuredClone(store.snapshots.v1.modules) as Array<{ title: string }>;
+    saved[0].title = "Already saved";
+    store.rows.bootstrapAdmin = saved;
+    store.snapshots.v1.modules = [];
+    expect((await publishAdminDraftToAllUsers({ status: "idle", message: "" })).status).toBe("success");
+    expect(store.snapshots.v1.modules).toEqual([]);
+    expect((await getWorkspaceData(7)).modules[0].title).toBe("Already saved");
+    expect(store.audit).toEqual(["release_published"]);
   });
 
   it("A → brouillon B → utilisateur A → publication B, avec réponses et progression intactes", async () => {

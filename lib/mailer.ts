@@ -1,6 +1,7 @@
 import "server-only";
 
 import { BrevoClient } from "@getbrevo/brevo";
+import { getPublicSiteUrlWithFallback } from "./public-site-url";
 
 type SendAccessCodeEmailInput = {
   email: string;
@@ -126,22 +127,7 @@ export async function sendAccessCodeEmail(input: SendAccessCodeEmailInput) {
 }
 
 function getPublicFormationUrl() {
-  const configured =
-    process.env.NEXT_PUBLIC_FORMATION_URL ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://brand-studio-new.vercel.app";
-  const unquoted = configured.trim().replace(/^(['"])(.*)\1$/, "$2");
-
-  try {
-    const url = new URL(unquoted);
-    if (url.protocol === "http:" || url.protocol === "https:") {
-      return url;
-    }
-  } catch {
-    // Use the known production URL when an environment value is malformed.
-  }
-
-  return new URL("https://brand-studio-new.vercel.app");
+  return getPublicSiteUrlWithFallback();
 }
 
 export async function sendAccountActivationEmail(

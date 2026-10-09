@@ -52,8 +52,8 @@ report.production = {
   url: baseline.productionUrl,
   status: response.status,
   reachable: response.ok,
-  expectedDeploymentId: baseline.vercelDeploymentId,
-  expectedGitCommit: baseline.gitCommit,
+  ...(baseline.vercelDeploymentId ? { expectedDeploymentId: baseline.vercelDeploymentId } : {}),
+  ...(baseline.gitCommit ? { expectedGitCommit: baseline.gitCommit } : {}),
 };
 failed ||= !response.ok;
 

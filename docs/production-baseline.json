@@ -1,25 +1,23 @@
 {
-  "capturedAt": "2026-07-28T11:34:39.574Z",
-  "productionUrl": "https://brand-studio-new.vercel.app",
-  "vercelDeploymentId": "dpl_2uwmetkwnkHeDah65xhT5gH1pSLx",
-  "gitCommit": "7685ce7",
-  "supabaseRef": "ndyasiohrwdyvrbxfdhn",
+  "capturedAt": "2026-10-09T08:11:01.162Z",
+  "productionUrl": "https://brand-studio-x-ty-ash.vercel.app",
+  "supabaseRef": "cplzwnlstcpqqzqeawgs",
   "contentTables": {
     "brand_modules": {
-      "rows": 4,
-      "sha256": "9570cbbc2645e3277bdeafe023e3e14fae41231f4f750f019261e78a83ca3282"
+      "rows": 3,
+      "sha256": "476b33067a772487ec5fd8553ed5659fc7564ba0ae7142e3724a6888e48171ea"
     },
     "brand_submodules": {
-      "rows": 14,
-      "sha256": "147fa34744ba769fdee43a349525b8627038b431838d86c3aabc429486cc5689"
+      "rows": 15,
+      "sha256": "c3e914af0673b980c4c6718e6d52c413cedd0a345703a5bb0c48e502b78db690"
     },
     "module_exercises": {
-      "rows": 60,
-      "sha256": "00041fd7fab97be412ac7f6d1fb1157c318e543d1427afcb52059878d327871f"
+      "rows": 51,
+      "sha256": "639b24480bcd9df297f1f80f5ef64d06aaf7d79c872fe7d0689beed08b902f7d"
     }
   },
   "answerInventoryAtCapture": {
-    "project_exercise_answers": 11,
-    "user_answers": 106
+    "project_exercise_answers": 0,
+    "user_answers": 0
   }
 }

@@ -1,109 +1,65 @@
-# Releases contrôlées Brand Studio
+# Releases contrôlées — Brand Studio X Ty Ash
 
-## Principe de sécurité
+## Environnement Ty Ash
 
-La production continue à lire les tables historiques tant que
-`CONTENT_RELEASE_READ_MODE` n'est pas explicitement défini à `controlled`.
-La migration `20260728140000_controlled_content_releases.sql` est additive :
-elle ne supprime, ne renomme et ne met à jour aucune ligne de contenu ou de
-réponse historique.
+- Site de production : https://brand-studio-x-ty-ash.vercel.app.
+- Projet Supabase : cplzwnlstcpqqzqeawgs.
+- NEXT_PUBLIC_SITE_URL doit désigner le site Ty Ash.
+- Les clés Supabase doivent appartenir à ce même projet et rester hors de Git.
+- Aucun identifiant de déploiement Vercel n'est présumé : la baseline n'en contient pas tant qu'un identifiant Ty Ash réel n'a pas été vérifié.
 
-La migration n'est volontairement pas appliquée à la base de production dans
-cette branche. Elle doit d'abord être validée sur un projet Supabase Preview
-isolé, initialisé depuis une sauvegarde anonymisée ou contrôlée.
+## Baseline en lecture seule
 
-## Environnements
+Exécuter, avec des variables Ty Ash valides :
 
-### Production
-
-- branche autorisée : `main` uniquement ;
-- URL : `https://brand-studio-new.vercel.app` ;
-- `NEXT_PUBLIC_APP_ENV=production` ;
-- `NEXT_PUBLIC_ENABLE_ADMIN_DRAFT_PREVIEW=false` ;
-- `CONTENT_RELEASE_READ_MODE=legacy` jusqu'au basculement volontaire ;
-- aucune commande `vercel --prod` depuis une branche feature.
-
-### Preview Admin
-
-- branche : `feature/*` puis `develop` ;
-- projet Supabase gratuit distinct : `Brand Studio Preview`
-  (`lsqulmivxidmgqzxpdsx`, région `eu-west-3`) ;
-- `NEXT_PUBLIC_APP_ENV=preview` ;
-- `NEXT_PUBLIC_ENABLE_ADMIN_DRAFT_PREVIEW=true` ;
-- `CONTENT_RELEASE_READ_MODE=legacy` ;
-- variables Supabase et clés Stripe/Brevo de test uniquement ;
-- Vercel Deployment Protection activée ;
-- application `noindex, nofollow` et refus des comptes non Admin.
-
-Le projet Supabase Preview est nécessaire : tester des migrations, des RPC et
-des brouillons dans la base des bêta-testeurs contredirait l'exigence de
-non-impact. Il ne doit contenir aucune donnée sensible non nécessaire.
-
-La Preview utilise un projet Free autonome et non une branche Supabase
-facturée. Elle contient uniquement le contenu éditorial publié (4 modules,
-14 sous-modules et 60 exercices), un compte Admin de test et aucune réponse de
-bêta-testeur. Le projet gratuit peut être mis en pause après une période
-d'inactivité ; cela n'a aucun effet sur la production.
-
-## Procédure progressive
-
-1. Exécuter `node --env-file=.env.local scripts/verify-production-baseline.mjs`.
-2. Créer une sauvegarde Supabase vérifiée.
-3. Restaurer la sauvegarde dans le projet Supabase Preview.
-4. Appliquer la migration uniquement au projet Preview.
-5. Exécuter `supabase/verification/controlled_release_migration_report.sql`.
-6. Vérifier que les trois empreintes de contenu historique correspondent à
-   `docs/production-baseline.json`.
-7. Configurer les variables Preview dans Vercel et activer Deployment Protection.
-8. Déployer la branche sans `--prod`.
-9. Tester les scénarios Admin, non-Admin, réponses de test, PDF et Guide de Marque.
-10. Rejouer le test de baseline contre la production : les empreintes doivent
-    rester identiques.
-11. Après validation seulement, préparer une fenêtre de migration production.
-12. Appliquer la migration additive, conserver `CONTENT_RELEASE_READ_MODE=legacy`
-    et vérifier à nouveau la baseline.
-13. Créer et valider un brouillon sans publication : les bêta-testeurs doivent
-    toujours lire les tables historiques.
-14. Le basculement vers `controlled` nécessite une décision distincte, une PR
-    vers `main`, un plan de retour à `legacy` et une validation explicite.
-
-## Retour arrière
-
-Avant le basculement, le retour arrière consiste uniquement à garder ou remettre
-`CONTENT_RELEASE_READ_MODE=legacy`. Les nouvelles tables peuvent rester en place
-sans influencer l'application publiée. Elles ne doivent pas être supprimées tant
-qu'un historique ou un brouillon les référence.
-
-Après le basculement, remettre `CONTENT_RELEASE_READ_MODE=legacy` restaure
-immédiatement la lecture historique sans supprimer les nouvelles releases.
-
-## Publication de contenu
-
-1. Créer un brouillon depuis la release publiée.
-2. Modifier via l'éditeur Admin : chaque sauvegarde synchronise uniquement le
-   snapshot du brouillon courant.
-3. Prévisualiser avec les réponses Admin existantes ou avec un jeu de test isolé.
-4. Comparer publié et brouillon.
-5. Saisir les notes et marquer la release comme prête.
-6. La production reste inchangée.
-7. Saisir exactement `PUBLIER POUR TOUS` pour appeler la RPC atomique.
-
-La publication archive l'ancienne release et change le pointeur
-`published_release_id` dans une transaction. Elle ne déploie jamais du code.
-
-## Workflow Git et Vercel
-
-```text
-feature/* -> Pull Request vers develop -> Vercel Preview protégé
-          -> validation Admin -> Pull Request contrôlée vers main
-          -> déploiement production volontaire
+```powershell
+node --env-file=.env.production.local scripts/verify-production-baseline.mjs
 ```
 
-Les protections à configurer manuellement :
+Le script refuse un project ref différent de celui de docs/production-baseline.json.
+Il compare les nombres et empreintes des tables principales, inventorie les réponses
+sans les modifier et vérifie que l'URL Ty Ash est accessible. Les éventuels identifiants
+de commit et de déploiement sont informatifs, pas une preuve de la version déployée.
+La baseline capture le contenu intermédiaire Ty Ash (3 modules, 15 sous-modules,
+51 exercices), pas les anciens chiffres du Brand Studio original. Une évolution
+volontaire de contenu nécessitera une nouvelle baseline revue ; ne pas la régénérer
+pour masquer une différence inattendue.
 
-- GitHub : protection de `main`, PR obligatoire, checks obligatoires, interdiction
-  des pushes directs ;
-- Vercel : Production Branch = `main`, Deployment Protection sur Preview,
-  variables séparées par environnement ;
-- supprimer l'autorisation opérationnelle d'utiliser `vercel --prod` depuis une
-  branche non `main`.
+## Avant activation de la publication contrôlée
+
+Le code corrigé requiert CONTENT_RELEASE_READ_MODE=controlled et un snapshot officiel
+valide, non vide. Il n'offre aucun retour automatique vers les tables historiques.
+Ne pas activer ni déployer ce code tant que l'initialisation du contenu officiel
+n'a pas été préparée et validée séparément. La V1 vide ne constitue pas une base valide.
+
+Les brouillons brand_exports, copies Storage, anciennes versions et URL audio restent
+conservés. Aucun import, remplacement de média ou amorçage de release n'est automatique.
+Les notes vocales héritées peuvent encore dépendre du Storage original ; ce nettoyage
+technique ne les copie pas et ne change pas leurs URL.
+
+Les variables à vérifier lors d'une activation expressément autorisée sont :
+
+```dotenv
+NEXT_PUBLIC_SITE_URL=https://brand-studio-x-ty-ash.vercel.app
+NEXT_PUBLIC_SUPABASE_URL=https://cplzwnlstcpqqzqeawgs.supabase.co
+CONTENT_RELEASE_READ_MODE=controlled
+NEXT_PUBLIC_APP_ENV=production
+NEXT_PUBLIC_ENABLE_ADMIN_DRAFT_PREVIEW=false
+ENABLE_CONTROLLED_ADMIN_PUBLISHING=true
+```
+
+Voir docs/tyash-controlled-publication.md pour le fonctionnement du circuit.
+Vérifier l'état des migrations avant toute action ; ne pas réappliquer une migration
+historique ni réécrire son SQL pour remplacer une référence de projet.
+
+## Recette et déploiement
+
+Utiliser une base de recette isolée explicitement choisie pour Ty Ash, avec des données
+de test. Aucun ancien projet Preview Brand Studio n'est imposé par cette procédure.
+Tester sauvegarde privée, publication explicite, conservation des identifiants,
+réponses et progressions avant toute activation. Tout commit, push, déploiement,
+publication ou changement de variable distante exige l'autorisation correspondante.
+
+Le retour à CONTENT_RELEASE_READ_MODE=legacy n'est pas compatible avec le code corrigé.
+Un éventuel retour arrière doit être préparé et validé séparément ; ne supprimer aucune
+release, réponse ou table pour revenir à une version antérieure.

@@ -5,7 +5,7 @@
 --   'brand-studio-publish-scheduled',
 --   '* * * * *',
 --   $$ select net.http_get(
---     url := 'https://brand-studio-new.vercel.app/api/cron/publish-scheduled',
+--     url := 'https://brand-studio-x-ty-ash.vercel.app/api/cron/publish-scheduled',
 --     headers := jsonb_build_object(
 --       'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'brand_studio_cron_secret')
 --     )

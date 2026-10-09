@@ -12,6 +12,7 @@ import {
 import { sendPasswordResetEmail } from "@/lib/mailer";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { headers } from "next/headers";
+import { getConfiguredPublicSiteUrl, getPublicSiteUrlWithFallback } from "@/lib/public-site-url";
 
 type LoginState = {
   status: "idle" | "error" | "success";
@@ -19,6 +20,8 @@ type LoginState = {
 };
 
 async function getPublicSiteUrl() {
+  const configured = getConfiguredPublicSiteUrl();
+  if (configured) return configured.toString().replace(/\/$/, "");
   const headerStore = await headers();
   const forwardedHost = headerStore.get("x-forwarded-host");
   const host = forwardedHost ?? headerStore.get("host");
@@ -29,11 +32,7 @@ async function getPublicSiteUrl() {
     return `${proto}://${host}`.replace(/\/$/, "");
   }
 
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    process.env.NEXT_PUBLIC_FORMATION_URL?.replace(/\/$/, "") ||
-    "https://brand-studio-new.vercel.app"
-  );
+  return getPublicSiteUrlWithFallback().toString().replace(/\/$/, "");
 }
 
 export async function loginWithPassword(

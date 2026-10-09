@@ -1418,7 +1418,9 @@ export async function getWorkspaceData(accountId: number) {
   if (!snapshot || snapshot.schema_version !== 1) {
     throw new Error("Snapshot publié introuvable ou incompatible. Aucun contenu historique n'est affiché.");
   }
-  const validatedModules = validateReleaseModules(snapshot.modules) as unknown as DraftModule[];
+  const validatedModules = (Array.isArray(snapshot.modules) && snapshot.modules.length === 0 && !contentPreview.isPreviewMode
+    ? await (await import("./legacy-release-bootstrap")).getBootstrapPublishedModules()
+    : validateReleaseModules(snapshot.modules)) as unknown as DraftModule[];
   const modules = contentPreview.isPreviewMode
     ? validatedModules
     : validatedModules.filter((item) => item.is_published);
