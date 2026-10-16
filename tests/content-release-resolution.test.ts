@@ -3,11 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const db = vi.hoisted(() => ({
   published: { id: "v1", status: "published" } as { id: string; status: string } | null,
   draft: { id: "v2", status: "draft" }, error: null as { message: string } | null,
-  reads: [] as string[],
+  reads: [] as string[], rpcCalls: [] as Array<{ name: string; parameters: unknown }>,
 }));
 vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 vi.mock("@/lib/supabase/server", () => ({
+  createSupabaseAuthServerClient: async () => ({ rpc: async (name: string, parameters: unknown) => {
+    db.rpcCalls.push({ name, parameters }); return { data: "new-authenticated-draft", error: null };
+  } }),
   createSupabaseServerClient: () => ({ from: (table: string) => {
     db.reads.push(table); let requestedId: unknown;
     const query = {
@@ -18,7 +21,7 @@ vi.mock("@/lib/supabase/server", () => ({
     }; return query;
   } }),
 }));
-import { resolveActiveContentRelease } from "../lib/content-releases";
+import { createIndependentPathwayDraft, resolveActiveContentRelease } from "../lib/content-releases";
 
 describe("résolution réelle de la publication officielle", () => {
   beforeEach(() => {
@@ -28,6 +31,14 @@ describe("résolution réelle de la publication officielle", () => {
     db.published = { id: "v1", status: "published" }; db.error = null; db.reads = [];
   });
   afterEach(() => vi.unstubAllEnvs());
+  it("creates the independent draft through the existing authenticated session, without the service client", async () => {
+    db.rpcCalls = [];
+    expect(await createIndependentPathwayDraft({ name: "Draft", modules: [], expectedPublishedReleaseId: "v1" })).toBe("new-authenticated-draft");
+    expect(db.rpcCalls).toEqual([{ name: "create_independent_pathway_draft", parameters: {
+      draft_name: "Draft", snapshot_modules: [], expected_published_release_id: "v1",
+    } }]);
+    expect(db.reads).toEqual([]);
+  });
   it.each(["published", "legacy", ""])("rejette le mode %s sans retour historique", async (mode) => {
     vi.stubEnv("CONTENT_RELEASE_READ_MODE", mode);
     await expect(resolveActiveContentRelease({ account: { role: "user" } })).rejects.toThrow("doit valoir controlled");

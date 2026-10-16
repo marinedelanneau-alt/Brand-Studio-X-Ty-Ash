@@ -24,6 +24,7 @@ import { getAuthenticatedAdmin } from "@/lib/session";
 import { publishCurrentAdminRelease } from "@/lib/admin-content-release";
 
 type EditorExercise = {
+  completion?: import("@/lib/exercise-completion").CompletionRequirements;
   clientId: string;
   type: ExerciseType;
   explanation: string;
@@ -171,6 +172,7 @@ function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercise
 
     return {
       clientId,
+      ...(item.completion !== undefined ? { completion: item.completion as import("@/lib/exercise-completion").CompletionRequirements } : {}),
       type,
       explanation,
       answerPlaceholder,

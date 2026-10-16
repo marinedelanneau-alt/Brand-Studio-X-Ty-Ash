@@ -1,0 +1,618 @@
+{
+  "modules": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+      "type": "object",
+      "required": [
+        "id",
+        "stableKey",
+        "position",
+        "title",
+        "submodules"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": -1
+        },
+        "stableKey": {
+          "type": "string",
+          "pattern": "^tyash_v1_.+"
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "video_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audio_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audio_transcript": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "editorKey": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "editorRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "content_html": {
+          "type": "string"
+        },
+        "is_published": {
+          "type": "boolean"
+        },
+        "submodules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "stableKey",
+              "position",
+              "module_id",
+              "title",
+              "content_html",
+              "exercises"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": -1
+              },
+              "stableKey": {
+                "type": "string",
+                "pattern": "^tyash_v1_.+"
+              },
+              "position": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "video_url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "audio_url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "audio_transcript": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "editorKey": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "editorRevision": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "module_id": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": -1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "content_html": {
+                "type": "string"
+              },
+              "exercises": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "stableKey",
+                    "position",
+                    "module_id",
+                    "submodule_id",
+                    "type",
+                    "question",
+                    "options"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": -1
+                    },
+                    "stableKey": {
+                      "type": "string",
+                      "pattern": "^tyash_v1_.+"
+                    },
+                    "position": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "video_url": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "audio_url": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "audio_transcript": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "editorKey": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "editorRevision": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "created_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "updated_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "module_id": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": -1
+                    },
+                    "submodule_id": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": -1
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "static_text",
+                        "popup_message",
+                        "image_upload",
+                        "open",
+                        "single",
+                        "multiple",
+                        "checklist",
+                        "table",
+                        "boolean",
+                        "color",
+                        "fill_blank",
+                        "prompt_open",
+                        "group_open",
+                        "brand_persona",
+                        "spectrum",
+                        "color_palette",
+                        "typography",
+                        "editorial_calendar",
+                        "moodboard"
+                      ]
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "explanation": {
+                      "type": "string"
+                    },
+                    "answer_placeholder": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "exercise_group_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "completion": {
+                      "type": "object",
+                      "properties": {
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "optionalFields": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "optionalRows": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "optionalCells": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "videoUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "audioUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "audioTranscript": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "answerPlaceholder": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feedback_config": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "required": [
+                        "enabled",
+                        "type",
+                        "minLength",
+                        "maxLength",
+                        "requiredKeywords",
+                        "forbiddenKeywords",
+                        "clarityScoreEnabled",
+                        "rules",
+                        "positiveMessage",
+                        "neutralMessage",
+                        "improvementMessage",
+                        "excellentMessage"
+                      ],
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "clarityScoreEnabled": {
+                          "type": "boolean"
+                        },
+                        "positiveMessage": {
+                          "type": "string"
+                        },
+                        "neutralMessage": {
+                          "type": "string"
+                        },
+                        "improvementMessage": {
+                          "type": "string"
+                        },
+                        "excellentMessage": {
+                          "type": "string"
+                        },
+                        "minLength": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "maxLength": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "requiredKeywords": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "forbiddenKeywords": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "rule_based",
+                            "manual",
+                            "ai_ready"
+                          ]
+                        },
+                        "rules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "condition",
+                              "message",
+                              "level"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "condition": {
+                                "type": "string",
+                                "enum": [
+                                  "length_less_than",
+                                  "length_between",
+                                  "contains_generic_words",
+                                  "contains_required_keywords",
+                                  "passes_all_checks"
+                                ]
+                              },
+                              "message": {
+                                "type": "string"
+                              },
+                              "level": {
+                                "type": "string",
+                                "enum": [
+                                  "improve",
+                                  "warning",
+                                  "good",
+                                  "excellent"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "contentHtml": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "videoUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "audioUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "audioTranscript": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "answerPlaceholder": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contentHtml": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "videoUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audioUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audioTranscript": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "answerPlaceholder": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "contentHtml": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "spectrum": {
+    "type": "object",
+    "required": [
+      "leftLabel",
+      "rightLabel",
+      "defaultValue"
+    ],
+    "properties": {
+      "leftLabel": {
+        "type": "string"
+      },
+      "rightLabel": {
+        "type": "string"
+      },
+      "leftEmoji": {
+        "type": "string"
+      },
+      "rightEmoji": {
+        "type": "string"
+      },
+      "helperText": {
+        "type": "string"
+      },
+      "leftEdgeMessage": {
+        "type": "string"
+      },
+      "rightEdgeMessage": {
+        "type": "string"
+      },
+      "enableJustification": {
+        "type": "boolean"
+      },
+      "requireJustification": {
+        "type": "boolean"
+      },
+      "enableEdgeEffect": {
+        "type": "boolean"
+      },
+      "defaultValue": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "edgeThreshold": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 50
+      },
+      "edgeEffectType": {
+        "type": "string",
+        "enum": [
+          "confetti",
+          "sparkle",
+          "pulse"
+        ]
+      }
+    }
+  },
+  "numericOptions": {
+    "__table_rows__:": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "__table_columns__:": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "__group_open_layout__:": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "__question_columns__:": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "__image_upload_max__:": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    }
+  }
+}

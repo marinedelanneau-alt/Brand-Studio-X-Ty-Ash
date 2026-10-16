@@ -2,6 +2,8 @@ export type AnswerPersistenceScope = {
   userId: number;
   projectId: number;
   moduleId: number;
+  moduleStableKey?: string;
+  exerciseKeys?: Record<number, string>;
 };
 
 export type LocalAnswerRecord = AnswerPersistenceScope & {
@@ -51,9 +53,14 @@ export function getAnswerKey(
   scope: AnswerPersistenceScope,
   exerciseId: number,
 ) {
+  if (scope.moduleStableKey?.startsWith("tyash_v1_")) {
+    const key = scope.exerciseKeys?.[exerciseId];
+    if (!key?.startsWith("tyash_v1_")) throw new Error("Stable exercise identity required.");
+    return `${scope.userId}:${scope.projectId}:${scope.moduleStableKey}:${key}`;
+  }
   return `${scope.userId}:${scope.projectId}:${scope.moduleId}:${exerciseId}`;
 }
 
 export function getModuleScopeKey(scope: AnswerPersistenceScope) {
-  return `${scope.userId}:${scope.projectId}:${scope.moduleId}`;
+  return `${scope.userId}:${scope.projectId}:${scope.moduleStableKey ?? scope.moduleId}`;
 }

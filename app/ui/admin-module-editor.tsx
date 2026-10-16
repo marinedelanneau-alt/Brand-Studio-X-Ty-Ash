@@ -73,6 +73,7 @@ import VoiceNotePlayer from "./voice-note-player";
 import type { BrandSubmodule, ModuleExercise } from "@/lib/training-types";
 
 type EditorQuestion = {
+  completion?: import("@/lib/exercise-completion").CompletionRequirements;
   id: string;
   type: ExerciseType;
   explanation: string;
@@ -295,6 +296,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
 
   return {
     id: exercise.editorKey ?? String(exercise.id ?? fallbackIndex + 1),
+    completion: exercise.completion,
     type: exercise.type,
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
@@ -509,6 +511,7 @@ function serializeQuestion(question: EditorQuestion) {
 
   return {
     clientId: question.id,
+    completion: question.completion,
     type: question.type,
     explanation: question.explanation.trim(),
     answerPlaceholder:
@@ -981,6 +984,26 @@ function QuestionCard({
 
         {isExpanded ? (
         <div className="mt-4 grid max-w-5xl gap-4">
+          <fieldset className="rounded-lg border border-[var(--border)] p-3 space-y-3">
+            <legend>Participation</legend>
+            <label className="flex gap-2"><input type="checkbox" checked={question.completion?.required !== false}
+              onChange={event => onChange(current => ({ ...current, completion: { ...current.completion, required: event.target.checked } }))} />Exercice obligatoire</label>
+            {question.type === "group_open" && question.optionsText.split("\n").filter(line => line.trim()).map((label, index) => (
+              <label key={index} className="flex gap-2"><input type="checkbox" checked={!question.completion?.optionalFields?.includes(index)}
+                onChange={event => onChange(current => ({ ...current, completion: { ...current.completion, optionalFields: event.target.checked ? (current.completion?.optionalFields ?? []).filter(i => i !== index) : [...(current.completion?.optionalFields ?? []), index] } }))} />Champ obligatoire : {label}</label>
+            ))}
+            {question.type === "table" && Array.from({ length: question.tableRows }, (_, row) => (
+              <div key={row} className="flex flex-wrap gap-3">
+                <label className="flex gap-2"><input type="checkbox" checked={!question.completion?.optionalRows?.includes(row)}
+                  onChange={event => onChange(current => ({ ...current, completion: { ...current.completion, optionalRows: event.target.checked ? (current.completion?.optionalRows ?? []).filter(i => i !== row) : [...(current.completion?.optionalRows ?? []), row] } }))} />Ligne {row + 1} obligatoire</label>
+                {Array.from({ length: question.tableColumns }, (_, column) => {
+                  const index = row * question.tableColumns + column;
+                  return <label key={column} className="flex gap-2"><input type="checkbox" disabled={question.completion?.optionalRows?.includes(row)} checked={!question.completion?.optionalCells?.includes(index)}
+                    onChange={event => onChange(current => ({ ...current, completion: { ...current.completion, optionalCells: event.target.checked ? (current.completion?.optionalCells ?? []).filter(i => i !== index) : [...(current.completion?.optionalCells ?? []), index] } }))} />Cellule {column + 1} obligatoire</label>;
+                })}
+              </div>
+            ))}
+          </fieldset>
           <label className="space-y-2">
             <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
               Type
@@ -992,6 +1015,7 @@ function QuestionCard({
                 onChange((current) => ({
                   ...createEmptyQuestion(nextType),
                   id: current.id,
+                  completion: current.completion ? { required: current.completion.required } : undefined,
                   question: current.question,
                   explanation: current.explanation,
                   answerPlaceholder: current.answerPlaceholder,

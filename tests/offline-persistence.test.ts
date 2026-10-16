@@ -23,6 +23,17 @@ beforeEach(async () => {
 });
 
 describe("offline-first answer repository", () => {
+  it("isolates Ty Ash IndexedDB answers and mutations from legacy records with identical numeric IDs", async () => {
+    await persistLocalAnswer({ scope, exerciseId: 1, values: ["historical"], explicitDelete: false });
+    const tyash = { ...scope, moduleStableKey: "tyash_v1_test_module", exerciseKeys: { 1: "tyash_v1_test_question" } };
+    expect(await loadLocalModuleAnswers(tyash)).toEqual([]);
+    expect(await getPendingMutations(tyash)).toEqual([]);
+    await persistLocalAnswer({ scope: tyash, exerciseId: 1, values: ["new"], explicitDelete: false });
+    expect((await loadLocalModuleAnswers(tyash))[0].values).toEqual(["new"]);
+    expect((await loadLocalModuleAnswers(scope))[0].values).toEqual(["historical"]);
+    expect(await loadLocalModuleAnswers({ ...tyash, exerciseKeys: { 1: "tyash_v1_other_question" } })).toEqual([]);
+    expect((await getPendingMutations(tyash))[0].questionId).toBe("tyash_v1_test_question");
+  });
   it("writes locally and queues immediately, including very long answers", async () => {
     const value = "réponse ".repeat(20_000);
     const saved = await persistLocalAnswer({ scope, exerciseId: 1, values: [value], explicitDelete: false });

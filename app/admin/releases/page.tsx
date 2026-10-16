@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createTyAshPathwayDraft } from "./new-pathway-action";
 import {
   getApplicationReleaseState,
   getContentReleaseSnapshot,
@@ -93,6 +94,14 @@ export default async function ReleasesPage({
 
   return (
     <div className="space-y-6">
+      <section className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6">
+        <h2 className="text-xl font-bold">Le nouveau parcours Ty Ash</h2>
+        <p className="mt-2 text-sm">Prépare les 4 modules, 15 sous-modules et 43 exercices en brouillon. Tu pourras relire et modifier tous les contenus dans Modules. Le parcours publié et les anciennes réponses restent conservés.</p>
+        <form action={createTyAshPathwayDraft} className="mt-4 flex flex-col gap-3">
+          <button type="submit" disabled={!!draft || !!loadError} className="bs-button-primary rounded px-4 py-2 disabled:opacity-50">Créer le nouveau parcours Ty Ash</button>
+          {draft ? <p className="text-sm">Un brouillon existe déjà. Termine sa révision avant de créer un nouveau parcours.</p> : null}
+        </form>
+      </section>
       <section className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6">
         <p className="text-xs font-black uppercase tracking-[.2em] text-[var(--tyash-label-text)]">
           Versions et déploiements

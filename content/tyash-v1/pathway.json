@@ -1,0 +1,1897 @@
+[
+  {
+    "id": 1,
+    "stableKey": "template_module_1",
+    "position": 1,
+    "title": "TON ENTREPRISE",
+    "content_html": "<p>Comprendre ce qu&#x27;il y a derrière l&#x27;entreprise :\nson histoire, ce qui l&#x27;anime, sa personnalité, ses ambitions et ses publics.</p>",
+    "submodules": [
+      {
+        "id": 100,
+        "stableKey": "template_submodule_1.1",
+        "module_id": 1,
+        "position": 1,
+        "title": "TON HISTOIRE",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1000,
+            "stableKey": "template_question_1000",
+            "module_id": 1,
+            "submodule_id": 100,
+            "position": 1,
+            "type": "open",
+            "question": "Que fait ton entreprise ?",
+            "options": [],
+            "explanation": "<h3>Présente ton entreprise</h3><p>Présente-nous ton entreprise simplement.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_01"
+          },
+          {
+            "id": 1001,
+            "stableKey": "template_question_1001",
+            "module_id": 1,
+            "submodule_id": 100,
+            "position": 2,
+            "type": "open",
+            "question": "Quels produits ou services proposes-tu aujourd'hui ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_01"
+          },
+          {
+            "id": 1002,
+            "stableKey": "template_question_1002",
+            "module_id": 1,
+            "submodule_id": 100,
+            "position": 3,
+            "type": "open",
+            "question": "Depuis quand existe-t-elle ?",
+            "options": [],
+            "explanation": "Quelques phrases suffisent. Pas besoin de nous faire la présentation commerciale parfaite.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_01"
+          },
+          {
+            "id": 1003,
+            "stableKey": "template_question_1003",
+            "module_id": 1,
+            "submodule_id": 100,
+            "position": 4,
+            "type": "open",
+            "question": "Qu'est-ce qui a donné naissance à l'entreprise ?",
+            "options": [],
+            "explanation": "<h3>Comment tout a commencé ?</h3><p>Derrière chaque entreprise, il y a un point de départ. Quel a été le tien ?</p><p>Une envie, une rencontre, un problème que tu voulais résoudre, une opportunité, une conviction...</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_02"
+          },
+          {
+            "id": 1004,
+            "stableKey": "template_question_1004",
+            "module_id": 1,
+            "submodule_id": 100,
+            "position": 5,
+            "type": "open",
+            "question": "Y a-t-il un moment qui raconte particulièrement bien votre histoire ?",
+            "options": [],
+            "explanation": "Une anecdote, un tournant, une réussite, une galère, une rencontre... On cherche ce qui raconte quelque chose de vous, pas toute la chronologie de l'entreprise.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_02"
+          }
+        ]
+      },
+      {
+        "id": 101,
+        "stableKey": "template_submodule_1.2",
+        "module_id": 1,
+        "position": 2,
+        "title": "CE QUI VOUS ANIME",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1005,
+            "stableKey": "template_question_1005",
+            "module_id": 1,
+            "submodule_id": 101,
+            "position": 6,
+            "type": "open",
+            "question": "Au fond, pourquoi faites-vous ce que vous faites ?",
+            "options": [],
+            "explanation": "<h3>Pourquoi vous faites ça ?</h3><p>Au-delà de vendre un produit ou un service, qu&#x27;avez-vous envie d&#x27;apporter à vos clients, votre secteur ou votre territoire ? Qu&#x27;est-ce qui vous donne encore envie de faire ce métier demain matin ?</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_03"
+          },
+          {
+            "id": 1006,
+            "stableKey": "template_question_1006",
+            "module_id": 1,
+            "submodule_id": 101,
+            "position": 7,
+            "type": "multiple",
+            "question": "Chez vous, il y a sûrement des choses sur lesquelles on ne transige pas. Lesquelles ?",
+            "options": [
+              "La qualité",
+              "La relation client",
+              "Notre manière de fabriquer",
+              "Notre manière de conseiller",
+              "Notre façon de manager",
+              "Notre impact",
+              "Notre expertise",
+              "Notre transparence",
+              "Notre façon de travailler",
+              "Autre"
+            ],
+            "explanation": "<h3>Vos convictions</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_04"
+          },
+          {
+            "id": 1007,
+            "stableKey": "template_question_1007",
+            "module_id": 1,
+            "submodule_id": 101,
+            "position": 8,
+            "type": "open",
+            "question": "Pourquoi est-ce important pour vous ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_04"
+          },
+          {
+            "id": 1008,
+            "stableKey": "template_question_1008",
+            "module_id": 1,
+            "submodule_id": 101,
+            "position": 9,
+            "type": "open",
+            "question": "Qu'est-ce que vous faites à votre manière ?",
+            "options": [],
+            "explanation": "<h3>Votre façon de faire</h3><p>Une méthode, un geste, une attention, un savoir-faire, une façon de recevoir les clients, de fabriquer, de conseiller ou de travailler... Ce qui vous semble complètement normal peut justement être très différent chez vos concurrents.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_05"
+          },
+          {
+            "id": 1009,
+            "stableKey": "template_question_1009",
+            "module_id": 1,
+            "submodule_id": 101,
+            "position": 10,
+            "type": "open",
+            "question": "Qu'est-ce qu'on comprend mieux de votre entreprise quand on la découvre de l'intérieur ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_05"
+          }
+        ]
+      },
+      {
+        "id": 102,
+        "stableKey": "template_submodule_1.3",
+        "module_id": 1,
+        "position": 3,
+        "title": "TA PERSONNALITÉ",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1010,
+            "stableKey": "template_question_1010",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 11,
+            "type": "multiple",
+            "question": "Imagine : ton entreprise entre dans une pièce remplie de monde. Comment se comporte-t-elle ?",
+            "options": [
+              "Elle met immédiatement tout le monde à l'aise",
+              "Elle observe avant de prendre la parole",
+              "Elle arrive avec beaucoup d'énergie",
+              "Elle impose naturellement sa présence",
+              "Elle fait rire tout le monde",
+              "Elle inspire immédiatement confiance",
+              "Elle intrigue",
+              "Elle reste discrète mais on se souvient d'elle",
+              "Autre"
+            ],
+            "explanation": "<h3>Si ton entreprise était une personne...</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_06"
+          },
+          {
+            "id": 1011,
+            "stableKey": "template_question_1011",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 12,
+            "type": "open",
+            "question": "Et qu'aimerais-tu que les gens disent d'elle une fois qu'elle est partie ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_06"
+          },
+          {
+            "id": 1012,
+            "stableKey": "template_question_1012",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 13,
+            "type": "spectrum",
+            "question": "Sérieuse ←→ Joueuse",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22S%C3%A9rieuse%22%2C%22rightLabel%22%3A%22Joueuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "<h3>Place les curseurs</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1013,
+            "stableKey": "template_question_1013",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 14,
+            "type": "spectrum",
+            "question": "Discrète ←→ Expressive",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Discr%C3%A8te%22%2C%22rightLabel%22%3A%22Expressive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1014,
+            "stableKey": "template_question_1014",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 15,
+            "type": "spectrum",
+            "question": "Institutionnelle ←→ Spontanée",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Institutionnelle%22%2C%22rightLabel%22%3A%22Spontan%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1015,
+            "stableKey": "template_question_1015",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 16,
+            "type": "spectrum",
+            "question": "Accessible ←→ Exclusive",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Accessible%22%2C%22rightLabel%22%3A%22Exclusive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1016,
+            "stableKey": "template_question_1016",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 17,
+            "type": "spectrum",
+            "question": "Rassurante ←→ Audacieuse",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rassurante%22%2C%22rightLabel%22%3A%22Audacieuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1017,
+            "stableKey": "template_question_1017",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 18,
+            "type": "spectrum",
+            "question": "Posée ←→ Énergique",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Pos%C3%A9e%22%2C%22rightLabel%22%3A%22%C3%89nergique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_07"
+          },
+          {
+            "id": 1018,
+            "stableKey": "template_question_1018",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 19,
+            "type": "multiple",
+            "question": "Si tu ne pouvais garder que 3 mots pour décrire la personnalité de ton entreprise, lesquels choisirais-tu ?",
+            "options": [
+              "Chaleureuse",
+              "Experte",
+              "Audacieuse",
+              "Accessible",
+              "Exigeante",
+              "Créative",
+              "Rassurante",
+              "Engagée",
+              "Élégante",
+              "Spontanée",
+              "Énergique",
+              "Authentique",
+              "Décalée",
+              "Pédagogique",
+              "Ambitieuse",
+              "Humaine",
+              "Premium",
+              "Simple",
+              "Inspirante"
+            ],
+            "explanation": "<h3>Trois mots qui vous ressemblent</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_08"
+          },
+          {
+            "id": 1019,
+            "stableKey": "template_question_1019",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 20,
+            "type": "open",
+            "question": "Et quels mots ne doivent surtout PAS vous définir ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_08"
+          },
+          {
+            "id": 1020,
+            "stableKey": "template_question_1020",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 21,
+            "type": "multiple",
+            "question": "Si ton entreprise prenait la parole, comment parlerait-elle ?",
+            "options": [
+              "Avec simplicité",
+              "Avec expertise",
+              "Avec pédagogie",
+              "Avec humour",
+              "Avec émotion",
+              "Avec conviction",
+              "Très directement",
+              "Comme dans une conversation",
+              "Avec beaucoup d'énergie",
+              "De manière posée",
+              "Autre"
+            ],
+            "explanation": "<h3>Donnons-lui une voix</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_09"
+          },
+          {
+            "id": 1021,
+            "stableKey": "template_question_1021",
+            "module_id": 1,
+            "submodule_id": 102,
+            "position": 22,
+            "type": "open",
+            "question": "Y a-t-il une expression, une façon de parler, un mot ou une petite phrase qui vous ressemble particulièrement ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_09"
+          }
+        ]
+      },
+      {
+        "id": 103,
+        "stableKey": "template_submodule_1.4",
+        "module_id": 1,
+        "position": 4,
+        "title": "TES AMBITIONS",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1022,
+            "stableKey": "template_question_1022",
+            "module_id": 1,
+            "submodule_id": 103,
+            "position": 23,
+            "type": "multiple",
+            "question": "Quelles sont vos priorités pour les 6 à 12 prochains mois ?",
+            "options": [
+              "Développer les ventes",
+              "Gagner en visibilité",
+              "Lancer une nouvelle offre",
+              "Toucher un nouveau marché",
+              "Fidéliser",
+              "Recruter",
+              "Structurer l'entreprise",
+              "Faire évoluer son image",
+              "Autre"
+            ],
+            "explanation": "<h3>Où allez-vous ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_10"
+          },
+          {
+            "id": 1023,
+            "stableKey": "template_question_1023",
+            "module_id": 1,
+            "submodule_id": 103,
+            "position": 24,
+            "type": "open",
+            "question": "Dans un an, qu'aimerais-tu avoir fait évoluer ?",
+            "options": [],
+            "explanation": "<h3>Et demain ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_11"
+          },
+          {
+            "id": 1024,
+            "stableKey": "template_question_1024",
+            "module_id": 1,
+            "submodule_id": 103,
+            "position": 25,
+            "type": "open",
+            "question": "Y a-t-il un changement ou un projet important qui arrive prochainement ?",
+            "options": [],
+            "explanation": "Lancement, anniversaire, nouvelle implantation, recrutement, nouvelle offre, transformation de l'entreprise...",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_11"
+          }
+        ]
+      },
+      {
+        "id": 104,
+        "stableKey": "template_submodule_1.5",
+        "module_id": 1,
+        "position": 5,
+        "title": "TES PUBLICS",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1025,
+            "stableKey": "template_question_1025",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 26,
+            "type": "open",
+            "question": "Qui sont vos clients aujourd'hui ?",
+            "options": [],
+            "explanation": "<h3>À qui vous adressez-vous ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_12"
+          },
+          {
+            "id": 1026,
+            "stableKey": "template_question_1026",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 27,
+            "type": "open",
+            "question": "Qui aimeriez-vous davantage toucher demain ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_12"
+          },
+          {
+            "id": 1027,
+            "stableKey": "template_question_1027",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 28,
+            "type": "multiple",
+            "question": "Au-delà de vos clients, quelles autres personnes ou organisations comptent dans votre communication ?",
+            "options": [
+              "Partenaires",
+              "Prescripteurs",
+              "Candidats",
+              "Collaborateurs",
+              "Institutions",
+              "Investisseurs",
+              "Communauté",
+              "Autre"
+            ],
+            "explanation": "<h3>Qui compte autour de vous ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_13"
+          },
+          {
+            "id": 1028,
+            "stableKey": "template_question_1028",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 29,
+            "type": "open",
+            "question": "Pour ce projet, qui veux-tu toucher en priorité ?",
+            "options": [],
+            "explanation": "<h3>La priorité</h3><p>Décris-nous une seule personne ou catégorie de personnes.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_14"
+          },
+          {
+            "id": 1029,
+            "stableKey": "template_question_1029",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 30,
+            "type": "open",
+            "question": "Qu'est-ce qui compte vraiment pour elle lorsqu'elle choisit une entreprise comme la vôtre ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_14"
+          },
+          {
+            "id": 1030,
+            "stableKey": "template_question_1030",
+            "module_id": 1,
+            "submodule_id": 104,
+            "position": 31,
+            "type": "open",
+            "question": "Est-ce elle qui prend réellement la décision ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_14",
+            "completion": {
+              "required": false
+            }
+          }
+        ]
+      }
+    ],
+    "is_published": true
+  },
+  {
+    "id": 2,
+    "stableKey": "template_module_2",
+    "position": 2,
+    "title": "TA COMMUNICATION",
+    "content_html": "<p>Comprendre ce qui existe déjà, ce qui fonctionne, ce qui bloque et le décalage entre la personnalité de la marque et ce qu&#x27;elle donne réellement à voir.</p>",
+    "submodules": [
+      {
+        "id": 105,
+        "stableKey": "template_submodule_2.1",
+        "module_id": 2,
+        "position": 1,
+        "title": "AUJOURD'HUI",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1031,
+            "stableKey": "template_question_1031",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 1,
+            "type": "multiple",
+            "question": "Quels canaux et supports utilisez-vous vraiment aujourd'hui ?",
+            "options": [
+              "Site internet",
+              "LinkedIn",
+              "Instagram",
+              "Facebook",
+              "TikTok",
+              "YouTube",
+              "Newsletter",
+              "Supports commerciaux",
+              "Print",
+              "Événements",
+              "Vidéo",
+              "Relations presse",
+              "Autre",
+              "Aucun actuellement"
+            ],
+            "explanation": "<h3>Où communiquez-vous ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_15"
+          },
+          {
+            "id": 1032,
+            "stableKey": "template_question_1032",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 2,
+            "type": "open",
+            "question": "Qui s'occupe de la communication ?",
+            "options": [],
+            "explanation": "<h3>Comment ça fonctionne ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_16"
+          },
+          {
+            "id": 1033,
+            "stableKey": "template_question_1033",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 3,
+            "type": "open",
+            "question": "À quelle fréquence communiquez-vous ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_16"
+          },
+          {
+            "id": 1034,
+            "stableKey": "template_question_1034",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 4,
+            "type": "single",
+            "question": "Avez-vous une stratégie ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_16"
+          },
+          {
+            "id": 1035,
+            "stableKey": "template_question_1035",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 5,
+            "type": "single",
+            "question": "Avez-vous défini des objectifs ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_16"
+          },
+          {
+            "id": 1036,
+            "stableKey": "template_question_1036",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 6,
+            "type": "single",
+            "question": "Utilisez-vous un calendrier éditorial ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_16"
+          },
+          {
+            "id": 1037,
+            "stableKey": "template_question_1037",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 7,
+            "type": "open",
+            "question": "Quels supports avez-vous déjà à disposition ?",
+            "options": [],
+            "explanation": "<h3>Votre existant</h3><p>Site, plaquette, photos, vidéos, présentations commerciales, contenus sociaux...</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_17"
+          },
+          {
+            "id": 1038,
+            "stableKey": "template_question_1038",
+            "module_id": 2,
+            "submodule_id": 105,
+            "position": 8,
+            "type": "open",
+            "question": "Y en a-t-il que vous n'utilisez presque jamais ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_17"
+          }
+        ]
+      },
+      {
+        "id": 106,
+        "stableKey": "template_submodule_2.2",
+        "module_id": 2,
+        "position": 2,
+        "title": "CE QUI FONCTIONNE... OU PAS",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1039,
+            "stableKey": "template_question_1039",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 9,
+            "type": "single",
+            "question": "te permet d'être connu ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "<h3>Faisons le point</h3><p>Aujourd&#x27;hui, ta communication...</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1040,
+            "stableKey": "template_question_1040",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 10,
+            "type": "single",
+            "question": "fait comprendre clairement ton activité ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1041,
+            "stableKey": "template_question_1041",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 11,
+            "type": "single",
+            "question": "te différencie ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1042,
+            "stableKey": "template_question_1042",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 12,
+            "type": "single",
+            "question": "génère des demandes ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1043,
+            "stableKey": "template_question_1043",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 13,
+            "type": "single",
+            "question": "inspire confiance ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1044,
+            "stableKey": "template_question_1044",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 14,
+            "type": "single",
+            "question": "fidélise ;",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1045,
+            "stableKey": "template_question_1045",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 15,
+            "type": "single",
+            "question": "attire les bons candidats.",
+            "options": [
+              "Pas du tout",
+              "Un peu",
+              "Plutôt",
+              "Tout à fait",
+              "Je ne sais pas",
+              "Non concerné"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_18"
+          },
+          {
+            "id": 1046,
+            "stableKey": "template_question_1046",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 16,
+            "type": "single",
+            "question": "Qu'est-ce qui vous freine le plus aujourd'hui ?",
+            "options": [
+              "Manque de temps",
+              "Manque de ressources",
+              "Message peu clair",
+              "Difficulté à produire du contenu",
+              "Difficulté à toucher les bonnes personnes",
+              "Communication qui ne reflète plus l'entreprise",
+              "Difficulté à mesurer les résultats",
+              "Manque d'idées",
+              "Autre",
+              "Je ne sais pas"
+            ],
+            "explanation": "<h3>Le principal frein</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_19"
+          },
+          {
+            "id": 1047,
+            "stableKey": "template_question_1047",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 17,
+            "type": "open",
+            "question": "Qu'est-ce qui fonctionne bien et mérite d'être conservé ?",
+            "options": [],
+            "explanation": "<h3>À garder / à changer</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_20"
+          },
+          {
+            "id": 1048,
+            "stableKey": "template_question_1048",
+            "module_id": 2,
+            "submodule_id": 106,
+            "position": 18,
+            "type": "open",
+            "question": "À l'inverse, qu'est-ce qui te frustre le plus aujourd'hui ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_20"
+          }
+        ]
+      },
+      {
+        "id": 107,
+        "stableKey": "template_submodule_2.3",
+        "module_id": 2,
+        "position": 3,
+        "title": "L'IMAGE PERÇUE",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1049,
+            "stableKey": "template_question_1049",
+            "module_id": 2,
+            "submodule_id": 107,
+            "position": 19,
+            "type": "open",
+            "question": "Après avoir découvert mon entreprise, j'aimerais que quelqu'un dise...",
+            "options": [],
+            "explanation": "<h3>Ce qu&#x27;on aimerait entendre</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_21"
+          },
+          {
+            "id": 1050,
+            "stableKey": "template_question_1050",
+            "module_id": 2,
+            "submodule_id": 107,
+            "position": 20,
+            "type": "spectrum",
+            "question": "Quand tu regardes ta communication actuelle, retrouves-tu vraiment la personnalité que tu viens de décrire ?",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Compl%C3%A8tement%22%2C%22rightLabel%22%3A%22Pas%20du%20tout%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "<h3>Est-ce vraiment ce qu&#x27;on montre ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_22"
+          },
+          {
+            "id": 1051,
+            "stableKey": "template_question_1051",
+            "module_id": 2,
+            "submodule_id": 107,
+            "position": 21,
+            "type": "open",
+            "question": "Qu'est-ce qui manque ou sonne faux ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_22"
+          },
+          {
+            "id": 1052,
+            "stableKey": "template_question_1052",
+            "module_id": 2,
+            "submodule_id": 107,
+            "position": 22,
+            "type": "open",
+            "question": "Comment penses-tu que les autres perçoivent ton entreprise aujourd'hui ?",
+            "options": [],
+            "explanation": "<h3>Aujourd&#x27;hui vs demain</h3>",
+            "answer_placeholder": "Je ne sais pas",
+            "exercise_group_id": "template_exercise_23"
+          },
+          {
+            "id": 1053,
+            "stableKey": "template_question_1053",
+            "module_id": 2,
+            "submodule_id": 107,
+            "position": 23,
+            "type": "open",
+            "question": "Comment voudrais-tu qu'ils la perçoivent demain ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas",
+            "exercise_group_id": "template_exercise_23"
+          }
+        ]
+      }
+    ],
+    "is_published": true
+  },
+  {
+    "id": 3,
+    "stableKey": "template_module_3",
+    "position": 3,
+    "title": "TON BESOIN",
+    "content_html": "<p>Identifier le véritable problème de communication avant de parler de format vidéo.</p>",
+    "submodules": [
+      {
+        "id": 108,
+        "stableKey": "template_submodule_3.1",
+        "module_id": 3,
+        "position": 1,
+        "title": "LE PROBLÈME À RÉSOUDRE",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1054,
+            "stableKey": "template_question_1054",
+            "module_id": 3,
+            "submodule_id": 108,
+            "position": 1,
+            "type": "open",
+            "question": "Si cette communication fonctionne parfaitement, qu'est-ce qui aura changé pour ton entreprise ?",
+            "options": [],
+            "explanation": "<h3>Si ça fonctionne...</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_24"
+          },
+          {
+            "id": 1055,
+            "stableKey": "template_question_1055",
+            "module_id": 3,
+            "submodule_id": 108,
+            "position": 2,
+            "type": "multiple",
+            "question": "Quels changements recherches-tu ?",
+            "options": [
+              "Être davantage connu",
+              "Mieux faire comprendre mon activité",
+              "Faire évoluer mon image",
+              "Me différencier",
+              "Générer des contacts",
+              "Rassurer",
+              "Attirer des candidats",
+              "Valoriser mon expertise",
+              "Valoriser mon savoir-faire",
+              "Créer de la proximité",
+              "Autre"
+            ],
+            "explanation": "<h3>Concrètement</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_25"
+          },
+          {
+            "id": 1056,
+            "stableKey": "template_question_1056",
+            "module_id": 3,
+            "submodule_id": 108,
+            "position": 3,
+            "type": "open",
+            "question": "Pourquoi ce sujet devient-il important aujourd'hui ?",
+            "options": [],
+            "explanation": "<h3>Pourquoi maintenant ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_26"
+          },
+          {
+            "id": 1057,
+            "stableKey": "template_question_1057",
+            "module_id": 3,
+            "submodule_id": 108,
+            "position": 4,
+            "type": "open",
+            "question": "Quel problème concret aimerais-tu résoudre en priorité ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_26"
+          }
+        ]
+      },
+      {
+        "id": 109,
+        "stableKey": "template_submodule_3.2",
+        "module_id": 3,
+        "position": 2,
+        "title": "LA PRIORITÉ",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1058,
+            "stableKey": "template_question_1058",
+            "module_id": 3,
+            "submodule_id": 109,
+            "position": 5,
+            "type": "single",
+            "question": "S'il ne fallait en retenir qu'un :",
+            "options": [
+              "Notoriété — être davantage connu",
+              "Image — faire évoluer la perception",
+              "Acquisition — générer des contacts/opportunités",
+              "Fidélisation — renforcer la relation",
+              "Recrutement / marque employeur",
+              "À définir ensemble"
+            ],
+            "explanation": "<h3>Un seul objectif</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_27"
+          },
+          {
+            "id": 1059,
+            "stableKey": "template_question_1059",
+            "module_id": 3,
+            "submodule_id": 109,
+            "position": 6,
+            "type": "open",
+            "question": "Comment saurais-tu que le projet a vraiment fonctionné ?",
+            "options": [],
+            "explanation": "<h3>Ça aura fonctionné si...</h3><p>On cherche d&#x27;abord un signe concret, pas forcément un KPI.</p><p>Les prospects comprennent enfin ce qu&#x27;on fait.\nLes commerciaux utilisent la vidéo en rendez-vous.\nOn reçoit davantage de candidatures pertinentes.\nLes clients nous parlent de notre savoir-faire.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_28"
+          },
+          {
+            "id": 1060,
+            "stableKey": "template_question_1060",
+            "module_id": 3,
+            "submodule_id": 109,
+            "position": 7,
+            "type": "open",
+            "question": "As-tu déjà un indicateur ou un résultat chiffré en tête ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_28",
+            "completion": {
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "id": 110,
+        "stableKey": "template_submodule_3.3",
+        "module_id": 3,
+        "position": 3,
+        "title": "CE QU'IL FAUT RACONTER",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1061,
+            "stableKey": "template_question_1061",
+            "module_id": 3,
+            "submodule_id": 110,
+            "position": 8,
+            "type": "open",
+            "question": "S'il ne devait rester qu'une seule idée après avoir vu votre communication, laquelle serait-ce ?",
+            "options": [],
+            "explanation": "<h3>L&#x27;idée à retenir</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_29"
+          },
+          {
+            "id": 1062,
+            "stableKey": "template_question_1062",
+            "module_id": 3,
+            "submodule_id": 110,
+            "position": 9,
+            "type": "multiple",
+            "question": "Quelle partie de votre entreprise mérite d'être montrée mais reste trop souvent invisible ?",
+            "options": [
+              "Les coulisses",
+              "Les personnes",
+              "Un geste métier",
+              "Votre méthode",
+              "La fabrication",
+              "La relation client",
+              "Votre exigence",
+              "Votre culture",
+              "Un savoir-faire",
+              "Votre impact",
+              "Votre quotidien",
+              "Autre"
+            ],
+            "explanation": "<h3>La partie invisible</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_30"
+          },
+          {
+            "id": 1063,
+            "stableKey": "template_question_1063",
+            "module_id": 3,
+            "submodule_id": 110,
+            "position": 10,
+            "type": "open",
+            "question": "Qu'est-ce qu'on pourrait montrer pour prouver ce que vous racontez ?",
+            "options": [],
+            "explanation": "<h3>Les preuves</h3><p>Résultats, gestes, témoignages, clients, produits, lieux, équipes, process, détails...</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_31"
+          },
+          {
+            "id": 1064,
+            "stableKey": "template_question_1064",
+            "module_id": 3,
+            "submodule_id": 110,
+            "position": 11,
+            "type": "open",
+            "question": "Y a-t-il quelque chose que vos clients comprennent souvent mal sur votre entreprise ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_31"
+          },
+          {
+            "id": 1065,
+            "stableKey": "template_question_1065",
+            "module_id": 3,
+            "submodule_id": 110,
+            "position": 12,
+            "type": "open",
+            "question": "Y a-t-il des sujets ou formulations à éviter absolument ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_31"
+          }
+        ]
+      }
+    ],
+    "is_published": true
+  },
+  {
+    "id": 4,
+    "stableKey": "template_module_4",
+    "position": 4,
+    "title": "TON PROJET VIDÉO",
+    "content_html": "<p>Traduire tout le travail précédent en matière créative exploitable par Ty Ash.</p>",
+    "submodules": [
+      {
+        "id": 111,
+        "stableKey": "template_submodule_4.1",
+        "module_id": 4,
+        "position": 1,
+        "title": "LE CONTEXTE",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1066,
+            "stableKey": "template_question_1066",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 1,
+            "type": "multiple",
+            "question": "À quoi ce projet est-il lié ?",
+            "options": [
+              "Lancement",
+              "Événement",
+              "Anniversaire",
+              "Nouvelle offre",
+              "Évolution de l'entreprise",
+              "Campagne commerciale",
+              "Recrutement",
+              "Communication régulière",
+              "Nouveau positionnement",
+              "Autre",
+              "Aucun événement particulier"
+            ],
+            "explanation": "<h3>Pourquoi maintenant ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_32"
+          },
+          {
+            "id": 1067,
+            "stableKey": "template_question_1067",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 2,
+            "type": "multiple",
+            "question": "Où vivra cette vidéo ?",
+            "options": [
+              "Site internet",
+              "LinkedIn",
+              "Instagram",
+              "TikTok",
+              "YouTube",
+              "Publicité",
+              "Rendez-vous commerciaux",
+              "Salon / événement",
+              "Communication interne",
+              "Recrutement",
+              "Autre",
+              "À définir ensemble"
+            ],
+            "explanation": "<h3>Où vivra cette vidéo ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_33"
+          },
+          {
+            "id": 1068,
+            "stableKey": "template_question_1068",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 3,
+            "type": "open",
+            "question": "Y a-t-il une échéance ?",
+            "options": [],
+            "explanation": "<h3>Quelle place aura-t-elle ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_34"
+          },
+          {
+            "id": 1069,
+            "stableKey": "template_question_1069",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 4,
+            "type": "single",
+            "question": "Doit-elle vivre seule ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_34"
+          },
+          {
+            "id": 1070,
+            "stableKey": "template_question_1070",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 5,
+            "type": "single",
+            "question": "Faire partie d'une campagne ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_34"
+          },
+          {
+            "id": 1071,
+            "stableKey": "template_question_1071",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 6,
+            "type": "single",
+            "question": "D'une série ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_34"
+          },
+          {
+            "id": 1072,
+            "stableKey": "template_question_1072",
+            "module_id": 4,
+            "submodule_id": 111,
+            "position": 7,
+            "type": "single",
+            "question": "Existe-t-il déjà d'autres contenus auxquels la relier ?",
+            "options": [
+              "Oui",
+              "Non",
+              "Je ne sais pas"
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_34"
+          }
+        ]
+      },
+      {
+        "id": 112,
+        "stableKey": "template_submodule_4.2",
+        "module_id": 4,
+        "position": 2,
+        "title": "DE TA PERSONNALITÉ À TON UNIVERS VIDÉO",
+        "content_html": "<p>Maintenant, voyons comment la personnalité de ta marque pourrait prendre vie à l'écran.</p>",
+        "exercises": [
+          {
+            "id": 1073,
+            "stableKey": "template_question_1073",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 8,
+            "type": "multiple",
+            "question": "Qu'aimerais-tu que l'on ressente en regardant votre vidéo ?",
+            "options": [
+              "Confiance",
+              "Énergie",
+              "Émotion",
+              "Curiosité",
+              "Proximité",
+              "Admiration",
+              "Envie",
+              "Sérénité",
+              "Surprise",
+              "Fierté",
+              "Autre"
+            ],
+            "explanation": "<h3>L&#x27;émotion</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_35"
+          },
+          {
+            "id": 1074,
+            "stableKey": "template_question_1074",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 9,
+            "type": "group_open",
+            "question": "Y a-t-il des vidéos, campagnes, films, marques ou univers qui t'inspirent ?",
+            "options": [
+              "__group_open_layout__:1",
+              "__group_open__:Référence / lien 1",
+              "__group_open__:Référence / lien 2",
+              "__group_open__:Référence / lien 3"
+            ],
+            "explanation": "<h3>Les références</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_36",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1075,
+            "stableKey": "template_question_1075",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 10,
+            "type": "open",
+            "question": "Qu'est-ce que tu aimes dedans ?",
+            "options": [],
+            "explanation": "Ambiance, lumière, rythme, réalisation, musique, manière de filmer les personnes...",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_36",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1076,
+            "stableKey": "template_question_1076",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 11,
+            "type": "multiple",
+            "question": "Je préfère laisser Ty Ash me proposer une direction.",
+            "options": [
+              "Je préfère laisser Ty Ash me proposer une direction."
+            ],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_36",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1077,
+            "stableKey": "template_question_1077",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 12,
+            "type": "spectrum",
+            "question": "Lumière naturelle ←→ Lumière très travaillée",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Lumi%C3%A8re%20naturelle%22%2C%22rightLabel%22%3A%22Lumi%C3%A8re%20tr%C3%A8s%20travaill%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "<h3>Traduisons ta personnalité en images</h3><p>Ces choix sont des préférences et non des décisions de réalisation définitives.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1078,
+            "stableKey": "template_question_1078",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 13,
+            "type": "spectrum",
+            "question": "Observation / documentaire ←→ Mise en scène",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Observation%20%2F%20documentaire%22%2C%22rightLabel%22%3A%22Mise%20en%20sc%C3%A8ne%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1079,
+            "stableKey": "template_question_1079",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 14,
+            "type": "spectrum",
+            "question": "Rythme contemplatif ←→ Montage dynamique",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rythme%20contemplatif%22%2C%22rightLabel%22%3A%22Montage%20dynamique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1080,
+            "stableKey": "template_question_1080",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 15,
+            "type": "spectrum",
+            "question": "Très humain ←→ Très produit / savoir-faire",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Tr%C3%A8s%20humain%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20produit%20%2F%20savoir-faire%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1081,
+            "stableKey": "template_question_1081",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 16,
+            "type": "spectrum",
+            "question": "Brut / authentique ←→ Très esthétique / maîtrisé",
+            "options": [
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Brut%20%2F%20authentique%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20esth%C3%A9tique%20%2F%20ma%C3%AEtris%C3%A9%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+            ],
+            "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1082,
+            "stableKey": "template_question_1082",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 17,
+            "type": "multiple",
+            "question": "Le son",
+            "options": [
+              "Musique",
+              "Voix off",
+              "Interviews",
+              "Sons du métier",
+              "Silence / respiration",
+              "Mélange",
+              "À définir avec Ty Ash"
+            ],
+            "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_37"
+          },
+          {
+            "id": 1083,
+            "stableKey": "template_question_1083",
+            "module_id": 4,
+            "submodule_id": 112,
+            "position": 18,
+            "type": "open",
+            "question": "Qu'est-ce que tu ne veux surtout pas voir dans cette vidéo ?",
+            "options": [],
+            "explanation": "<h3>Le NON</h3><p>Je ne veux pas une vidéo corporate.\nPas de collaborateurs qui récitent un texte.\nPas quelque chose de trop parfait.\nPas de musique épique.\nPas quelque chose de trop publicitaire.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_38"
+          }
+        ]
+      },
+      {
+        "id": 113,
+        "stableKey": "template_submodule_4.3",
+        "module_id": 4,
+        "position": 3,
+        "title": "LA MATIÈRE À FILMER",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1084,
+            "stableKey": "template_question_1084",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 19,
+            "type": "open",
+            "question": "Quelles personnes pourraient ou devraient apparaître ?",
+            "options": [],
+            "explanation": "<h3>Qui peut-on rencontrer ?</h3><p>Dirigeant, collaborateurs, clients, partenaires, artisans, utilisateurs...</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_39"
+          },
+          {
+            "id": 1085,
+            "stableKey": "template_question_1085",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 20,
+            "type": "open",
+            "question": "Quels lieux ?",
+            "options": [],
+            "explanation": "<h3>Qu&#x27;est-ce qu&#x27;on peut montrer ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1086,
+            "stableKey": "template_question_1086",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 21,
+            "type": "open",
+            "question": "Quels produits ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1087,
+            "stableKey": "template_question_1087",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 22,
+            "type": "open",
+            "question": "Quels gestes ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1088,
+            "stableKey": "template_question_1088",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 23,
+            "type": "open",
+            "question": "Quels métiers ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1089,
+            "stableKey": "template_question_1089",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 24,
+            "type": "open",
+            "question": "Quelles situations ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1090,
+            "stableKey": "template_question_1090",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 25,
+            "type": "open",
+            "question": "Quels moments du quotidien ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1091,
+            "stableKey": "template_question_1091",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 26,
+            "type": "open",
+            "question": "Parmi tout cela, qu'est-ce qui raconte le mieux qui vous êtes ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_40"
+          },
+          {
+            "id": 1092,
+            "stableKey": "template_question_1092",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 27,
+            "type": "open",
+            "question": "Budget / enveloppe",
+            "options": [],
+            "explanation": "<h3>Ce qu&#x27;il faut anticiper</h3>",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1093,
+            "stableKey": "template_question_1093",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 28,
+            "type": "open",
+            "question": "Disponibilités",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1094,
+            "stableKey": "template_question_1094",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 29,
+            "type": "open",
+            "question": "Échéances",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1095,
+            "stableKey": "template_question_1095",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 30,
+            "type": "open",
+            "question": "Contraintes de tournage",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1096,
+            "stableKey": "template_question_1096",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 31,
+            "type": "open",
+            "question": "Obligations juridiques ou sectorielles",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1097,
+            "stableKey": "template_question_1097",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 32,
+            "type": "open",
+            "question": "Autorisations",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          },
+          {
+            "id": 1098,
+            "stableKey": "template_question_1098",
+            "module_id": 4,
+            "submodule_id": 113,
+            "position": 33,
+            "type": "open",
+            "question": "Éléments imposés",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "Je ne sais pas / À définir ensemble / Non concerné",
+            "exercise_group_id": "template_exercise_41"
+          }
+        ]
+      },
+      {
+        "id": 114,
+        "stableKey": "template_submodule_4.4",
+        "module_id": 4,
+        "position": 4,
+        "title": "LES FORMATS ENVISAGÉS",
+        "content_html": "",
+        "exercises": [
+          {
+            "id": 1099,
+            "stableKey": "template_question_1099",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 34,
+            "type": "multiple",
+            "question": "As-tu déjà imaginé un format ou préfères-tu être conseillé ?",
+            "options": [
+              "Film de marque",
+              "Interview",
+              "Témoignage client",
+              "Présentation produit/service",
+              "Film savoir-faire",
+              "Film recrutement / marque employeur",
+              "Formats courts réseaux sociaux",
+              "Série de contenus",
+              "Autre",
+              "Je ne sais pas encore, conseille-moi"
+            ],
+            "explanation": "<h3>As-tu déjà quelque chose en tête ?</h3><p>Ce choix est une piste, pas un engagement. Le format doit servir ton objectif, pas l&#x27;inverse.</p>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_42"
+          },
+          {
+            "id": 1100,
+            "stableKey": "template_question_1100",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 35,
+            "type": "open",
+            "question": "Combien de contenus seraient utiles ?",
+            "options": [],
+            "explanation": "<h3>Et après ?</h3>",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1101,
+            "stableKey": "template_question_1101",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 36,
+            "type": "open",
+            "question": "Faut-il prévoir plusieurs déclinaisons ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1102,
+            "stableKey": "template_question_1102",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 37,
+            "type": "open",
+            "question": "Vertical / carré / horizontal ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1103,
+            "stableKey": "template_question_1103",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 38,
+            "type": "open",
+            "question": "Versions courtes ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1104,
+            "stableKey": "template_question_1104",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 39,
+            "type": "open",
+            "question": "Sur quelles plateformes ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          },
+          {
+            "id": 1105,
+            "stableKey": "template_question_1105",
+            "module_id": 4,
+            "submodule_id": 114,
+            "position": 40,
+            "type": "open",
+            "question": "Que souhaites-tu que la personne fasse après avoir regardé ?",
+            "options": [],
+            "explanation": "",
+            "answer_placeholder": "",
+            "exercise_group_id": "template_exercise_43",
+            "completion": {
+              "required": false
+            }
+          }
+        ]
+      }
+    ],
+    "is_published": true
+  }
+]

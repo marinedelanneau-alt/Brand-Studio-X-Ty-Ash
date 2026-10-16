@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import BillingPortalButton from "@/app/ui/billing-portal-button";
@@ -23,8 +22,6 @@ import {
 import ContentPreviewFrame from "@/app/ui/content-preview-frame";
 
 export const dynamic = "force-dynamic";
-
-const END_OF_TRAINING_CALL_URL = "https://calendly.com/marine-delanneau/30min";
 
 function isExerciseAnswered(
   exercise: WorkspaceModule["exercises"][number],
@@ -358,34 +355,6 @@ export default async function MonEspacePage() {
                         projectName={workspaceTitle}
                       />
                     ) : null}
-                  </div>
-
-                    <div className="rounded-[1rem] border border-[var(--tyash-border)] bg-[var(--tyash-subtle)] p-2.5 shadow-[0_8px_18px_rgba(21,33,59,0.045)]">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.65rem] bg-[var(--card)] text-[var(--tyash-primary)] ring-1 ring-[var(--tyash-border)]">
-                        <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <p className="text-[0.6rem] font-black uppercase tracking-[0.16em] text-[var(--tyash-primary-dark)]">
-                          Fin de parcours
-                        </p>
-                        <p className="mt-0.5 text-sm font-extrabold text-[var(--heading-color)]">
-                          Faisons le point ensemble
-                        </p>
-                      </div>
-                    </div>
-                    <p className="mt-2 flex items-center gap-1.5 text-[0.68rem] font-bold text-[var(--text-primary)]">
-                      <ClockIcon className="h-3.5 w-3.5 text-[var(--tyash-primary)]" aria-hidden="true" />
-                      45 minutes en visioconférence
-                    </p>
-                    <a
-                      href={END_OF_TRAINING_CALL_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bs-button-primary mt-3 flex h-9 w-full items-center justify-center rounded-[0.7rem] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.09em] shadow-[0_8px_16px_rgba(21,33,59,0.14)]"
-                    >
-                      Réserver mon rendez-vous
-                    </a>
                   </div>
 
                   {workspace.project ? (

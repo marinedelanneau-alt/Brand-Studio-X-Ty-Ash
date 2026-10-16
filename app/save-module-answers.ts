@@ -1,4 +1,6 @@
 "use server";
+import { getModuleProgress } from "@/lib/training";
+import { isTyAshContent, requireTyAshKey } from "@/lib/tyash-answer-identity";
 
 import { revalidatePath } from "next/cache";
 import { updateCompletedModuleCookie } from "@/lib/module-completion-fallback";
@@ -93,6 +95,14 @@ async function persistModuleAnswers(input: {
       } satisfies ModuleState;
     }
 
+    if (isTyAshContent(selectedModule)) {
+      if (input.formData.get("moduleStableKey") !== requireTyAshKey(selectedModule)) throw new Error("Stale module identity.");
+      const submitted = getSubmittedExerciseIds(input.formData);
+      for (const id of submitted.size ? submitted : selectedModule.exercises.map(e => e.id)) {
+        const exercise = selectedModule.exercises.find(e => e.id === id);
+        if (!exercise || input.formData.get(`exerciseStableKey-${id}`) !== requireTyAshKey(exercise)) throw new Error("Stale exercise identity.");
+      }
+    }
     const submittedExerciseIds = getSubmittedExerciseIds(input.formData);
     const hasSubmittedExerciseScope = submittedExerciseIds.size > 0;
 
@@ -163,6 +173,10 @@ async function persistModuleAnswers(input: {
     const submodulePositionById = new Map(
       selectedModule.submodules.map((submodule) => [submodule.id, submodule.position]),
     );
+    if (input.markModuleCompleted && isTyAshContent(selectedModule)) {
+      const candidateAnswers = { ...selectedModule.answers, ...Object.fromEntries(answers.map(a => [a.exerciseId, a.answerText ? [a.answerText] : a.selectedOptions])) };
+      if (!getModuleProgress(selectedModule, selectedModule.exercises, candidateAnswers, 1, false).isCompleted) throw new Error("Required answers are incomplete.");
+    }
     const persistableAnswers = answers.filter((answer) =>
       (answer.answerText?.trim().length ?? 0) > 0 ||
       answer.selectedOptions.some((value) => value.trim().length > 0),
@@ -211,8 +225,11 @@ async function persistModuleAnswers(input: {
       projectId: workspace.project.id,
       moduleId: selectedModule.id,
       modulePosition: selectedModule.position,
+      moduleStableKey: selectedModule.stableKey,
       answers: persistableAnswers.map((answer) => ({
         exerciseId: answer.exerciseId,
+        exerciseStableKey: exerciseById.get(answer.exerciseId)?.stableKey,
+        submoduleStableKey: selectedModule.submodules.find(s => s.id === exerciseById.get(answer.exerciseId)?.submodule_id)?.stableKey,
         exercisePosition: exerciseById.get(answer.exerciseId)?.position ?? answer.exerciseId,
         submodulePosition: (() => {
           const submoduleId = exerciseById.get(answer.exerciseId)?.submodule_id;
@@ -227,7 +244,7 @@ async function persistModuleAnswers(input: {
       })),
     });
 
-    await backupModuleAnswers({
+    if (!isTyAshContent(selectedModule)) await backupModuleAnswers({
       projectId: workspace.project.id,
       modulePosition: selectedModule.position,
       answers: persistableAnswers.flatMap((answer) => {
@@ -250,7 +267,7 @@ async function persistModuleAnswers(input: {
     // Release snapshots use deterministic negative IDs and are not rows in the
     // legacy FK tables. Their durable source is the stable user_answers table.
     if (
-      selectedModule.id > 0 &&
+      !isTyAshContent(selectedModule) && selectedModule.id > 0 &&
       persistableAnswers.every((answer) => answer.exerciseId > 0)
     ) {
       await replaceModuleAnswers({
@@ -262,6 +279,9 @@ async function persistModuleAnswers(input: {
     }
 
     if (input.markModuleCompleted) {
+      if (isTyAshContent(selectedModule)) {
+        await upsertStableModuleAnswers({ userId: workspace.project.account_id, projectId: workspace.project.id, moduleId: selectedModule.id, modulePosition: selectedModule.position, moduleStableKey: requireTyAshKey(selectedModule), answers: [{ exerciseId: selectedModule.id, exerciseStableKey: "__completed", exercisePosition: 0, submodulePosition: null, values: ["true"], clientUpdatedAt: Date.now() }] });
+      } else {
       if (selectedModule.id > 0) {
         await setProjectModuleCompletion({
           projectId: workspace.project.id,
@@ -274,6 +294,7 @@ async function persistModuleAnswers(input: {
         moduleId: selectedModule.id,
         isCompleted: true,
       });
+      }
     }
 
     // Draft autosaves must not refresh the active React tree: doing so can race with

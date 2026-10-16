@@ -34,8 +34,8 @@ export function useAnswerSync(input: {
   const channelRef = useRef<BroadcastChannel | null>(null);
   const onRemoteAnswersRef = useRef(input.onRemoteAnswers);
   onRemoteAnswersRef.current = input.onRemoteAnswers;
-  const { userId, projectId, moduleId } = input.scope;
-  const scopeKey = `${userId}:${projectId}:${moduleId}`;
+  const { userId, projectId, moduleId, moduleStableKey, exerciseKeys } = input.scope;
+  const scopeKey = `${userId}:${projectId}:${moduleStableKey ?? moduleId}`;
   const enabled = input.enabled;
 
   const sync = useCallback(async () => {
@@ -49,7 +49,7 @@ export function useAnswerSync(input: {
       return;
     }
 
-    const scope = { userId, projectId, moduleId };
+    const scope = { userId, projectId, moduleId, moduleStableKey, exerciseKeys };
     const mutations = await getPendingMutations(scope);
     if (mutations.length === 0) {
       setStatus("synced");
@@ -70,6 +70,8 @@ export function useAnswerSync(input: {
           projectId: mutation.projectId,
           moduleId: mutation.moduleId,
           exerciseId: mutation.exerciseId,
+          moduleStableKey: mutation.moduleStableKey,
+          exerciseStableKey: mutation.questionId,
           values: mutation.values,
           revision: mutation.revision,
           updatedAt: mutation.updatedAt,
@@ -99,7 +101,7 @@ export function useAnswerSync(input: {
         queueMicrotask(() => void syncRef.current());
       }
     }
-  }, [enabled, moduleId, projectId, scopeKey, userId]);
+  }, [enabled, moduleId, projectId, scopeKey, moduleStableKey, exerciseKeys, userId]);
   syncRef.current = sync;
 
   useEffect(() => {
@@ -126,7 +128,7 @@ export function useAnswerSync(input: {
     channel.onmessage = (event: MessageEvent<{ type: string; answer?: LocalAnswerRecord }>) => {
       if (event.data.type === "answer-updated" && event.data.answer) {
         const exerciseId = event.data.answer.exerciseId;
-        void loadLocalModuleAnswers({ userId, projectId, moduleId }).then((records) => {
+        void loadLocalModuleAnswers({ userId, projectId, moduleId, moduleStableKey, exerciseKeys }).then((records) => {
           const current = records.find((record) => record.exerciseId === exerciseId);
           if (current) onRemoteAnswersRef.current([current]);
         });
@@ -137,7 +139,7 @@ export function useAnswerSync(input: {
       channel.close();
       channelRef.current = null;
     };
-  }, [enabled, moduleId, projectId, scopeKey, sync, userId]);
+  }, [enabled, moduleId, projectId, scopeKey, sync, userId, moduleStableKey, exerciseKeys]);
 
   useEffect(() => () => {
     if (retryTimerRef.current !== null) window.clearTimeout(retryTimerRef.current);

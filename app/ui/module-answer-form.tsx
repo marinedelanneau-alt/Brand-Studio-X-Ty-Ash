@@ -1,4 +1,6 @@
 "use client";
+import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
+import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
 
 import { SparklesIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -802,6 +804,10 @@ function buildSubmissionFormData(
 ) {
   const formData = new FormData();
   formData.set("moduleId", String(module.id));
+  if (isTyAshContent(module)) {
+    formData.set("moduleStableKey", module.stableKey!);
+    for (const e of module.exercises) formData.set(`exerciseStableKey-${e.id}`, e.stableKey!);
+  }
 
   module.exercises.forEach((exercise) => {
     if (!isAnswerableExerciseType(exercise.type)) {
@@ -926,6 +932,13 @@ function readNewestBrowserDraft(localKey: string, sessionKey: string) {
 }
 
 function readBrowserAnswersDraft(module: WorkspaceModule) {
+  if (isTyAshContent(module)) {
+    if (typeof window === "undefined" || !module.answerProjectId) return null;
+    const key = tyAshBrowserKey(module.answerProjectId, module);
+    const local = decodeTyAshBrowserDraft(window.localStorage.getItem(key), module, module.answerProjectId);
+    const session = decodeTyAshBrowserDraft(window.sessionStorage.getItem(key), module, module.answerProjectId);
+    return !local ? session : !session || local.updatedAt >= session.updatedAt ? local : session;
+  }
   const idDraft = readNewestBrowserDraft(
     getLocalAnswersDraftKey(module.id),
     getSessionAnswersDraftKey(module.id),
@@ -1003,6 +1016,16 @@ function writeBrowserAnswersDraft(
         JSON.stringify(persistedAnswers[exercise.id] ?? []),
     )
     .map((exercise) => exercise.id);
+  if (isTyAshContent(module)) {
+    if (!module.answerProjectId) return false;
+    const key = tyAshBrowserKey(module.answerProjectId, module);
+    const value = encodeTyAshBrowserDraft(module, module.answerProjectId, answers, pendingExerciseIds, updatedAt);
+    let stored = false;
+    for (const storage of [window.localStorage, window.sessionStorage]) {
+      try { storage.setItem(key, value); stored = true; } catch { /* Server persistence remains available. */ }
+    }
+    return stored;
+  }
   const payload = JSON.stringify({
     updatedAt,
     answers,
@@ -1164,6 +1187,8 @@ function isExerciseAnswered(
   }
 
   const values = answers[exercise.id] ?? [];
+  const override = completionOverride(exercise, values);
+  if (override !== undefined) return override;
   const normalizedValues = normalizeTextEntryValues(exercise, values);
   const questionPrompts = getQuestionPrompts(exercise);
 
@@ -1502,15 +1527,17 @@ export default function ModuleAnswerForm({
     () =>
       module.exercises.filter(
         (exercise) =>
-          isAnswerableExerciseType(exercise.type) &&
+          isAnswerableExerciseType(exercise.type) && countsTowardsProgress(exercise) &&
           isExerciseAnswered(exercise, answers),
       ).length,
     [answers, module.exercises],
   );
   const totalAnswerableExercises = useMemo(
-    () => module.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type)).length,
+    () => module.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type) && countsTowardsProgress(exercise)).length,
     [module.exercises],
   );
+  const localProgressPercent = totalAnswerableExercises > 0 ? Math.round(progressCount / totalAnswerableExercises * 100) : module.progress.completionPercent;
+  const globalProgressPercent = Math.max(0, Math.min(100, Math.round((module.globalProgressPercent ?? module.progress.completionPercent) + (localProgressPercent - module.progress.completionPercent) / (module.globalModuleCount ?? 4))));
   const isFirstSubmodule = currentSubmoduleIndex === 0;
   const isLastSubmodule =
     totalSubmodules === 0 || currentSubmoduleIndex === totalSubmodules - 1;
@@ -1877,7 +1904,7 @@ export default function ModuleAnswerForm({
   useEffect(() => {
     function handleStorage(event: StorageEvent) {
       const activeModule = moduleRef.current;
-      const relevantKeys = new Set([
+      const relevantKeys = new Set(isTyAshContent(activeModule) && activeModule.answerProjectId ? [tyAshBrowserKey(activeModule.answerProjectId, activeModule)] : [
         getLocalAnswersDraftKey(activeModule.id),
         getStableLocalAnswersDraftKey(activeModule.position),
       ]);
@@ -2105,7 +2132,7 @@ export default function ModuleAnswerForm({
 
         <div className="flex items-center justify-between gap-4">
           <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
-            {visibleExerciseGroups.length > 0
+            {isTyAshContent(module) ? `Étape ${module.position} sur 4 — ${module.title}` : visibleExerciseGroups.length > 0
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
                   ? "Inspiration"
@@ -2114,7 +2141,7 @@ export default function ModuleAnswerForm({
               : "Aucun exercice dans ce sous-module"}
           </p>
           <p className="text-sm text-[var(--text-muted)]">
-            {progressCount}/{totalAnswerableExercises} complétées
+            {isTyAshContent(module) ? `${globalProgressPercent} % du parcours` : `${progressCount}/${totalAnswerableExercises} complétées`}
           </p>
         </div>
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-secondary)]">
@@ -2122,7 +2149,7 @@ export default function ModuleAnswerForm({
             className="h-full rounded-full bg-[image:var(--tyash-progress-gradient)] transition-[width]"
             style={{
               width: `${
-                totalAnswerableExercises > 0
+                isTyAshContent(module) ? globalProgressPercent : totalAnswerableExercises > 0
                   ? (progressCount / totalAnswerableExercises) * 100
                   : 0
               }%`,
@@ -2132,6 +2159,7 @@ export default function ModuleAnswerForm({
       </div>
 
       <div className="space-y-4">
+        {currentExercise?.completion?.required === false ? <p className="text-sm text-[var(--text-muted)]">Facultatif : tu peux continuer sans remplir cet exercice.</p> : null}
         {currentSubmodule ? (
           <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             {currentSubmodule.title}
@@ -2140,7 +2168,7 @@ export default function ModuleAnswerForm({
         {!isPassiveContentType(currentExercise?.type) ? (
           <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
             {visibleExerciseGroups.length > 0
-              ? `Exercice ${currentAnswerableExerciseIndex + 1}`
+              ? isTyAshContent(module) ? "" : `Exercice ${currentAnswerableExerciseIndex + 1}`
               : "Exercices à venir"}
           </p>
         ) : null}
@@ -2330,7 +2358,7 @@ export default function ModuleAnswerForm({
                     >
                       <span className="flex items-start gap-3">
                         <span className="min-w-0 flex-1 text-sm font-semibold leading-7 text-[var(--text-primary)]">
-                          {prompt}
+                          {prompt}{currentExercise.completion?.required === false || currentExercise.completion?.optionalFields?.includes(questionIndex) ? " (facultatif)" : ""}
                         </span>
                         <ExerciseAiActions
                           exercise={currentExercise}
@@ -3346,6 +3374,7 @@ export default function ModuleAnswerForm({
                                                 className="border-t border-[var(--border)] px-3 py-3"
                                               >
                                                 <textarea
+                                                  aria-label={`${rowLabel || `Ligne ${rowIndex + 1}`} - ${columnLabels[columnIndex] || `Colonne ${columnIndex + 1}`}${currentExercise.completion?.required === false || currentExercise.completion?.optionalRows?.includes(rowIndex) || currentExercise.completion?.optionalCells?.includes(cellIndex) ? " (facultatif)" : ""}`}
                                                   value={questionValues[cellIndex] ?? ""}
                                                   onChange={(event) =>
                                                     setAnswers((current) => {
@@ -3442,7 +3471,7 @@ export default function ModuleAnswerForm({
           className="bs-button-secondary flex h-12 items-center justify-center rounded-[0.9rem] border px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
         >
           {currentIndex > 0 || isFirstSubmodule
-            ? "Question precedente"
+            ? isTyAshContent(module) ? "Revenir" : "Question precedente"
             : "Sous-module précédent"}
         </button>
 
@@ -3478,7 +3507,7 @@ export default function ModuleAnswerForm({
               onClick={() => void goToNextStep()}
               className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
-              {isSavingDraft ? "Enregistrement..." : nextStepLabel}
+              {isSavingDraft ? "Enregistrement..." : isTyAshContent(module) ? "Continuer" : nextStepLabel}
             </button>
           ) : !isLastSubmodule ? (
             <button
@@ -3487,7 +3516,7 @@ export default function ModuleAnswerForm({
               onClick={() => void goToNextStep()}
               className="bs-button-primary flex h-12 items-center justify-center rounded-[0.9rem] px-5 text-sm font-extrabold uppercase tracking-[0.12em]"
             >
-              {isSavingDraft ? "Enregistrement..." : nextStepLabel}
+              {isSavingDraft ? "Enregistrement..." : isTyAshContent(module) ? "Continuer" : nextStepLabel}
             </button>
           ) : isEditorialCalendarModule ? (
             <button

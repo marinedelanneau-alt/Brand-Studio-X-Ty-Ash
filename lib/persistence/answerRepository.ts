@@ -19,7 +19,8 @@ export async function loadLocalModuleAnswers(scope: AnswerPersistenceScope) {
     (answer) =>
       answer.userId === scope.userId &&
       answer.projectId === scope.projectId &&
-      answer.moduleId === scope.moduleId,
+      answer.moduleId === scope.moduleId &&
+      (scope.moduleStableKey ? answer.moduleStableKey === scope.moduleStableKey && answer.questionId === scope.exerciseKeys?.[answer.exerciseId] : !answer.moduleStableKey),
   );
 }
 
@@ -53,7 +54,7 @@ export async function persistLocalAnswer(input: {
       ...input.scope,
       key,
       exerciseId: input.exerciseId,
-      questionId: `question_${input.exerciseId}`,
+      questionId: input.scope.exerciseKeys?.[input.exerciseId] ?? `question_${input.exerciseId}`,
       values: [...input.values],
       revision,
       updatedAt: now,
@@ -112,7 +113,7 @@ export async function mergeRemoteModuleAnswers(
         ...scope,
         key: getAnswerKey(scope, exerciseId),
         exerciseId,
-        questionId: `question_${exerciseId}`,
+        questionId: scope.exerciseKeys?.[exerciseId] ?? `question_${exerciseId}`,
         values: [...resolved.answer.values],
         revision: resolved.answer.revision,
         updatedAt: resolved.answer.updatedAt,
@@ -138,6 +139,7 @@ export async function getPendingMutations(scope: AnswerPersistenceScope) {
       mutation.userId === scope.userId &&
       mutation.projectId === scope.projectId &&
       mutation.moduleId === scope.moduleId &&
+      (scope.moduleStableKey ? mutation.moduleStableKey === scope.moduleStableKey && mutation.questionId === scope.exerciseKeys?.[mutation.exerciseId] : !mutation.moduleStableKey) &&
       mutation.nextRetryAt <= now,
   );
 }

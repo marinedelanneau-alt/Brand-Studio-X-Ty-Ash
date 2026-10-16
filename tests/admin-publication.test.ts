@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({
   state: { published_release_id: "v1", current_draft_release_id: null as string | null },
-  releases: {} as Record<string, { id: string; status: string }>,
+  releases: {} as Record<string, { id: string; status: string; pathway_root_id?: string; published_at?: string }>,
   snapshots: {} as Record<string, { schema_version: number; modules: unknown[]; updated_at: string; brand_guide_settings: object; pdf_settings: object; interface_settings: object }>,
   rows: {} as Record<string, unknown>, reads: [] as string[], writes: [] as string[], audit: [] as string[],
   revision: 0, publishError: "",
@@ -27,6 +27,15 @@ vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: () => ({ f
   }; return query;
 } }) }));
 vi.mock("@/lib/content-releases", () => ({
+  createIndependentPathwayDraft: async (input: { modules: unknown[]; expectedPublishedReleaseId: string }) => {
+    if (store.state.current_draft_release_id || store.state.published_release_id !== input.expectedPublishedReleaseId) throw new Error("Stale pathway creation");
+    const id = `independent-${++store.revision}`;
+    store.releases[id] = { id, status: "draft", pathway_root_id: id };
+    store.snapshots[id] = { ...structuredClone(store.snapshots[store.state.published_release_id]), modules: structuredClone(input.modules) };
+    store.state.current_draft_release_id = id;
+    return id;
+  },
+  getRetainedPathwaySnapshots: async () => Object.values(store.releases).map(release => ({ release, modules: structuredClone(store.snapshots[release.id].modules) })),
   getApplicationReleaseState: async () => ({ ...store.state }),
   getContentRelease: async (id: string) => store.releases[id] ? { ...store.releases[id] } : null,
   getContentReleaseSnapshot: async (id: string) => structuredClone(store.snapshots[id] ?? null),
@@ -66,6 +75,10 @@ vi.mock("@/lib/content-releases", () => ({
 import { saveAdminModuleDraft, publishFinalVersionForAllUsers, publishAdminDraftToAllUsers } from "../app/admin/modules/actions";
 import { getAdminWorkingModules, getWorkspaceData, publishAdminModuleDraft } from "../lib/training";
 import { saveAdminReleaseModules } from "../lib/admin-content-release";
+import { prepareIndependentPathway } from "../lib/pathway-versions";
+import { createNewPathwayDraft, createTyAshPathwayDraft } from "../app/admin/releases/new-pathway-action";
+import { groupExercisesByGroupId } from "../lib/exercise-groups";
+import { getSerializedSpectrumOptions, parseStoredSpectrumConfig } from "../lib/spectrum";
 
 const question = (id: number, position: number) => ({ id, position, module_id: 1, submodule_id: 2, stableKey: `exercise_${id}`,
   type: "open", question: `Question ${id} A`, options: [], explanation: "", answer_placeholder: "", audio_url: null, audio_transcript: null });
@@ -92,6 +105,138 @@ describe("brouillon privé et publication officielle sans mutation utilisateur",
     store.rows = { brand_projects: { id: 10, account_id: 7, name: "Projet existant" }, client_access_codes: { id: 7, role: "user" },
       project_exercise_answers: [{ id: 1, project_id: 10, module_id: 1, exercise_id: 3, answer_text: "Réponse A", selected_options: [], updated_at: "2026-09-23T12:00:00Z" }],
       project_module_states: [{ id: 1, project_id: 10, module_id: 1, is_completed: true }], brand_exports: null, user_answers: [] };
+  });
+
+  it("the Ty Ash button prepares the whole approved course only on invocation and preserves the published workspace", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://cplzwnlstcpqqzqeawgs.supabase.co");
+    const before = structuredClone(store.rows);
+    const official = structuredClone(store.snapshots.v1);
+    await expect(createTyAshPathwayDraft()).rejects.toThrow("/admin/modules?status=saved");
+    const admin = await getAdminWorkingModules(42);
+    expect(admin).toHaveLength(4);
+    expect(admin.flatMap(m => m.submodules)).toHaveLength(15);
+    expect(new Set(admin.flatMap(m => m.exercises.map(e => e.exercise_group_id))).size).toBe(43);
+    expect(admin.flatMap(m => m.exercises).filter(e => e.type === "spectrum")).toHaveLength(12);
+    expect(store.snapshots.v1).toEqual(official);
+    expect(store.rows).toEqual(before);
+    expect(store.state.published_release_id).toBe("v1");
+    expect((await getWorkspaceData(7)).modules[0].id).toBe(1);
+    const moduleItem = admin[3];
+    const edit = new FormData();
+    edit.set("moduleId", String(moduleItem.id)); edit.set("position", "4"); edit.set("isPublished", "on");
+    edit.set("title", "Editable video module"); edit.set("saveMode", "manual");
+    edit.set("expectedModuleUpdatedAt", moduleItem.editorRevision ?? moduleItem.updated_at ?? "initial");
+    edit.set("submodulesJson", JSON.stringify(moduleItem.submodules.map(sub => ({
+      clientId: String(sub.id), title: "Editable submodule", contentHtml: "<p>Editable introduction</p>",
+      exerciseGroups: groupExercisesByGroupId(sub.exercises).map(group => ({ groupId: group.id,
+        questions: group.questions.map(e => ({ clientId: String(e.id), type: e.type,
+          completion: e.completion, question: e.question, explanation: "Editable help",
+          options: e.type === "spectrum" ? getSerializedSpectrumOptions({ ...parseStoredSpectrumConfig(e.options), leftLabel: "Editable axis" })
+            : e.type === "multiple" ? [...e.options, "Editable choice"] : e.options,
+        })),
+      })),
+    }))));
+    const saved = await saveAdminModuleDraft(edit);
+    expect(saved.status, saved.message).toBe("success");
+    const reread = await getAdminWorkingModules(42);
+    expect(reread[3].title).toBe("Editable video module");
+    expect(parseStoredSpectrumConfig(reread[3].exercises.find(e => e.type === "spectrum")!.options).leftLabel).toBe("Editable axis");
+    expect(new Set(reread.flatMap(m => m.exercises.map(e => e.exercise_group_id))).size).toBe(43);
+    expect(store.snapshots.v1).toEqual(official);
+    expect(store.rows).toEqual(before);
+    const draft = store.state.current_draft_release_id;
+    await expect(createTyAshPathwayDraft()).rejects.toThrow("/admin/releases?kind=error");
+    expect(store.state.current_draft_release_id).toBe(draft);
+    vi.unstubAllEnvs();
+  });
+
+  it("the Ty Ash button refuses a different Supabase project", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.invalid");
+    await expect(createTyAshPathwayDraft()).rejects.toThrow("/admin/releases?kind=error");
+    expect(store.state.current_draft_release_id).toBeNull();
+    vi.unstubAllEnvs();
+  });
+
+  it("the explicit admin import creates a draft immediately readable by the real admin loader", async () => {
+    const official = structuredClone(store.snapshots.v1);
+    const before = structuredClone(store.rows);
+    const form = new FormData();
+    form.set("name", "Independent fixture");
+    form.set("pathway", new File([JSON.stringify(official.modules)], "fixture.json", { type: "application/json" }));
+    await expect(createNewPathwayDraft(form)).rejects.toThrow("/admin/modules?status=saved");
+    const admin = await getAdminWorkingModules(42);
+    expect(admin).toHaveLength(1);
+    expect(admin[0].stableKey).toMatch(/^tyash_v1_/);
+    expect(admin[0].id).not.toBe(1);
+    expect(admin[0].exercises.every(e => e.id < 0 && e.stableKey?.startsWith("tyash_v1_"))).toBe(true);
+    expect(store.snapshots.v1).toEqual(official);
+    expect(store.state.published_release_id).toBe("v1");
+    expect(store.rows).toEqual(before);
+    expect((await getWorkspaceData(7)).modules[0].id).toBe(1);
+  });
+
+  it("a malformed admin import creates no draft and changes no user data or published pointer", async () => {
+    const before = structuredClone(store.rows);
+    const form = new FormData();
+    form.set("name", "Invalid fixture");
+    form.set("pathway", new File(['{"modules":[{"title":"Missing identity and structure"}]}'], "invalid.json"));
+    await expect(createNewPathwayDraft(form)).rejects.toThrow("/admin/releases?kind=error");
+    expect(store.state.current_draft_release_id).toBeNull();
+    expect(store.state.published_release_id).toBe("v1");
+    expect(Object.keys(store.releases)).toEqual(["v1"]);
+    expect(store.rows).toEqual(before);
+  });
+
+  it("loads and edits only the independent 4/15/43 draft while users keep the old answers and release", async () => {
+    let id = 100;
+    let subIndex = 0;
+    const input = [5, 3, 3, 4].map((count, moduleIndex) => {
+      let exercisePosition = 0;
+      return { id: id++, stableKey: `fixture_module_${moduleIndex}`, title: "Fixture", position: moduleIndex + 1,
+        submodules: Array.from({ length: count }, (_, submoduleIndex) => {
+          const questionCount = subIndex++ < 13 ? 3 : 2;
+          return { id: id++, stableKey: `fixture_sub_${subIndex}`, title: "Fixture", position: submoduleIndex + 1, content_html: "",
+            exercises: Array.from({ length: questionCount }, () => {
+              const exerciseId = id++;
+              return { id: exerciseId, stableKey: `fixture_question_${exerciseId}`, position: ++exercisePosition, type: "open", question: "Fixture?", options: [] };
+            }),
+          };
+        }),
+      };
+    });
+    const before = structuredClone(store.rows);
+    const official = structuredClone(store.snapshots.v1);
+    const modules = prepareIndependentPathway(input, [official.modules]);
+    store.releases.independent = { id: "independent", status: "draft", pathway_root_id: "independent" };
+    store.snapshots.independent = { ...structuredClone(official), modules };
+    store.state.current_draft_release_id = "independent";
+    const admin = await getAdminWorkingModules(42);
+    expect(admin).toHaveLength(4);
+    expect(admin.flatMap(m => m.submodules)).toHaveLength(15);
+    expect(admin.flatMap(m => m.exercises)).toHaveLength(43);
+    expect((await getWorkspaceData(7)).modules[0].answers[3]).toEqual(["Réponse A"]);
+    const moduleItem = admin[0];
+    const form = new FormData();
+    form.set("moduleId", String(moduleItem.id)); form.set("position", "1"); form.set("isPublished", "on");
+    form.set("title", "Edited module"); form.set("saveMode", "manual");
+    form.set("expectedModuleUpdatedAt", moduleItem.editorRevision ?? moduleItem.updated_at ?? "initial");
+    form.set("submodulesJson", JSON.stringify(moduleItem.submodules.map(sub => ({
+      clientId: String(sub.id), title: "Edited submodule", contentHtml: "<p>Edited introduction</p>",
+      exerciseGroups: sub.exercises.map(e => ({ groupId: `group_${e.id}`, questions: [{
+        clientId: String(e.id), type: e.type, question: "Edited question?", explanation: "Edited help", options: [],
+      }] })),
+    }))));
+    const result = await saveAdminModuleDraft(form);
+    expect(result.status, result.message).toBe("success");
+    const reread = await getAdminWorkingModules(42);
+    expect(reread[0].title).toBe("Edited module");
+    expect(reread[0].exercises[0].question).toBe("Edited question?");
+    expect(reread[0].exercises[0].explanation).toBe("Edited help");
+    expect(reread[0].exercises[0].stableKey).toBe(moduleItem.exercises[0].stableKey);
+    expect(store.snapshots.v1).toEqual(official);
+    expect(store.rows).toEqual(before);
+    expect(store.state.published_release_id).toBe("v1");
+    expect((await getWorkspaceData(7)).modules).toHaveLength(1);
   });
 
   it("autosave creates the first controlled draft despite unchanged historical choices, then publishes that exact draft", async () => {

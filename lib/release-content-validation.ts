@@ -1,15 +1,13 @@
+import { validateCompletionRequirements, type CompletionRequirements } from "./exercise-completion";
 import { hydrateReleaseSnapshotModules } from "./content-release-diff";
 import { getFillBlankCount, parseStoredExerciseQuestionConfig, parseStoredTableConfig, type ExerciseType } from "./exercise-types";
+import contract from "./pathway-snapshot.schema.json";
 
 type Entity = { id: number; stableKey?: string; position: number };
-type Exercise = Entity & { type: ExerciseType; question: string; options: string[]; module_id: number; submodule_id: number };
+type Exercise = Entity & { completion?: CompletionRequirements; type: ExerciseType; question: string; options: string[]; module_id: number; submodule_id: number };
 type Submodule = Entity & { title: string; content_html: string; exercises: Exercise[] };
 type Module = Entity & { title: string; submodules: Submodule[]; exercises: Exercise[] };
-const supportedTypes = new Set<ExerciseType>([
-  "static_text", "popup_message", "image_upload", "open", "single", "multiple", "checklist", "table",
-  "boolean", "color", "fill_blank", "prompt_open", "group_open", "brand_persona", "spectrum",
-  "color_palette", "typography", "editorial_calendar", "moodboard",
-]);
+const supportedTypes = new Set<ExerciseType>(contract.modules.items.properties.submodules.items.properties.exercises.items.properties.type.enum as ExerciseType[]);
 
 export function validateReleaseModules(value: unknown): Module[] {
   if (!Array.isArray(value) || value.length === 0) {
@@ -71,6 +69,7 @@ export function validateReleaseModules(value: unknown): Module[] {
       }
       for (const exercise of submodule.exercises) {
         check(exercise, "exercise");
+        validateCompletionRequirements(exercise);
         if (typeof exercise.question !== "string" || !supportedTypes.has(exercise.type)) {
           throw new Error("Release invalide : question ou type absent.");
         }

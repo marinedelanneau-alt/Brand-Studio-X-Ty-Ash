@@ -13,6 +13,7 @@ export type ContentReleaseStatus = "draft" | "ready" | "published" | "archived";
 export type ContentPreviewMode = "current_answers" | "new_user";
 
 export type ContentRelease = {
+  pathway_root_id?: string | null;
   id: string;
   version_number: number;
   name: string;
@@ -106,7 +107,7 @@ export async function listContentReleases() {
   const { data, error } = await supabase
     .from("content_releases")
     .select(
-      "id,version_number,name,status,created_at,updated_at,published_at,source_release_id,notes",
+      "*",
     )
     .order("version_number", { ascending: false })
     .returns<ContentRelease[]>();
@@ -133,7 +134,7 @@ export async function getContentRelease(releaseId: string) {
   const { data, error } = await supabase
     .from("content_releases")
     .select(
-      "id,version_number,name,status,created_at,updated_at,published_at,source_release_id,notes",
+      "*",
     )
     .eq("id", releaseId)
     .maybeSingle<ContentRelease>();
@@ -216,6 +217,34 @@ export function createContentDraft(input: {
     draft_name: input.name,
     replace_current_draft: input.replaceCurrentDraft ?? false,
   });
+}
+
+export function createIndependentPathwayDraft(input: {
+  name: string; modules: unknown[]; expectedPublishedReleaseId: string;
+}) {
+  return callAuthenticatedReleaseRpc("create_independent_pathway_draft", {
+    draft_name: input.name,
+    snapshot_modules: input.modules,
+    expected_published_release_id: input.expectedPublishedReleaseId,
+  });
+}
+
+export async function getRetainedPathwaySnapshots() {
+  const supabase = createSupabaseServerClient();
+  const results: Array<{ release: ContentRelease; modules: unknown[] }> = [];
+  // Explicit paging: identity reservations must include all retained releases.
+  for (let offset = 0; ; offset += 100) {
+    const { data, error } = await supabase.from("content_releases").select("*")
+      .order("version_number").range(offset, offset + 99).returns<ContentRelease[]>();
+    if (error) throw new Error(error.message);
+    for (const release of data ?? []) {
+      const snapshot = await getContentReleaseSnapshot(release.id);
+      if (!snapshot) throw new Error("Snapshot historique absent : identités non vérifiables.");
+      results.push({ release, modules: snapshot.modules });
+    }
+    if (!data || data.length < 100) break;
+  }
+  return results;
 }
 
 export function markContentReleaseReady(input: {

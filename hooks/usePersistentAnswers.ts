@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isTyAshContent, requireTyAshKey } from "@/lib/tyash-answer-identity";
 import type { WorkspaceModule } from "@/lib/training-types";
 import {
   loadLocalModuleAnswers,
@@ -29,6 +30,8 @@ export function usePersistentAnswers(input: {
   const answersRef = useRef(answers);
   const broadcastAnswerRef = useRef<(answer: LocalAnswerRecord) => void>(() => undefined);
   const { userId, projectId, moduleId } = input.scope;
+  const moduleStableKey = isTyAshContent(input.module) ? requireTyAshKey(input.module) : undefined;
+  const exerciseKeys = useMemo(() => moduleStableKey ? Object.fromEntries(input.module.exercises.map(e => [e.id, requireTyAshKey(e)])) : undefined, [input.module.exercises, moduleStableKey]);
   const exercisesRef = useRef(input.module.exercises);
 
   const remoteVersions = useMemo<RemoteAnswerVersion[]>(
@@ -48,6 +51,7 @@ export function usePersistentAnswers(input: {
       const next = { ...current };
       let changed = false;
       for (const record of records) {
+        if (moduleStableKey && (record.moduleStableKey !== moduleStableKey || record.questionId !== exerciseKeys?.[record.exerciseId])) continue;
         if (
           locallyEditedDuringHydrationRef.current.has(record.exerciseId)
         ) {
@@ -63,10 +67,10 @@ export function usePersistentAnswers(input: {
         answersRef.current = next;
         setAnswersState(next);
       }
-  }, []);
+  }, [moduleStableKey, exerciseKeys]);
 
   const sync = useAnswerSync({
-    scope: { userId, projectId, moduleId },
+    scope: { userId, projectId, moduleId, moduleStableKey, exerciseKeys },
     enabled: hasHydrated,
     changeToken,
     onRemoteAnswers: applyRecords,
@@ -83,7 +87,7 @@ export function usePersistentAnswers(input: {
     let cancelled = false;
 
     void (async () => {
-      const scope = { userId, projectId, moduleId };
+      const scope = { userId, projectId, moduleId, moduleStableKey, exerciseKeys };
       const localFirst = await loadLocalModuleAnswers(scope);
       if (cancelled) return;
       applyRecords(localFirst);
@@ -129,7 +133,7 @@ export function usePersistentAnswers(input: {
     return () => {
       cancelled = true;
     };
-  }, [applyRecords, input.module.exercises, moduleId, projectId, remoteVersions, userId]);
+  }, [applyRecords, input.module.exercises, moduleId, projectId, remoteVersions, userId, moduleStableKey, exerciseKeys]);
 
   const setAnswers = useCallback(
     (update: AnswersByExercise | ((current: AnswersByExercise) => AnswersByExercise)) => {
@@ -152,7 +156,7 @@ export function usePersistentAnswers(input: {
           if (!hasValue(nextValues)) continue;
 
           void persistLocalAnswer({
-            scope: { userId, projectId, moduleId },
+            scope: { userId, projectId, moduleId, moduleStableKey, exerciseKeys },
             exerciseId: exercise.id,
             values: nextValues,
             explicitDelete: false,
@@ -166,7 +170,7 @@ export function usePersistentAnswers(input: {
 
         userInteractionRef.current = false;
     },
-    [hasHydrated, moduleId, projectId, userId],
+    [hasHydrated, moduleId, projectId, userId, moduleStableKey, exerciseKeys],
   );
 
   const markUserInteraction = useCallback(() => {

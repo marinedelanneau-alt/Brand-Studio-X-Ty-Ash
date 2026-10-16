@@ -8,11 +8,13 @@ import {
   markContentReleaseReady,
   publishContentRelease,
   updateCurrentDraftSnapshot,
+  getRetainedPathwaySnapshots,
   type ContentReleaseSnapshot,
 } from "./content-releases";
 import { normalizeReleaseSnapshotModules } from "./content-release-diff";
 import { assertReleaseAnswerCompatibility, validateReleaseModules } from "./release-content-validation";
 import { getBootstrapAdminSnapshot, getBootstrapPublishedModules } from "./legacy-release-bootstrap";
+import { assertPathwaySave } from "./pathway-versions";
 
 export async function getAdminReleaseWorkspace() {
   const state = await getApplicationReleaseState();
@@ -45,7 +47,9 @@ export async function saveAdminReleaseModules(modules: unknown[], expectedUpdate
   const normalized = normalizeReleaseSnapshotModules(modules);
   const publishedModules = Array.isArray(publishedSnapshot.modules) && publishedSnapshot.modules.length === 0
     ? await getBootstrapPublishedModules() : publishedSnapshot.modules;
-  assertReleaseAnswerCompatibility(publishedModules, normalized);
+  if (workspace.release.pathway_root_id) {
+    assertPathwaySave(normalized, workspace.release, await getRetainedPathwaySnapshots());
+  } else assertReleaseAnswerCompatibility(publishedModules, normalized);
   let releaseId = workspace.release.id;
   let snapshotUpdatedAt = workspace.snapshot.updated_at;
   if (workspace.release.status !== "draft") {
@@ -87,7 +91,9 @@ export async function verifyCurrentDraft(releaseId?: string): Promise<{
   if (!publishedSnapshot) throw new Error("Snapshot publié introuvable.");
   const publishedModules = Array.isArray(publishedSnapshot.modules) && publishedSnapshot.modules.length === 0
     ? await getBootstrapPublishedModules() : publishedSnapshot.modules;
-  assertReleaseAnswerCompatibility(publishedModules, workspace.snapshot.modules);
+  if (workspace.release.pathway_root_id) {
+    assertPathwaySave(workspace.snapshot.modules, workspace.release, await getRetainedPathwaySnapshots());
+  } else assertReleaseAnswerCompatibility(publishedModules, workspace.snapshot.modules);
   return { releaseId: workspace.release.id, snapshot: workspace.snapshot, status: workspace.release.status };
 }
 

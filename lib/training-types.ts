@@ -41,6 +41,7 @@ export type BrandSubmodule = {
 };
 
 export type ModuleExercise = {
+  completion?: import("./exercise-completion").CompletionRequirements;
   stableKey?: string;
   editorKey?: string;
   id: number;
@@ -73,6 +74,9 @@ export type ModuleProgress = {
 };
 
 export type WorkspaceModule = BrandModule & {
+  answerProjectId?: number;
+  globalProgressPercent?: number;
+  globalModuleCount?: number;
   submodules: Array<
     BrandSubmodule & {
       exercises: ModuleExercise[];

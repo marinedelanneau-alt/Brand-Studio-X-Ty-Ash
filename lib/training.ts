@@ -1,6 +1,9 @@
+import { isTyAshContent, requireTyAshKey, resolveTyAshExerciseId } from "./tyash-answer-identity";
+import { countsTowardsProgress, completionOverride } from "./exercise-completion";
 import "server-only";
 import { getAdminReleaseWorkspace, saveAdminReleaseModules } from "@/lib/admin-content-release";
 import { validateReleaseModules } from "@/lib/release-content-validation";
+import { getRetainedPathwaySnapshots } from "@/lib/content-releases";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -266,7 +269,7 @@ export function groupModuleExercises(exercises: ModuleExercise[]) {
 function computeModuleAnswerMap(
   exercises: ModuleExercise[],
   answers: ProjectExerciseAnswerRecord[],
-) {
+): Record<number, string[]> {
   const answerByExercise = new Map<number, string[]>();
   const exerciseById = new Map(exercises.map((exercise) => [exercise.id, exercise]));
 
@@ -355,7 +358,7 @@ function isAlwaysUnlockedModule(module: BrandModule) {
   return ALWAYS_UNLOCK_MODULE_KEYWORDS.some((keyword) => title.includes(keyword));
 }
 
-function getModuleProgress(
+export function getModuleProgress(
   module: BrandModule,
   exercises: ModuleExercise[],
   answerMap: Record<number, string[]>,
@@ -363,11 +366,13 @@ function getModuleProgress(
   hasManualCompletion: boolean,
 ) {
   const answerableExercises = exercises.filter((exercise) =>
-    isAnswerableExerciseType(exercise.type),
+    isAnswerableExerciseType(exercise.type) && countsTowardsProgress(exercise),
   );
   const exerciseCount = answerableExercises.length;
   const answeredCount = answerableExercises.filter((exercise) => {
     const answer = answerMap[exercise.id] ?? [];
+    const override = completionOverride(exercise, answer);
+    if (override !== undefined) return override;
     const questionConfig = parseStoredExerciseQuestionConfig(
       exercise.type,
       exercise.options,
@@ -494,7 +499,7 @@ function getModuleProgress(
     return answer.some((item) => item.trim().length > 0);
   }).length;
   const isCompleted =
-    hasManualCompletion || (exerciseCount > 0 && answeredCount === exerciseCount);
+    (hasManualCompletion && !isTyAshContent(module)) || (exerciseCount > 0 && answeredCount === exerciseCount) || (exercises.some(e => isAnswerableExerciseType(e.type)) && exerciseCount === 0);
 
   const isUnlocked = true;
 
@@ -1163,6 +1168,7 @@ function buildDraftModuleFromDefinition(
         groupId: string;
         questions: Array<{
           clientId?: string;
+          completion?: import("./exercise-completion").CompletionRequirements;
           type: ExerciseType;
           explanation: string;
           answerPlaceholder: string;
@@ -1179,20 +1185,15 @@ function buildDraftModuleFromDefinition(
   existingModules: DraftModule[],
 ) {
   const now = new Date().toISOString();
+  let nextIdentityId = getNextDraftId(existingModules.flatMap(m => [m.id, ...m.submodules.map(s => s.id), ...m.exercises.map(e => e.id)]));
   const moduleId =
     existingModule
       ? existingModule.id
       : input.moduleId && Number.isFinite(input.moduleId)
         ? input.moduleId
-      : getNextDraftId(existingModules.map((module) => module.id));
+      : nextIdentityId--;
   const existingSubmodules = existingModule?.submodules ?? [];
   const existingExercises = existingModule?.exercises ?? [];
-  let nextSubmoduleId = getNextDraftId(
-    existingModules.flatMap((module) => module.submodules.map((submodule) => submodule.id)),
-  );
-  let nextExerciseId = getNextDraftId(
-    existingModules.flatMap((module) => module.exercises.map((exercise) => exercise.id)),
-  );
   let globalExercisePosition = 1;
 
   const submodules = input.submodules.map((submodule, submoduleIndex) => {
@@ -1201,7 +1202,7 @@ function buildDraftModuleFromDefinition(
       (Number.isFinite(requestedSubmoduleId)
         ? existingSubmodules.find((item) => item.id === requestedSubmoduleId)
         : existingSubmodules.find((item) => item.editorKey === submodule.clientId));
-    const submoduleId = existingSubmodule?.id ?? nextSubmoduleId--;
+    const submoduleId = existingSubmodule?.id ?? nextIdentityId--;
     const questions = submodule.exerciseGroups.flatMap((group) =>
       group.questions.map((question) => {
         const requestedExerciseId = Number(question.clientId);
@@ -1210,10 +1211,11 @@ function buildDraftModuleFromDefinition(
             ? existingExercises.find((item) => item.id === requestedExerciseId)
             : undefined) ??
           existingExercises.find((item) => item.editorKey === question.clientId);
-        const exerciseId = existingExercise?.id ?? nextExerciseId--;
+        const exerciseId = existingExercise?.id ?? nextIdentityId--;
 
         return {
           ...existingExercise,
+          stableKey: existingExercise?.stableKey ?? `tyash_v1_question_${crypto.randomUUID()}`,
           editorKey: existingExercise?.editorKey ?? question.clientId,
           id: exerciseId,
           module_id: moduleId,
@@ -1231,12 +1233,14 @@ function buildDraftModuleFromDefinition(
           ],
           exercise_group_id: group.groupId,
           feedback_config: question.feedbackConfig,
+          completion: question.completion ?? existingExercise?.completion,
         } satisfies ModuleExercise;
       }),
     );
 
     return {
       ...existingSubmodule,
+      stableKey: existingSubmodule?.stableKey ?? `tyash_v1_submodule_${crypto.randomUUID()}`,
       editorKey: existingSubmodule?.editorKey ?? submodule.clientId,
       id: submoduleId,
       module_id: moduleId,
@@ -1254,6 +1258,7 @@ function buildDraftModuleFromDefinition(
 
   return normalizeDraftModule({
     ...existingModule,
+    stableKey: existingModule?.stableKey ?? `tyash_v1_module_${crypto.randomUUID()}`,
     editorRevision: crypto.randomUUID(),
     id: moduleId,
     title: input.title,
@@ -1302,7 +1307,9 @@ export async function saveAdminModuleDefinitionDraft(
     }
   }
   if (input.moduleId && !existingModule) throw new Error("Module périmé : recharge l'éditeur.");
-  const nextModule = buildDraftModuleFromDefinition(input, existingModule, modules);
+  const history = existingModule && !isTyAshContent(existingModule) ? [] : await getRetainedPathwaySnapshots();
+  const reserved = history.flatMap(h => h.modules.length ? validateReleaseModules(h.modules) : []) as unknown as DraftModule[];
+  const nextModule = buildDraftModuleFromDefinition(input, existingModule, [...modules, ...reserved]);
   const nextModules = existingModule
     ? reorderDraftModules(modules, nextModule)
     : reorderDraftModules([...modules, nextModule], nextModule);
@@ -1524,7 +1531,8 @@ export async function getWorkspaceData(accountId: number) {
   );
 
   const draftModules = modules.map((module) => {
-    const moduleAnswers = groupedAnswers.get(module.id) ?? [];
+    const strictIdentity = isTyAshContent(module);
+    const moduleAnswers = strictIdentity ? [] : groupedAnswers.get(module.id) ?? [];
     const answersMap = computeModuleAnswerMap(module.exercises, moduleAnswers);
     const answerVersions = Object.fromEntries(
       moduleAnswers.map((answer) => [
@@ -1532,12 +1540,12 @@ export async function getWorkspaceData(accountId: number) {
         { updatedAt: Date.parse(answer.updated_at) || 0, revision: 0 },
       ]),
     ) as WorkspaceModule["answerVersions"];
-    const backedUpModuleAnswers = answerBackup?.modules[String(module.position)];
+    const backedUpModuleAnswers = strictIdentity ? undefined : answerBackup?.modules[String(module.position)];
     const stableModuleAnswers = stableAnswers
       .filter(
         (item) =>
-          item.module_key === `module_position_${module.position}` ||
-          item.module_key === `module_${module.id}`,
+          strictIdentity ? item.module_key === requireTyAshKey(module) : (item.module_key === `module_position_${module.position}` ||
+          item.module_key === `module_${module.id}`),
       )
       .sort((left, right) =>
         Number(left.module_key.startsWith("module_position_")) -
@@ -1566,7 +1574,7 @@ export async function getWorkspaceData(accountId: number) {
       const legacyPositionMatch = stableAnswer.question_key.match(
         /^module_position_\d+_exercise_position_(\d+)$/,
       );
-      const exerciseId: number | undefined = scopedPositionMatch
+      const exerciseId: number | undefined = strictIdentity ? resolveTyAshExerciseId(module, stableAnswer) : scopedPositionMatch
         ? module.exercises.find((exercise) => {
             const exerciseSubmodule = module.submodules.find(
               (submodule) => submodule.id === exercise.submodule_id,
@@ -1624,14 +1632,15 @@ export async function getWorkspaceData(accountId: number) {
     }
     const isCompletedFromDatabase = usesSeparatedPreviewAnswers
       ? previewModuleAnswers.__completed?.includes("true") ?? false
-      : completionStateByModuleId.get(module.id) ?? false;
+      : strictIdentity ? stableAnswers.some(a => a.module_key === requireTyAshKey(module) && a.question_key === "__completed" && Array.isArray(a.answer_value) && a.answer_value.includes("true")) : completionStateByModuleId.get(module.id) ?? false;
 
     return {
       ...module,
+      answerProjectId: project.id,
       answers: answersMap,
       answerVersions,
       isManuallyCompleted:
-        isCompletedFromDatabase || completedModuleIdsFromCookie.has(module.id),
+        isCompletedFromDatabase || (!strictIdentity && completedModuleIdsFromCookie.has(module.id)),
     };
   });
 
@@ -1678,7 +1687,7 @@ export async function getWorkspaceData(accountId: number) {
 
   return {
     project,
-    modules: workspaceModules,
+    modules: workspaceModules.map(m => ({ ...m, globalProgressPercent: progressPercent, globalModuleCount: totalModulesCount })),
     progressPercent,
     completedModulesCount,
     totalModulesCount,
@@ -1763,7 +1772,10 @@ export async function upsertStableModuleAnswers(input: {
   projectId: number;
   moduleId: number;
   modulePosition: number;
+  moduleStableKey?: string;
   answers: Array<{
+    exerciseStableKey?: string;
+    submoduleStableKey?: string;
     exerciseId: number;
     exercisePosition: number;
     submodulePosition: number | null;
@@ -1778,18 +1790,18 @@ export async function upsertStableModuleAnswers(input: {
   const rows = input.answers.map((answer) => ({
     user_id: input.userId,
     project_id: input.projectId,
-    module_key: `module_position_${input.modulePosition}`,
-    submodule_key: "stable_position",
-    exercise_key: getStableExerciseAnswerKey({
+    module_key: isTyAshContent({ stableKey: input.moduleStableKey }) ? requireTyAshKey({ stableKey: input.moduleStableKey }) : `module_position_${input.modulePosition}`,
+    submodule_key: isTyAshContent({ stableKey: input.moduleStableKey }) ? (answer.submoduleStableKey ?? "module_root") : "stable_position",
+    exercise_key: (isTyAshContent({ stableKey: input.moduleStableKey }) ? (answer.exerciseStableKey === "__completed" ? "__completed" : requireTyAshKey({ stableKey: answer.exerciseStableKey })) : getStableExerciseAnswerKey({
       modulePosition: input.modulePosition,
       submodulePosition: answer.submodulePosition,
       exercisePosition: answer.exercisePosition,
-    }),
-    question_key: getStableExerciseAnswerKey({
+    })),
+    question_key: (isTyAshContent({ stableKey: input.moduleStableKey }) ? (answer.exerciseStableKey === "__completed" ? "__completed" : requireTyAshKey({ stableKey: answer.exerciseStableKey })) : getStableExerciseAnswerKey({
       modulePosition: input.modulePosition,
       submodulePosition: answer.submodulePosition,
       exercisePosition: answer.exercisePosition,
-    }),
+    })),
     field_key: "answer",
     answer_value: answer.values,
     source_version_id: null,
@@ -1897,6 +1909,7 @@ export async function saveModuleDefinition(input: {
       groupId: string;
       questions: Array<{
         clientId?: string;
+        completion?: import("./exercise-completion").CompletionRequirements;
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;

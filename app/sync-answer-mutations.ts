@@ -1,4 +1,5 @@
 "use server";
+import { isTyAshContent, requireTyAshKey } from "@/lib/tyash-answer-identity";
 
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import { getAuthenticatedAccount } from "@/lib/session";
@@ -18,6 +19,8 @@ export type AnswerSyncMutationInput = {
   projectId: number;
   moduleId: number;
   exerciseId: number;
+  moduleStableKey?: string;
+  exerciseStableKey?: string;
   values: string[];
   revision: number;
   updatedAt: number;
@@ -59,6 +62,7 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
       mutation.projectId === workspace.project?.id &&
       mutation.moduleId === moduleId &&
       exerciseById.has(mutation.exerciseId) &&
+      (!isTyAshContent(selectedModule) || (mutation.moduleStableKey === requireTyAshKey(selectedModule) && mutation.exerciseStableKey === requireTyAshKey(exerciseById.get(mutation.exerciseId)!))) &&
       Number.isFinite(mutation.updatedAt) &&
       Number.isFinite(mutation.revision),
   );
@@ -112,8 +116,11 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
     projectId: workspace.project.id,
     moduleId,
     modulePosition: selectedModule.position,
+    moduleStableKey: selectedModule.stableKey,
     answers: validMutations.map((mutation) => ({
       exerciseId: mutation.exerciseId,
+      exerciseStableKey: exerciseById.get(mutation.exerciseId)?.stableKey,
+      submoduleStableKey: selectedModule.submodules.find(s => s.id === exerciseById.get(mutation.exerciseId)?.submodule_id)?.stableKey,
       exercisePosition: exerciseById.get(mutation.exerciseId)!.position,
       submodulePosition: (() => {
         const submoduleId = exerciseById.get(mutation.exerciseId)!.submodule_id;

@@ -3,7 +3,10 @@ import "server-only";
 import { cache } from "react";
 import { getAuthenticatedAdmin } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getModulesWithExercises } from "@/lib/training";
+import { isTyAshContent, requireTyAshKey } from "./tyash-answer-identity";
+import { getApplicationReleaseState, getContentReleaseSnapshot, isControlledProductionContentEnabled } from "./content-releases";
+import { validateReleaseModules } from "./release-content-validation";
+import { getModulesWithExercises, getModuleProgress } from "@/lib/training";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
 
@@ -60,7 +63,9 @@ function latestDate(...dates: Array<string | null | undefined>) {
 export const getAdminUsers = cache(async function getAdminUsers(): Promise<AdminUserView[]> {
   await getAuthenticatedAdmin();
   const db = createSupabaseServerClient();
-  const modules = await getModulesWithExercises();
+  const modules = isControlledProductionContentEnabled()
+    ? validateReleaseModules((await getContentReleaseSnapshot((await getApplicationReleaseState()).published_release_id))?.modules) as unknown as Awaited<ReturnType<typeof getModulesWithExercises>>
+    : await getModulesWithExercises();
   const [accountsResult, projectsResult, stableResult, legacyResult, exportsResult] = await Promise.all([
     db.from("client_access_codes").select("id,email,client_name,company_name,created_at,is_admin,role").order("created_at", { ascending: false }),
     db.from("brand_projects").select("id,account_id,name,created_at,updated_at"),
@@ -80,12 +85,12 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
     .filter((account) => !account.is_admin && account.role !== "admin")
     .map((account) => {
       const project = projects.find((item) => item.account_id === account.id) ?? null;
-      const stableForUser = stable.filter((item) => item.user_id === account.id);
+      const stableForUser = stable.filter((item) => item.user_id === account.id && item.project_id === project?.id);
       const legacyForProject = project ? legacy.filter((item) => item.project_id === project.id) : [];
       const answers: AdminAnswerView[] = [];
       const moduleProgress = modules.map((moduleItem) => {
         const answerable = moduleItem.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type));
-        let answered = 0;
+        const answerMap: Record<number, string[]> = {};
         for (const exercise of answerable) {
           const submodule = moduleItem.submodules.find((item) => item.id === exercise.submodule_id);
           const stableKey = getStableExerciseAnswerKey({
@@ -94,16 +99,16 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
             exercisePosition: exercise.position,
           });
           const stableAnswer = stableForUser
-            .filter((item) => item.question_key === stableKey || item.question_key === `question_${exercise.id}`)
+            .filter((item) => isTyAshContent(moduleItem) ? item.module_key === requireTyAshKey(moduleItem) && item.question_key === requireTyAshKey(exercise) : (item.question_key === stableKey || item.question_key === `question_${exercise.id}`))
             .sort((a, b) => latestDate(a.client_updated_at, a.updated_at).localeCompare(latestDate(b.client_updated_at, b.updated_at)))
             .at(-1);
-          const legacyAnswer = legacyForProject.find((item) => item.exercise_id === exercise.id);
+          const legacyAnswer = isTyAshContent(moduleItem) ? undefined : legacyForProject.find((item) => item.exercise_id === exercise.id);
           const values = stableAnswer
             ? valuesOf(stableAnswer.answer_value)
             : legacyAnswer?.answer_text
               ? [legacyAnswer.answer_text]
               : valuesOf(legacyAnswer?.selected_options);
-          if (hasValue(values)) answered += 1;
+          answerMap[exercise.id] = values;
           if (hasValue(values)) {
             answers.push({
               moduleId: moduleItem.id,
@@ -121,7 +126,7 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
         return {
           id: moduleItem.id,
           title: moduleItem.title,
-          progress: answerable.length === 0 ? 0 : Math.round((answered / answerable.length) * 100),
+          progress: getModuleProgress(moduleItem, moduleItem.exercises, answerMap, 1, false).completionPercent,
         };
       });
       const progress = moduleProgress.length === 0
