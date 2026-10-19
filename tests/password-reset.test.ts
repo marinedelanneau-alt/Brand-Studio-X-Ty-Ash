@@ -22,10 +22,10 @@ const resetEmailFunction =
 describe("réinitialisation du mot de passe", () => {
   it("envoie un véritable message de récupération et non une activation", () => {
     expect(resetEmailFunction).toContain(
-      "Réinitialisation de ton mot de passe Brand Studio",
+      "Réinitialisation de votre mot de passe Brand Studio",
     );
     expect(resetEmailFunction).toContain("Modifier mon mot de passe");
-    expect(resetEmailFunction).not.toContain("Ton aventure commence ici");
+    expect(resetEmailFunction).not.toContain("Votre aventure commence ici");
     expect(resetEmailFunction).not.toContain("Créer mon mot de passe");
   });
 

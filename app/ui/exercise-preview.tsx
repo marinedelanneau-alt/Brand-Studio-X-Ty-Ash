@@ -123,7 +123,7 @@ function PreviewTextInput({ placeholder }: { placeholder: string }) {
       type="text"
       readOnly
       value=""
-      placeholder={placeholder || "Ta réponse"}
+      placeholder={placeholder || "Votre réponse"}
       className="w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)]"
     />
   );
@@ -134,7 +134,7 @@ function PreviewTextarea({ placeholder }: { placeholder: string }) {
     <textarea
       readOnly
       value=""
-      placeholder={placeholder || "Ta réponse"}
+      placeholder={placeholder || "Votre réponse"}
       className="min-h-24 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--text-primary)]"
     />
   );
@@ -440,7 +440,7 @@ function PreviewBrandPersona({ exercise }: { exercise: PreviewExercise }) {
           Persona de marque
         </p>
         <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.95] text-[var(--heading-color)]">
-          {exercise.question || "Crée le persona incarné de ta marque"}
+          {exercise.question || "Créez le persona incarné de votre marque"}
         </h3>
         {exercise.explanation ? (
           <PedagogicalContent
@@ -579,7 +579,7 @@ function PreviewColorPalette({ exercise }: { exercise: PreviewExercise }) {
           Palette de couleurs
         </p>
         <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.96] text-[var(--heading-color)]">
-          {exercise.question || "Construis la palette de couleurs de ta marque"}
+          {exercise.question || "Construisez la palette de couleurs de votre marque"}
         </h3>
         {exercise.explanation ? (
           <PedagogicalContent
@@ -870,7 +870,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
                   {prompt}
                 </span>
                 <div className="mt-3">
-                  <PreviewTextInput placeholder={exercise.answer_placeholder || "Ta réponse"} />
+                  <PreviewTextInput placeholder={exercise.answer_placeholder || "Votre réponse"} />
                 </div>
               </label>
             ))}
@@ -883,7 +883,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
               </span>
               <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">:</span>
               <div className="min-w-64 flex-1">
-                <PreviewTextInput placeholder={exercise.answer_placeholder || "Ta réponse"} />
+                <PreviewTextInput placeholder={exercise.answer_placeholder || "Votre réponse"} />
               </div>
             </div>
           </div>
@@ -1031,7 +1031,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
                   className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4 text-base leading-8 text-[var(--text-primary)]"
                 >
                   <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                    Complete la phrase
+                    Complétez la phrase
                   </p>
                   <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
                     {splitFillBlankText(prompt).map((part, index, parts) => (
@@ -1056,7 +1056,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
         ) : (
           <div className="rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-4 text-base leading-8 text-[var(--text-primary)]">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-              Complete la phrase
+              Complétez la phrase
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
               {splitFillBlankText(exercise.question).map((part, index, parts) => (
@@ -1081,7 +1081,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
             </div>
             {getFillBlankCount(exercise.question) === 0 ? (
               <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-                Ajoute `___` dans la question pour afficher les champs à compléter.
+                Ajoutez `___` dans la question pour afficher les champs à compléter.
               </p>
             ) : null}
           </div>

@@ -96,7 +96,7 @@ export function buildModuleSummaryCard(input: {
     submoduleRecaps,
     keyTakeaways,
     footer:
-      "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand tu le souhaites.",
+      "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand vous le souhaitez.",
   } satisfies ModuleSummaryCard;
 }
 
@@ -217,7 +217,7 @@ function buildPersonaTakeaway(module: WorkspaceModule) {
   ].filter(Boolean).join(" — ");
   const context = traits
     ? `Une personnalité ${traits}.`
-    : sentence || "Le visage et l'attitude qui incarnent ta marque.";
+    : sentence || "Le visage et l'attitude qui incarnent votre marque.";
 
   return hasUsableTakeawayValue(value)
     ? {
@@ -257,7 +257,7 @@ function buildToneTakeaway(
           id: "tone",
           label: "Ton de voix",
           value: tone,
-          context: "La manière dont ta marque s'exprime et crée la relation.",
+          context: "La manière dont votre marque s'exprime et crée la relation.",
           icon: "tone",
         } satisfies ModuleKeyTakeaway;
       }
@@ -270,7 +270,7 @@ function buildToneTakeaway(
         id: "tone",
         label: "Ton de voix",
         value: cleanTakeawayValue(match.value),
-        context: "La manière dont ta marque s'exprime et crée la relation.",
+        context: "La manière dont votre marque s'exprime et crée la relation.",
         icon: "tone",
       } satisfies ModuleKeyTakeaway
     : null;
@@ -284,7 +284,7 @@ function buildOdorTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
     id: "odor",
     label: "Odeur",
     value: cleanTakeawayValue(match.value),
-    context: "Une sensation immédiate pour rendre ton univers plus vivant.",
+    context: "Une sensation immédiate pour rendre votre univers plus vivant.",
     icon: "odor",
   } satisfies ModuleKeyTakeaway;
 }
@@ -297,7 +297,7 @@ function buildBaselineTakeaway(submoduleRecaps: ModuleSubmoduleSummary[]) {
     id: "baseline",
     label: "Baseline",
     value: cleanTakeawayValue(match.value),
-    context: "Ta phrase repère pour présenter ton activité.",
+    context: "Votre phrase repère pour présenter votre activité.",
     icon: "baseline",
   } satisfies ModuleKeyTakeaway;
 }
@@ -331,7 +331,7 @@ function buildPaletteTakeaway(
       id: "palette",
       label: "Palette",
       value: paletteColors.slice(0, 5).join(" · "),
-      context: "Les repères visuels qui posent l'ambiance de ta marque.",
+      context: "Les repères visuels qui posent l'ambiance de votre marque.",
       icon: "palette",
       colors: visualColors,
     } satisfies ModuleKeyTakeaway;
@@ -343,7 +343,7 @@ function buildPaletteTakeaway(
         id: "palette",
         label: "Palette",
         value: cleanTakeawayValue(match.value),
-        context: "Les repères visuels qui posent l'ambiance de ta marque.",
+        context: "Les repères visuels qui posent l'ambiance de votre marque.",
         icon: "palette",
       } satisfies ModuleKeyTakeaway
     : null;
@@ -420,54 +420,54 @@ function buildModuleSpecificQuickRecap(module: WorkspaceModule) {
       ),
     },
     {
-      label: "Ta mission",
+      label: "Votre mission",
       item: findSemanticHighlight(
         module,
         ["mission"],
-        "Ta mission",
+        "Votre mission",
       ),
     },
     {
-      label: "Ta vision",
+      label: "Votre vision",
       item: findSemanticHighlight(
         module,
         ["vision"],
-        "Ta vision",
+        "Votre vision",
       ),
     },
     {
-      label: "Tes valeurs",
+      label: "Vos valeurs",
       item: findValuesHighlight(module),
     },
     {
-      label: "Ta promesse",
+      label: "Votre promesse",
       item: findSemanticHighlight(
         module,
         ["promesse"],
-        "Ta promesse",
+        "Votre promesse",
       ),
     },
   ].map(({ label, item }) => item ?? buildEmptyHighlight(label, "À compléter"));
 
   return recap
     .filter((item) =>
-      ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].includes(item.label),
+      ["Votre mission", "Votre vision", "Votre promesse", "Vos valeurs"].includes(item.label),
     )
     .sort(
       (left, right) =>
-        ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].indexOf(left.label) -
-        ["Ta mission", "Ta vision", "Ta promesse", "Tes valeurs"].indexOf(right.label),
+        ["Votre mission", "Votre vision", "Votre promesse", "Vos valeurs"].indexOf(left.label) -
+        ["Votre mission", "Votre vision", "Votre promesse", "Vos valeurs"].indexOf(right.label),
     );
 }
 
 function buildPositioningQuickRecap(module: WorkspaceModule) {
   const definitions = [
     {
-      label: "Le moment où ta marque intervient",
+      label: "Le moment où votre marque intervient",
       keywords: ["moment precis", "intervient ma marque", "declencheur"],
     },
     {
-      label: "La situation de ton client",
+      label: "La situation de votre client",
       keywords: ["situation exacte", "lorsqu il me contacte", "contexte client"],
     },
     {
@@ -479,30 +479,31 @@ function buildPositioningQuickRecap(module: WorkspaceModule) {
       keywords: ["ce qu il refuse", "il refuse", "ne veut plus"],
     },
     {
-      label: "Ta cible principale",
+      label: "Votre cible principale",
       keywords: ["a qui t adresses", "cible", "client ideal"],
     },
     {
-      label: "Ta différence",
+      label: "Votre différence",
       keywords: ["distingue", "difference", "singularite"],
     },
     {
-      label: "Pourquoi te choisir",
-      keywords: ["pourquoi devrait on te choisir", "pourquoi te choisir", "raison de choisir"],
+      label: "Pourquoi vous choisir",
+      keywords: ["pourquoi devrait on te choisir", "pourquoi te choisir", "pourquoi devrait on vous choisir", "pourquoi vous choisir", "raison de choisir"],
     },
     {
-      label: "Tes repères concurrentiels",
+      label: "Vos repères concurrentiels",
       keywords: ["principaux concurrents", "concurrence"],
     },
     {
-      label: "Ce que tu retiens de leur communication",
-      keywords: ["aimes tu", "aime pas", "leur communication"],
+      label: "Ce que vous retenez de leur communication",
+      keywords: ["aimes tu", "aimez vous", "aime pas", "leur communication"],
     },
     {
-      label: "Ton positionnement formulé",
+      label: "Votre positionnement formulé",
       keywords: [
         "mon positionnement",
         "ton positionnement",
+        "votre positionnement",
         "positionnement final",
         "phrase de positionnement",
         "positionnement en une phrase",
@@ -526,16 +527,16 @@ function buildModuleSpecificKeyTakeaways(module: WorkspaceModule) {
 
   const isPositioning = normalizeForSearch(module.title).includes("positionnement");
   const positioningContexts: Record<string, string> = {
-    "Le moment où ta marque intervient": "Le déclencheur qui rend ton offre pertinente.",
-    "La situation de ton client": "Le contexte concret dans lequel ton client a besoin de toi.",
+    "Le moment où votre marque intervient": "Le déclencheur qui rend votre offre pertinente.",
+    "La situation de votre client": "Le contexte concret dans lequel votre client a besoin de vous.",
     "Ce qu'il a déjà essayé": "Les solutions qui n'ont pas encore produit le résultat attendu.",
-    "Ce qu'il refuse désormais": "Les limites et frustrations que ton positionnement doit dépasser.",
-    "Ta cible principale": "La personne à qui ton message doit parler en priorité.",
-    "Ta différence": "L'élément distinctif à rendre visible dans ta communication.",
-    "Pourquoi te choisir": "La valeur décisive qui justifie le choix de ta marque.",
-    "Tes repères concurrentiels": "Les acteurs auxquels ton audience peut comparer ta marque.",
-    "Ce que tu retiens de leur communication": "Les codes à reprendre, éviter ou dépasser.",
-    "Ton positionnement formulé": "La formulation synthétique à réutiliser dans tes supports.",
+    "Ce qu'il refuse désormais": "Les limites et frustrations que votre positionnement doit dépasser.",
+    "Votre cible principale": "La personne à qui votre message doit parler en priorité.",
+    "Votre différence": "L'élément distinctif à rendre visible dans votre communication.",
+    "Pourquoi vous choisir": "La valeur décisive qui justifie le choix de votre marque.",
+    "Vos repères concurrentiels": "Les acteurs auxquels votre audience peut comparer votre marque.",
+    "Ce que vous retenez de leur communication": "Les codes à reprendre, éviter ou dépasser.",
+    "Votre positionnement formulé": "La formulation synthétique à réutiliser dans vos supports.",
   };
 
   return recap.map((item, index) => ({
@@ -746,7 +747,7 @@ function summarizeTableAnswer(
     .replace(/[_:]+/g, " ")
     .trim();
   const label = normalizeForSearch(rawQuestion).includes("valeur")
-    ? "Tes valeurs en pratique"
+    ? "Vos valeurs en pratique"
     : rawQuestion || "Synthèse du tableau";
 
   const summary = buildHighlight(label, preview.join(" • "));
@@ -990,7 +991,7 @@ function findValuesHighlight(module: WorkspaceModule) {
             .sort((a, b) => a.valueIndex - b.valueIndex)
             .map((item) => compactText(item.value)).filter(Boolean).join(", ")
           : compactText(values[questionIndex] ?? "");
-        return value ? [{ label: "Tes valeurs", value, exerciseId: exercise.id, score: 2 }] : [];
+        return value ? [{ label: "Vos valeurs", value, exerciseId: exercise.id, score: 2 }] : [];
       });
     }
 
@@ -1001,7 +1002,7 @@ function findValuesHighlight(module: WorkspaceModule) {
     const summary = summarizeExerciseAnswer(exercise, values);
     if (!summary) return [];
     const direct = /^(?:(?:mes|tes|nos|vos|les) )?valeurs?\s*[.:!?]?$/.test(question);
-    return [{ ...summary, label: "Tes valeurs", exerciseId: exercise.id, score: table || direct ? 2 : 1 }];
+    return [{ ...summary, label: "Vos valeurs", exerciseId: exercise.id, score: table || direct ? 2 : 1 }];
   });
 
   const match = candidates.sort((a, b) => b.score - a.score)[0];
@@ -1075,7 +1076,7 @@ function buildSubmoduleInsightSentence(
   }
 
   const pointLabel = highlights.length > 1 ? "points clés" : "point clé";
-  return `Tu as formulé ${highlights.length} ${pointLabel} dans ce sous-module. L'essentiel est résumé dans les cartes ci-dessous.`;
+  return `Vous avez formulé ${highlights.length} ${pointLabel} dans ce sous-module. L'essentiel est résumé dans les cartes ci-dessous.`;
 }
 
 function joinSummaryParts(values: string[]) {

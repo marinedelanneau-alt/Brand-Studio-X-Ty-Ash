@@ -58,8 +58,8 @@ export default function EditorialCalendarExercise({
             Vue Notion 2026
           </h3>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-primary)]">
-            Complete directement ton calendrier editorial dans Notion. La vue ci-dessous reprend
-            ton espace de travail dedie.
+            Complétez directement votre calendrier editorial dans Notion. La vue ci-dessous reprend
+            votre espace de travail dedie.
           </p>
         </div>
         <a
@@ -98,7 +98,7 @@ export default function EditorialCalendarExercise({
         <div className="mt-3 flex items-start gap-3 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm leading-6 text-[var(--text-primary)]">
           <CalendarDaysIcon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--tyash-label-text)]" />
           <p>
-            Apercu direct de la page Notion. Clique sur l&apos;image ou sur le bouton pour modifier le
+            Apercu direct de la page Notion. Cliquez sur l&apos;image ou sur le bouton pour modifier le
             calendrier complet dans Notion.
           </p>
         </div>
@@ -116,11 +116,11 @@ export default function EditorialCalendarExercise({
                   Templates Canva
                 </p>
                 <h3 className="mt-1 text-lg font-semibold text-[var(--heading-color)]">
-                  Crée tes contenus plus rapidement
+                  Créez vos contenus plus rapidement
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-primary)]">
-                  Retrouve les templates prêts à personnaliser pour transformer ton calendrier
-                  éditorial en publications cohérentes avec ta marque.
+                  Retrouvez les templates prêts à personnaliser pour transformer votre calendrier
+                  éditorial en publications cohérentes avec votre marque.
                 </p>
               </div>
             </div>

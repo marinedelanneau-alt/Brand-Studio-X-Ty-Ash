@@ -98,7 +98,7 @@ export function mergeOrphanContentIntoPreviousPage<T extends { contentScore: num
 export const forbiddenPdfTexts = [
   "Cela signifie que je",
   "Concrètement cela se traduit",
-  "Ta réponse",
+  "Votre réponse",
   "Exemple de prise de parole",
   "Inspiration 1",
   "Inspiration 2",

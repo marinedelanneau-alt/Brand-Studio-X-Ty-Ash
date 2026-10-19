@@ -34,7 +34,7 @@ function formatSummaryForClipboard(summary: ModuleSummaryCard) {
   return [
     `${summary.title} - ${summary.subtitle}`,
     "",
-    "Ce que tu as construit",
+    "Ce que vous avez construit",
     ...summary.submoduleRecaps.flatMap((submodule) => [
       "",
       submodule.title,
@@ -61,10 +61,10 @@ function CompletionHero({
             Module termine
           </span>
           <h1 className="bs-completion-title mt-5 max-w-3xl font-[family:var(--font-cormorant)] text-[2.6rem] leading-[0.95] text-[var(--heading-color)] sm:text-[3.35rem]">
-            Bravo, tu viens de terminer {summary.title}.
+            Bravo, vous venez de terminer {summary.title}.
           </h1>
           <p className="bs-completion-copy mt-5 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
-            Tu as posé une nouvelle base pour ta marque. Voici les éléments essentiels à garder, partager ou reprendre pour avancer.
+            Vous avez posé une nouvelle base pour votre marque. Voici les éléments essentiels à garder, partager ou reprendre pour avancer.
           </p>
         </div>
 
@@ -133,9 +133,9 @@ function KeyTakeawayCard({ item }: { item: ModuleKeyTakeaway }) {
 }
 
 const positioningModuleVisibleLabels = new Set([
-  "le moment ou ta marque intervient",
-  "ta difference",
-  "ton positionnement formule",
+  "le moment ou votre marque intervient",
+  "votre difference",
+  "votre positionnement formule",
 ]);
 
 function normalizeSummaryLabel(label: string) {
@@ -171,7 +171,7 @@ function ModuleKeyTakeaways({
           Synthese express
         </p>
         <h2 className="mt-2 text-2xl font-extrabold text-[var(--heading-color)]">
-          Voici les éléments essentiels que tu viens de construire.
+          Voici les éléments essentiels que vous venez de construire.
         </h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -209,7 +209,7 @@ function StorySharePreview({
             Une story pour célébrer cette belle avancée 🎉
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-primary)]">
-            Partage ton avancée pour commencer à communiquer sur ta marque :)
+            Partagez votre avancée pour commencer à communiquer sur votre marque :)
           </p>
         </div>
 
@@ -234,7 +234,7 @@ function StorySharePreview({
           </button>
           <p className="max-w-md text-sm leading-6 text-[var(--text-muted)]">
             {/* eslint-disable-next-line react/no-unescaped-entities */}
-            Sur mobile, choisis Instagram dans le partage, puis ajoute l'image en story. Si l'option n'apparaît pas, la story sera téléchargée en PNG.
+            Sur mobile, choisissez Instagram dans le partage, puis ajoutez l'image en story. Si l'option n'apparaît pas, la story sera téléchargée en PNG.
           </p>
         </div>
       </div>
@@ -284,7 +284,7 @@ function ModuleDetailAccordion({
     <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-5 py-6 shadow-[0_16px_36px_rgba(91,73,57,0.06)]">
       <div>
         <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--tyash-label-text)]">
-          Ce que tu as construit
+          Ce que vous avez construit
         </p>
         <h2 className="mt-2 text-2xl font-extrabold text-[var(--heading-color)]">
           Le détail par sous-module
@@ -570,24 +570,24 @@ export default function ModuleCompletionScreen({
 
     if ("share" in navigator && canShareFile) {
       try {
-        setStatusMessage("La story est prête. Choisis Instagram, puis Story.");
+        setStatusMessage("La story est prête. Choisissez Instagram, puis Story.");
         await navigator.share(sharePayload);
-        setStatusMessage("Choisis Instagram dans le partage, puis ajoute l'image en story.");
+        setStatusMessage("Choisissez Instagram dans le partage, puis ajoutez l'image en story.");
         return;
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
-          setStatusMessage("Partage annulé. Tu peux réessayer ou télécharger la story.");
+          setStatusMessage("Partage annulé. Vous pouvez réessayer ou télécharger la story.");
           return;
         }
 
         downloadDataUrl(dataUrl, storyFilename);
-        setStatusMessage("Partage annulé. Tu peux télécharger la story et l'ajouter sur Instagram.");
+        setStatusMessage("Partage annulé. Vous pouvez télécharger la story et l'ajouter sur Instagram.");
         return;
       }
     }
 
     downloadDataUrl(dataUrl, storyFilename);
-    setStatusMessage("Story téléchargée. Ouvre Instagram, crée une story et sélectionne cette image.");
+    setStatusMessage("Story téléchargée. Ouvrez Instagram, créez une story et sélectionnez cette image.");
   }
 
   async function copySummary() {
@@ -676,7 +676,7 @@ export default function ModuleCompletionScreen({
                   setIsValidatingAdjustment(true);
                   await new Promise((resolve) => window.setTimeout(resolve, 1400));
                   setAdjustedExerciseId(null);
-                  setStatusMessage("Ta réponse a été mise à jour.");
+                  setStatusMessage("Votre réponse a été mise à jour.");
                   router.refresh();
                   setIsValidatingAdjustment(false);
                 }}

@@ -96,10 +96,10 @@ export default async function ReleasesPage({
     <div className="space-y-6">
       <section className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6">
         <h2 className="text-xl font-bold">Le nouveau parcours Ty Ash</h2>
-        <p className="mt-2 text-sm">Prépare les 4 modules, 15 sous-modules et 43 exercices en brouillon. Tu pourras relire et modifier tous les contenus dans Modules. Le parcours publié et les anciennes réponses restent conservés.</p>
+        <p className="mt-2 text-sm">Préparez les 4 modules, 15 sous-modules et 43 exercices en brouillon. Vous pourrez relire et modifier tous les contenus dans Modules. Le parcours publié et les anciennes réponses restent conservés.</p>
         <form action={createTyAshPathwayDraft} className="mt-4 flex flex-col gap-3">
           <button type="submit" disabled={!!draft || !!loadError} className="bs-button-primary rounded px-4 py-2 disabled:opacity-50">Créer le nouveau parcours Ty Ash</button>
-          {draft ? <p className="text-sm">Un brouillon existe déjà. Termine sa révision avant de créer un nouveau parcours.</p> : null}
+          {draft ? <p className="text-sm">Un brouillon existe déjà. Terminez sa révision avant de créer un nouveau parcours.</p> : null}
         </form>
       </section>
       <section className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6">
@@ -229,13 +229,13 @@ export default async function ReleasesPage({
                 <div className="mt-5 space-y-5 rounded-2xl border border-[#efc6bf] bs-status-light bg-[#fff4f1] p-4">
                   <p className="font-bold text-[var(--status-error-text)]">
                     Déployer rendra cette version visible par tous les
-                    utilisateurs. Choisis un déploiement immédiat ou programmé.
+                    utilisateurs. Choisissez un déploiement immédiat ou programmé.
                   </p>
                   <form action={publishReleaseForAllUsers} className="space-y-3">
                     <input type="hidden" name="releaseId" value={draft.id} />
                     <textarea name="notes" required defaultValue={draft.notes ?? ""} className="min-h-24 w-full rounded-xl border p-3" />
                     <label className="block text-sm">
-                      Saisis « PUBLIER POUR TOUS »
+                      Saisissez « PUBLIER POUR TOUS »
                       <input name="confirmation" required className="mt-2 h-11 w-full rounded-xl border px-3" />
                     </label>
                     <button className="rounded-xl bg-[#9d4e40] px-4 py-2 font-bold text-white">
@@ -254,7 +254,7 @@ export default async function ReleasesPage({
                         <input name="scheduledAt" type="datetime-local" required className="mt-2 h-11 w-full rounded-xl border px-3" />
                       </label>
                       <label className="block text-sm">
-                        Saisis « DÉPLOYER À TOUS »
+                        Saisissez « DÉPLOYER À TOUS »
                         <input name="confirmation" required className="mt-2 h-11 w-full rounded-xl border px-3" />
                       </label>
                       <button className="rounded-xl border border-[#9d4e40] px-4 py-2 font-bold text-[var(--status-error-text)]">

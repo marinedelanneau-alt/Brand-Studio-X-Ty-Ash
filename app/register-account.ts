@@ -93,7 +93,7 @@ export async function registerAccount(
     if (existingAccount?.auth_user_id) {
       return {
         status: "error",
-        message: "Un compte existe déjà avec cet e-mail. Connecte-toi directement.",
+        message: "Un compte existe déjà avec cet e-mail. Connectez-vous directement.",
       };
     }
 
@@ -181,7 +181,7 @@ export async function registerAccount(
     if (signInError) {
       return {
         status: "error",
-        message: "Compte créé. Connecte-toi avec ton e-mail et ton mot de passe.",
+        message: "Compte créé. Connectez-vous avec votre e-mail et votre mot de passe.",
       };
     }
 
@@ -197,7 +197,7 @@ export async function registerAccount(
     return {
       status: "error",
       message:
-        "La création du compte a échoué. Reprends ton lien personnel ou contacte le support.",
+        "La création du compte a échoué. Reprenez votre lien personnel ou contactez le support.",
     };
   }
 

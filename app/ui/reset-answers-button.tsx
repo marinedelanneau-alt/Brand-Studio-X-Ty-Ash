@@ -45,7 +45,7 @@ export default function ResetAnswersButton({ userId }: { userId: number }) {
         Paramètres du compte
       </p>
       <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-        Supprime toutes tes réponses et remet ta progression à zéro.
+        Cette action supprime toutes vos réponses et remet votre progression à zéro.
       </p>
       {!isConfirming ? (
         <button
@@ -58,7 +58,7 @@ export default function ResetAnswersButton({ userId }: { userId: number }) {
       ) : (
         <div className="mt-4 rounded-[1rem] border border-[#efc6bf] bs-status-light bg-[#fff4f1] p-4">
           <p className="text-sm font-semibold leading-6 text-[var(--status-error-text)]">
-            Cette action supprimera uniquement tes réponses et ta progression. Elle est irréversible.
+            Cette action supprimera uniquement vos réponses et votre progression. Elle est irréversible.
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
             <button

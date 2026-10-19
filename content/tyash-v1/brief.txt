@@ -94,7 +94,7 @@ sans corrompre les réponses existantes.
 Je veux construire 4 modules.
 
 ==================================================
-MODULE 1 — TON ENTREPRISE
+MODULE 1 — VOTRE ENTREPRISE
 ==================================================
 
 Objectif :
@@ -102,17 +102,17 @@ Comprendre ce qu'il y a derrière l'entreprise :
 son histoire, ce qui l'anime, sa personnalité, ses ambitions et ses publics.
 
 --------------------------------------------------
-SOUS-MODULE 1.1 — TON HISTOIRE
+SOUS-MODULE 1.1 — VOTRE HISTOIRE
 --------------------------------------------------
 
-EXERCICE 1 — Présente ton entreprise
+EXERCICE 1 — Présentez votre entreprise
 
 Introduction :
-"Présente-nous ton entreprise simplement."
+"Présentez-nous votre entreprise simplement."
 
 Questions :
-- Que fait ton entreprise ?
-- Quels produits ou services proposes-tu aujourd'hui ?
+- Que fait votre entreprise ?
+- Quels produits ou services proposez-vous aujourd'hui ?
 - Depuis quand existe-t-elle ?
 
 Aide :
@@ -125,13 +125,13 @@ Utiliser les types de champs existants les plus adaptés.
 EXERCICE 2 — Comment tout a commencé ?
 
 Introduction :
-"Derrière chaque entreprise, il y a un point de départ. Quel a été le tien ?"
+"Derrière chaque entreprise, il y a un point de départ. Quel a été le vôtre ?"
 
 Question principale :
 "Qu'est-ce qui a donné naissance à l'entreprise ?"
 
 Aide :
-"Une envie, une rencontre, un problème que tu voulais résoudre, une opportunité, une conviction..."
+"Une envie, une rencontre, un problème que vous vouliez résoudre, une opportunité, une conviction..."
 
 Deuxième question :
 "Y a-t-il un moment qui raconte particulièrement bien votre histoire ?"
@@ -187,13 +187,13 @@ Question complémentaire :
 "Qu'est-ce qu'on comprend mieux de votre entreprise quand on la découvre de l'intérieur ?"
 
 --------------------------------------------------
-SOUS-MODULE 1.3 — TA PERSONNALITÉ
+SOUS-MODULE 1.3 — VOTRE PERSONNALITÉ
 --------------------------------------------------
 
-EXERCICE 6 — Si ton entreprise était une personne...
+EXERCICE 6 — Si votre entreprise était une personne...
 
 Introduction :
-"Imagine : ton entreprise entre dans une pièce remplie de monde. Comment se comporte-t-elle ?"
+"Imaginez : votre entreprise entre dans une pièce remplie de monde. Comment se comporte-t-elle ?"
 
 Choix :
 - Elle met immédiatement tout le monde à l'aise
@@ -207,7 +207,7 @@ Choix :
 - Autre
 
 Question complémentaire :
-"Et qu'aimerais-tu que les gens disent d'elle une fois qu'elle est partie ?"
+"Et qu'aimeriez-vous que les gens disent d'elle une fois qu'elle est partie ?"
 
 ---
 
@@ -229,7 +229,7 @@ Conserver le fonctionnement visuel/ludique des curseurs déjà utilisé dans Bra
 EXERCICE 8 — Trois mots qui vous ressemblent
 
 Question :
-"Si tu ne pouvais garder que 3 mots pour décrire la personnalité de ton entreprise, lesquels choisirais-tu ?"
+"Si vous ne pouviez garder que 3 mots pour décrire la personnalité de votre entreprise, lesquels choisiriez-vous ?"
 
 Choix proposés :
 - Chaleureuse
@@ -262,7 +262,7 @@ Question complémentaire :
 EXERCICE 9 — Donnons-lui une voix
 
 Question :
-"Si ton entreprise prenait la parole, comment parlerait-elle ?"
+"Si votre entreprise prenait la parole, comment parlerait-elle ?"
 
 Choix :
 - Avec simplicité
@@ -281,7 +281,7 @@ Question complémentaire :
 "Y a-t-il une expression, une façon de parler, un mot ou une petite phrase qui vous ressemble particulièrement ?"
 
 --------------------------------------------------
-SOUS-MODULE 1.4 — TES AMBITIONS
+SOUS-MODULE 1.4 — VOS AMBITIONS
 --------------------------------------------------
 
 EXERCICE 10 — Où allez-vous ?
@@ -305,7 +305,7 @@ Choix :
 EXERCICE 11 — Et demain ?
 
 Question :
-"Dans un an, qu'aimerais-tu avoir fait évoluer ?"
+"Dans un an, qu'aimeriez-vous avoir fait évoluer ?"
 
 Question complémentaire :
 "Y a-t-il un changement ou un projet important qui arrive prochainement ?"
@@ -314,7 +314,7 @@ Aide :
 "Lancement, anniversaire, nouvelle implantation, recrutement, nouvelle offre, transformation de l'entreprise..."
 
 --------------------------------------------------
-SOUS-MODULE 1.5 — TES PUBLICS
+SOUS-MODULE 1.5 — VOS PUBLICS
 --------------------------------------------------
 
 EXERCICE 12 — À qui vous adressez-vous ?
@@ -345,10 +345,10 @@ Choix :
 EXERCICE 14 — La priorité
 
 Question :
-"Pour ce projet, qui veux-tu toucher en priorité ?"
+"Pour ce projet, qui voulez-vous toucher en priorité ?"
 
 Aide :
-"Décris-nous une seule personne ou catégorie de personnes."
+"Décrivez-nous une seule personne ou catégorie de personnes."
 
 Question complémentaire :
 "Qu'est-ce qui compte vraiment pour elle lorsqu'elle choisit une entreprise comme la vôtre ?"
@@ -358,7 +358,7 @@ Question facultative :
 
 
 ==================================================
-MODULE 2 — TA COMMUNICATION
+MODULE 2 — VOTRE COMMUNICATION
 ==================================================
 
 Objectif :
@@ -424,12 +424,12 @@ SOUS-MODULE 2.2 — CE QUI FONCTIONNE... OU PAS
 EXERCICE 18 — Faisons le point
 
 Introduction :
-"Aujourd'hui, ta communication..."
+"Aujourd'hui, votre communication..."
 
 Créer une évaluation simple pour :
-- te permet d'être connu ;
-- fait comprendre clairement ton activité ;
-- te différencie ;
+- vous permet d'être connu ;
+- fait comprendre clairement votre activité ;
+- vous différencie ;
 - génère des demandes ;
 - inspire confiance ;
 - fidélise ;
@@ -466,7 +466,7 @@ EXERCICE 20 — À garder / à changer
 Questions :
 "Qu'est-ce qui fonctionne bien et mérite d'être conservé ?"
 
-"À l'inverse, qu'est-ce qui te frustre le plus aujourd'hui ?"
+"À l'inverse, qu'est-ce qui vous frustre le plus aujourd'hui ?"
 
 --------------------------------------------------
 SOUS-MODULE 2.3 — L'IMAGE PERÇUE
@@ -484,7 +484,7 @@ Réponse ouverte.
 EXERCICE 22 — Est-ce vraiment ce qu'on montre ?
 
 Question :
-"Quand tu regardes ta communication actuelle, retrouves-tu vraiment la personnalité que tu viens de décrire ?"
+"Quand vous regardez votre communication actuelle, retrouvez-vous vraiment la personnalité que vous venez de décrire ?"
 
 Utiliser un curseur :
 Complètement ←→ Pas du tout
@@ -497,15 +497,15 @@ Question complémentaire :
 EXERCICE 23 — Aujourd'hui vs demain
 
 Questions :
-"Comment penses-tu que les autres perçoivent ton entreprise aujourd'hui ?"
+"Comment pensez-vous que les autres perçoivent votre entreprise aujourd'hui ?"
 
-"Comment voudrais-tu qu'ils la perçoivent demain ?"
+"Comment voudriez-vous qu'ils la perçoivent demain ?"
 
 Prévoir "Je ne sais pas" lorsque pertinent.
 
 
 ==================================================
-MODULE 3 — TON BESOIN
+MODULE 3 — VOTRE BESOIN
 ==================================================
 
 Objectif :
@@ -518,7 +518,7 @@ SOUS-MODULE 3.1 — LE PROBLÈME À RÉSOUDRE
 EXERCICE 24 — Si ça fonctionne...
 
 Question :
-"Si cette communication fonctionne parfaitement, qu'est-ce qui aura changé pour ton entreprise ?"
+"Si cette communication fonctionne parfaitement, qu'est-ce qui aura changé pour votre entreprise ?"
 
 Réponse ouverte.
 
@@ -527,7 +527,7 @@ Réponse ouverte.
 EXERCICE 25 — Concrètement
 
 Question :
-"Quels changements recherches-tu ?"
+"Quels changements recherchez-vous ?"
 
 Choix :
 - Être davantage connu
@@ -549,7 +549,7 @@ EXERCICE 26 — Pourquoi maintenant ?
 Questions :
 "Pourquoi ce sujet devient-il important aujourd'hui ?"
 
-"Quel problème concret aimerais-tu résoudre en priorité ?"
+"Quel problème concret aimeriez-vous résoudre en priorité ?"
 
 --------------------------------------------------
 SOUS-MODULE 3.2 — LA PRIORITÉ
@@ -573,7 +573,7 @@ Choix :
 EXERCICE 28 — Ça aura fonctionné si...
 
 Question :
-"Comment saurais-tu que le projet a vraiment fonctionné ?"
+"Comment sauriez-vous que le projet a vraiment fonctionné ?"
 
 Aide :
 "On cherche d'abord un signe concret, pas forcément un KPI."
@@ -585,7 +585,7 @@ Exemples :
 "Les clients nous parlent de notre savoir-faire."
 
 Question complémentaire facultative :
-"As-tu déjà un indicateur ou un résultat chiffré en tête ?"
+"Avez-vous déjà un indicateur ou un résultat chiffré en tête ?"
 
 --------------------------------------------------
 SOUS-MODULE 3.3 — CE QU'IL FAUT RACONTER
@@ -634,7 +634,7 @@ Questions complémentaires :
 
 
 ==================================================
-MODULE 4 — TON PROJET VIDÉO
+MODULE 4 — VOTRE PROJET VIDÉO
 ==================================================
 
 Objectif :
@@ -692,19 +692,19 @@ Questions :
 - Existe-t-il déjà d'autres contenus auxquels la relier ?
 
 --------------------------------------------------
-SOUS-MODULE 4.2 — DE TA PERSONNALITÉ À TON UNIVERS VIDÉO
+SOUS-MODULE 4.2 — DE VOTRE PERSONNALITÉ À VOTRE UNIVERS VIDÉO
 --------------------------------------------------
 
 IMPORTANT :
 cette partie doit exploiter autant que possible les réponses du module
-"Ta personnalité".
+"Votre personnalité".
 
 Ne redemande pas inutilement au client les informations qu'il a déjà données.
 
 Si l'architecture existante permet d'afficher dynamiquement les réponses précédentes,
 prévoir une introduction du type :
 
-"Tu nous as décrit une marque [PERSONNALITÉ 1], [PERSONNALITÉ 2] et [PERSONNALITÉ 3]. Maintenant, voyons comment cette personnalité pourrait prendre vie à l'écran."
+"Vous nous avez décrit une marque [PERSONNALITÉ 1], [PERSONNALITÉ 2] et [PERSONNALITÉ 3]. Maintenant, voyons comment cette personnalité pourrait prendre vie à l'écran."
 
 Si cette fonctionnalité n'existe pas encore, ne crée pas une architecture complexe juste pour cela.
 Conserve une introduction éditable générique et signale-moi la possibilité d'amélioration.
@@ -714,7 +714,7 @@ Conserve une introduction éditable générique et signale-moi la possibilité d
 EXERCICE 35 — L'émotion
 
 Question :
-"Qu'aimerais-tu que l'on ressente en regardant votre vidéo ?"
+"Qu'aimeriez-vous que l'on ressente en regardant votre vidéo ?"
 
 Choix :
 - Confiance
@@ -734,12 +734,12 @@ Choix :
 EXERCICE 36 — Les références
 
 Question :
-"Y a-t-il des vidéos, campagnes, films, marques ou univers qui t'inspirent ?"
+"Y a-t-il des vidéos, campagnes, films, marques ou univers qui vous inspirent ?"
 
 Permettre jusqu'à 3 références/liens si le système le permet.
 
 Question complémentaire :
-"Qu'est-ce que tu aimes dedans ?"
+"Qu'est-ce que vous aimez dedans ?"
 
 Aide :
 "Ambiance, lumière, rythme, réalisation, musique, manière de filmer les personnes..."
@@ -749,7 +749,7 @@ Prévoir l'option :
 
 ---
 
-EXERCICE 37 — Traduisons ta personnalité en images
+EXERCICE 37 — Traduisons votre personnalité en images
 
 Utiliser les curseurs existants :
 
@@ -778,7 +778,7 @@ présenter ces choix comme des préférences et non comme des décisions de réa
 EXERCICE 38 — Le NON
 
 Question :
-"Qu'est-ce que tu ne veux surtout pas voir dans cette vidéo ?"
+"Qu'est-ce que vous ne voulez surtout pas voir dans cette vidéo ?"
 
 Réponse ouverte.
 
@@ -838,10 +838,10 @@ Prévoir lorsque pertinent :
 SOUS-MODULE 4.4 — LES FORMATS ENVISAGÉS
 --------------------------------------------------
 
-EXERCICE 42 — As-tu déjà quelque chose en tête ?
+EXERCICE 42 — Avez-vous déjà quelque chose en tête ?
 
 Question :
-"As-tu déjà imaginé un format ou préfères-tu être conseillé ?"
+"Avez-vous déjà imaginé un format ou préférez-vous être conseillé ?"
 
 Choix :
 - Film de marque
@@ -856,7 +856,7 @@ Choix :
 - Je ne sais pas encore, conseille-moi
 
 Aide :
-"Ce choix est une piste, pas un engagement. Le format doit servir ton objectif, pas l'inverse."
+"Ce choix est une piste, pas un engagement. Le format doit servir votre objectif, pas l'inverse."
 
 ---
 
@@ -868,7 +868,7 @@ Questions facultatives :
 - Vertical / carré / horizontal ?
 - Versions courtes ?
 - Sur quelles plateformes ?
-- Que souhaites-tu que la personne fasse après avoir regardé ?
+- Que souhaitez-vous que la personne fasse après avoir regardé ?
 
 Ces questions doivent rester facultatives autant que possible :
 le rôle de Ty Ash est aussi de recommander la bonne architecture de contenus.

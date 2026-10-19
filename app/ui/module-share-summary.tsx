@@ -58,7 +58,7 @@ export default function ModuleShareSummary({
           </p>
           <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
             Voici la synthese des elements rediges dans ce module. L&apos;objectif est
-            de te permettre de relire rapidement l&apos;essentiel, sans effet de card
+            de vous permettre de relire rapidement l&apos;essentiel, sans effet de card
             ni mise en page décorative qui nuit à la lecture.
           </p>
         </div>
@@ -119,8 +119,8 @@ export default function ModuleShareSummary({
             Lecture rapide
           </p>
           <p className="mt-3 text-sm leading-7 text-[var(--text-primary)]">
-            Ce résumé apparaît uniquement à la fin du module. Tu peux t&apos;en servir
-            comme recap de travail, puis revenir ensuite sur le module si tu veux
+            Ce résumé apparaît uniquement à la fin du module. Vous pouvez vous en servir
+            comme recap de travail, puis revenir ensuite sur le module si vous voulez
             compléter ou ajuster certaines réponses.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">

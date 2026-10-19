@@ -520,7 +520,7 @@ function shouldShowExerciseExplanation(
 function getAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   displayedQuestion?: string,
-  fallback = "Ta réponse",
+  fallback = "Votre réponse",
 ) {
   const placeholder = exercise.answer_placeholder.trim();
 
@@ -589,7 +589,7 @@ function getFillBlankAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   sourceQuestion: string,
   blankIndex: number,
-  fallback = "Ta réponse",
+  fallback = "Votre réponse",
 ) {
   const placeholder = getAnswerPlaceholder(exercise, sourceQuestion, fallback);
   const blankCount = getFillBlankCount(sourceQuestion);
@@ -1685,7 +1685,7 @@ export default function ModuleAnswerForm({
           if (!navigator.onLine) {
             result = {
               status: "error",
-              message: "Hors ligne. Tes réponses sont conservées sur cet appareil.",
+              message: "Hors ligne. Vos réponses sont conservées sur cet appareil.",
             };
           } else {
             result = await saveModuleDraft(
@@ -1696,7 +1696,7 @@ export default function ModuleAnswerForm({
           result = {
             status: "error",
             message:
-              "Connexion interrompue. Ta réponse est conservée sur cet appareil et sera synchronisée automatiquement.",
+              "Connexion interrompue. Votre réponse est conservée sur cet appareil et sera synchronisée automatiquement.",
           };
         }
 
@@ -2092,7 +2092,7 @@ export default function ModuleAnswerForm({
                 : syncStatus === "synced"
                   ? "✓ Synchronisé"
                   : syncStatus === "offline"
-                    ? "⚠ Hors ligne — tes réponses sont enregistrées sur cet appareil."
+                    ? "⚠ Hors ligne — vos réponses sont enregistrées sur cet appareil."
                     : "⚠ Erreur de synchronisation"}
         </span>
         {syncStatus === "error" && !needsPageRefresh ? (
@@ -2136,7 +2136,7 @@ export default function ModuleAnswerForm({
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
                   ? "Inspiration"
-                  : "Pour t’éclairer"
+                  : "Pour vous éclairer"
                 : `Question ${currentAnswerableExerciseIndex + 1} sur ${answerableExerciseGroups.length}`
               : "Aucun exercice dans ce sous-module"}
           </p>
@@ -2159,7 +2159,7 @@ export default function ModuleAnswerForm({
       </div>
 
       <div className="space-y-4">
-        {currentExercise?.completion?.required === false ? <p className="text-sm text-[var(--text-muted)]">Facultatif : tu peux continuer sans remplir cet exercice.</p> : null}
+        {currentExercise?.completion?.required === false ? <p className="text-sm text-[var(--text-muted)]">Facultatif : vous pouvez continuer sans remplir cet exercice.</p> : null}
         {currentSubmodule ? (
           <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             {currentSubmodule.title}
@@ -2624,7 +2624,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précise ta réponse"
+                                  placeholder="Précisez votre réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
@@ -2677,7 +2677,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précise ta réponse"
+                            placeholder="Précisez votre réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
@@ -2866,7 +2866,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précise ta réponse"
+                                  placeholder="Précisez votre réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
@@ -2929,7 +2929,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précise ta réponse"
+                            placeholder="Précisez votre réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
@@ -3133,7 +3133,7 @@ export default function ModuleAnswerForm({
                     >
                       <div className="flex items-start gap-3">
                         <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                          Complete la phrase
+                          Complétez la phrase
                         </p>
                         <ExerciseAiActions
                           exercise={currentExercise}
@@ -3217,7 +3217,7 @@ export default function ModuleAnswerForm({
                   <div className="mt-4 border-l border-[var(--border)] pl-4 text-base leading-8 text-[var(--text-primary)]">
                     <div className="flex items-start gap-3">
                       <p className="min-w-0 flex-1 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                        Complete la phrase
+                        Complétez la phrase
                       </p>
                       <ExerciseAiActions
                         exercise={currentExercise}
@@ -3430,7 +3430,7 @@ export default function ModuleAnswerForm({
                       </div>
 
                       <p className="text-sm leading-6 text-[var(--text-muted)]">
-                        Complete chaque case du tableau pour valider cet exercice.
+                        Complétez chaque case du tableau pour valider cet exercice.
                       </p>
                     </>
                   );
@@ -3572,7 +3572,7 @@ export default function ModuleAnswerForm({
               if (stored) {
                 window.location.reload();
               } else {
-                setRefreshError("Impossible de conserver le brouillon sur cet appareil. Copie ta réponse avant d’actualiser la page.");
+                setRefreshError("Impossible de conserver le brouillon sur cet appareil. Copiez votre réponse avant d’actualiser la page.");
               }
             }}
           >
@@ -3684,7 +3684,7 @@ function ImageUploadExercise({
 
     const timeoutId = window.setTimeout(() => {
       setIsUploading(false);
-      setMessage("L'upload prend trop de temps. Réessaie avec moins d'images ou des fichiers plus légers.");
+      setMessage("L'upload prend trop de temps. Réessayez avec moins d'images ou des fichiers plus légers.");
     }, IMAGE_UPLOAD_TIMEOUT_MS + 1000);
 
     return () => window.clearTimeout(timeoutId);
@@ -3719,7 +3719,7 @@ function ImageUploadExercise({
               resolve({
                 status: "error",
                 message:
-                  "L'upload prend trop de temps. Réessaie avec moins d'images ou des fichiers plus légers.",
+                  "L'upload prend trop de temps. Réessayez avec moins d'images ou des fichiers plus légers.",
               }),
             IMAGE_UPLOAD_TIMEOUT_MS,
           );
@@ -3733,7 +3733,7 @@ function ImageUploadExercise({
 
       onChange([...imageUrls, ...result.urls].slice(0, config.maxImages));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "L'upload a échoué. Réessaie avec une autre image.");
+      setMessage(error instanceof Error ? error.message : "L'upload a échoué. Réessayez avec une autre image.");
     } finally {
       setIsUploading(false);
     }
@@ -3747,7 +3747,7 @@ function ImageUploadExercise({
             Tableau d&apos;inspiration
           </p>
           <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">
-            Ajoute simplement les images demandees dans la question.
+            Ajoutez simplement les images demandees dans la question.
           </p>
         </div>
         <p className="rounded-full border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
@@ -3844,7 +3844,7 @@ function ExerciseAiActions({
         <div className="pointer-events-none absolute right-0 top-11 z-20 w-72 translate-y-1 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
           <div className="rounded-[1.1rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-4 shadow-[0_18px_42px_rgba(120,92,56,0.14)]">
             <p className="text-sm leading-6 text-[var(--text-primary)]">
-              L&apos;IA peut proposer une réponse ou retravailler ton texte.
+              L&apos;IA peut proposer une réponse ou retravailler votre texte.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -4039,7 +4039,7 @@ function ChecklistExerciseBlocks({
 
             {entries.length === 0 ? (
               <div className="rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-4 py-4 text-sm leading-6 text-[var(--text-muted)]">
-                Ajoute tes mots ci-dessus pour construire ta checklist.
+                Ajoutez vos mots ci-dessus pour construire votre checklist.
               </div>
             ) : null}
 

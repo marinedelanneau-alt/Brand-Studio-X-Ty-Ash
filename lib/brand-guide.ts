@@ -317,7 +317,7 @@ function findSource(sources: AnswerSource[], keywordGroups: string[][]) {
       }));
       const assessment = /\b(aligne|alignee|alignes|alignees|je pense|je suis|coherent|coherente)\b/.test(label);
       const score = /\b(final|finale|definitif|definitive)\b/.test(label) ? 3
-        : /^(?:ta|ton|tes|ma|mon|mes|notre) \w+(?: de marque)?$/.test(label) ? 2
+        : /^(?:ta|ton|tes|ma|mon|mes|notre|votre|vos) \w+(?: de marque)?$/.test(label) ? 2
         : source.exercise.type === "prompt_open" ? 1 : 0;
       return { source, matches: matches && !assessment, score };
     })
@@ -642,14 +642,14 @@ export function generateBrandGuide(input: {
         sources.length === 0
           ? "Aucune réponse n'est encore disponible pour générer le guide."
           : missingRequiredCount > 0
-            ? "Ton guide peut être généré, mais certaines sections seront incomplètes."
-            : "Ton Guide de Marque est prêt.",
+            ? "Votre guide peut être généré, mais certaines sections seront incomplètes."
+            : "Votre Guide de Marque est prêt.",
       items: completionItems,
     },
     cover: {
       title: `Guide de Marque - ${brandName}`,
       subtitle: baseline,
-      introLine: toneWords.length > 0 ? `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.` : "Les fondations de ta marque.",
+      introLine: toneWords.length > 0 ? `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.` : "Les fondations de votre marque.",
     },
     introduction: `Ce guide rassemble les fondations stratégiques, verbales et visuelles de ${brandName}. Il sert de référence pour créer des contenus, guider les visuels et garder une communication cohérente dans le temps.`,
     dna: {
@@ -721,7 +721,7 @@ export function generateBrandGuide(input: {
     checklists: {
       visual: [
         "La palette principale est-elle respectee ?",
-        "Le niveau de contraste rend-il le texte lisible ?",
+        "Le niveau de contrasvous rend-il le texte lisible ?",
         "L'ambiance correspond-elle au moodboard ?",
         "Le visuel reste-t-il cohérent avec la promesse ?",
       ],

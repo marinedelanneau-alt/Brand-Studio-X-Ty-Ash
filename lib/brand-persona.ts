@@ -67,7 +67,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
           createQuestion("identity", 1, {
             id: "persona_first_name",
             label: "Prenom du persona",
-            helperText: "Choisis un prenom qui traduit l'aura de ta marque.",
+            helperText: "Choisissez un prenom qui traduit l'aura de votre marque.",
             placeholder: "Ex. Lumiere",
             fieldType: "text",
             example: "",
@@ -84,7 +84,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
           createQuestion("identity", 3, {
             id: "persona_symbolic_profession",
             label: "Profession symbolique",
-            helperText: "Un rôle qui exprime ce que ta marque apporte au monde.",
+            helperText: "Un rôle qui exprime ce que votre marque apporte au monde.",
             placeholder: "Ex. Stratege bienveillante",
             fieldType: "text",
             example: "Stratege bienveillante",
@@ -106,7 +106,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
         key: "personality",
         title: "Personnalite & caractere",
         description:
-          "Définis sa façon d'être, d'entrer en relation et de faire passer ses idées.",
+          "Définissez sa façon d'être, d'entrer en relation et de faire passer ses idées.",
         order: 2,
         isActive: true,
         questions: [
@@ -131,7 +131,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
           createQuestion("personality", 3, {
             id: "tone_of_voice",
             label: "Ton de voix",
-            helperText: "Le ton doit pouvoir guider tes textes et prises de parole.",
+            helperText: "Le ton doit pouvoir guider vos textes et prises de parole.",
             placeholder: "Ex. Accessible sans être familier, expert sans être froid",
             fieldType: "textarea",
             example: "Accessible sans être familier, expert sans être froid",
@@ -152,14 +152,14 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
         key: "style",
         title: "Style & apparence",
         description:
-          "Traduis sa personnalité en signaux visuels concrets pour inspirer ton univers de marque.",
+          "Traduisez sa personnalité en signaux visuels concrets pour inspirer votre univers de marque.",
         order: 3,
         isActive: true,
         questions: [
           createQuestion("style", 1, {
             id: "clothing_style",
             label: "Style vestimentaire",
-            helperText: "Imagine son allure globale au premier regard.",
+            helperText: "Imaginez son allure globale au premier regard.",
             placeholder: "Ex. Elegant decontracte, minimaliste et lumineux",
             fieldType: "text",
             example: "Elegant decontracte, minimaliste et lumineux",
@@ -263,7 +263,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
           createQuestion("relationships", 3, {
             id: "advisor_type",
             label: "Quel type d'ami ou de conseiller serait-elle ?",
-            helperText: "Décris le rôle qu'elle joue pour les autres.",
+            helperText: "Décrivez le rôle qu'elle joue pour les autres.",
             placeholder: "Ex. Une amie lucide qui dit les choses avec tact et aide à trancher",
             fieldType: "textarea",
             example: "",
@@ -334,7 +334,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
           createQuestion("summary", 1, {
             id: "final_summary_sentence",
             label: "En une phrase, ma marque-persona est...",
-            helperText: "Ta phrase-repère finale.",
+            helperText: "Votre phrase-repère finale.",
             placeholder: "Ex. Une guide claire, élégante et rassurante qui aide à mieux choisir.",
             fieldType: "textarea",
             example: "",
@@ -344,7 +344,7 @@ export function getDefaultBrandPersonaConfig(): BrandPersonaConfig {
             id: "content_guiding_question",
             label:
               "Quand je cree du contenu, je dois me demander : Comment [prenom] communiquerait-elle ce message ?",
-            helperText: "Transforme cette phrase en reflexe creatif.",
+            helperText: "Transformez cette phrase en reflexe creatif.",
             placeholder: "Ex. Avec clarté, tact et une vraie intention d'aider",
             fieldType: "textarea",
             example: "",

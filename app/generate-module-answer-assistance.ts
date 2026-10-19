@@ -46,7 +46,7 @@ export async function requestModuleAnswerAssistance(input: {
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Crée d'abord ton projet de marque.",
+        message: "Créez d'abord votre projet de marque.",
         coachingNote: "",
         values: [],
       };

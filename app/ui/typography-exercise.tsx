@@ -76,9 +76,9 @@ export default function TypographyExercise({ exercise, answers, onChange }: {
 
   return (
     <section className="rounded-[1.5rem] border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-7">
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Ton système typographique</p>
-      <h3 className="mt-3 font-serif text-3xl text-[var(--heading-color)]">Choisis jusqu’à trois typographies.</h3>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-muted)]">Associe une police à chaque rôle. Toutes les polices proposées sont libres de droit. Tu peux aussi importer tes propres fichiers si leur licence t’autorise à les utiliser.</p>
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Votre système typographique</p>
+      <h3 className="mt-3 font-serif text-3xl text-[var(--heading-color)]">Choisissez jusqu’à trois typographies.</h3>
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--text-muted)]">Associez une police à chaque rôle. Toutes les polices proposées sont libres de droit. Vous pouvez aussi importer vos propres fichiers si leur licence vous autorise à les utiliser.</p>
       <div className="mt-7 grid gap-5">
         {ROLES.map((role) => {
           const selected = choices.find((choice) => choice.role === role.id);

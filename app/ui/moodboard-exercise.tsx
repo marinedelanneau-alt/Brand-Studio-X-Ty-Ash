@@ -90,7 +90,7 @@ function fileToDataUrl(file: File) {
 
 async function compressMoodboardImage(file: File) {
   if (!ACCEPTED_IMAGE_TYPES.has(file.type) || file.size > MAX_IMAGE_BYTES) {
-    throw new Error("Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.");
+    throw new Error("Cette image n’a pas pu être ajoutée. Vérifiez son format ou son poids.");
   }
 
   const sourceUrl = URL.createObjectURL(file);
@@ -794,7 +794,7 @@ export default function MoodboardExercise({
     } catch {
       setUploadState({
         status: "error",
-        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+        message: "Cette image n’a pas pu être ajoutée. Vérifiez son format ou son poids.",
       });
       return;
     }
@@ -881,7 +881,7 @@ export default function MoodboardExercise({
     } catch {
       setUploadState({
         status: "error",
-        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+        message: "Cette image n’a pas pu être ajoutée. Vérifiez son format ou son poids.",
       });
     }
   }
@@ -928,7 +928,7 @@ export default function MoodboardExercise({
       });
       setUploadState(initialUploadState);
     } catch {
-      setUploadState({ status: "error", message: "Ce pictogramme n’a pas pu être ajouté. Vérifie son format ou son poids." });
+      setUploadState({ status: "error", message: "Ce pictogramme n’a pas pu être ajouté. Vérifiez son format ou son poids." });
     }
   }
 
@@ -963,16 +963,16 @@ export default function MoodboardExercise({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
               <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
-                Ton moodboard de marque
+                Votre moodboard de marque
               </p>
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[var(--heading-color)]">
-                Compose ton univers visuel
+                Composez votre univers visuel
               </h3>
               <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--text-primary)]">
-                Rassemble ici les images, couleurs, mots et détails qui traduisent l’atmosphère de ta marque.
+                Rassemblez ici les images, couleurs, mots et détails qui traduisent l’atmosphère de votre marque.
               </p>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--text-primary)]">
-                Ce moodboard te servira de repère pour créer tes supports, choisir tes visuels et conserver une vraie cohérence dans ta communication.
+                Ce moodboard vous servira de repère pour créer vos supports, choisir vos visuels et conserver une vraie cohérence dans votre communication.
               </p>
             </div>
 
@@ -981,7 +981,7 @@ export default function MoodboardExercise({
                 Ambiance
               </p>
               <p className="mt-3 max-w-56 text-sm leading-6 text-[var(--text-primary)]">
-                {board.feedback || "Ton moodboard se construira ici, avec une lecture immédiate de son équilibre visuel."}
+                {board.feedback || "Votre moodboard se construira ici, avec une lecture immédiate de son équilibre visuel."}
               </p>
             </div>
           </div>
@@ -1140,7 +1140,7 @@ export default function MoodboardExercise({
               >
                 {board.blocks.length === 0 ? (
                   <div className="flex h-full items-center justify-center rounded-[1.2rem] border border-dashed border-[var(--surface-highlight)]/70 bg-white/30 px-6 text-center text-sm leading-7 text-[var(--text-primary)]">
-                    Glisse tes images ici ou utilise les actions ci-dessus pour commencer ta composition.
+                    Glissez vos images ici ou utilisez les actions ci-dessus pour commencer votre composition.
                   </div>
                 ) : null}
 
@@ -1297,7 +1297,7 @@ export default function MoodboardExercise({
                         <textarea
                           value={selectedBlock.altText}
                           onChange={(event) => patchSelectedBlock({ altText: event.target.value })}
-                          placeholder="Décris brièvement l’image"
+                          placeholder="Décrivez brièvement l’image"
                           className="min-h-20 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text-primary)]"
                         />
                       </label>
@@ -1485,7 +1485,7 @@ export default function MoodboardExercise({
                 </div>
               ) : (
                 <p className="mt-4 text-sm leading-7 text-[var(--text-muted)]">
-                  Sélectionne un bloc dans la composition pour l&apos;affiner.
+                  Sélectionnez un bloc dans la composition pour l&apos;affiner.
                 </p>
               )}
             </div>

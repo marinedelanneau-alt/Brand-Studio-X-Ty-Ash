@@ -1286,7 +1286,7 @@ export async function saveAdminModuleDefinitionDraft(
     ? modules.find((module) => module.id === input.moduleId)
     : undefined;
   if (existingModule && options.expectedModuleUpdatedAt !== (existingModule.editorRevision ?? existingModule.updated_at ?? "initial")) {
-    throw new Error("Ce module a changé depuis son chargement. Recharge l'éditeur avant de sauvegarder.");
+    throw new Error("Ce module a changé depuis son chargement. Rechargez l'éditeur avant de sauvegarder.");
   }
   if (options.preserveOmittedContent && existingModule) {
     const submittedExerciseCount = input.submodules.reduce(
@@ -1302,11 +1302,11 @@ export async function saveAdminModuleDefinitionDraft(
       submittedExerciseCount < existingModule.exercises.length
     ) {
       throw new Error(
-        "Sauvegarde automatique interrompue : le contenu reçu est incomplet. Utilise Enregistrer pour confirmer une suppression volontaire.",
+        "Sauvegarde automatique interrompue : le contenu reçu est incomplet. Utilisez Enregistrer pour confirmer une suppression volontaire.",
       );
     }
   }
-  if (input.moduleId && !existingModule) throw new Error("Module périmé : recharge l'éditeur.");
+  if (input.moduleId && !existingModule) throw new Error("Module périmé : rechargez l'éditeur.");
   const history = existingModule && !isTyAshContent(existingModule) ? [] : await getRetainedPathwaySnapshots();
   const reserved = history.flatMap(h => h.modules.length ? validateReleaseModules(h.modules) : []) as unknown as DraftModule[];
   const nextModule = buildDraftModuleFromDefinition(input, existingModule, [...modules, ...reserved]);
@@ -1398,13 +1398,13 @@ export async function saveAdminVoiceNoteToDraft(input: {
 
 export async function publishAdminModuleDraft(_accountId: number): Promise<never> {
   void _accountId;
-  throw new Error("Publication historique désactivée : utilise la publication contrôlée.");
+  throw new Error("Publication historique désactivée : utilisez la publication contrôlée.");
 }
 
 export async function publishScheduledAdminModuleSnapshot(_accountId: number, _modules: DraftModule[]): Promise<never> {
   void _accountId;
   void _modules;
-  throw new Error("Déploiement historique désactivé : utilise les releases contrôlées.");
+  throw new Error("Déploiement historique désactivé : utilisez les releases contrôlées.");
 }
 
 export async function getWorkspaceData(accountId: number) {
@@ -1942,7 +1942,7 @@ export async function saveModuleDefinition(input: {
   const moduleAudioUrl = firstSubmodule?.audioUrl?.trim() || null;
   const moduleAudioTranscript = firstSubmodule?.audioTranscript?.trim() || null;
   const moduleContentHtml = appendAudioMetadataToHtml(
-    firstSubmodule?.contentHtml ?? "<p>Ajoute ici le contenu du sous-module.</p>",
+    firstSubmodule?.contentHtml ?? "<p>Ajoutez ici le contenu du sous-module.</p>",
     moduleAudioUrl ?? "",
     moduleAudioTranscript ?? "",
   );

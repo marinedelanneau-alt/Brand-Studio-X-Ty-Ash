@@ -40,7 +40,7 @@ export async function getAdminReleaseWorkspace() {
 export async function saveAdminReleaseModules(modules: unknown[], expectedUpdatedAt: string) {
   const workspace = await getAdminReleaseWorkspace();
   if (workspace.snapshot.updated_at !== expectedUpdatedAt) {
-    throw new Error("Le brouillon a changé pendant l'enregistrement. Recharge l'éditeur avant de réessayer.");
+    throw new Error("Le brouillon a changé pendant l'enregistrement. Rechargez l'éditeur avant de réessayer.");
   }
   const publishedSnapshot = await getContentReleaseSnapshot(workspace.state.published_release_id);
   if (!publishedSnapshot) throw new Error("Snapshot publié introuvable.");

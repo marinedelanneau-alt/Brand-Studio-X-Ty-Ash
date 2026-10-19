@@ -112,7 +112,7 @@ export default function BrandPersonaExercise({
       }
 
       return getFieldValues(answers, fieldIndex)[0] ?? "";
-    })() || "ta marque";
+    })() || "votre marque";
   const summary = {
     firstName:
       getFieldValues(answers, fieldIndexById.get("persona_first_name") ?? -1)[0] ?? "",
@@ -153,7 +153,7 @@ export default function BrandPersonaExercise({
     try {
       return await exportStoryAsPng(storyRef.current);
     } catch {
-      setShareMessage("Impossible de préparer l'image. Réessaie dans quelques instants.");
+      setShareMessage("Impossible de préparer l'image. Réessayez dans quelques instants.");
       return null;
     } finally {
       setIsExporting(false);
@@ -164,7 +164,7 @@ export default function BrandPersonaExercise({
     const dataUrl = await createPersonaImage();
     if (!dataUrl) return;
     downloadDataUrl(dataUrl, personaFilename);
-    setShareMessage("Ta fiche persona a été téléchargée.");
+    setShareMessage("Votre fiche persona a été téléchargée.");
   }
 
   async function sharePersona() {
@@ -175,14 +175,14 @@ export default function BrandPersonaExercise({
     if (canShare) {
       try {
         await navigator.share({ files: [file], title: "Mon persona de marque", text: "Voici le persona de ma marque, créé avec Brand Studio." });
-        setShareMessage("Choisis Instagram puis ajoute l'image à ta story.");
+        setShareMessage("Choisissez Instagram puis ajoutez l'image à votre story.");
         return;
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
       }
     }
     downloadDataUrl(dataUrl, personaFilename);
-    setShareMessage("Image téléchargée. Ouvre Instagram et sélectionne-la dans ta story.");
+    setShareMessage("Image téléchargée. Ouvrez Instagram et sélectionnez-la dans votre story.");
   }
 
   return (
@@ -195,19 +195,19 @@ export default function BrandPersonaExercise({
                 Persona de marque
               </p>
               <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.3rem] leading-[0.94] text-[var(--heading-color)]">
-                {exercise.question || "Crée le persona incarné de ta marque"}
+                {exercise.question || "Créez le persona incarné de votre marque"}
               </h3>
               <PedagogicalContent
                 content={
                   exercise.explanation ||
-                  "Imagine ta marque comme une vraie personne. Cet exercice va t'aider a definir sa personnalite, sa maniere de parler, son attitude et son univers."
+                  "Imaginez votre marque comme une vraie personne. Cet exercice va vous aider a definir sa personnalite, sa maniere de parler, son attitude et son univers."
                 }
                 className="mt-5 rounded-[1rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-4 py-4"
               />
               {false ? (
               <p>
                 {exercise.explanation ||
-                  "Imagine ta marque comme une vraie personne. Cet exercice va t'aider à définir sa personnalité, sa manière de parler, son attitude et son univers."}
+                  "Imaginez votre marque comme une vraie personne. Cet exercice va vous aider à définir sa personnalité, sa manière de parler, son attitude et son univers."}
               </p>
               ) : null}
             </div>
@@ -404,7 +404,7 @@ export default function BrandPersonaExercise({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[0.74rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
-              Ton persona de marque
+              Votre persona de marque
             </p>
             <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2.2rem] leading-[0.94] text-[var(--heading-color)]">
               {summary.firstName || "Le portrait prend forme"}
@@ -428,15 +428,15 @@ export default function BrandPersonaExercise({
         </div>
 
         <div className="mt-5 rounded-[1.2rem] border border-[var(--border)] bg-[var(--tyash-subtle)] px-5 py-4 text-sm leading-7 text-[var(--text-primary)]">
-          Quand tu crees du contenu, demande-toi : comment {personaFirstName} communiquerait-elle ce message ?
+          Quand vous créez du contenu, demandez-vous : comment {personaFirstName} communiquerait-elle ce message ?
         </div>
         {overallCompletion === 100 ? (
           <div className="mt-6 rounded-[1.4rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-5">
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <div>
                 <p className="text-[0.7rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Fiche terminée</p>
-                <h4 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">Télécharge ou partage ton persona</h4>
-                <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">Télécharge le CV complet de ton persona en PDF ou partage sa version courte au format Story.</p>
+                <h4 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">Téléchargez ou partagez votre persona</h4>
+                <p className="mt-2 text-sm leading-7 text-[var(--text-primary)]">Téléchargez le CV complet de votre persona en PDF ou partagez sa version courte au format Story.</p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <a href="/mon-espace/persona/download" className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#4b4550] bg-[var(--card)] px-4 text-sm font-bold text-[var(--heading-color)]"><DocumentArrowDownIcon className="size-5" />PDF complet</a>
                   <button type="button" onClick={() => void downloadPersona()} disabled={isExporting} className="inline-flex h-11 items-center gap-2 rounded-xl border border-[var(--tyash-primary)] bg-[var(--card)] px-4 text-sm font-bold text-[var(--tyash-label-text)] disabled:opacity-50"><ArrowDownTrayIcon className="size-5" />{isExporting ? "Préparation..." : "Télécharger"}</button>

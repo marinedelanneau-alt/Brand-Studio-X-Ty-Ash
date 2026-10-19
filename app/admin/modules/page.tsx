@@ -64,7 +64,7 @@ export default async function AdminModulesPage({
           Gestion des modules
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[var(--text-muted)]">
-          Tes modifications sont enregistrées automatiquement dans le brouillon privé.
+          Vos modifications sont enregistrées automatiquement dans le brouillon privé.
           Publie volontairement la version enregistrée pour la rendre visible aux utilisateurs.
         </p>
         <AdminDeploymentButton />
@@ -72,7 +72,7 @@ export default async function AdminModulesPage({
           Versions, aperçu et déploiements programmés
         </a>
         <p className="mt-3 text-sm text-[var(--text-muted)]">
-          Attends la confirmation de sauvegarde avant de publier. Les déplacements,
+          Attendez la confirmation de sauvegarde avant de publier. Les déplacements,
           suppressions et changements de type des éléments publiés sont protégés
           pour conserver les réponses existantes.
         </p>

@@ -3,7 +3,7 @@
     "id": 1,
     "stableKey": "template_module_1",
     "position": 1,
-    "title": "TON ENTREPRISE",
+    "title": "VOTRE ENTREPRISE",
     "content_html": "<p>Comprendre ce qu&#x27;il y a derrière l&#x27;entreprise :\nson histoire, ce qui l&#x27;anime, sa personnalité, ses ambitions et ses publics.</p>",
     "submodules": [
       {
@@ -11,7 +11,7 @@
         "stableKey": "template_submodule_1.1",
         "module_id": 1,
         "position": 1,
-        "title": "TON HISTOIRE",
+        "title": "VOTRE HISTOIRE",
         "content_html": "",
         "exercises": [
           {
@@ -21,9 +21,9 @@
             "submodule_id": 100,
             "position": 1,
             "type": "open",
-            "question": "Que fait ton entreprise ?",
+            "question": "Que fait votre entreprise ?",
             "options": [],
-            "explanation": "<h3>Présente ton entreprise</h3><p>Présente-nous ton entreprise simplement.</p>",
+            "explanation": "<h3>Présentez votre entreprise</h3><p>Présentez-nous votre entreprise simplement.</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_01"
           },
@@ -34,7 +34,7 @@
             "submodule_id": 100,
             "position": 2,
             "type": "open",
-            "question": "Quels produits ou services proposes-tu aujourd'hui ?",
+            "question": "Quels produits ou services proposez-vous aujourd'hui ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",
@@ -62,7 +62,7 @@
             "type": "open",
             "question": "Qu'est-ce qui a donné naissance à l'entreprise ?",
             "options": [],
-            "explanation": "<h3>Comment tout a commencé ?</h3><p>Derrière chaque entreprise, il y a un point de départ. Quel a été le tien ?</p><p>Une envie, une rencontre, un problème que tu voulais résoudre, une opportunité, une conviction...</p>",
+            "explanation": "<h3>Comment tout a commencé ?</h3><p>Derrière chaque entreprise, il y a un point de départ. Quel a été le vôtre ?</p><p>Une envie, une rencontre, un problème que vous vouliez résoudre, une opportunité, une conviction...</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_02"
           },
@@ -172,7 +172,7 @@
         "stableKey": "template_submodule_1.3",
         "module_id": 1,
         "position": 3,
-        "title": "TA PERSONNALITÉ",
+        "title": "VOTRE PERSONNALITÉ",
         "content_html": "",
         "exercises": [
           {
@@ -182,7 +182,7 @@
             "submodule_id": 102,
             "position": 11,
             "type": "multiple",
-            "question": "Imagine : ton entreprise entre dans une pièce remplie de monde. Comment se comporte-t-elle ?",
+            "question": "Imaginez : votre entreprise entre dans une pièce remplie de monde. Comment se comporte-t-elle ?",
             "options": [
               "Elle met immédiatement tout le monde à l'aise",
               "Elle observe avant de prendre la parole",
@@ -194,7 +194,7 @@
               "Elle reste discrète mais on se souvient d'elle",
               "Autre"
             ],
-            "explanation": "<h3>Si ton entreprise était une personne...</h3>",
+            "explanation": "<h3>Si votre entreprise était une personne...</h3>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_06"
           },
@@ -205,7 +205,7 @@
             "submodule_id": 102,
             "position": 12,
             "type": "open",
-            "question": "Et qu'aimerais-tu que les gens disent d'elle une fois qu'elle est partie ?",
+            "question": "Et qu'aimeriez-vous que les gens disent d'elle une fois qu'elle est partie ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",
@@ -220,7 +220,7 @@
             "type": "spectrum",
             "question": "Sérieuse ←→ Joueuse",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22S%C3%A9rieuse%22%2C%22rightLabel%22%3A%22Joueuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22S%C3%A9rieuse%22%2C%22rightLabel%22%3A%22Joueuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "<h3>Place les curseurs</h3>",
             "answer_placeholder": "",
@@ -235,7 +235,7 @@
             "type": "spectrum",
             "question": "Discrète ←→ Expressive",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Discr%C3%A8te%22%2C%22rightLabel%22%3A%22Expressive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Discr%C3%A8te%22%2C%22rightLabel%22%3A%22Expressive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "",
             "answer_placeholder": "",
@@ -250,7 +250,7 @@
             "type": "spectrum",
             "question": "Institutionnelle ←→ Spontanée",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Institutionnelle%22%2C%22rightLabel%22%3A%22Spontan%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Institutionnelle%22%2C%22rightLabel%22%3A%22Spontan%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "",
             "answer_placeholder": "",
@@ -265,7 +265,7 @@
             "type": "spectrum",
             "question": "Accessible ←→ Exclusive",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Accessible%22%2C%22rightLabel%22%3A%22Exclusive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Accessible%22%2C%22rightLabel%22%3A%22Exclusive%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "",
             "answer_placeholder": "",
@@ -280,7 +280,7 @@
             "type": "spectrum",
             "question": "Rassurante ←→ Audacieuse",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rassurante%22%2C%22rightLabel%22%3A%22Audacieuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rassurante%22%2C%22rightLabel%22%3A%22Audacieuse%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "",
             "answer_placeholder": "",
@@ -295,7 +295,7 @@
             "type": "spectrum",
             "question": "Posée ←→ Énergique",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Pos%C3%A9e%22%2C%22rightLabel%22%3A%22%C3%89nergique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Pos%C3%A9e%22%2C%22rightLabel%22%3A%22%C3%89nergique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "",
             "answer_placeholder": "",
@@ -308,7 +308,7 @@
             "submodule_id": 102,
             "position": 19,
             "type": "multiple",
-            "question": "Si tu ne pouvais garder que 3 mots pour décrire la personnalité de ton entreprise, lesquels choisirais-tu ?",
+            "question": "Si vous ne pouviez garder que 3 mots pour décrire la personnalité de votre entreprise, lesquels choisiriez-vous ?",
             "options": [
               "Chaleureuse",
               "Experte",
@@ -354,7 +354,7 @@
             "submodule_id": 102,
             "position": 21,
             "type": "multiple",
-            "question": "Si ton entreprise prenait la parole, comment parlerait-elle ?",
+            "question": "Si votre entreprise prenait la parole, comment parlerait-elle ?",
             "options": [
               "Avec simplicité",
               "Avec expertise",
@@ -392,7 +392,7 @@
         "stableKey": "template_submodule_1.4",
         "module_id": 1,
         "position": 4,
-        "title": "TES AMBITIONS",
+        "title": "VOS AMBITIONS",
         "content_html": "",
         "exercises": [
           {
@@ -425,7 +425,7 @@
             "submodule_id": 103,
             "position": 24,
             "type": "open",
-            "question": "Dans un an, qu'aimerais-tu avoir fait évoluer ?",
+            "question": "Dans un an, qu'aimeriez-vous avoir fait évoluer ?",
             "options": [],
             "explanation": "<h3>Et demain ?</h3>",
             "answer_placeholder": "",
@@ -451,7 +451,7 @@
         "stableKey": "template_submodule_1.5",
         "module_id": 1,
         "position": 5,
-        "title": "TES PUBLICS",
+        "title": "VOS PUBLICS",
         "content_html": "",
         "exercises": [
           {
@@ -509,9 +509,9 @@
             "submodule_id": 104,
             "position": 29,
             "type": "open",
-            "question": "Pour ce projet, qui veux-tu toucher en priorité ?",
+            "question": "Pour ce projet, qui voulez-vous toucher en priorité ?",
             "options": [],
-            "explanation": "<h3>La priorité</h3><p>Décris-nous une seule personne ou catégorie de personnes.</p>",
+            "explanation": "<h3>La priorité</h3><p>Décrivez-nous une seule personne ou catégorie de personnes.</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_14"
           },
@@ -553,7 +553,7 @@
     "id": 2,
     "stableKey": "template_module_2",
     "position": 2,
-    "title": "TA COMMUNICATION",
+    "title": "VOTRE COMMUNICATION",
     "content_html": "<p>Comprendre ce qui existe déjà, ce qui fonctionne, ce qui bloque et le décalage entre la personnalité de la marque et ce qu&#x27;elle donne réellement à voir.</p>",
     "submodules": [
       {
@@ -712,7 +712,7 @@
             "submodule_id": 106,
             "position": 9,
             "type": "single",
-            "question": "te permet d'être connu ;",
+            "question": "vous permet d'être connu ;",
             "options": [
               "Pas du tout",
               "Un peu",
@@ -721,7 +721,7 @@
               "Je ne sais pas",
               "Non concerné"
             ],
-            "explanation": "<h3>Faisons le point</h3><p>Aujourd&#x27;hui, ta communication...</p>",
+            "explanation": "<h3>Faisons le point</h3><p>Aujourd&#x27;hui, votre communication...</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_18"
           },
@@ -732,7 +732,7 @@
             "submodule_id": 106,
             "position": 10,
             "type": "single",
-            "question": "fait comprendre clairement ton activité ;",
+            "question": "fait comprendre clairement votre activité ;",
             "options": [
               "Pas du tout",
               "Un peu",
@@ -752,7 +752,7 @@
             "submodule_id": 106,
             "position": 11,
             "type": "single",
-            "question": "te différencie ;",
+            "question": "vous différencie ;",
             "options": [
               "Pas du tout",
               "Un peu",
@@ -889,7 +889,7 @@
             "submodule_id": 106,
             "position": 18,
             "type": "open",
-            "question": "À l'inverse, qu'est-ce qui te frustre le plus aujourd'hui ?",
+            "question": "À l'inverse, qu'est-ce qui vous frustre le plus aujourd'hui ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",
@@ -925,9 +925,9 @@
             "submodule_id": 107,
             "position": 20,
             "type": "spectrum",
-            "question": "Quand tu regardes ta communication actuelle, retrouves-tu vraiment la personnalité que tu viens de décrire ?",
+            "question": "Quand vous regardez votre communication actuelle, retrouvez-vous vraiment la personnalité que vous venez de décrire ?",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Compl%C3%A8tement%22%2C%22rightLabel%22%3A%22Pas%20du%20tout%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Compl%C3%A8tement%22%2C%22rightLabel%22%3A%22Pas%20du%20tout%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "<h3>Est-ce vraiment ce qu&#x27;on montre ?</h3>",
             "answer_placeholder": "",
@@ -953,7 +953,7 @@
             "submodule_id": 107,
             "position": 22,
             "type": "open",
-            "question": "Comment penses-tu que les autres perçoivent ton entreprise aujourd'hui ?",
+            "question": "Comment pensez-vous que les autres perçoivent votre entreprise aujourd'hui ?",
             "options": [],
             "explanation": "<h3>Aujourd&#x27;hui vs demain</h3>",
             "answer_placeholder": "Je ne sais pas",
@@ -966,7 +966,7 @@
             "submodule_id": 107,
             "position": 23,
             "type": "open",
-            "question": "Comment voudrais-tu qu'ils la perçoivent demain ?",
+            "question": "Comment voudriez-vous qu'ils la perçoivent demain ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "Je ne sais pas",
@@ -981,7 +981,7 @@
     "id": 3,
     "stableKey": "template_module_3",
     "position": 3,
-    "title": "TON BESOIN",
+    "title": "VOTRE BESOIN",
     "content_html": "<p>Identifier le véritable problème de communication avant de parler de format vidéo.</p>",
     "submodules": [
       {
@@ -999,7 +999,7 @@
             "submodule_id": 108,
             "position": 1,
             "type": "open",
-            "question": "Si cette communication fonctionne parfaitement, qu'est-ce qui aura changé pour ton entreprise ?",
+            "question": "Si cette communication fonctionne parfaitement, qu'est-ce qui aura changé pour votre entreprise ?",
             "options": [],
             "explanation": "<h3>Si ça fonctionne...</h3>",
             "answer_placeholder": "",
@@ -1012,7 +1012,7 @@
             "submodule_id": 108,
             "position": 2,
             "type": "multiple",
-            "question": "Quels changements recherches-tu ?",
+            "question": "Quels changements recherchez-vous ?",
             "options": [
               "Être davantage connu",
               "Mieux faire comprendre mon activité",
@@ -1050,7 +1050,7 @@
             "submodule_id": 108,
             "position": 4,
             "type": "open",
-            "question": "Quel problème concret aimerais-tu résoudre en priorité ?",
+            "question": "Quel problème concret aimeriez-vous résoudre en priorité ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",
@@ -1093,7 +1093,7 @@
             "submodule_id": 109,
             "position": 6,
             "type": "open",
-            "question": "Comment saurais-tu que le projet a vraiment fonctionné ?",
+            "question": "Comment sauriez-vous que le projet a vraiment fonctionné ?",
             "options": [],
             "explanation": "<h3>Ça aura fonctionné si...</h3><p>On cherche d&#x27;abord un signe concret, pas forcément un KPI.</p><p>Les prospects comprennent enfin ce qu&#x27;on fait.\nLes commerciaux utilisent la vidéo en rendez-vous.\nOn reçoit davantage de candidatures pertinentes.\nLes clients nous parlent de notre savoir-faire.</p>",
             "answer_placeholder": "",
@@ -1106,7 +1106,7 @@
             "submodule_id": 109,
             "position": 7,
             "type": "open",
-            "question": "As-tu déjà un indicateur ou un résultat chiffré en tête ?",
+            "question": "Avez-vous déjà un indicateur ou un résultat chiffré en tête ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",
@@ -1212,7 +1212,7 @@
     "id": 4,
     "stableKey": "template_module_4",
     "position": 4,
-    "title": "TON PROJET VIDÉO",
+    "title": "VOTRE PROJET VIDÉO",
     "content_html": "<p>Traduire tout le travail précédent en matière créative exploitable par Ty Ash.</p>",
     "submodules": [
       {
@@ -1362,8 +1362,8 @@
         "stableKey": "template_submodule_4.2",
         "module_id": 4,
         "position": 2,
-        "title": "DE TA PERSONNALITÉ À TON UNIVERS VIDÉO",
-        "content_html": "<p>Maintenant, voyons comment la personnalité de ta marque pourrait prendre vie à l'écran.</p>",
+        "title": "DE VOTRE PERSONNALITÉ À VOTRE UNIVERS VIDÉO",
+        "content_html": "<p>Maintenant, voyons comment la personnalité de votre marque pourrait prendre vie à l'écran.</p>",
         "exercises": [
           {
             "id": 1073,
@@ -1372,7 +1372,7 @@
             "submodule_id": 112,
             "position": 8,
             "type": "multiple",
-            "question": "Qu'aimerais-tu que l'on ressente en regardant votre vidéo ?",
+            "question": "Qu'aimeriez-vous que l'on ressente en regardant votre vidéo ?",
             "options": [
               "Confiance",
               "Énergie",
@@ -1397,7 +1397,7 @@
             "submodule_id": 112,
             "position": 9,
             "type": "group_open",
-            "question": "Y a-t-il des vidéos, campagnes, films, marques ou univers qui t'inspirent ?",
+            "question": "Y a-t-il des vidéos, campagnes, films, marques ou univers qui vous inspirent ?",
             "options": [
               "__group_open_layout__:1",
               "__group_open__:Référence / lien 1",
@@ -1418,7 +1418,7 @@
             "submodule_id": 112,
             "position": 10,
             "type": "open",
-            "question": "Qu'est-ce que tu aimes dedans ?",
+            "question": "Qu'est-ce que vous aimez dedans ?",
             "options": [],
             "explanation": "Ambiance, lumière, rythme, réalisation, musique, manière de filmer les personnes...",
             "answer_placeholder": "",
@@ -1454,9 +1454,9 @@
             "type": "spectrum",
             "question": "Lumière naturelle ←→ Lumière très travaillée",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Lumi%C3%A8re%20naturelle%22%2C%22rightLabel%22%3A%22Lumi%C3%A8re%20tr%C3%A8s%20travaill%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Lumi%C3%A8re%20naturelle%22%2C%22rightLabel%22%3A%22Lumi%C3%A8re%20tr%C3%A8s%20travaill%C3%A9e%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
-            "explanation": "<h3>Traduisons ta personnalité en images</h3><p>Ces choix sont des préférences et non des décisions de réalisation définitives.</p>",
+            "explanation": "<h3>Traduisons votre personnalité en images</h3><p>Ces choix sont des préférences et non des décisions de réalisation définitives.</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_37"
           },
@@ -1469,7 +1469,7 @@
             "type": "spectrum",
             "question": "Observation / documentaire ←→ Mise en scène",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Observation%20%2F%20documentaire%22%2C%22rightLabel%22%3A%22Mise%20en%20sc%C3%A8ne%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Observation%20%2F%20documentaire%22%2C%22rightLabel%22%3A%22Mise%20en%20sc%C3%A8ne%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
             "answer_placeholder": "",
@@ -1484,7 +1484,7 @@
             "type": "spectrum",
             "question": "Rythme contemplatif ←→ Montage dynamique",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rythme%20contemplatif%22%2C%22rightLabel%22%3A%22Montage%20dynamique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Rythme%20contemplatif%22%2C%22rightLabel%22%3A%22Montage%20dynamique%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
             "answer_placeholder": "",
@@ -1499,7 +1499,7 @@
             "type": "spectrum",
             "question": "Très humain ←→ Très produit / savoir-faire",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Tr%C3%A8s%20humain%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20produit%20%2F%20savoir-faire%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Tr%C3%A8s%20humain%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20produit%20%2F%20savoir-faire%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
             "answer_placeholder": "",
@@ -1514,7 +1514,7 @@
             "type": "spectrum",
             "question": "Brut / authentique ←→ Très esthétique / maîtrisé",
             "options": [
-              "__spectrum_config__:%7B%22leftLabel%22%3A%22Brut%20%2F%20authentique%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20esth%C3%A9tique%20%2F%20ma%C3%AEtris%C3%A9%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20ta%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
+              "__spectrum_config__:%7B%22leftLabel%22%3A%22Brut%20%2F%20authentique%22%2C%22rightLabel%22%3A%22Tr%C3%A8s%20esth%C3%A9tique%20%2F%20ma%C3%AEtris%C3%A9%22%2C%22leftEmoji%22%3A%22%22%2C%22rightEmoji%22%3A%22%22%2C%22defaultValue%22%3A50%2C%22helperText%22%3A%22Deplace%20le%20curseur%20pour%20situer%20votre%20marque.%22%2C%22enableJustification%22%3Atrue%2C%22requireJustification%22%3Afalse%2C%22enableEdgeEffect%22%3Atrue%2C%22edgeEffectType%22%3A%22confetti%22%2C%22edgeThreshold%22%3A10%2C%22leftEdgeMessage%22%3A%22%22%2C%22rightEdgeMessage%22%3A%22%22%7D"
             ],
             "explanation": "Ces choix sont des préférences et non des décisions de réalisation définitives.",
             "answer_placeholder": "",
@@ -1548,7 +1548,7 @@
             "submodule_id": 112,
             "position": 18,
             "type": "open",
-            "question": "Qu'est-ce que tu ne veux surtout pas voir dans cette vidéo ?",
+            "question": "Qu'est-ce que vous ne voulez surtout pas voir dans cette vidéo ?",
             "options": [],
             "explanation": "<h3>Le NON</h3><p>Je ne veux pas une vidéo corporate.\nPas de collaborateurs qui récitent un texte.\nPas quelque chose de trop parfait.\nPas de musique épique.\nPas quelque chose de trop publicitaire.</p>",
             "answer_placeholder": "",
@@ -1776,7 +1776,7 @@
             "submodule_id": 114,
             "position": 34,
             "type": "multiple",
-            "question": "As-tu déjà imaginé un format ou préfères-tu être conseillé ?",
+            "question": "Avez-vous déjà imaginé un format ou préférez-vous être conseillé ?",
             "options": [
               "Film de marque",
               "Interview",
@@ -1789,7 +1789,7 @@
               "Autre",
               "Je ne sais pas encore, conseille-moi"
             ],
-            "explanation": "<h3>As-tu déjà quelque chose en tête ?</h3><p>Ce choix est une piste, pas un engagement. Le format doit servir ton objectif, pas l&#x27;inverse.</p>",
+            "explanation": "<h3>Avez-vous déjà quelque chose en tête ?</h3><p>Ce choix est une piste, pas un engagement. Le format doit servir votre objectif, pas l&#x27;inverse.</p>",
             "answer_placeholder": "",
             "exercise_group_id": "template_exercise_42"
           },
@@ -1880,7 +1880,7 @@
             "submodule_id": 114,
             "position": 40,
             "type": "open",
-            "question": "Que souhaites-tu que la personne fasse après avoir regardé ?",
+            "question": "Que souhaitez-vous que la personne fasse après avoir regardé ?",
             "options": [],
             "explanation": "",
             "answer_placeholder": "",

@@ -25,13 +25,13 @@ export default function RecoverCodePage() {
                 priority
               />
               <h1 className="mt-8 max-w-lg font-[family:var(--font-cormorant)] text-[3rem] leading-[0.96] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[4rem]">
-                Récupérer ton
+                Récupérer votre
                 <br />
                 code d&apos;accès
               </h1>
               <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[var(--text-muted)]">
                 Un écran d&apos;assistance cohérent avec le reste du studio, pour
-                renvoyer ton code simplement et proprement.
+                renvoyer votre code simplement et proprement.
               </p>
 
               <Link
@@ -60,13 +60,13 @@ export default function RecoverCodePage() {
                     Recuperation
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-                    Envoi à ton e-mail
+                    Envoi à votre e-mail
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[var(--text-muted)]">
-                Nous renvoyons ton code à l&apos;adresse e-mail associée à ton
+                Nous renvoyons votre code à l&apos;adresse e-mail associée à votre
                 compte.
               </p>
 

@@ -86,7 +86,7 @@ export function assertReleaseAnswerCompatibility(published: unknown[], draft: un
   const previous = validateReleaseModules(published);
   const next = validateReleaseModules(draft);
   const fail = () => {
-    throw new Error("Modification bloquée pour conserver les réponses et la progression : ne supprime, ne déplace et ne change pas le type d'une question existante. Ajoute les nouveaux éléments en fin de liste, sans déplacer les éléments publiés.");
+    throw new Error("Modification bloquée pour conserver les réponses et la progression : ne supprimez, ne déplacez et ne changez pas le type d'une question existante. Ajoutez les nouveaux éléments en fin de liste, sans déplacer les éléments publiés.");
   };
   for (const oldModule of previous) {
     const moduleItem = next.find((item) => item.stableKey === oldModule.stableKey);

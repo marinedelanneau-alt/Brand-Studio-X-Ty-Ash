@@ -31,7 +31,7 @@ export async function GET(
     const workspace = await getWorkspaceData(account.id);
     if (!workspace.project) {
       return NextResponse.json(
-        { message: "Cree d'abord ton projet de marque." },
+        { message: "Créez d'abord votre projet de marque." },
         { status: 400 },
       );
     }

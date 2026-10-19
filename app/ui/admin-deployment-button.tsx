@@ -19,7 +19,7 @@ async function publishWithRecovery(previousState: AdminDeploymentState): Promise
     return {
       status: "error",
       message: isMissingServerAction(message)
-        ? "Une nouvelle version du site est disponible. Recharge cette page avant de relancer la publication."
+        ? "Une nouvelle version du site est disponible. Rechargez cette page avant de relancer la publication."
         : message,
     };
   }

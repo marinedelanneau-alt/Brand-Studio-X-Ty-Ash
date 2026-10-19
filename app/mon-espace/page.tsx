@@ -168,7 +168,7 @@ export default async function MonEspacePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Ton espace ne peut pas être chargé"
+            title="Votre espace ne peut pas être chargé"
             message={loadError}
           />
         </section>
@@ -187,10 +187,10 @@ export default async function MonEspacePage() {
               <div className="max-w-2xl">
                 <BrandStudioTyAshLockup />
                 <h1 className="mt-10 font-[family:var(--font-cormorant)] text-[3.2rem] leading-[0.95] text-[var(--heading-color)] sm:text-[4.1rem]">
-                  Ton accès Brand Studio
+                  Votre accès Brand Studio
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-[var(--text-primary)]">
-                  Ton paiement doit être confirmé par Stripe avant de débloquer
+                  Votre paiement doit être confirmé par Stripe avant de débloquer
                   les modules de formation.
                 </p>
               </div>
@@ -202,8 +202,8 @@ export default async function MonEspacePage() {
                 <p className="mt-4 text-2xl font-black text-[var(--heading-color)]">{accessLabel}</p>
                 <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
                   {accessStatus?.status === "none"
-                    ? "Débloque Brand Studio pour accéder aux modules."
-                    : "Si tu viens de payer, l'accès apparaîtra dès que le webhook Stripe aura confirmé le paiement."}
+                    ? "Débloquez Brand Studio pour accéder aux modules."
+                    : "Si vous venez de payer, l'accès apparaîtra dès que le webhook Stripe aura confirmé le paiement."}
                 </p>
                 <div className="mt-6 space-y-3">
                   <Link
@@ -228,7 +228,7 @@ export default async function MonEspacePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Ton espace ne peut pas être chargé"
+            title="Votre espace ne peut pas être chargé"
             message={loadError}
           />
         </section>
@@ -293,7 +293,7 @@ export default async function MonEspacePage() {
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
-                  De ton besoin à un projet qui a du sens
+                  De votre besoin à un projet qui a du sens
                 </p>
               </div>
             </div>
@@ -321,7 +321,7 @@ export default async function MonEspacePage() {
                         Navigation
                       </p>
                       <h3 className="mt-1 font-[family:var(--font-cormorant)] text-[1.75rem] leading-none text-[var(--heading-color)]">
-                        Tes modules
+                        Vos modules
                       </h3>
                       <div className="mt-2.5 flex flex-col gap-1.5">
                         {workspace.modules.map((module) => (
@@ -360,7 +360,7 @@ export default async function MonEspacePage() {
                   {workspace.project ? (
                     <div>
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-primary-dark)]">
-                        Ton Guide de Marque
+                        Votre Guide de Marque
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Link
@@ -414,12 +414,12 @@ export default async function MonEspacePage() {
               </p>
               <div className="space-y-4 pt-4 text-[var(--text-primary)]">
                 <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">
-                  Bienvenue dans ton espace de réflexion
+                  Bienvenue dans votre espace de réflexion
                 </p>
                 <p className="rounded-[1.35rem] border border-[var(--border)] bg-[var(--background)] px-5 py-3 text-[1.05rem] leading-7 italic text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.85)]">
                   Hello, c’est parti ! Avant de parler caméra, format ou scénario,
-                  on va commencer par l’essentiel : comprendre ton entreprise,
-                  ta communication et ce que tu veux réellement faire passer.
+                  on va commencer par l’essentiel : comprendre votre entreprise,
+                  votre communication et ce que vous voulez réellement faire passer.
                 </p>
                 <div
                   className={`grid gap-3 text-base leading-7 text-[var(--text-primary)] ${
@@ -441,8 +441,8 @@ export default async function MonEspacePage() {
                         : "lg:border-l lg:border-t-0 lg:px-6 lg:py-0"
                     }`}
                   >
-                    À travers quelques étapes, tu vas prendre du recul sur ton
-                    entreprise, tes publics, ta communication actuelle et tes
+                    À travers quelques étapes, vous allez prendre du recul sur votre
+                    entreprise, vos publics, votre communication actuelle et vos
                     objectifs pour faire émerger un projet vidéo{" "}
                     <strong className="font-extrabold text-[var(--heading-color)]">
                       pertinent, cohérent et utile
@@ -457,8 +457,8 @@ export default async function MonEspacePage() {
                     }`}
                   >
                     <span className="font-black text-[var(--tyash-label-text)]">Cadre de travail :</span>{" "}
-                    réponds simplement et spontanément. Il n’y a pas de bonne ou
-                    de mauvaise réponse : tes réponses serviront de base à notre
+                    répondez simplement et spontanément. Il n’y a pas de bonne ou
+                    de mauvaise réponse : vos réponses serviront de base à notre
                     réflexion et à nos échanges pour construire la suite ensemble.
                   </p>
                 </div>
@@ -497,7 +497,7 @@ export default async function MonEspacePage() {
         </div>
         <div className="border-b border-[var(--border)] pb-8 pt-1 sm:pb-10">
           <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[var(--text-primary)] sm:text-[2.9rem] lg:text-[3.35rem]">
-            Ton histoire commence ici, écrivons-la ensemble !
+            Votre histoire commence ici, écrivons-la ensemble !
           </p>
         </div>
 
@@ -509,11 +509,11 @@ export default async function MonEspacePage() {
                   Création
                 </p>
                 <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.98] text-[var(--heading-color)] sm:text-[3rem]">
-                  Lance ton projet
+                  Lancez votre projet
                 </h2>
                 <p className="mt-4 max-w-xl text-base leading-8 text-[var(--text-muted)]">
-                  Le projet commence simplement avec le nom de ton entreprise et
-                  ton logo (si tu en as déjà un). Tu pourras ensuite suivre
+                  Le projet commence simplement avec le nom de votre entreprise et
+                  votre logo (si vous en avez déjà un). Vous pourrez ensuite suivre
                   l&apos;ensemble des modules et des exercices.
                 </p>
               </div>

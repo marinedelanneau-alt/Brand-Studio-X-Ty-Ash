@@ -12,10 +12,10 @@ export async function uploadExerciseFont(formData: FormData) {
     const moduleId = Number(formData.get("moduleId"));
     const exerciseId = Number(formData.get("exerciseId"));
     const file = formData.get("font");
-    if (!(file instanceof File) || !file.size) return { status: "error" as const, message: "Choisis un fichier de police." };
+    if (!(file instanceof File) || !file.size) return { status: "error" as const, message: "Choisissez un fichier de police." };
     const extension = file.name.split(".").pop()?.toLowerCase() || "";
     if (!FONT_EXTENSIONS.has(extension) || file.size > 5 * 1024 * 1024) {
-      return { status: "error" as const, message: "Utilise un fichier WOFF, WOFF2, TTF ou OTF de moins de 5 Mo." };
+      return { status: "error" as const, message: "Utilisez un fichier WOFF, WOFF2, TTF ou OTF de moins de 5 Mo." };
     }
     const workspace = await getWorkspaceData(account.id);
     const targetModule = workspace.modules.find((item) => item.id === moduleId);

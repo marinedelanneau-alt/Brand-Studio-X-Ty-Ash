@@ -85,7 +85,7 @@ export async function resetCurrentUserAnswers(): Promise<ResetAnswersState> {
 
     return {
       status: "success",
-      message: "Tes réponses et ta progression ont été réinitialisées.",
+      message: "Vos réponses et votre progression ont été réinitialisées.",
     };
   } catch (error) {
     return {

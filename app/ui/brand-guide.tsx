@@ -75,9 +75,9 @@ export default function BrandGuideLayout({
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(downloadUrl);
-      setMessage("Ton Guide de Marque a bien été téléchargé.");
+      setMessage("Votre Guide de Marque a bien été téléchargé.");
     } catch {
-      setMessage("Le PDF n’a pas pu être généré. Réessaie dans quelques instants.");
+      setMessage("Le PDF n’a pas pu être généré. Réessayez dans quelques instants.");
     } finally {
       setIsExporting(false);
     }
@@ -303,7 +303,7 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
             </div>
           ) : (
             <div className="flex min-h-56 w-full items-center justify-center rounded-[1rem] border border-dashed border-[var(--guide-border)] bg-[var(--card)] p-8 text-center text-sm font-semibold text-[var(--text-muted)]">
-              Ajoute ton logo pour personnaliser la couverture.
+              Ajoutez votre logo pour personnaliser la couverture.
             </div>
           )}
         </div>
@@ -486,10 +486,10 @@ export function EmptyGuideState() {
   return (
     <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-[0_18px_46px_rgba(210,189,152,0.08)]">
       <p className="font-[family:var(--font-cormorant)] text-[2.5rem] leading-tight text-[var(--heading-color)]">
-        Ton guide attend encore ses premières matières.
+        Votre guide attend encore ses premières matières.
       </p>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
-        Complète au moins une réponse dans les modules Brand Studio pour générer un guide personnalisé.
+        Complétez au moins une réponse dans les modules Brand Studio pour générer un guide personnalisé.
       </p>
       <Link href="/mon-espace" className={`${primaryButtonClass} mt-6`}>
         Modifier mes réponses

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const account = await getAuthenticatedAccount();
     if (!(await hasActiveAccess(account.id))) {
       return NextResponse.json(
-        { message: "Débloque Brand Studio pour télécharger ta feuille de route." },
+        { message: "Débloquez Brand Studio pour télécharger votre feuille de route." },
         { status: 403 },
       );
     }
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const workspace = await getWorkspaceData(account.id);
     if (!workspace.project) {
       return NextResponse.json(
-        { message: "Crée d'abord ton projet de marque." },
+        { message: "Créez d'abord votre projet de marque." },
         { status: 400 },
       );
     }

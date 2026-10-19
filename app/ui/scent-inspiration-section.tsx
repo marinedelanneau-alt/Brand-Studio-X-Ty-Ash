@@ -73,15 +73,15 @@ export default function ScentInspirationSection() {
     <section aria-labelledby="scent-inspiration-title" className="my-10 border-y border-[var(--border)] py-9 sm:my-12 sm:py-11">
       <div className="max-w-2xl">
         <p className="font-more-sugar text-lg text-[var(--tyash-label-text)]">Quelques pistes pour commencer…</p>
-        <h2 id="scent-inspiration-title" className="mt-1 font-[family-name:var(--font-cormorant)] text-3xl font-semibold leading-tight text-[var(--heading-color)] sm:text-4xl">Pour t’aider à sentir l’idée…</h2>
-        <p className="mt-4 text-sm leading-6 text-[var(--text-primary)] sm:text-base sm:leading-7">Une odeur raconte souvent beaucoup plus qu’un parfum. Elle évoque une matière, une lumière, une ambiance, une émotion. Et tout cela peut ensuite se traduire dans ta communication.</p>
+        <h2 id="scent-inspiration-title" className="mt-1 font-[family-name:var(--font-cormorant)] text-3xl font-semibold leading-tight text-[var(--heading-color)] sm:text-4xl">Pour vous aider à sentir l’idée…</h2>
+        <p className="mt-4 text-sm leading-6 text-[var(--text-primary)] sm:text-base sm:leading-7">Une odeur raconte souvent beaucoup plus qu’un parfum. Elle évoque une matière, une lumière, une ambiance, une émotion. Et tout cela peut ensuite se traduire dans votre communication.</p>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-x-7 gap-y-12 md:grid-cols-2 xl:grid-cols-3">{examples.map((example) => <ScentInspirationExample key={example.title} {...example} />)}</div>
 
       <div className="mt-10 max-w-3xl border-l-2 border-[var(--border)] pl-5">
-        <p className="text-sm italic leading-6 text-[var(--text-primary)]">Ce ne sont que des pistes. Ton univers peut sentir le café, la pluie, le cuir, le pain chaud, la mer, un jardin après l’orage… ou quelque chose de complètement différent.</p>
-        <p className="font-more-sugar mt-3 text-lg text-[var(--tyash-label-text)]">Et la tienne, elle sentirait quoi ? ↘</p>
+        <p className="text-sm italic leading-6 text-[var(--text-primary)]">Ce ne sont que des pistes. Votre univers peut sentir le café, la pluie, le cuir, le pain chaud, la mer, un jardin après l’orage… ou quelque chose de complètement différent.</p>
+        <p className="font-more-sugar mt-3 text-lg text-[var(--tyash-label-text)]">Et la vôtre, elle sentirait quoi ? ↘</p>
       </div>
     </section>
   );

@@ -26,7 +26,7 @@ export async function updateCompanyName(
     if (!companyName) {
       return {
         status: "error",
-        message: "Ajoute le nom de ton entreprise.",
+        message: "Ajoutez le nom de votre entreprise.",
       };
     }
 

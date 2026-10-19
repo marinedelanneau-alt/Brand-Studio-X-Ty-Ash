@@ -34,8 +34,8 @@ export default async function CommunicationActionPlanPage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Ta feuille de route ne peut pas être chargée"
-            message={loadError || "Crée d'abord ton projet de marque."}
+            title="Votre feuille de route ne peut pas être chargée"
+            message={loadError || "Créez d'abord votre projet de marque."}
             backHref="/mon-espace"
             backLabel="Retour à mon espace"
           />

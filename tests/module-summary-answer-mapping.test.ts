@@ -16,8 +16,8 @@ describe("module summary answer attribution", () => {
       { question: "Quelles valeurs te parlent ?", values: [] },
       { question: "Mes valeurs", values: ["Écoute, Créativité, Authenticité"] },
     ]);
-    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
-    expect(summary.keyTakeaways.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
+    expect(summary.quickRecap.find((item) => item.label === "Vos valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
+    expect(summary.keyTakeaways.find((item) => item.label === "Vos valeurs")?.value).toBe("Écoute, Créativité, Authenticité");
   });
 
   it("uses the values table instead of an earlier preparatory answer", () => {
@@ -25,7 +25,7 @@ describe("module summary answer attribution", () => {
       { question: "Pourquoi les valeurs sont-elles importantes ?", values: ["Pour guider mes choix"] },
       { question: "Complète ce tableau", type: "table", options: ["__table_rows__:2", "__table_columns__:2", "__table_column__:Valeur", "__table_column__:Application"], values: ["Écoute", "Comprendre le besoin", "Créativité", "Explorer plusieurs pistes"] },
     ]);
-    const values = summary.quickRecap.find((item) => item.label === "Tes valeurs");
+    const values = summary.quickRecap.find((item) => item.label === "Vos valeurs");
     expect(values?.value).toContain("Écoute");
     expect(values?.value).toContain("Créativité");
     expect(values?.value).not.toContain("Pour guider mes choix");
@@ -33,7 +33,7 @@ describe("module summary answer attribution", () => {
 
   it("extracts only values from a grouped question", () => {
     const summary = summarize([{ question: "Les fondations", type: "group_open", options: ["__question_item__:Ma mission", "__question_item__:Mes valeurs"], values: [serializeIndexedAnswerItem(0, 0, "Accompagner"), serializeIndexedAnswerItem(1, 1, "Respect"), serializeIndexedAnswerItem(1, 0, "Écoute")] }]);
-    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("Écoute, Respect");
+    expect(summary.quickRecap.find((item) => item.label === "Vos valeurs")?.value).toBe("Écoute, Respect");
   });
 
   it("removes table configuration and placeholders throughout the document", () => {
@@ -50,7 +50,7 @@ describe("module summary answer attribution", () => {
   it("does not turn configuration-only data into a completed answer", () => {
     const summary = summarize([{ question: "Mes valeurs", type: "table", values: ["__table_rows__:3", "__table_placeholder__:Écoute"] }]);
     expect(summary.submoduleRecaps[0].highlights[0].value).toBe("À compléter");
-    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("À compléter");
+    expect(summary.quickRecap.find((item) => item.label === "Vos valeurs")?.value).toBe("À compléter");
   });
   it("renders rich question labels and answers without HTML", () => {
     const summary = summarize([{ question: "<p>Ta mission doit guider tes offres.</p><p>Test : est-elle alignée ?</p>", values: ["<p>Je pense que mes offres sont alignées avec mes missions</p>"] }]);
@@ -75,7 +75,7 @@ describe("module summary answer attribution", () => {
       { question: "Ma mission", values: [] },
       { question: "Phrase finale", values: ["Slogan"] },
     ]);
-    expect(summary.keyTakeaways.find((item) => item.label === "Ta mission")?.value).toBe("À compléter");
+    expect(summary.keyTakeaways.find((item) => item.label === "Votre mission")?.value).toBe("À compléter");
   });
 
   it("keeps grouped questions separate even when an indexed answer is missing", () => {
@@ -85,7 +85,7 @@ describe("module summary answer attribution", () => {
 
   it("does not mistake an unrelated table for values", () => {
     const summary = summarize([{ question: "Mes concurrents", type: "table", values: ["Concurrent"] }, { question: "Mes valeurs", values: ["Respect"] }]);
-    expect(summary.quickRecap.find((item) => item.label === "Tes valeurs")?.value).toBe("Respect");
+    expect(summary.quickRecap.find((item) => item.label === "Vos valeurs")?.value).toBe("Respect");
   });
 
   it("maps positioning decisions to their individual questions", () => {
@@ -96,9 +96,9 @@ describe("module summary answer attribution", () => {
       { question: "Mon positionnement", values: ["Positionnement"] },
       { question: "Phrase finale", values: ["Autre phrase"] },
     ], "Positionnement");
-    expect(summary.keyTakeaways.find((item) => item.label === "La situation de ton client")?.value).toBe("Contexte");
-    expect(summary.keyTakeaways.find((item) => item.label === "Ta cible principale")?.value).toBe("Cible");
-    expect(summary.keyTakeaways.find((item) => item.label === "Ta différence")?.value).toBe("Différence");
-    expect(summary.keyTakeaways.find((item) => item.label === "Ton positionnement formulé")?.value).toBe("Positionnement");
+    expect(summary.keyTakeaways.find((item) => item.label === "La situation de votre client")?.value).toBe("Contexte");
+    expect(summary.keyTakeaways.find((item) => item.label === "Votre cible principale")?.value).toBe("Cible");
+    expect(summary.keyTakeaways.find((item) => item.label === "Votre différence")?.value).toBe("Différence");
+    expect(summary.keyTakeaways.find((item) => item.label === "Votre positionnement formulé")?.value).toBe("Positionnement");
   });
 });

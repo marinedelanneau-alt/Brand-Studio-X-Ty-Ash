@@ -38,10 +38,10 @@ export async function createNewPathwayDraft(form: FormData) {
     const file = form.get("pathway");
     const name = String(form.get("name") ?? "").trim();
     if (!(file instanceof File) || !file.size || file.size > 2_000_000 || !name) {
-      throw new Error("Choisis un fichier de parcours et un nom de brouillon.");
+      throw new Error("Choisissez un fichier de parcours et un nom de brouillon.");
     }
     const state = await getApplicationReleaseState();
-    if (state.current_draft_release_id) throw new Error("Un brouillon existe déjà. Termine sa révision avant de créer un nouveau parcours.");
+    if (state.current_draft_release_id) throw new Error("Un brouillon existe déjà. Terminez sa révision avant de créer un nouveau parcours.");
     const parsed = JSON.parse(await file.text());
     const modules = Array.isArray(parsed) ? parsed : parsed.modules;
     if (!Array.isArray(modules)) throw new Error("Le fichier ne contient pas de parcours.");

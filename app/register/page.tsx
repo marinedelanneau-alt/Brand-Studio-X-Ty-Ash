@@ -7,7 +7,7 @@ import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 
 const values = [
   "Lien personnel reçu après paiement",
-  "Choix de ton mot de passe",
+  "Choix de votre mot de passe",
   "Connexion ensuite par e-mail et mot de passe",
 ];
 
@@ -50,12 +50,12 @@ export default async function RegisterPage({
                   priority
                 />
                 <h1 className="mt-8 max-w-lg font-[family:var(--font-cormorant)] text-[3rem] leading-[0.96] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[4rem]">
-                  Ouvrir ton
+                  Ouvrir votre
                   <br />
                   espace client
                 </h1>
                 <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[var(--text-muted)]">
-                  Crée un accès élégant et professionnel, conçu comme une
+                  Créez un accès élégant et professionnel, conçu comme une
                   interface de studio de design graphique.
                 </p>
               </div>
@@ -76,7 +76,7 @@ export default async function RegisterPage({
 
                 <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-6 shadow-[0_18px_36px_rgba(221,204,176,0.14)]">
                   <p className="inline-flex rounded-full bs-status-light bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--status-success-text)]">
-                    Ce que tu obtiens
+                    Ce que vous obtenez
                   </p>
                   <div className="mt-5 grid gap-3">
                     {values.map((item) => (
@@ -105,7 +105,7 @@ export default async function RegisterPage({
                     Inscription
                   </p>
                   <h2 className="mt-5 font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[3rem]">
-                    Créer ton
+                    Créer votre
                     <br />
                     accès studio
                   </h2>
@@ -115,17 +115,17 @@ export default async function RegisterPage({
                     Accès personnel
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-                    Prêt après ton paiement
+                    Prêt après votre paiement
                   </p>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[var(--text-muted)]">
                 {activation
-                  ? "Choisis ton mot de passe pour créer ton compte. Ton adresse e-mail est déjà associée à ton paiement."
+                  ? "Choisissez votre mot de passe pour créer votre compte. Votre adresse e-mail est déjà associée à votre paiement."
                   : accountAlreadyCreated
-                    ? "Ton compte a déjà été créé avec ce lien. Tu peux maintenant te connecter avec ton e-mail et ton mot de passe."
-                  : "Ce lien personnel est absent, invalide ou expiré. Reprends le lien reçu par e-mail après ton paiement."}
+                    ? "Votre compte a déjà été créé avec ce lien. Vous pouvez maintenant vous connecter avec votre e-mail et votre mot de passe."
+                  : "Ce lien personnel est absent, invalide ou expiré. Reprenez le lien reçu par e-mail après votre paiement."}
               </p>
 
               <div className="mt-7">
@@ -137,7 +137,7 @@ export default async function RegisterPage({
                   </Link>
                 ) : (
                   <div className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--tyash-subtle)] p-5 text-sm leading-7 text-[var(--text-muted)]">
-                    Pour protéger ton accès, la création du compte est disponible uniquement depuis le lien personnel envoyé après ton paiement.
+                    Pour protéger votre accès, la création du compte est disponible uniquement depuis le lien personnel envoyé après votre paiement.
                   </div>
                 )}
               </div>

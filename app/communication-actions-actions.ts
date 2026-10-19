@@ -37,12 +37,12 @@ function getActionPlanErrorMessage(error: unknown) {
 async function getAuthorizedProject() {
   const account = await getAuthenticatedAccount();
   if (!(await hasActiveAccess(account.id))) {
-    throw new Error("Débloque Brand Studio pour enregistrer ta feuille de route.");
+    throw new Error("Débloquez Brand Studio pour enregistrer votre feuille de route.");
   }
 
   const workspace = await getWorkspaceData(account.id);
   if (!workspace.project) {
-    throw new Error("Crée d'abord ton projet de marque.");
+    throw new Error("Créez d'abord votre projet de marque.");
   }
 
   return { account, project: workspace.project };
@@ -69,7 +69,7 @@ export async function saveCommunicationAction(
 
     return {
       status: "success",
-      message: action.id ? "Action mise a jour." : "Action ajoutee a ta feuille de route.",
+      message: action.id ? "Action mise a jour." : "Action ajoutee a votre feuille de route.",
       data: savedAction,
     };
   } catch (error) {

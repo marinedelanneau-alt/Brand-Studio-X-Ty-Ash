@@ -54,7 +54,7 @@ const COLOR_PALETTE_CONFIG_PREFIX = "__color_palette_config__:";
 const COLOR_PALETTE_ANSWER_PREFIX = "__color_palette_answer__:";
 
 const DEFAULT_HELPER_TEXT =
-  "Compose une palette principale et secondaire, puis précise l'usage de chaque couleur.";
+  "Composez une palette principale et secondaire, puis précisez l'usage de chaque couleur.";
 
 const DEFAULT_EXAMPLES: ColorPaletteExample[] = [
   {
@@ -342,7 +342,7 @@ export function suggestColorMeaning(input: string) {
     return "Cette couleur peut évoquer l'émotion, la singularité et la proximité.";
   }
 
-  return "Cette couleur peut évoquer une présence forte. Précise ensuite son usage pour clarifier son rôle dans la marque.";
+  return "Cette couleur peut évoquer une présence forte. Précisez ensuite son usage pour clarifier son rôle dans la marque.";
 }
 
 function normalizeColorPaletteAnswer(

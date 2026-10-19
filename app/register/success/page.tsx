@@ -33,8 +33,8 @@ export default async function RegisterSuccessPage() {
                 {clientName ?? "dans Brand Studio"}
               </h1>
               <p className="mt-5 max-w-lg text-lg leading-[1.75] text-[var(--text-muted)]">
-                Ton compte est prêt. Ton lien personnel a bien été utilisé
-                et ton accès se fait maintenant avec ton e-mail et ton mot
+                Votre compte est prêt. Votre lien personnel a bien été utilisé
+                et votre accès se fait maintenant avec votre e-mail et votre mot
                 de passe.
               </p>
 
@@ -47,13 +47,13 @@ export default async function RegisterSuccessPage() {
                     Confirmation
                   </p>
                   <h2 className="mt-5 whitespace-nowrap font-[family:var(--font-cormorant)] text-[2.4rem] leading-[0.95] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[3rem]">
-                    Ton accès est prêt
+                    Votre accès est prêt
                   </h2>
                 </div>
               </div>
 
               <p className="mt-6 max-w-md text-base leading-7 text-[var(--text-muted)]">
-                Conserve ton code et utilise-le pour tes prochaines
+                Conservez votre code et utilisez-le pour vos prochaines
                 connexions à l&apos;espace client.
               </p>
 

@@ -5,7 +5,7 @@ import { getCurrentAccount } from "@/lib/session";
 import PaymentSuccessPopup from "./ui/payment-success-popup";
 
 const studioNotes = [
-  "Accès immédiat à ton espace de formation",
+  "Accès immédiat à votre espace de formation",
   "Code personnel simple à réutiliser",
   "Interface éditoriale inspirée de Brand Studio",
 ];
@@ -64,8 +64,8 @@ export default async function Home({
                     {homeTitle}
                   </h1>
                   <p className="bs-text-on-light-secondary mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
-                    Un espace éditorial pour structurer ton parcours, accéder
-                    à tes ressources et avancer avec plus de clarté.
+                    Un espace éditorial pour structurer votre parcours, accéder
+                    à vos ressources et avancer avec plus de clarté.
                   </p>
 
                   <div className="mt-6 grid gap-3 border-l border-[var(--border)] pl-5">
@@ -92,8 +92,8 @@ export default async function Home({
                 </p>
                 <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[var(--text-muted)]">
                   Le paiement déclenche l&apos;envoi d&apos;un lien personnel
-                  pour choisir ton mot de passe. Tu pourras ensuite créer ton
-                  compte et choisir ton mot de passe.
+                  pour choisir votre mot de passe. Vous pourrez ensuite créer votre
+                  compte et choisir votre mot de passe.
                 </p>
                 <Link
                   href="/pricing"
@@ -108,8 +108,8 @@ export default async function Home({
                   Déjà client ?
                 </p>
                 <p className="bs-text-on-light-secondary mt-1 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[var(--text-muted)]">
-                  Connecte-toi avec ton e-mail et ton mot de passe pour
-                  retrouver ton espace de travail.
+                  Connectez-vous avec votre e-mail et votre mot de passe pour
+                  retrouver votre espace de travail.
                 </p>
               </div>
 
@@ -125,7 +125,7 @@ export default async function Home({
                       </span>
                     </div>
                     <p className="bs-text-on-dark-secondary text-base leading-7 text-[var(--text-muted)]">
-                      Ton accès est déjà reconnu. Ouvre directement ton
+                      Votre accès est déjà reconnu. Ouvrez directement votre
                       espace client.
                     </p>
                     <Link

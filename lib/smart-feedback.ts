@@ -67,7 +67,7 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "length_less_than",
         value: 80,
         message:
-          "Ta réponse est encore courte. Tu peux préciser qui tu aides, ce que tu apportes et comment.",
+          "Votre réponse est encore courte. Vous pouvez préciser qui vous aidez, ce que vous apportez et comment.",
         level: "improve",
       },
       {
@@ -75,7 +75,7 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "contains_generic_words",
         value: DEFAULT_GENERIC_WORDS,
         message:
-          "Certains mots sont encore génériques. Essaie de rendre ta réponse plus concrète.",
+          "Certains mots sont encore génériques. Essayez de rendre votre réponse plus concrète.",
         level: "warning",
       },
       {
@@ -83,19 +83,19 @@ export function getDefaultSmartFeedbackConfig(): SmartFeedbackConfig {
         condition: "length_between",
         value: [120, 400],
         message:
-          "C'est clair. Tu peux encore renforcer ta réponse avec un exemple ou un bénéfice concret.",
+          "C'est clair. Vous pouvez encore renforcer votre réponse avec un exemple ou un bénéfice concret.",
         level: "good",
       },
       {
         id: "excellent_answer",
         condition: "passes_all_checks",
-        message: "Excellent. Ta réponse est claire, spécifique et exploitable.",
+        message: "Excellent. Votre réponse est claire, spécifique et exploitable.",
         level: "excellent",
       },
     ],
-    positiveMessage: "C'est clair, tu peux encore ajouter un exemple.",
-    neutralMessage: "Bonne base. Tu peux préciser davantage pour rendre la réponse plus exploitable.",
-    improvementMessage: "Ta réponse est encore un peu floue. Essaie d'ajouter un résultat concret.",
+    positiveMessage: "C'est clair, vous pouvez encore ajouter un exemple.",
+    neutralMessage: "Bonne base. Vous pouvez préciser davantage pour rendre la réponse plus exploitable.",
+    improvementMessage: "Votre réponse est encore un peu floue. Essayez d'ajouter un résultat concret.",
     excellentMessage: "Excellent, cette réponse est exploitable.",
   };
 }

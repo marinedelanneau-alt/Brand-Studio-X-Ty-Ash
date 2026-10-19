@@ -231,7 +231,7 @@ export default function ColorPaletteExercise({
             Palette de couleurs
           </p>
           <h3 className="mt-3 font-[family:var(--font-cormorant)] text-[2rem] leading-[0.96] text-[var(--heading-color)]">
-            {exercise.question || "Construis la palette de couleurs de ta marque"}
+            {exercise.question || "Construisez la palette de couleurs de votre marque"}
           </h3>
           {exercise.explanation ? (
             <PedagogicalContent
@@ -250,7 +250,7 @@ export default function ColorPaletteExercise({
                   Inspirations rapides
                 </p>
                 <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
-                  Clique sur un exemple pour l&apos;ajouter et l&apos;adapter.
+                  Cliquez sur un exemple pour l&apos;ajouter et l&apos;adapter.
                 </p>
               </div>
             </div>
@@ -655,7 +655,7 @@ export default function ColorPaletteExercise({
                         ) : null}
                         {!canSaveDraft(draftState.value, config) ? (
                           <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">
-                            Renseigne un nom, une couleur valide et{config.requireUsage ? " un usage" : ""} pour enregistrer cet element.
+                            Renseignez un nom, une couleur valide et{config.requireUsage ? " un usage" : ""} pour enregistrer cet element.
                           </p>
                         ) : null}
                       </div>

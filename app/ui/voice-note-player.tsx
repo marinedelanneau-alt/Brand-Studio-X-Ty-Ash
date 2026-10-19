@@ -111,7 +111,7 @@ export default function VoiceNotePlayer({
           </div>
           <audio controls preload="metadata" className="w-full">
             <source src={src} type="audio/mpeg" />
-            Ton navigateur ne peut pas lire cette note vocale.
+            Votre navigateur ne peut pas lire cette note vocale.
           </audio>
           {showSubtitles && hasSubtitles ? (
             <div className="max-h-44 overflow-y-auto rounded-[1rem] border border-[var(--border)] bg-[var(--card)]/84 px-4 py-3 text-sm leading-7 text-[var(--text-primary)] shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.8)]">

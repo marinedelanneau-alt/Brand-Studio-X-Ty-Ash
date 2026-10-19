@@ -39,7 +39,7 @@ function isImageUploadValue(value: string) {
 async function fileToDataUrl(file: File) {
   if (file.size > MAX_DATA_URL_SIZE) {
     throw new Error(
-      "L'image reste trop lourde après optimisation. Essaie une image plus légère.",
+      "L'image reste trop lourde après optimisation. Essayez une image plus légère.",
     );
   }
 
@@ -70,14 +70,14 @@ export async function uploadExerciseImages(
     if (files.length === 0) {
       return {
         status: "error",
-        message: "Ajoute au moins une image.",
+        message: "Ajoutez au moins une image.",
       };
     }
 
     if (files.some((file) => !ACCEPTED_IMAGE_TYPES.has(file.type))) {
       return {
         status: "error",
-        message: "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+        message: "Cette image n’a pas pu être ajoutée. Vérifiez son format ou son poids.",
       };
     }
 
@@ -92,7 +92,7 @@ export async function uploadExerciseImages(
       return {
         status: "error",
         message:
-          "Cette image n’a pas pu être ajoutée. Vérifie son format ou son poids.",
+          "Cette image n’a pas pu être ajoutée. Vérifiez son format ou son poids.",
       };
     }
 
@@ -101,7 +101,7 @@ export async function uploadExerciseImages(
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Crée d'abord ton projet de marque.",
+        message: "Créez d'abord votre projet de marque.",
       };
     }
 
@@ -139,7 +139,7 @@ export async function uploadExerciseImages(
     if (files.length > remainingSlots) {
       return {
         status: "error",
-        message: `Tu peux encore ajouter ${remainingSlots} image${remainingSlots > 1 ? "s" : ""}.`,
+        message: `Vous pouvez encore ajouter ${remainingSlots} image${remainingSlots > 1 ? "s" : ""}.`,
       };
     }
 

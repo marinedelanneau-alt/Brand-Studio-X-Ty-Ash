@@ -79,7 +79,7 @@ export default function AccessLoginForm() {
             type={isPasswordVisible ? "text" : "password"}
             required
             autoComplete="current-password"
-            placeholder="Ton mot de passe"
+            placeholder="Votre mot de passe"
             className={`${inputClassName} max-w-[41rem] pr-14`}
           />
           <button

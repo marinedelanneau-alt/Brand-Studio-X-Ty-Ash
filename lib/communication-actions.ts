@@ -237,7 +237,7 @@ export async function upsertCommunicationAction(input: {
   action: CommunicationActionInput;
 }) {
   if (!input.action.title.trim()) {
-    throw new Error("Donne un nom à ton action.");
+    throw new Error("Donnez un nom à votre action.");
   }
 
   const supabase = createSupabaseServerClient();
@@ -412,12 +412,12 @@ export function getSuggestedCommunicationActions(input: {
       id: "expertise-content",
       title: "Publier une série de contenus conseils",
       description:
-        "Transformer ton expertise en 3 à 5 contenus simples pour aider ton audience à comprendre ta valeur.",
+        "Transformer votre expertise en 3 à 5 contenus simples pour aider votre audience à comprendre votre valeur.",
       objective: "Faire comprendre mon expertise",
       action_type: "Réseaux sociaux",
-      first_step: "Lister les trois questions que tes clients te posent le plus souvent.",
+      first_step: "Lister les trois questions que vos clients vous posent le plus souvent.",
       target_audience: target,
-      rationale: "Tes réponses mettent en avant une posture d'expertise ou d'accompagnement.",
+      rationale: "Vos réponses mettent en avant une posture d'expertise ou d'accompagnement.",
     });
   }
 
@@ -426,7 +426,7 @@ export function getSuggestedCommunicationActions(input: {
       id: "local-partnership",
       title: "Créer une action de visibilité locale",
       description:
-        "Identifier un lieu, un partenaire ou un événement local où ta marque peut être visible.",
+        "Identifier un lieu, un partenaire ou un événement local où votre marque peut être visible.",
       objective: "Me faire connaître",
       action_type: "Communication locale",
       first_step: "Choisir trois lieux ou partenaires à contacter cette semaine.",
@@ -440,7 +440,7 @@ export function getSuggestedCommunicationActions(input: {
       id: "client-proof",
       title: "Collecter des témoignages clients",
       description:
-        "Demander un retour court à quelques clients pour renforcer la confiance autour de ton offre.",
+        "Demander un retour court à quelques clients pour renforcer la confiance autour de votre offre.",
       objective: "Renforcer la confiance",
       action_type: "Relation client",
       first_step: "Préparer un message simple à envoyer à trois clients satisfaits.",

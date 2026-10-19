@@ -133,10 +133,10 @@ export default function RegisterForm({
 
       <div className="rounded-[1.65rem] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_14px_28px_rgba(223,203,171,0.12)]">
         <p className="inline-flex rounded-full bs-status-light bg-[#eef6eb] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--status-success-text)]">
-          Ce que tu obtiens
+          Ce que vous obtenez
         </p>
         <p className="mt-4 text-sm leading-6 text-[var(--text-muted)]">
-          Après avoir choisi ton mot de passe, ton compte sera créé et tu accéderas directement à la formation.
+          Après avoir choisi votre mot de passe, votre compte sera créé et vous accéderez directement à la formation.
         </p>
       </div>
 

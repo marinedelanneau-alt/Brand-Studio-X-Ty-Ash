@@ -235,15 +235,15 @@ function createEmptyQuestion(type: ExerciseType = "open"): EditorQuestion {
     audioTranscript: "",
     question:
       type === "spectrum"
-        ? "Ou se situe ta marque entre sobriete et expression ?"
+        ? "Ou se situe votre marque entre sobriete et expression ?"
         : type === "color_palette"
-          ? "Construis la palette de couleurs de ta marque"
+          ? "Construisez la palette de couleurs de votre marque"
         : type === "typography"
-          ? "Choisis les typographies de ta marque"
+          ? "Choisissez les typographies de votre marque"
           : type === "editorial_calendar"
-            ? "Construis ton calendrier éditorial"
+            ? "Construisez votre calendrier éditorial"
           : type === "moodboard"
-            ? "Créer un moodboard d'inspiration pour ta marque"
+            ? "Créer un moodboard d'inspiration pour votre marque"
             : "",
     optionsText: getExerciseDefaultOptionsText(type),
     tableRows: tableConfig.rows,
@@ -271,7 +271,7 @@ function createEmptySubmodule(position: number): EditorSubmodule {
     videoUrl: "",
     audioUrl: "",
     audioTranscript: "",
-    contentHtml: "<p>Ajoute ici le contenu du sous-module.</p>",
+    contentHtml: "<p>Ajoutez ici le contenu du sous-module.</p>",
     exerciseGroups: [createEmptyExerciseGroup()],
   };
 }
@@ -305,9 +305,9 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
     question:
       getEditorExerciseQuestion(exercise.type, exercise.question) ||
       (exercise.type === "editorial_calendar"
-        ? "Construis ton calendrier éditorial"
+        ? "Construisez votre calendrier éditorial"
         : exercise.type === "moodboard"
-          ? "Créer un moodboard d'inspiration pour ta marque"
+          ? "Créer un moodboard d'inspiration pour votre marque"
           : ""),
     optionsText: getEditorOptionsText(exercise.type, exercise.options),
     tableRows: tableConfig.rows,
@@ -367,8 +367,8 @@ function getQuestionLabel(type: ExerciseType) {
 }
 
 function getQuestionHint(type: ExerciseType) {
-  if (type === "fill_blank") return "Utilise `___` dans la question pour créer les trous à compléter.";
-  if (type === "prompt_open") return "Exemple : `Ta Mission`. L'utilisateur verra `Ta Mission :` suivi d'un champ.";
+  if (type === "fill_blank") return "Utilisez `___` dans la question pour créer les trous à compléter.";
+  if (type === "prompt_open") return "Exemple : `Votre Mission`. L'utilisateur verra `Votre Mission :` suivi d'un champ.";
   if (type === "static_text") return "Ce bloc affiche simplement du texte entre deux questions.";
   if (type === "popup_message") return "Ce bloc ouvre une pop-up inspirante avec un message motivant ou une citation que l'utilisateur peut fermer.";
   if (type === "image_upload") return "L'utilisateur pourra importer plusieurs images pour composer un tableau d'inspiration.";
@@ -434,14 +434,14 @@ function getPlaceholderFieldHint(type: ExerciseType) {
   }
 
   if (type === "group_open") {
-    return "Ex. Ta réponse ici";
+    return "Ex. Votre réponse ici";
   }
 
   if (type === "table") {
-    return "Ex. Saisis ton idée";
+    return "Ex. Saisissez votre idée";
   }
 
-  return "Ex. Ta réponse ici";
+  return "Ex. Votre réponse ici";
 }
 
 function getFillBlankPlaceholderValues(question: EditorQuestion) {
@@ -919,7 +919,7 @@ function QuestionCard({
           >
             <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
               {question.type === "static_text"
-                ? "Pour t’éclairer"
+                ? "Pour vous éclairer"
                 : question.type === "popup_message"
                   ? "Inspiration"
                   : `Question ${exerciseNumber}`}
@@ -1052,8 +1052,8 @@ function QuestionCard({
                 onChange={(contentHtml) => onChange((current) => ({ ...current, question: contentHtml }))}
                 placeholder={
                   question.type === "popup_message"
-                    ? "Ajoute ici la citation ou le message inspirant."
-                    : "Ajoute ici le texte d'introduction ou d'explication."
+                    ? "Ajoutez ici la citation ou le message inspirant."
+                    : "Ajoutez ici le texte d'introduction ou d'explication."
                 }
               />
             ) : (
@@ -1090,7 +1090,7 @@ function QuestionCard({
               className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4"
             />
             <p className="text-sm leading-6 text-[var(--text-muted)]">
-              Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
+              Choisissez un fichier MP3 depuis votre ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
             </p>
             {voiceUploadMessage ? (
               <p className="text-sm leading-6 text-[var(--text-primary)]">{voiceUploadMessage}</p>
@@ -1142,7 +1142,7 @@ function QuestionCard({
                     onChange={(contentHtml) =>
                       onChange((current) => ({ ...current, explanation: contentHtml }))
                     }
-                    placeholder="Ajoute ici une description pédagogique, une astuce, un exemple ou un point d'attention."
+                    placeholder="Ajoutez ici une description pédagogique, une astuce, un exemple ou un point d'attention."
                   />
                 )}
               </label>
@@ -1185,7 +1185,7 @@ function QuestionCard({
                       </div>
                     ) : (
                       <p className="text-sm leading-6 text-[var(--text-muted)]">
-                        Ajoute au moins un `___` dans la question pour creer les placeholders.
+                        Ajoutez au moins un `___` dans la question pour creer les placeholders.
                       </p>
                     )}
                     <p className="text-sm leading-6 text-[var(--text-muted)]">
@@ -1450,7 +1450,7 @@ function QuestionCard({
                 </p>
                 <h3 className="mt-2 font-[family:var(--font-cormorant)] text-[2rem] leading-none text-[var(--heading-color)]">
                   {question.type === "static_text"
-                    ? "Pour t’éclairer"
+                    ? "Pour vous éclairer"
                     : question.type === "popup_message"
                       ? "Inspiration"
                       : `Question ${exerciseNumber}`}
@@ -1652,7 +1652,7 @@ function ModuleForm({
         lastSaveErrorRef.current = message;
         setModuleSaveMessage(
           isMissingServerAction(message)
-            ? "Le site vient d’être mis à jour. Copie tes modifications non enregistrées, puis recharge la page avant de sauvegarder."
+            ? "Le site vient d’être mis à jour. Copiez vos modifications non enregistrées, puis rechargez la page avant de sauvegarder."
             : message,
         );
       } finally {
@@ -2129,7 +2129,7 @@ function ModuleForm({
                         className="h-12 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--surface)] px-4"
                       />
                       <p className="text-sm leading-6 text-[var(--text-muted)]">
-                        Choisis un fichier MP3 depuis ton ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
+                        Choisissez un fichier MP3 depuis votre ordinateur. Il remplacera la note vocale actuelle a l&apos;enregistrement.
                       </p>
                       {submoduleVoiceUploadMessages[activeSubmodule.id] ? (
                         <p className="text-sm leading-6 text-[var(--text-primary)]">
@@ -2202,7 +2202,7 @@ function ModuleForm({
                             ),
                           }))
                         }
-                        placeholder="Ajoute ici le contenu du sous-module."
+                        placeholder="Ajoutez ici le contenu du sous-module."
                       />
                     </div>
 

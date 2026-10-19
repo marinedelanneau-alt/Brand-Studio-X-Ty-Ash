@@ -9,7 +9,7 @@ import { parseStoredSpectrumConfig } from "../lib/spectrum";
 describe("approved Ty Ash content seed", () => {
   it("prepares exactly 4 modules, 15 submodules and 43 native exercise groups", () => {
     const modules = prepareTyAshPathway([]);
-    expect(modules.map(m => m.title)).toEqual(["TON ENTREPRISE", "TA COMMUNICATION", "TON BESOIN", "TON PROJET VIDÉO"]);
+    expect(modules.map(m => m.title)).toEqual(["VOTRE ENTREPRISE", "VOTRE COMMUNICATION", "VOTRE BESOIN", "VOTRE PROJET VIDÉO"]);
     expect(modules.map(m => m.submodules.length)).toEqual([5, 3, 3, 4]);
     expect(modules.map(m => groupExercisesByGroupId(m.exercises).length)).toEqual([14, 9, 8, 12]);
     expect(modules.flatMap(m => m.exercises)).toHaveLength(106);
@@ -51,6 +51,6 @@ describe("approved Ty Ash content seed", () => {
     expect(groups.at(-1)!.questions).toHaveLength(6);
     expect(groups.at(-1)!.questions.every(q => q.completion?.required === false)).toBe(true);
     expect(questions.find(e => e.question === "Est-ce elle qui prend réellement la décision ?")!.completion?.required).toBe(false);
-    expect(questions.find(e => e.question === "As-tu déjà un indicateur ou un résultat chiffré en tête ?")!.completion?.required).toBe(false);
+    expect(questions.find(e => e.question === "Avez-vous déjà un indicateur ou un résultat chiffré en tête ?")!.completion?.required).toBe(false);
   });
 });

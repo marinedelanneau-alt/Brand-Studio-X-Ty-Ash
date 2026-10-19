@@ -25,8 +25,8 @@ export default function PricingPage() {
             Brand Studio
           </h1>
           <p className="mt-6 text-lg leading-8 text-[var(--text-primary)]">
-            Accède à la formation Brand Studio pour structurer ta stratégie,
-            ton positionnement, ta personnalité de marque et ton guide de
+            Accédez à la formation Brand Studio pour structurer votre stratégie,
+            votre positionnement, votre personnalité de marque et votre guide de
             marque final.
           </p>
 

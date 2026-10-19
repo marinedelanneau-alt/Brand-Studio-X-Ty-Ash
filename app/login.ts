@@ -49,7 +49,7 @@ export async function loginWithPassword(
   if (!email || !password) {
     return {
       status: "error",
-      message: "Merci de renseigner ton e-mail et ton mot de passe.",
+      message: "Merci de renseigner votre e-mail et votre mot de passe.",
     };
   }
 
@@ -91,7 +91,7 @@ export async function sendPasswordlessLoginLink(
   if (!email) {
     return {
       status: "error",
-      message: "Merci de renseigner ton e-mail pour recevoir le lien.",
+      message: "Merci de renseigner votre e-mail pour recevoir le lien.",
     };
   }
 
@@ -115,7 +115,7 @@ export async function sendPasswordlessLoginLink(
 
     return {
       status: "success",
-      message: "Lien de connexion envoye. Ouvre ta boite mail pour acceder a ton espace.",
+      message: "Lien de connexion envoye. Ouvrez votre boite mail pour acceder a votre espace.",
     };
   } catch (error) {
     return {
@@ -137,7 +137,7 @@ export async function sendPasswordResetLink(
   if (!email) {
     return {
       status: "error",
-      message: "Merci de renseigner ton e-mail pour reinitialiser ton mot de passe.",
+      message: "Merci de renseigner votre e-mail pour reinitialiser votre mot de passe.",
     };
   }
 
@@ -238,7 +238,7 @@ export async function sendPasswordResetLink(
     return {
       status: "success",
       message:
-        "Lien de réinitialisation envoyé. Ouvre ta boîte mail pour choisir un nouveau mot de passe.",
+        "Lien de réinitialisation envoyé. Ouvrez votre boîte mail pour choisir un nouveau mot de passe.",
     };
   } catch (error) {
     return {

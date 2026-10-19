@@ -23,7 +23,7 @@ export function findFinalAnswerCandidate<T extends FinalAnswerCandidate>(
 
     if (concept === "promise") {
       return candidate.type === "prompt_open" &&
-        (label === "ta promesse" || label.includes("promesse finale"));
+        (["ta promesse", "votre promesse"].includes(label) || label.includes("promesse finale"));
     }
 
     const isExplicitlyFinal =
@@ -31,6 +31,8 @@ export function findFinalAnswerCandidate<T extends FinalAnswerCandidate>(
       label.includes("positionnement formule") ||
       label.includes("phrase de positionnement") ||
       label === "ton positionnement" ||
+      label === "votre positionnement" ||
+      label === "votre phrase de positionnement" ||
       label === "ta phrase de positionnement";
 
     return ["open", "prompt_open", "group_open", "fill_blank"].includes(candidate.type) && isExplicitlyFinal;

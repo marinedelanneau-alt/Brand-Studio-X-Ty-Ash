@@ -325,7 +325,7 @@ function CommunicationActionForm({
 
           {step === 0 ? (
             <div className="space-y-4">
-              <Question title="Qu'est-ce que tu veux mettre en place ?" />
+              <Question title="Qu'est-ce que vous voulez mettre en place ?" />
               <input
                 value={draft.title}
                 onChange={(event) => setDraft({ ...draft, title: event.target.value })}
@@ -335,7 +335,7 @@ function CommunicationActionForm({
               <textarea
                 value={draft.description ?? ""}
                 onChange={(event) => setDraft({ ...draft, description: event.target.value })}
-                placeholder="Décris ton idée en quelques mots"
+                placeholder="Décrivez votre idée en quelques mots"
                 className="min-h-28 w-full rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm outline-none focus:border-[var(--tyash-primary)]"
               />
             </div>
@@ -343,7 +343,7 @@ function CommunicationActionForm({
 
           {step === 1 ? (
             <div className="space-y-4">
-              <Question title="Qu'est-ce que cette action doit t'aider à obtenir ?" />
+              <Question title="Qu'est-ce que cette action doit vous aider à obtenir ?" />
               <div className="grid gap-3 sm:grid-cols-2">
                 {ACTION_OBJECTIVES.map((objective, index) => (
                   <ChoiceCard
@@ -383,7 +383,7 @@ function CommunicationActionForm({
 
           {step === 3 ? (
             <div className="space-y-4">
-              <Question title="Quel type d'action souhaites-tu mettre en place ?" />
+              <Question title="Quel type d'action souhaitez-vous mettre en place ?" />
               <div className="grid gap-3 sm:grid-cols-2">
                 {ACTION_TYPES.map((type, index) => (
                   <ChoiceCard
@@ -399,7 +399,7 @@ function CommunicationActionForm({
 
           {step === 4 ? (
             <div className="space-y-4">
-              <Question title="Quand souhaites-tu lancer cette action ?" />
+              <Question title="Quand souhaitez-vous lancer cette action ?" />
               <div className="grid gap-3 sm:grid-cols-3">
                 <label className="text-sm font-semibold text-[var(--text-primary)]">
                   Date précise
@@ -468,7 +468,7 @@ function CommunicationActionForm({
               <div className={cx("rounded-[1rem] border px-4 py-3 text-sm font-semibold", getPriorityClass(priority))}>
                 Recommandation : {priority}
               </div>
-              <Question title="De quoi as-tu besoin pour réaliser cette action ?" small />
+              <Question title="De quoi avez-vous besoin pour réaliser cette action ?" small />
               <MultiSelect
                 values={draft.required_resources ?? []}
                 options={[...ACTION_RESOURCES]}
@@ -692,12 +692,12 @@ export default function CommunicationActionPlan({
       <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--card)]/92 p-6 shadow-[0_18px_46px_rgba(126,102,78,0.08)] sm:p-8">
         <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">Mon plan d&apos;action communication</p>
         <h1 className="mt-4 text-3xl font-semibold leading-tight text-[var(--heading-color)] sm:text-4xl">
-          Transforme tes idées en actions concrètes
+          Transformez vos idées en actions concrètes
         </h1>
         <div className="mt-6 max-w-3xl space-y-4 text-base leading-8 text-[var(--text-primary)]">
-          <p>Tu as maintenant posé les bases de ta marque. Il est temps de décider comment tu vas la faire vivre et la faire connaître.</p>
-          <p>Dans cet espace, tu vas construire ta feuille de route communication : les actions que tu souhaites lancer, leur objectif, leur priorité et le moment où tu souhaites les réaliser.</p>
-          <p>Pas besoin d&apos;en faire trop. L&apos;objectif est de choisir les bonnes actions pour ta marque, puis de les organiser pour savoir exactement par quoi commencer.</p>
+          <p>Vous avez maintenant posé les bases de votre marque. Il est temps de décider comment vous allez la faire vivre et la faire connaître.</p>
+          <p>Dans cet espace, vous allez construire votre feuille de route communication : les actions que vous souhaitez lancer, leur objectif, leur priorité et le moment où vous souhaitez les réaliser.</p>
+          <p>Pas besoin d&apos;en faire trop. L&apos;objectif est de choisir les bonnes actions pour votre marque, puis de les organiser pour savoir exactement par quoi commencer.</p>
         </div>
         <div className="mt-6 rounded-[1.1rem] border border-[#f0dfba] bs-status-light bg-[#fff8e8] px-5 py-4 text-sm leading-7 text-[var(--text-primary)]">
           <strong className="text-[var(--tyash-label-text)]">Conseil</strong> : Commence petit. Trois actions réellement mises en place auront toujours plus d&apos;impact qu&apos;une liste de vingt idées qui restent dans un carnet.
@@ -721,7 +721,7 @@ export default function CommunicationActionPlan({
             <p className="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">Mon plan d&apos;action communication</p>
             <h1 className="mt-3 text-3xl font-semibold text-[var(--heading-color)]">Ma feuille de route communication</h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">
-              Tes prochaines actions pour {brandName}, organisées au même endroit.
+              Vos prochaines actions pour {brandName}, organisées au même endroit.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -765,7 +765,7 @@ export default function CommunicationActionPlan({
 
       {nextAction ? (
         <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--surface)] p-5">
-          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Ta prochaine étape</p>
+          <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">Votre prochaine étape</p>
           <h2 className="mt-2 text-xl font-semibold text-[var(--heading-color)]">{nextAction.title}</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">Première action : {nextAction.first_step || "Préciser la première étape."}</p>
           <button
@@ -805,8 +805,8 @@ export default function CommunicationActionPlan({
       {yearActions.length === 0 ? (
         <section className="rounded-[1.4rem] border border-dashed border-[var(--border)] bg-[var(--card)]/80 p-8 text-center">
           <ClipboardDocumentListIcon className="mx-auto h-10 w-10 text-[var(--tyash-label-text)]" />
-          <h2 className="mt-4 text-xl font-semibold text-[var(--heading-color)]">Ta feuille de route est prête à être construite.</h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">Ajoute une première action concrète pour savoir exactement par quoi commencer.</p>
+          <h2 className="mt-4 text-xl font-semibold text-[var(--heading-color)]">Votre feuille de route est prête à être construite.</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-primary)]">Ajoutez une première action concrète pour savoir exactement par quoi commencer.</p>
         </section>
       ) : null}
 
@@ -931,7 +931,7 @@ export default function CommunicationActionPlan({
                 Supprimer cette action ?
                 </h2>
                 <p id="delete-action-description" className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
-                  L’action « {actionToDelete.title} » sera supprimée définitivement de ta feuille de route.
+                  L’action « {actionToDelete.title} » sera supprimée définitivement de votre feuille de route.
                 </p>
               </div>
             </div>

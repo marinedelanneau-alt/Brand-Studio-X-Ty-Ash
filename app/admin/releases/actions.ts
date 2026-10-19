@@ -110,7 +110,7 @@ export async function publishReleaseForAllUsers(formData: FormData) {
 
   if (confirmation !== "PUBLIER POUR TOUS") {
     releasesRedirect(
-      "Saisis exactement « PUBLIER POUR TOUS » pour confirmer.",
+      "Saisissez exactement « PUBLIER POUR TOUS » pour confirmer.",
       "error",
     );
   }
@@ -138,13 +138,13 @@ export async function scheduleReleaseForAllUsers(formData: FormData) {
   const scheduledAtLocal = requiredString(formData, "scheduledAt");
   if (confirmation !== "DÉPLOYER À TOUS") {
     releasesRedirect(
-      "Saisis exactement « DÉPLOYER À TOUS » pour confirmer.",
+      "Saisissez exactement « DÉPLOYER À TOUS » pour confirmer.",
       "error",
     );
   }
   const scheduledAt = parseParisLocalDate(scheduledAtLocal);
   if (!scheduledAt || scheduledAt <= new Date()) {
-    releasesRedirect("Choisis une date de déploiement future.", "error");
+    releasesRedirect("Choisissez une date de déploiement future.", "error");
   }
   try {
     await verifyCurrentDraft(releaseId);

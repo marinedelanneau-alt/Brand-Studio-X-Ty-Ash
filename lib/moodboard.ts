@@ -116,7 +116,7 @@ export const MOODBOARD_TEMPLATES: MoodboardTemplate[] = [
     slots: [
       { id: "image_1", type: "image", x: 6, y: 8, width: 34, height: 34, rotation: -4 },
       { id: "image_2", type: "image", x: 42, y: 8, width: 32, height: 26, rotation: 3 },
-      { id: "text_1", type: "text", x: 76, y: 38, width: 18, height: 12, rotation: 0, defaultText: "Ton univers en quelques mots" },
+      { id: "text_1", type: "text", x: 76, y: 38, width: 18, height: 12, rotation: 0, defaultText: "Votre univers en quelques mots" },
       { id: "color_1", type: "color", x: 8, y: 72, width: 12, height: 10, rotation: 0, label: "Accent", usage: "Ton principal" },
     ],
   },
@@ -205,7 +205,7 @@ export function createMoodboardFromTemplate(
     return {
       id: `mood-text-${crypto.randomUUID()}`,
       type: "text",
-      text: slot.defaultText ?? signals.keywords[index % Math.max(signals.keywords.length, 1)] ?? "Ton univers",
+      text: slot.defaultText ?? signals.keywords[index % Math.max(signals.keywords.length, 1)] ?? "Votre univers",
       author: signals.persona || "Brand Studio",
       textColor: "#4B4550",
       fontSize: 28,

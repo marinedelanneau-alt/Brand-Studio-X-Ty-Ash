@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
     if (!workspace.project) {
       return NextResponse.json(
-        { message: "Crée d'abord ton projet de marque." },
+        { message: "Créez d'abord votre projet de marque." },
         { status: 400 },
       );
     }

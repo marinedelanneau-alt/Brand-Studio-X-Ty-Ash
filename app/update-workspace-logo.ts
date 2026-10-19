@@ -22,7 +22,7 @@ export async function updateWorkspaceLogo(
     if (!(logo instanceof File) || logo.size === 0) {
       return {
         status: "error",
-        message: "Sélectionne un logo à importer.",
+        message: "Sélectionnez un logo à importer.",
       };
     }
 

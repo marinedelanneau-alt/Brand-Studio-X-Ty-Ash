@@ -137,7 +137,7 @@ function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercise
 
     const normalizedOptions = options;
     if (!question) {
-      throw new Error("Une question est vide. Complète-la avant d’enregistrer le module.");
+      throw new Error("Une question est vide. Complétez-la avant d’enregistrer le module.");
     }
 
     if (type === "fill_blank") {
@@ -350,7 +350,7 @@ export async function saveAdminModuleDraft(formData: FormData) {
     if (submodules.length === 0) {
       return {
         status: "error",
-        message: "Ajoute au moins un sous-module avant d'enregistrer.",
+        message: "Ajoutez au moins un sous-module avant d'enregistrer.",
       };
     }
 

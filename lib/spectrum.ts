@@ -39,14 +39,14 @@ export function getDefaultSpectrumConfig(): SpectrumConfig {
     leftEmoji: "🌿",
     rightEmoji: "🎨",
     defaultValue: 50,
-    helperText: "Deplace le curseur pour situer ta marque.",
+    helperText: "Déplacez le curseur pour situer votre marque.",
     enableJustification: true,
     requireJustification: false,
     enableEdgeEffect: true,
     edgeEffectType: "confetti",
     edgeThreshold: 10,
-    leftEdgeMessage: "Ta marque assume une direction tres sobre.",
-    rightEdgeMessage: "Ta marque assume une direction tres expressive.",
+    leftEdgeMessage: "Votre marque assume une direction tres sobre.",
+    rightEdgeMessage: "Votre marque assume une direction tres expressive.",
   };
 }
 

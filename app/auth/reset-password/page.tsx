@@ -17,7 +17,7 @@ export default async function ResetPasswordPage({
           Choisir un nouveau mot de passe
         </h1>
         <p className="mt-4 text-sm leading-7 text-[var(--text-muted)]">
-          Saisis ton nouveau mot de passe pour retrouver ton espace Brand Studio.
+          Saisissez votre nouveau mot de passe pour retrouver votre espace Brand Studio.
         </p>
         <div className="mt-6">
           <ResetPasswordForm hasCallbackError={Boolean(error)} />
