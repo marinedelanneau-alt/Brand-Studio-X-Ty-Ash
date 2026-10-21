@@ -2,7 +2,7 @@ import "server-only";
 
 import { BrevoClient } from "@getbrevo/brevo";
 import { getPublicSiteUrlWithFallback } from "./public-site-url";
-import { logJulienBrevoFailure } from "./brevo-diagnostics";
+import { BrevoDeliveryError, logJulienBrevoFailure } from "./brevo-diagnostics";
 
 type SendAccessCodeEmailInput = {
   email: string;
@@ -71,9 +71,9 @@ export async function sendJulienInvitationEmail(activationUrl: string) {
     if (!result.messageId) throw new Error("Brevo n’a pas confirmé la prise en charge de l’email.");
     return result.messageId;
   } catch (error) {
-    logJulienBrevoFailure(error, url);
-    // Keep provider details on the server; never forward the SDK error to the UI.
-    throw new Error("Envoi Brevo non confirmé. Consultez les journaux serveur filtrés.");
+    const diagnostic = logJulienBrevoFailure(error, url);
+    // Only the allowlisted, sanitized DTO can cross the Admin action boundary.
+    throw new BrevoDeliveryError(diagnostic);
   }
 }
 

@@ -2,6 +2,7 @@
 import { useActionState } from "react";
 import { inviteJulien } from "./viewer-actions";
 import type { JulienInvitationState } from "@/lib/julien-invitation";
+import BrevoErrorNotice from "./brevo-error-notice";
 const initial: JulienInvitationState = { status: "idle", account: "unchecked", accessGranted: false, emailSent: false, message: "" };
 export default function InviteJulienForm() {
   const [state, action, pending] = useActionState(inviteJulien, initial);
@@ -14,6 +15,7 @@ export default function InviteJulienForm() {
         <li>Accès gratuit et suivi clients : {state.accessGranted ? "accordés" : "non accordés"}</li>
         <li>Email : {state.emailSent ? "accepté par Brevo pour envoi" : "non envoyé"}</li>
       </ul>
+      {state.brevoError ? <BrevoErrorNotice diagnostic={state.brevoError} /> : null}
     </div> : null}
   </form>;
 }

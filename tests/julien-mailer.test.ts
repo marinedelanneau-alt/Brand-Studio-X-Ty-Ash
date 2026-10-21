@@ -21,7 +21,7 @@ describe("Julien custom email",()=>{
  });
  it("logs filtered API details only on the server and returns a generic error",async()=>{
   m.send.mockRejectedValue({statusCode:401,body:{code:"unauthorized",message:"Key not found: server-key"},message:"unsafe activation URL"});
-  await expect(sendJulienInvitationEmail("https://brand-studio-x-ty-ash.vercel.app/auth/reset/callback?token_hash=activation-secret&type=recovery")).rejects.toThrow("Consultez les journaux serveur filtrés");
+  await expect(sendJulienInvitationEmail("https://brand-studio-x-ty-ash.vercel.app/auth/reset/callback?token_hash=activation-secret&type=recovery")).rejects.toThrow("Envoi Brevo non confirmé");
   expect(console.error).toHaveBeenCalledWith("[Ty Ash] Julien Brevo email failure",{httpStatus:401,code:"unauthorized",message:"Key not found: [REDACTED]"});
   expect(m.send).toHaveBeenCalledTimes(1);
  });

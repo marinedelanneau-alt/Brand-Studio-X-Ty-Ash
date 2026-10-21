@@ -33,7 +33,8 @@ describe("Brevo server diagnostics without credential or activation-link disclos
     for (const value of ["brevo-api-key-secret", "supabase-service-role-secret", "activation-hash-secret", "unknown-bearer-token", "other-secret", link.toString(), "unsafe SDK message", "unsafe stack", "never log"]) {
       expect(logged).not.toContain(value);
     }
-    expect(logged).toContain("Invalid sender");
+    expect(logged).toContain("invalid_parameter");
+    expect(logged).toContain("[REDACTED_SENSITIVE_DETAIL]");
   });
   it("does not pretend a timeout has an HTTP response", () => {
     logJulienBrevoFailure({ name: "BrevoTimeoutError", message: link.toString() }, link);

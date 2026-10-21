@@ -3,12 +3,14 @@ import { createSupabaseServerClient } from "./supabase/server";
 import { getAuthenticatedInvitationAdmin } from "./session";
 import { grantJulienAccess } from "./julien-access";
 import { assertJulienEmailConfigured, sendJulienInvitationEmail } from "./mailer";
+import { BrevoDeliveryError, type BrevoDiagnostic } from "./brevo-diagnostics";
 export const JULIEN_EMAIL = "jsene@ty-ash.com";
 export const TY_ASH_ORIGIN = "https://brand-studio-x-ty-ash.vercel.app";
 export type JulienInvitationState = {
   status: "idle" | "error" | "success";
   account: "unchecked" | "absent" | "created" | "existing";
   accessGranted: boolean; emailSent: boolean; message: string;
+  brevoError?: BrevoDiagnostic;
 };
 // Coalesce concurrent clicks within the same server instance. Auth uniqueness
 // and targeted account insertion keep identity/access idempotent across instances.
@@ -61,10 +63,11 @@ async function sendInvitation(): Promise<JulienInvitationState> {
     state.emailSent = true;
     return { ...state, status: "success", message: "Invitation envoyée à jsene@ty-ash.com" };
   } catch (error) {
+    if (error instanceof BrevoDeliveryError) state.brevoError = error.diagnostic;
     // A provider timeout is ambiguous; never display success without its receipt.
     state.message = state.accessGranted
       ? "Compte disponible et accès accordé, mais envoi non confirmé. Vérifiez Brevo avant une nouvelle tentative."
-      : error instanceof Error ? error.message : "Invitation impossible. Aucun email envoyé.";
+      : "Invitation impossible. Aucun email envoyé.";
     return state;
   }
 }
