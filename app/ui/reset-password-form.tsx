@@ -100,7 +100,7 @@ export default function ResetPasswordForm({
       setState({
         status: "error",
         message:
-          "La session de réinitialisation a expiré. Demande un nouveau lien.",
+          "La session de réinitialisation a expiré. Demandez un nouveau lien.",
       });
       setPending(false);
       return;
@@ -111,7 +111,7 @@ export default function ResetPasswordForm({
       setState({
         status: "error",
         message:
-          "Le mot de passe n’a pas pu être mis à jour. Demande un nouveau lien si celui-ci a expiré.",
+          "Le mot de passe n’a pas pu être mis à jour. Demandez un nouveau lien si celui-ci a expiré.",
       });
       setPending(false);
       return;
@@ -132,7 +132,7 @@ export default function ResetPasswordForm({
           role="alert"
           className="rounded-[1rem] border border-[#efc8c1] bs-status-light bg-[#fff4f1] p-4 text-sm font-medium leading-6 text-[var(--status-error-text)]"
         >
-          Ce lien de réinitialisation est invalide ou a expiré. Demande un
+          Ce lien de réinitialisation est invalide ou a expiré. Demandez un
           nouveau lien depuis la page de connexion.
         </div>
       ) : null}

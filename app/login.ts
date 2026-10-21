@@ -269,7 +269,7 @@ export async function updatePassword(
     if (error) {
       return {
         status: "error",
-        message: "Le mot de passe n'a pas pu etre mis a jour. Recommence depuis le lien recu par e-mail.",
+        message: "Le mot de passe n'a pas pu etre mis a jour. Recommencez depuis le lien reçu par e-mail.",
       };
     }
 

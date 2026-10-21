@@ -1,5 +1,17 @@
 # Inventaire du tutoiement — Brand Studio X Ty Ash
 
+## État après harmonisation de l’application
+
+La présentation client utilise désormais le vouvoiement : une correspondance éditoriale relue dans `lib/client-copy.ts` corrige les titres, introductions, questions, explications, placeholders, transcriptions et messages de feedback à la lecture, sans modifier le snapshot publié.
+
+Le contrôle en lecture seule du contenu publié a confirmé 782 champs/libellés corrigés et aucun des tutoiements repérés restant dans cette présentation. Les modules, sous-modules, questions, groupes, positions et valeurs des choix restent identiques. Le miroir `module.exercises` n’est pas recompté.
+
+Les réponses libres et les noms saisis par les clients ne sont jamais réécrits. Les libellés de choix prédéfinis sont affichés au vouvoiement, mais leurs valeurs enregistrées restent inchangées afin de conserver les sélections et la progression. Le suivi client applique la même présentation ; les écrans techniques Admin conservent leurs sources.
+
+Les emails destinés à Julien et les messages de récupération du compte ont aussi été harmonisés. Les consignes d’assistance IA exigent le vouvoiement pour les conseils, tout en conservant la première personne pour les propositions rédigées au nom de la marque. Cette convention est inscrite dans `AGENTS.md` pour les prochains contenus.
+
+Le relevé ci-dessous est conservé comme inventaire des formulations sources avant correction de leur affichage. Aucune écriture Supabase, modification de release, de réponse, d’accès ou de facturation, ni aucun envoi d’email n’a été effectué pour cette harmonisation.
+
 Relevé du 21 octobre 2026. Projet : cplzwnlstcpqqzqeawgs.
 Source : textes du parcours publié, lus uniquement par SELECT. Aucun brouillon ni aucune réponse utilisateur consulté ; aucune modification distante.
 Le modèle local content/tyash-v1/pathway.json est déjà au vouvoiement et ne représente pas exactement les textes actuellement publiés.
@@ -1038,12 +1050,12 @@ Occurrences : 1.
 
 ## Hors parcours : email client à harmoniser ultérieurement
 
-L’email personnalisé de Julien reste au tutoiement dans lib/mailer.ts : objet « Julien, ton accès à Brand Studio X Ty Ash est prêt » et corps « Ton accès… », « Je t’invite… », « Clique… ton accès… ton mot de passe ». Versions texte et HTML concernées. Non inclus dans les décomptes du parcours et non modifié.
+L’email personnalisé de Julien reste au tutoiement dans lib/mailer.ts : objet « Julien, ton accès à Brand Studio X Ty Ash est prêt » et corps « Ton accès… », « Je t’invite… », « Clique… ton accès… ton mot de passe ». Versions texte et HTML concernées. Non inclus dans les décomptes du parcours ; ces versions ont depuis été corrigées au vouvoiement dans le code, sans envoi d’email.
 
 ## Faux positifs à ne pas convertir automatiquement
 
 « Ton de voix », « Ton de marque », « Ton en 3 mots » et « donner le ton » désignent le ton de communication. Les correspondances historiques dans lib/module-summary.ts, lib/brand-guide-final-answers.ts, lib/brand-guide.ts et les stop words de moodboard ne sont pas des messages au client.
 
-## Suite proposée
+## Règle pour les prochains contenus
 
-Valider une réécriture au vouvoiement par familles : navigation/titres, contenus pédagogiques/questions, feedbacks, puis emails. Les ids, stableKeys, groupes et positions doivent rester inchangés. Aucune publication ni modification de release n’a été faite pour cet inventaire.
+Rédiger directement au vouvoiement tous les textes adressés aux clients, y compris les messages d’erreur et emails. Conserver les ids, stableKeys, groupes et positions. Ne pas convertir les réponses libres ni les noms saisis par les clients, les phrases à la première personne de la marque ou le nom « ton » au sens de ton de voix.

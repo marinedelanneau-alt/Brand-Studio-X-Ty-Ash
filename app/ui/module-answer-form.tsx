@@ -1,4 +1,5 @@
 "use client";
+import { formalizeClientCopy } from "@/lib/client-copy";
 import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
 
@@ -2595,7 +2596,7 @@ export default function ModuleAnswerForm({
                                   }
                                   className="mt-1"
                                 />
-                                <span>{option}</span>
+                                <span>{formalizeClientCopy(option)}</span>
                               </label>
                               {isOtherOption && isChecked ? (
                                 <input
@@ -2661,7 +2662,7 @@ export default function ModuleAnswerForm({
                             }
                             className="mt-1"
                           />
-                          <span>{option}</span>
+                          <span>{formalizeClientCopy(option)}</span>
                         </label>
                         {isOtherOption && isChecked ? (
                           <input
@@ -2735,7 +2736,7 @@ export default function ModuleAnswerForm({
                                 }))
                               }
                             />
-                            <span>{option}</span>
+                            <span>{formalizeClientCopy(option)}</span>
                           </label>
                         ))}
                       </div>
@@ -2761,7 +2762,7 @@ export default function ModuleAnswerForm({
                           }))
                         }
                       />
-                      <span>{option}</span>
+                      <span>{formalizeClientCopy(option)}</span>
                     </label>
                   ))}
                 </div>
@@ -2837,7 +2838,7 @@ export default function ModuleAnswerForm({
                                   }
                                   className="mt-1"
                                 />
-                                <span>{option}</span>
+                                <span>{formalizeClientCopy(option)}</span>
                               </label>
                               {isOtherOption && isChecked ? (
                                 <input
@@ -2911,7 +2912,7 @@ export default function ModuleAnswerForm({
                             }
                             className="mt-1"
                           />
-                          <span>{option}</span>
+                          <span>{formalizeClientCopy(option)}</span>
                         </label>
                         {isOtherOption && isChecked ? (
                           <input
@@ -3017,7 +3018,7 @@ export default function ModuleAnswerForm({
                                 style={{ backgroundColor: colorOption.color }}
                               />
                               <span className="flex-1">
-                                <span className="block font-semibold">{colorOption.label}</span>
+                                <span className="block font-semibold">{formalizeClientCopy(colorOption.label)}</span>
                                 <span className="block text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
                                   {colorOption.color}
                                 </span>
@@ -3062,7 +3063,7 @@ export default function ModuleAnswerForm({
                           style={{ backgroundColor: colorOption.color }}
                         />
                         <span className="flex-1">
-                          <span className="block font-semibold">{colorOption.label}</span>
+                          <span className="block font-semibold">{formalizeClientCopy(colorOption.label)}</span>
                           <span className="block text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
                             {colorOption.color}
                           </span>

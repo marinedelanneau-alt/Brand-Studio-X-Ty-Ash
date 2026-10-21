@@ -56,16 +56,16 @@ export async function sendJulienInvitationEmail(activationUrl: string) {
   // No automatic email retry: a provider timeout can mean acceptance. The UI
   // reports failure/uncertainty and the next attempt reuses the existing account.
   const brevo = new BrevoClient({ apiKey: config.apiKey, timeoutInSeconds: 15, maxRetries: 0 });
-  const text = "Bonjour Julien,\n\nTon accès à Brand Studio X Ty Ash est prêt ✨\n\nJe t’invite à créer ton compte pour découvrir l’outil et suivre les parcours des utilisateurs Ty Ash.\n\nClique ci-dessous pour activer ton accès et choisir ton mot de passe.\n\n";
+  const text = "Bonjour Julien,\n\nVotre accès à Brand Studio X Ty Ash est prêt ✨\n\nJe vous invite à créer votre compte pour découvrir l’outil et suivre les parcours des utilisateurs Ty Ash.\n\nCliquez ci-dessous pour activer votre accès et choisir votre mot de passe.\n\n";
   const escapedUrl = url.toString().replaceAll("&", "&amp;").replaceAll('"', "&quot;");
   try {
     const result = await brevo.transactionalEmails.sendTransacEmail({
-      subject: "Julien, ton accès à Brand Studio X Ty Ash est prêt",
+      subject: "Julien, votre accès à Brand Studio X Ty Ash est prêt",
       sender: { email: config.senderEmail, name: config.senderName },
       to: [{ email: "jsene@ty-ash.com", name: "Julien SENE" }],
       replyTo: config.replyToEmail ? { email: config.replyToEmail, name: config.replyToName } : undefined,
       textContent: `${text}${url}\n\nÀ très vite,\nMarine`,
-      htmlContent: `<p>Bonjour Julien,</p><p>Ton accès à Brand Studio X Ty Ash est prêt ✨</p><p>Je t’invite à créer ton compte pour découvrir l’outil et suivre les parcours des utilisateurs Ty Ash.</p><p>Clique ci-dessous pour activer ton accès et choisir ton mot de passe.</p><p><a href="${escapedUrl}" style="display:inline-block;padding:14px 24px;background:#7a2d46;color:white;border-radius:8px;text-decoration:none">CRÉER MON COMPTE</a></p><p>À très vite,<br>Marine</p>`,
+      htmlContent: `<p>Bonjour Julien,</p><p>Votre accès à Brand Studio X Ty Ash est prêt ✨</p><p>Je vous invite à créer votre compte pour découvrir l’outil et suivre les parcours des utilisateurs Ty Ash.</p><p>Cliquez ci-dessous pour activer votre accès et choisir votre mot de passe.</p><p><a href="${escapedUrl}" style="display:inline-block;padding:14px 24px;background:#7a2d46;color:white;border-radius:8px;text-decoration:none">CRÉER MON COMPTE</a></p><p>À très vite,<br>Marine</p>`,
       tags: ["tyash-julien-invitation"],
     });
     if (!result.messageId) throw new Error("Brevo n’a pas confirmé la prise en charge de l’email.");

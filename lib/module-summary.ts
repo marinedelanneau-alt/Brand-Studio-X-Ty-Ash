@@ -17,6 +17,7 @@ import { parseStoredColorPaletteAnswer } from "@/lib/color-palette";
 import { getVocabularyDirection } from "@/lib/brand-guide-answer-labels";
 import { toPlainText } from "@/lib/plain-text";
 import type { WorkspaceModule } from "@/lib/training-types";
+import { clientOptionAnswerLabel } from "./client-copy";
 
 export type ModuleSummaryHighlight = {
   label: string;
@@ -579,7 +580,7 @@ function summarizeExerciseAnswer(
 ): ModuleSummaryHighlight | null {
   // Preserve cell indices: replacing metadata with empty cells avoids moving
   // subsequent real answers into another column.
-  values = values.map((value) => isStoredConfiguration(value) ? "" : value);
+  values = values.map((value) => isStoredConfiguration(value) ? "" : clientOptionAnswerLabel(exercise, value));
   if (values.length === 0) {
     return null;
   }

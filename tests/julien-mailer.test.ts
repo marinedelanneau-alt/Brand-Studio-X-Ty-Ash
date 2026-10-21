@@ -9,7 +9,7 @@ describe("Julien custom email",()=>{
  it("uses the exact recipient, subject, text and secure activation button",async()=>{
   const link="https://brand-studio-x-ty-ash.vercel.app/auth/reset/callback?token_hash=secret&type=invite";
   expect(await sendJulienInvitationEmail(link)).toBe("message-id");
-  expect(m.send).toHaveBeenCalledWith(expect.objectContaining({subject:"Julien, ton accès à Brand Studio X Ty Ash est prêt",to:[{email:"jsene@ty-ash.com",name:"Julien SENE"}],htmlContent:expect.stringContaining("CRÉER MON COMPTE"),textContent:expect.stringContaining(link)}));
+  expect(m.send).toHaveBeenCalledWith(expect.objectContaining({subject:"Julien, votre accès à Brand Studio X Ty Ash est prêt",to:[{email:"jsene@ty-ash.com",name:"Julien SENE"}],htmlContent:expect.stringContaining("CRÉER MON COMPTE"),textContent:expect.stringContaining(link)}));
  });
  it("fails when Brevo does not acknowledge acceptance",async()=>{
   m.send.mockResolvedValue({});

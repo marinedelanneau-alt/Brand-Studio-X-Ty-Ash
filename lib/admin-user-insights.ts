@@ -1,4 +1,5 @@
 import "server-only";
+import { clientOptionAnswerLabel, formalizeClientCopy } from "./client-copy";
 
 import { cache } from "react";
 import { getAuthenticatedClientReader } from "@/lib/session";
@@ -61,7 +62,8 @@ function latestDate(...dates: Array<string | null | undefined>) {
 }
 
 export const getAdminUsers = cache(async function getAdminUsers(): Promise<AdminUserView[]> {
-  await getAuthenticatedClientReader();
+  const reader = await getAuthenticatedClientReader();
+  const clientLabel = reader.is_admin || reader.role === "admin" ? (text: string) => text : formalizeClientCopy;
   const db = createSupabaseServerClient();
   const modules = isControlledProductionContentEnabled()
     ? validateReleaseModules((await getContentReleaseSnapshot((await getApplicationReleaseState()).published_release_id))?.modules) as unknown as Awaited<ReturnType<typeof getModulesWithExercises>>
@@ -112,20 +114,20 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
           if (hasValue(values)) {
             answers.push({
               moduleId: moduleItem.id,
-              moduleTitle: moduleItem.title,
+              moduleTitle: clientLabel(moduleItem.title),
               modulePosition: moduleItem.position,
-              submoduleTitle: submodule?.title ?? "Repères essentiels",
+              submoduleTitle: clientLabel(submodule?.title ?? "Repères essentiels"),
               exerciseId: exercise.id,
-              exerciseTitle: exercise.question || `Exercice ${exercise.position}`,
+              exerciseTitle: clientLabel(exercise.question || `Exercice ${exercise.position}`),
               exerciseType: exercise.type,
-              values,
+              values: reader.is_admin || reader.role === "admin" ? values : values.map(value => clientOptionAnswerLabel(exercise, value)),
               updatedAt: stableAnswer ? latestDate(stableAnswer.client_updated_at, stableAnswer.updated_at) : legacyAnswer?.updated_at ?? null,
             });
           }
         }
         return {
           id: moduleItem.id,
-          title: moduleItem.title,
+          title: clientLabel(moduleItem.title),
           progress: getModuleProgress(moduleItem, moduleItem.exercises, answerMap, 1, false).completionPercent,
         };
       });

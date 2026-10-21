@@ -1,6 +1,7 @@
 import { isTyAshContent, requireTyAshKey, resolveTyAshExerciseId } from "./tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "./exercise-completion";
 import "server-only";
+import { withFormalClientCopy } from "./client-copy";
 import { getAdminReleaseWorkspace, saveAdminReleaseModules } from "@/lib/admin-content-release";
 import { validateReleaseModules } from "@/lib/release-content-validation";
 import { getRetainedPathwaySnapshots } from "@/lib/content-releases";
@@ -1687,7 +1688,7 @@ export async function getWorkspaceData(accountId: number) {
 
   return {
     project,
-    modules: workspaceModules.map(m => ({ ...m, globalProgressPercent: progressPercent, globalModuleCount: totalModulesCount })),
+    modules: workspaceModules.map(m => withFormalClientCopy({ ...m, globalProgressPercent: progressPercent, globalModuleCount: totalModulesCount })),
     progressPercent,
     completedModulesCount,
     totalModulesCount,
