@@ -162,6 +162,9 @@ export default function ModuleSubmoduleViewer({
   const showColorLibrary = currentSubmodule
     ? isColorPaletteSubmodule(currentSubmodule)
     : false;
+  const showBrandVideoIntroduction = currentSubmodule?.stableKey?.startsWith("tyash_v1_")
+    && normalizeForSearch(currentSubmodule.title).includes("personnalite")
+    && normalizeForSearch(currentSubmodule.title).includes("univers video");
 
   if (!currentSubmodule) {
     return (
@@ -235,6 +238,21 @@ export default function ModuleSubmoduleViewer({
           />
 
           <div className="bs-dark-subcard rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-6 py-5 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)] sm:px-7">
+            {showBrandVideoIntroduction ? (
+              <aside aria-label="De votre marque à votre vidéo" className="mb-7 max-w-3xl space-y-4 border-b border-[var(--border)] pb-6">
+                <h3 className="font-[family:var(--font-cormorant)] text-2xl leading-snug text-[var(--heading-color)] sm:text-3xl">
+                  Avant de montrer, il faut savoir ce qu’on veut raconter.
+                </h3>
+                <div className="space-y-4 text-[0.98rem] leading-7 text-[var(--text-primary)]">
+                  <p>Une belle vidéo attire l’attention. Une marque claire laisse une empreinte.</p>
+                  <p>Travailler votre identité en amont, c’est mettre des mots sur ce qui vous rend unique : votre histoire, votre personnalité, vos convictions et ce que vous voulez transmettre.</p>
+                  <p>C’est cette matière qui permettra ensuite à Ty Ash de créer une vidéo qui ne soit pas seulement belle, mais juste, cohérente et vraiment à votre image.</p>
+                </div>
+                <p className="border-l-2 border-[var(--tyash-primary)] pl-4 font-[family:var(--font-cormorant)] text-xl font-semibold leading-relaxed text-[var(--tyash-label-text)]">
+                  Votre marque donne le fond. La vidéo lui donne vie.
+                </p>
+              </aside>
+            ) : null}
             {showColorLibrary ? (
               <ColorLibrarySection recap={<ColorSymbolismResource />} />
             ) : showBaselineInspiration ? (
