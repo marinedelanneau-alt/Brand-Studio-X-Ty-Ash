@@ -163,8 +163,8 @@ export default function ModuleSubmoduleViewer({
     ? isColorPaletteSubmodule(currentSubmodule)
     : false;
   const showBrandVideoIntroduction = currentSubmodule?.stableKey?.startsWith("tyash_v1_")
-    && normalizeForSearch(currentSubmodule.title).includes("personnalite")
-    && normalizeForSearch(currentSubmodule.title).includes("univers video");
+    && currentIndex === 0
+    && normalizeForSearch(currentSubmodule.title).includes("histoire");
 
   if (!currentSubmodule) {
     return (
