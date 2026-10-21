@@ -25,7 +25,17 @@ export type BrandModule = {
   updated_at: string;
 };
 
+// Presentation contract only; persistence and Admin editing require explicit wiring.
+export type SubmoduleEditorialIntroduction = {
+  label?: string;
+  headline?: string;
+  paragraphs?: string[];
+  // {exercises} expands to the live count and its singular/plural label.
+  transition?: string;
+};
+
 export type BrandSubmodule = {
+  editorialIntroduction?: SubmoduleEditorialIntroduction;
   stableKey?: string;
   editorKey?: string;
   id: number;

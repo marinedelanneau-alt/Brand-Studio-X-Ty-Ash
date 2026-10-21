@@ -252,6 +252,64 @@ select {
   pointer-events: none;
 }
 
+.submodule-introduction {
+  padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+  border-left: 2px solid var(--tyash-primary);
+  background: var(--tyash-subtle);
+  border-radius: 0 0.75rem 0.75rem 0;
+  overflow-wrap: anywhere;
+}
+
+.submodule-introduction__label {
+  margin: 0 0 0.85rem;
+  color: var(--tyash-label-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.submodule-introduction__headline {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--heading-color);
+  font-family: var(--font-cormorant), serif;
+  font-size: clamp(1.55rem, 2.8vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.18;
+  white-space: pre-line;
+}
+
+.submodule-introduction__body,
+.submodule-introduction__legacy {
+  max-width: 70ch;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.submodule-introduction__body { margin-top: 1rem; }
+.submodule-introduction__body p { margin: 0; }
+.submodule-introduction__body p + p { margin-top: 0.65rem; }
+.submodule-introduction__legacy > :first-child { margin-top: 0; }
+.submodule-introduction__legacy > :last-child { margin-bottom: 0; }
+
+.submodule-introduction__transition {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  max-width: 70ch;
+  margin: 1.1rem 0 0;
+  color: var(--tyash-label-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+@media (min-width: 640px) {
+  .submodule-introduction { padding: 1.5rem 2rem; }
+}
+
 .tiptap-editor h1,
 .module-content h1,
 .pedagogical-content h1 {

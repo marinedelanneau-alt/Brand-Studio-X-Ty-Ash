@@ -9,6 +9,7 @@ import ScentInspirationSection from "./scent-inspiration-section";
 import TypographyInspirationSection from "./typography-inspiration-section";
 import BaselineInspirationSection from "./baseline-inspiration-section";
 import ColorLibrarySection from "./color-library-section";
+import SubmoduleIntroduction from "./submodule-introduction";
 
 const COLOR_SYMBOLISM_RESOURCE = {
   href: "/symbolique-couleurs-communication.png",
@@ -237,7 +238,7 @@ export default function ModuleSubmoduleViewer({
             subtitles={currentSubmodule.audio_transcript}
           />
 
-          <div className="bs-dark-subcard rounded-[1.5rem] border border-[var(--border)] bg-[var(--card)] px-6 py-5 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)] sm:px-7">
+          <div>
             {showBrandVideoIntroduction ? (
               <aside aria-label="De votre marque à votre vidéo" className="mb-7 max-w-3xl space-y-4 border-b border-[var(--border)] pb-6">
                 <h3 className="font-[family:var(--font-cormorant)] text-2xl leading-snug text-[var(--heading-color)] sm:text-3xl">
@@ -261,7 +262,11 @@ export default function ModuleSubmoduleViewer({
               <TypographyInspirationSection />
             ) : (
               <>
-                <div className="module-content max-w-none text-[var(--text-primary)]" dangerouslySetInnerHTML={{ __html: scentContent?.before ?? currentSubmodule.content_html }} />
+                <SubmoduleIntroduction
+                  contentHtml={scentContent?.before ?? currentSubmodule.content_html}
+                  introduction={currentSubmodule.editorialIntroduction}
+                  exerciseCount={answerableExerciseCount}
+                />
                 {scentContent ? <ScentInspirationSection /> : null}
                 {scentContent?.after ? <div className="module-content max-w-none text-[var(--text-primary)]" dangerouslySetInnerHTML={{ __html: scentContent.after }} /> : null}
               </>
