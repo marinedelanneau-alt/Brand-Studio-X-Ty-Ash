@@ -1,6 +1,7 @@
 import AdminShell from "@/app/ui/admin-shell";
 import DatabaseErrorState from "@/app/ui/database-error-state";
-import { getAuthenticatedAdmin } from "@/lib/session";
+import { getAuthenticatedClientReader } from "@/lib/session";
+import { canAdminister } from "@/lib/account-permissions";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
 import { isLegalPreviewEnabled } from "@/lib/legal";
@@ -10,11 +11,11 @@ export default async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let account: Awaited<ReturnType<typeof getAuthenticatedAdmin>> | null = null;
+  let account: Awaited<ReturnType<typeof getAuthenticatedClientReader>> | null = null;
   let loadError = "";
 
   try {
-    account = await getAuthenticatedAdmin();
+    account = await getAuthenticatedClientReader();
   } catch (error) {
     unstable_rethrow(error);
     loadError = getUserFacingDataErrorMessage(error);
@@ -39,6 +40,7 @@ export default async function AdminLayout({
       adminName={account.client_name ?? "Administrateur"}
       adminEmail={account.email}
       showLegal={isLegalPreviewEnabled()}
+      readOnly={!canAdminister(account)}
     >
       {children}
     </AdminShell>

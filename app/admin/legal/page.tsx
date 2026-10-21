@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getAuthenticatedAdmin } from "@/lib/session";
 import { getLegalDocumentsForAdmin, isLegalPreviewEnabled } from "@/lib/legal";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { changeLegalStatus, cloneLegalDocument, setEnforcement, updateLegalDraft, prepareLegalDrafts } from "./actions";
@@ -7,6 +8,7 @@ const labels = { draft: "Brouillon", ready: "Prête à publier", published: "En 
 export const dynamic = "force-dynamic";
 
 export default async function LegalAdminPage() {
+  await getAuthenticatedAdmin();
   if (!isLegalPreviewEnabled()) return <div className="rounded-2xl border bg-[var(--card)] p-6">Ce module est désactivé hors environnement Preview.</div>;
   const documents = await getLegalDocumentsForAdmin();
   const db = createSupabaseServerClient();

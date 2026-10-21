@@ -4,6 +4,10 @@ import { getPublicSiteUrlWithFallback } from "../lib/public-site-url";
 afterEach(() => vi.unstubAllEnvs());
 
 describe("Ty Ash public site URL", () => {
+  it("replaces the retired domain for authentication and email links", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://brand-studio-tyash.vercel.app");
+    expect(getPublicSiteUrlWithFallback().origin).toBe("https://brand-studio-x-ty-ash.vercel.app");
+  });
   it("prefers a valid site URL over the formation URL", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", ' "https://brand-studio-x-ty-ash.vercel.app" ');
     vi.stubEnv("NEXT_PUBLIC_FORMATION_URL", "https://example.com");

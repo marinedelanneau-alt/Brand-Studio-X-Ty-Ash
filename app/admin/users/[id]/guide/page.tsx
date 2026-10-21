@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import { getAuthenticatedAdmin } from "@/lib/session";
 import BrandGuideLayout from "@/app/ui/brand-guide";
 import AdminGuideDownload from "@/app/ui/admin-guide-download";
 import { getAdminUser } from "@/lib/admin-user-insights";
 import { getLatestBrandGuideExport } from "@/lib/brand-guide";
 
 export default async function AdminUserGuidePage({ params }: { params: Promise<{ id: string }> }) {
+  await getAuthenticatedAdmin();
   const user = await getAdminUser(Number((await params).id));
   if (!user?.projectId) notFound();
   const guide = await getLatestBrandGuideExport(user.projectId);

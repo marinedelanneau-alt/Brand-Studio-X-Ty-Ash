@@ -5,6 +5,7 @@ export function getConfiguredPublicSiteUrl(): URL | null {
     if (!configured) continue;
     try {
       const url = new URL(configured.trim().replace(/^(['"])(.*)\1$/, "$2"));
+      if (url.hostname === "brand-studio-tyash.vercel.app") return new URL(TY_ASH_SITE_URL);
       if (url.protocol === "http:" || url.protocol === "https:") return url;
     } catch {
       // Try the next configured URL before using the Ty Ash fallback.

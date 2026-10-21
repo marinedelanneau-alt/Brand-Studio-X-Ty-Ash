@@ -15,10 +15,12 @@ type AdminShellProps = {
   adminEmail: string;
   children: React.ReactNode;
   showLegal?: boolean;
+  readOnly?: boolean;
 };
 
 const navItems = [
   { href: "/admin", label: "Utilisateurs", icon: HomeIcon },
+  { href: "/admin/clients", label: "Accès utilisateurs", icon: HomeIcon },
   { href: "/admin/modules", label: "Modules", icon: Square2StackIcon },
   { href: "/admin/releases", label: "Versions et déploiements", icon: Square2StackIcon },
 ];
@@ -28,6 +30,7 @@ export default function AdminShell({
   adminEmail,
   children,
   showLegal = false,
+  readOnly = false,
 }: AdminShellProps) {
   const pathname = usePathname();
 
@@ -38,7 +41,7 @@ export default function AdminShell({
           <div className="flex h-full flex-col px-5 py-6">
             <div className="rounded-[0.9rem] border border-[var(--surface-highlight)]/10 bg-white/5 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--tyash-on-dark-accent)]">
-                Administration
+                {readOnly ? "Consultation" : "Administration"}
               </p>
               <p className="mt-3 text-xl font-semibold">Brand Studio</p>
               <p className="mt-2 text-sm leading-6 text-white/70">
@@ -47,7 +50,7 @@ export default function AdminShell({
             </div>
 
             <nav className="mt-6 space-y-2">
-              {[...navItems, ...(showLegal ? [{ href: "/admin/legal", label: "Documents juridiques", icon: DocumentTextIcon }] : [])].map((item) => {
+              {[...(readOnly ? [{ href: "/admin/clients", label: "Suivi clients", icon: HomeIcon }] : navItems), ...(!readOnly && showLegal ? [{ href: "/admin/legal", label: "Documents juridiques", icon: DocumentTextIcon }] : [])].map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
 
@@ -109,7 +112,7 @@ export default function AdminShell({
                 </p>
               </div>
               <div className="inline-flex items-center rounded-[0.8rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--text-primary)]">
-                Session admin active
+                {readOnly ? "Session en lecture seule" : "Session admin active"}
               </div>
             </div>
           </header>

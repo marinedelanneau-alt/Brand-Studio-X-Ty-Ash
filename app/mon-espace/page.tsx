@@ -8,6 +8,7 @@ import ProjectNameForm from "@/app/ui/project-name-form";
 import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
 import LogoutButton from "../ui/logout-button";
+import { canReadClients } from "@/lib/account-permissions";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
@@ -387,6 +388,7 @@ export default async function MonEspacePage() {
                 </div>
               </div>
 
+              {canReadClients(account) ? <Link href="/admin/clients" className="bs-button-secondary rounded-xl px-4 py-3">Suivi Ty Ash</Link> : null}
               {account.is_admin ? (
                 <div className="sm:col-span-2 lg:col-span-1">
                   <Link

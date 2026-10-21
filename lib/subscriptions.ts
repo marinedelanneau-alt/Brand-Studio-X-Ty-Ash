@@ -28,6 +28,13 @@ export async function getSubscriptionAccessStatus(
   userId: number,
 ): Promise<SubscriptionAccessStatus> {
   const supabase = createSupabaseServerClient();
+  const { data: freeAccount, error: freeError } = await supabase.from("client_access_codes")
+    .select("is_active,complimentary_access").eq("id", userId).maybeSingle();
+  if (freeError) throw new Error(freeError.message);
+  if (freeAccount?.is_active !== false && freeAccount?.complimentary_access === true) {
+    return { status: "active", accessGranted: true, plan: "complimentary",
+      stripeCustomerId: null, stripeSubscriptionId: null, currentPeriodEnd: null };
+  }
   const { data, error } = await supabase
     .from("subscriptions")
     .select(
@@ -74,7 +81,9 @@ export async function hasActiveAccess(userId: number) {
     throw new Error(accountError.message);
   }
 
-  if (account?.is_admin && account.is_active !== false) {
+  if (account?.is_active === false) return false;
+
+  if (account?.is_admin) {
     return true;
   }
 

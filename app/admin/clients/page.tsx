@@ -1,4 +1,9 @@
 import DatabaseErrorState from "@/app/ui/database-error-state";
+import { getAuthenticatedClientReader } from "@/lib/session";
+import { canAdminister } from "@/lib/account-permissions";
+import { getAdminUsers } from "@/lib/admin-user-insights";
+import AdminUsersTable from "@/app/ui/admin-users-table";
+import InviteJulienForm from "./invite-julien-form";
 import { getAdminAccounts } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
@@ -6,6 +11,15 @@ import { unstable_rethrow } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function AdminClientsPage() {
+  const account = await getAuthenticatedClientReader();
+  if (!canAdminister(account)) {
+    const users = await getAdminUsers();
+    return <section className="space-y-5">
+      <h1 className="text-3xl font-semibold">Suivi des utilisateurs Ty Ash</h1>
+      <p>Consultez les utilisateurs, leur progression et leurs réponses.</p>
+      <AdminUsersTable users={users} />
+    </section>;
+  }
   let accounts: Awaited<ReturnType<typeof getAdminAccounts>> = [];
   let loadError = "";
 
@@ -29,6 +43,11 @@ export default async function AdminClientsPage() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-2xl border p-5">
+        <h2 className="font-bold">Accès de Julien SENE</h2>
+        <p className="mt-2 text-sm">Inviter jsene@ty-ash.com avec un accès personnel gratuit et la consultation des clients Ty Ash. Un compte existant reçoit un lien de récupération.</p>
+        <InviteJulienForm />
+      </section>
       <section className="rounded-[1.4rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-6 shadow-[0_16px_40px_rgba(210,189,152,0.1)]">
         <p className="inline-flex rounded-full bg-[var(--tyash-soft)] px-4 py-2 text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
           Clients

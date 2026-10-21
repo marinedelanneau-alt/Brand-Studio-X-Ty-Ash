@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
-import { getAuthenticatedAdmin } from "@/lib/session";
+import { getAuthenticatedClientReader } from "@/lib/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isTyAshContent, requireTyAshKey } from "./tyash-answer-identity";
 import { getApplicationReleaseState, getContentReleaseSnapshot, isControlledProductionContentEnabled } from "./content-releases";
@@ -61,7 +61,7 @@ function latestDate(...dates: Array<string | null | undefined>) {
 }
 
 export const getAdminUsers = cache(async function getAdminUsers(): Promise<AdminUserView[]> {
-  await getAuthenticatedAdmin();
+  await getAuthenticatedClientReader();
   const db = createSupabaseServerClient();
   const modules = isControlledProductionContentEnabled()
     ? validateReleaseModules((await getContentReleaseSnapshot((await getApplicationReleaseState()).published_release_id))?.modules) as unknown as Awaited<ReturnType<typeof getModulesWithExercises>>

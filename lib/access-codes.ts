@@ -12,6 +12,8 @@ type AccessCodeRecord = {
   is_active: boolean;
   is_admin: boolean;
   role?: "user" | "admin";
+  can_view_clients?: boolean;
+  complimentary_access?: boolean;
   created_at: string;
 };
 
