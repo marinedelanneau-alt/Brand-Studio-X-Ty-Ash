@@ -343,7 +343,7 @@ function toEditorModule(module: AdminModule): EditorModule {
     submodules: module.submodules.map((submodule, index) => ({
       id: submodule.editorKey ?? String(submodule.id ?? index + 1),
       title: submodule.title,
-      videoUrl: submodule.video_url,
+      videoUrl: submodule.video_url ?? "",
       audioUrl: submodule.audio_url ?? "",
       audioTranscript: submodule.audio_transcript ?? "",
       contentHtml: submodule.content_html,
