@@ -67,6 +67,7 @@ import ColorPaletteAdminEditor from "./color-palette-admin-editor";
 import ExercisePreview from "./exercise-preview";
 import MoodboardAdminEditor from "./moodboard-admin-editor";
 import RichTextEditor, { type RichTextEditorHandle } from "./rich-text-editor";
+import SubmoduleEditorialEditor from "./submodule-editorial-editor";
 import SmartFeedbackAdminEditor from "./smart-feedback-admin-editor";
 import SpectrumAdminEditor from "./spectrum-admin-editor";
 import VoiceNotePlayer from "./voice-note-player";
@@ -171,6 +172,7 @@ type EditorSubmodule = {
   audioUrl: string;
   audioTranscript: string;
   contentHtml: string;
+  editorialIntroduction?: BrandSubmodule["editorialIntroduction"] | null;
   exerciseGroups: EditorExerciseGroup[];
 };
 type EditorModule = {
@@ -349,6 +351,7 @@ function toEditorModule(module: AdminModule): EditorModule {
       audioUrl: submodule.audio_url ?? "",
       audioTranscript: submodule.audio_transcript ?? "",
       contentHtml: submodule.content_html,
+      editorialIntroduction: submodule.editorialIntroduction,
       exerciseGroups: toEditorExerciseGroups(submodule.exercises),
     })),
   };
@@ -539,6 +542,7 @@ function serializeSubmodules(module: EditorModule) {
       audioUrl: submodule.audioUrl.trim(),
       audioTranscript: submodule.audioTranscript.trim(),
       contentHtml: submodule.contentHtml.trim(),
+      editorialIntroduction: submodule.editorialIntroduction,
       exerciseGroups: submodule.exerciseGroups.map((group) => ({
         groupId: group.id,
         questions: group.questions.map((question) => serializeQuestion(question)),
@@ -2195,8 +2199,9 @@ function ModuleForm({
                       />
                     </label>
 
+                    <SubmoduleEditorialEditor value={activeSubmodule.editorialIntroduction} contentHtml={activeSubmodule.contentHtml} onChange={editorialIntroduction => onChange(current => ({ ...current, submodules: current.submodules.map(item => item.id === activeSubmodule.id ? { ...item, editorialIntroduction } : item) }))} />
                     <div className="space-y-3">
-                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">Contenu</span>
+                      <span className="block text-xs font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">{activeSubmodule.editorialIntroduction?.layout === "brand_video" ? "Consigne courte — encart rose final" : "Contenu"}</span>
                       <RichTextEditor
                         ref={activeSubmoduleContentEditorRef}
                         value={activeSubmodule.contentHtml}

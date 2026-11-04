@@ -1212,6 +1212,7 @@ function buildDraftModuleFromDefinition(
       audioUrl: string;
       audioTranscript: string;
       contentHtml: string;
+      editorialIntroduction?: import("./training-types").SubmoduleEditorialIntroduction | null;
       exerciseGroups: Array<{
         groupId: string;
         questions: Array<{
@@ -1305,7 +1306,7 @@ function buildDraftModuleFromDefinition(
       audio_url: submodule.audioUrl || null,
       audio_transcript: submodule.audioTranscript || null,
       content_html: submodule.contentHtml,
-      editorialIntroduction: undefined,
+      editorialIntroduction: submodule.editorialIntroduction === null ? undefined : submodule.editorialIntroduction ?? existingSubmodule?.editorialIntroduction,
       created_at: existingSubmodule?.created_at ?? now,
       updated_at: now,
       exercises: questions,
@@ -1966,6 +1967,7 @@ export async function saveModuleDefinition(input: {
     audioUrl: string;
     audioTranscript: string;
     contentHtml: string;
+    editorialIntroduction?: import("./training-types").SubmoduleEditorialIntroduction | null;
     exerciseGroups: Array<{
       groupId: string;
       questions: Array<{

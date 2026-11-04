@@ -10,6 +10,7 @@ import TypographyInspirationSection from "./typography-inspiration-section";
 import BaselineInspirationSection from "./baseline-inspiration-section";
 import ColorLibrarySection from "./color-library-section";
 import SubmoduleIntroduction from "./submodule-introduction";
+import SubmoduleEditorialLayout from "./submodule-editorial-layout";
 import { getSubmoduleIntroduction } from "@/lib/submodule-introductions";
 
 const COLOR_SYMBOLISM_RESOURCE = {
@@ -241,19 +242,12 @@ export default function ModuleSubmoduleViewer({
 
           <div>
             {showBrandVideoIntroduction ? (
-              <aside aria-label="De ta marque à ta vidéo" className="mb-7 max-w-3xl space-y-4 border-b border-[var(--border)] pb-6">
-                <h3 className="font-[family:var(--font-cormorant)] text-2xl leading-snug text-[var(--heading-color)] sm:text-3xl">
-                  Avant de montrer, il faut savoir ce qu’on veut raconter.
-                </h3>
-                <div className="space-y-4 text-[0.98rem] leading-7 text-[var(--text-primary)]">
-                  <p>Une belle vidéo attire l’attention. Une marque claire laisse une empreinte.</p>
-                  <p>Travailler ton identité en amont, c’est mettre des mots sur ce qui te rend unique : ton histoire, ta personnalité, tes convictions et ce que tu veux transmettre.</p>
-                  <p>C’est cette matière qui permettra ensuite à TYASH de créer une vidéo qui ne soit pas seulement belle, mais juste, cohérente et vraiment à ton image.</p>
-                </div>
-                <p className="border-l-2 border-[var(--tyash-primary)] pl-4 font-[family:var(--font-cormorant)] text-xl font-semibold leading-relaxed text-[var(--tyash-label-text)]">
-                  Ta marque donne le fond. La vidéo lui donne vie.
-                </p>
-              </aside>
+              <SubmoduleEditorialLayout
+                label="De ta marque à ta vidéo"
+                headline="Avant de montrer, il faut savoir ce qu’on veut raconter."
+                paragraphs={["Une belle vidéo attire l’attention. Une marque claire laisse une empreinte.", "Travailler ton identité en amont, c’est mettre des mots sur ce qui te rend unique : ton histoire, ta personnalité, tes convictions et ce que tu veux transmettre.", "C’est cette matière qui permettra ensuite à TYASH de créer une vidéo qui ne soit pas seulement belle, mais juste, cohérente et vraiment à ton image."]}
+                keyPhrase="Ta marque donne le fond. La vidéo lui donne vie."
+              />
             ) : null}
             {showColorLibrary ? (
               <ColorLibrarySection recap={<ColorSymbolismResource />} />

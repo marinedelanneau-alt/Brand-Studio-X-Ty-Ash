@@ -1,4 +1,5 @@
 import type { SubmoduleEditorialIntroduction } from "@/lib/training-types";
+import SubmoduleEditorialLayout from "./submodule-editorial-layout";
 
 export default function SubmoduleIntroduction({
   contentHtml,
@@ -9,6 +10,10 @@ export default function SubmoduleIntroduction({
   introduction?: SubmoduleEditorialIntroduction;
   exerciseCount: number;
 }) {
+  if (introduction?.layout === "brand_video") return <>
+    <SubmoduleEditorialLayout headline={introduction.headline} paragraphs={introduction.paragraphs} keyPhrase={introduction.keyPhrase} label={introduction.label} />
+    <SubmoduleIntroduction contentHtml={contentHtml} exerciseCount={exerciseCount} />
+  </>;
   const hasEditorialContent = Boolean(
     introduction?.label?.trim() || introduction?.headline?.trim()
       || introduction?.paragraphs?.some(paragraph => paragraph.trim())

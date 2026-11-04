@@ -107,6 +107,23 @@ describe("brouillon privé et publication officielle sans mutation utilisateur",
       project_module_states: [{ id: 1, project_id: 10, module_id: 1, is_completed: true }], brand_exports: null, user_answers: [] };
   });
 
+  it("saves independent editorial fields through the Admin action and preserves them on later edits", async () => {
+    const form = await formForPublished();
+    const submodules = JSON.parse(String(form.get("submodulesJson")));
+    const introduction = { layout: "brand_video", headline: "Accroche Admin", paragraphs: ["Premier paragraphe", "Second paragraphe"], keyPhrase: "Phrase clé Admin" };
+    submodules[0].editorialIntroduction = introduction;
+    submodules[0].contentHtml = "<p>Consigne Admin</p>";
+    form.set("submodulesJson", JSON.stringify(submodules));
+    expect((await saveAdminModuleDraft(form)).status).toBe("success");
+    expect((await getAdminWorkingModules(42))[0].submodules[0].editorialIntroduction).toEqual(introduction);
+    expect((await getWorkspaceData(7)).modules[0].submodules[0].editorialIntroduction).toBeUndefined();
+    const next = await formForPublished("C");
+    expect((await saveAdminModuleDraft(next)).status).toBe("success");
+    expect((await getAdminWorkingModules(42))[0].submodules[0].editorialIntroduction).toEqual(introduction);
+    await expect(publishFinalVersionForAllUsers()).rejects.toThrow("status=published");
+    expect((await getWorkspaceData(7)).modules[0].submodules[0].editorialIntroduction).toEqual(introduction);
+  });
+
   it("the Ty Ash button prepares the whole approved course only on invocation and preserves the published workspace", async () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://cplzwnlstcpqqzqeawgs.supabase.co");
     const before = structuredClone(store.rows);

@@ -50,6 +50,7 @@ type EditorSubmodule = {
   audioUrl: string;
   audioTranscript: string;
   contentHtml: string;
+  editorialIntroduction?: import("@/lib/training-types").SubmoduleEditorialIntroduction | null;
   exerciseGroups: EditorExerciseGroup[];
 };
 
@@ -254,6 +255,12 @@ function parseSubmodules(rawValue: FormDataEntryValue | null, existingExercises:
       audioUrl,
       audioTranscript,
       contentHtml,
+      ...(item.editorialIntroduction === null ? { editorialIntroduction: null } : item.editorialIntroduction ? { editorialIntroduction: {
+        layout: item.editorialIntroduction.layout === "brand_video" ? "brand_video" as const : undefined,
+        headline: typeof item.editorialIntroduction.headline === "string" ? item.editorialIntroduction.headline.trim() : "",
+        paragraphs: Array.isArray(item.editorialIntroduction.paragraphs) ? item.editorialIntroduction.paragraphs.filter((p): p is string => typeof p === "string").map(p => p.trim()).filter(Boolean) : [],
+        keyPhrase: typeof item.editorialIntroduction.keyPhrase === "string" ? item.editorialIntroduction.keyPhrase.trim() : "",
+      } } : {}),
       exerciseGroups,
     };
   });

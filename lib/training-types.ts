@@ -30,6 +30,8 @@ export type BrandModule = {
 
 // Presentation contract only; persistence and Admin editing require explicit wiring.
 export type SubmoduleEditorialIntroduction = {
+  layout?: "brand_video";
+  keyPhrase?: string;
   label?: string;
   headline?: string;
   paragraphs?: string[];
