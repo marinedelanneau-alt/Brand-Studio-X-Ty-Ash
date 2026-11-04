@@ -10,6 +10,7 @@ import { upsertSubscription } from "@/lib/subscriptions";
 import { getStripe } from "@/lib/stripe";
 import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 import { fulfillCommercialOrder } from "@/lib/commercial-order-fulfillment";
+import { PLATFORM_AMOUNT, PLATFORM_CHECKOUT_FLOW, PLATFORM_PRICE_ID } from "@/lib/platform-checkout";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -62,6 +63,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!["paid", "no_payment_required"].includes(session.payment_status)) {
     return;
   }
+  const isPlatformCheckout = session.metadata?.checkout_flow === PLATFORM_CHECKOUT_FLOW;
+  if (isPlatformCheckout) {
+    const items = await getStripe().checkout.sessions.listLineItems(session.id, { limit: 2 });
+    if (session.mode !== "payment" || session.currency !== "eur" || session.amount_subtotal !== PLATFORM_AMOUNT || items.data.length !== 1 || items.data[0].price?.id !== PLATFORM_PRICE_ID || items.data[0].quantity !== 1) {
+      throw new Error("Invalid platform checkout");
+    }
+  }
+  const priceId = isPlatformCheckout ? PLATFORM_PRICE_ID : process.env.STRIPE_PRICE_ID ?? null;
   const userId = Number(session.metadata?.user_id);
   const subscriptionId = objectId(
     session.subscription as string | { id: string } | null | undefined,
@@ -88,7 +97,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         stripeCustomerId: customerId,
         stripeSubscriptionId: subscriptionId,
         stripeCheckoutSessionId: session.id,
-        priceId: process.env.STRIPE_PRICE_ID ?? null,
+        priceId,
       }));
 
     await deliverActivationEmail(activation);
@@ -101,7 +110,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     stripeCustomerId: customerId,
     stripeSubscriptionId: subscriptionId,
     stripeCheckoutSessionId: session.id,
-    priceId: process.env.STRIPE_PRICE_ID ?? null,
+    priceId,
     status,
     accessGranted: true,
   });

@@ -15,6 +15,8 @@ import { normalizeReleaseSnapshotModules } from "./content-release-diff";
 import { assertReleaseAnswerCompatibility, validateReleaseModules } from "./release-content-validation";
 import { getBootstrapAdminSnapshot, getBootstrapPublishedModules } from "./legacy-release-bootstrap";
 import { assertPathwaySave } from "./pathway-versions";
+import { tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { createSupabaseServerClient } from "./supabase/server";
 
 export async function getAdminReleaseWorkspace() {
   const state = await getApplicationReleaseState();
@@ -94,6 +96,11 @@ export async function verifyCurrentDraft(releaseId?: string): Promise<{
   if (workspace.release.pathway_root_id) {
     assertPathwaySave(workspace.snapshot.modules, workspace.release, await getRetainedPathwaySnapshots());
   } else assertReleaseAnswerCompatibility(publishedModules, workspace.snapshot.modules);
+  if ((workspace.snapshot.modules as Array<{ tyashQuestionnaireRevision?: string }>).some(tyashRefonteEnabled)) {
+    const { error } = await createSupabaseServerClient().from("tyash_questionnaire_prefills").select("project_id").limit(1);
+    if (error) throw new Error("Appliquez la migration de préremplissage TYASH avant de publier cette refonte.");
+    if (!process.env.OPENAI_API_KEY) throw new Error("Configurez OPENAI_API_KEY côté serveur dans cet environnement TYASH avant de publier la refonte.");
+  }
   return { releaseId: workspace.release.id, snapshot: workspace.snapshot, status: workspace.release.status };
 }
 

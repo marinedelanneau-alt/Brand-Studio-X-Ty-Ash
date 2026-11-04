@@ -2,6 +2,7 @@ import { validateCompletionRequirements, type CompletionRequirements } from "./e
 import { hydrateReleaseSnapshotModules } from "./content-release-diff";
 import { getFillBlankCount, parseStoredExerciseQuestionConfig, parseStoredTableConfig, type ExerciseType } from "./exercise-types";
 import contract from "./pathway-snapshot.schema.json";
+import { validateTyashQuestionnaireMetadata } from "./tyash-questionnaire-refonte";
 
 type Entity = { id: number; stableKey?: string; position: number };
 type Exercise = Entity & { completion?: CompletionRequirements; type: ExerciseType; question: string; options: string[]; module_id: number; submodule_id: number };
@@ -76,6 +77,7 @@ export function validateReleaseModules(value: unknown): Module[] {
       }
     }
   }
+  validateTyashQuestionnaireMetadata(modules);
   return modules;
 }
 

@@ -69,9 +69,20 @@ export function formalizeClientCopy(value: string): string {
   }).join("");
 }
 
+export function informalTyashEditorialCopy(value: string): string {
+  const pairs: Array<[string, string]> = REPLACEMENTS.map(([informal, formal]) => [formal, informal]);
+  pairs.push(["votre réponse", "ta réponse"], ["Votre réponse", "Ta réponse"], ["vos réponses", "tes réponses"], ["vous pouvez", "tu peux"], ["Vous pouvez", "Tu peux"], ["votre marque", "ta marque"], ["votre entreprise", "ton entreprise"], ["votre communication", "ta communication"], ["votre projet", "ton projet"], ["vous ressemble", "te ressemble"], ["Essayez", "Essaie"], ["Ajoutez", "Ajoute"], ["Précisez", "Précise"], ["Décrivez", "Décris"], ["Votre méthode", "Ta méthode"], ["Votre exigence", "Ton exigence"], ["Votre culture", "Ta culture"], ["Votre impact", "Ton impact"], ["Votre quotidien", "Ton quotidien"]);
+  return value.split(/(<[a-z/][^>]*>)/gi).map((part, index) => {
+    if (index % 2) return part;
+    for (const [from, to] of pairs.sort((a, b) => b[0].length - a[0].length)) part = part.replaceAll(from, to);
+    return part.replace(/Ty[ -]?Ash/gi, "TYASH");
+  }).join("");
+}
+
 // A selected predefined label can be presented formally without rewriting its
 // saved value. Free-text answers, including identical-looking prose, stay intact.
 export function clientOptionAnswerLabel(exercise: ModuleExercise, value: string): string {
+  if (exercise.tyashQuestionnaire?.status === "active" && exercise.options.includes(value)) return informalTyashEditorialCopy(value);
   return exercise.stableKey?.startsWith("tyash_v1_")
     && ["single", "multiple", "boolean", "color"].includes(exercise.type)
     && exercise.options.includes(value)
@@ -100,6 +111,7 @@ function formalExercise(exercise: ModuleExercise): ModuleExercise {
 }
 
 export function withFormalClientCopy(module: WorkspaceModule): WorkspaceModule {
+  if (module.tyashQuestionnaireRevision === "julien-2026-11-04") return module;
   if (!module.stableKey?.startsWith("tyash_v1_")) return module;
   return {
     ...module,

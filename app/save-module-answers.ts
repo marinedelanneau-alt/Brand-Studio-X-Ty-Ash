@@ -82,7 +82,7 @@ async function persistModuleAnswers(input: {
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Créez d'abord votre projet de marque.",
+        message: "Commence par créer ton projet de marque.",
       } satisfies ModuleState;
     }
 
@@ -227,9 +227,10 @@ async function persistModuleAnswers(input: {
       modulePosition: selectedModule.position,
       moduleStableKey: selectedModule.stableKey,
       answers: persistableAnswers.map((answer) => ({
+        answerModuleStableKey: exerciseById.get(answer.exerciseId)?.answerModuleStableKey,
         exerciseId: answer.exerciseId,
         exerciseStableKey: exerciseById.get(answer.exerciseId)?.stableKey,
-        submoduleStableKey: selectedModule.submodules.find(s => s.id === exerciseById.get(answer.exerciseId)?.submodule_id)?.stableKey,
+        submoduleStableKey: exerciseById.get(answer.exerciseId)?.answerSubmoduleStableKey ?? selectedModule.submodules.find(s => s.id === exerciseById.get(answer.exerciseId)?.submodule_id)?.stableKey,
         exercisePosition: exerciseById.get(answer.exerciseId)?.position ?? answer.exerciseId,
         submodulePosition: (() => {
           const submoduleId = exerciseById.get(answer.exerciseId)?.submodule_id;
@@ -307,8 +308,8 @@ async function persistModuleAnswers(input: {
     return {
       status: "success",
       message: input.markModuleCompleted
-        ? "Le module est terminé. Vous pourrez revenir plus tard sur les questions laissées en attente."
-        : "Vos réponses ont bien été enregistrées.",
+        ? "Le module est terminé. Tu pourras revenir plus tard sur les questions laissées en attente."
+        : "Tes réponses ont bien été enregistrées.",
     } satisfies ModuleState;
   } catch (error) {
     return {
@@ -327,7 +328,7 @@ export async function saveModuleAnswers(
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error",
-        message: "Débloquez Brand Studio pour enregistrer vos réponses.",
+        message: "Débloque Brand Studio pour enregistrer tes réponses.",
       };
     }
 
@@ -350,7 +351,7 @@ export async function saveModuleDraft(formData: FormData): Promise<ModuleState> 
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error",
-        message: "Débloquez Brand Studio pour enregistrer vos réponses.",
+        message: "Débloque Brand Studio pour enregistrer tes réponses.",
       };
     }
 

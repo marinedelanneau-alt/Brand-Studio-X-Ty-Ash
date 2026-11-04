@@ -3,11 +3,16 @@ import { buildGuideMoodboard } from "@/lib/brand-guide";
 import { parseStoredMoodboardAnswer } from "@/lib/moodboard";
 import { GuideMoodboard } from "@/app/ui/brand-guide";
 import Image from "next/image";
+import { parseStoredSpectrumAnswer } from "@/lib/spectrum";
 
 const imagePattern = /^(https?:\/\/|\/|data:image\/).+\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
 const colorPattern = /^#[0-9a-f]{6}$/i;
 
-export default function AdminAnswerValue({ values, type }: { values: string[]; type: string }) {
+export default function AdminAnswerValue({ values, type, showHistoricalJustification = false }: { values: string[]; type: string; showHistoricalJustification?: boolean }) {
+  if (type === "spectrum") {
+    const answer = parseStoredSpectrumAnswer(values);
+    return answer ? <div className="space-y-2"><p className="font-semibold">{answer.leftLabel} ↔ {answer.rightLabel} : {answer.score} / 100</p><p className="text-sm">{answer.interpretation}</p>{showHistoricalJustification && answer.justification ? <p className="whitespace-pre-wrap text-sm">Justification historique : {answer.justification}</p> : null}</div> : <p>Curseur non renseigné.</p>;
+  }
   if (type === "moodboard") {
     const moodboard = buildGuideMoodboard(parseStoredMoodboardAnswer(values));
     return (

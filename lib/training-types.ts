@@ -11,6 +11,8 @@ export type BrandProject = {
 };
 
 export type BrandModule = {
+  tyashQuestionnaireRevision?: string;
+  tyashQuestionnairePreparedAt?: string;
   stableKey?: string;
   editorRevision?: string;
   id: number;
@@ -51,6 +53,9 @@ export type BrandSubmodule = {
 };
 
 export type ModuleExercise = {
+  tyashQuestionnaire?: import("./tyash-questionnaire-refonte").TyashQuestionnaireRule;
+  answerModuleStableKey?: string;
+  answerSubmoduleStableKey?: string;
   completion?: import("./exercise-completion").CompletionRequirements;
   stableKey?: string;
   editorKey?: string;
@@ -84,6 +89,7 @@ export type ModuleProgress = {
 };
 
 export type WorkspaceModule = BrandModule & {
+  prefilledQuestionKeys?: string[];
   answerProjectId?: number;
   globalProgressPercent?: number;
   globalModuleCount?: number;

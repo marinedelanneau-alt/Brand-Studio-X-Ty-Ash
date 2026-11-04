@@ -118,9 +118,10 @@ export async function syncAnswerMutations(mutations: AnswerSyncMutationInput[]) 
     modulePosition: selectedModule.position,
     moduleStableKey: selectedModule.stableKey,
     answers: validMutations.map((mutation) => ({
+      answerModuleStableKey: exerciseById.get(mutation.exerciseId)?.answerModuleStableKey,
       exerciseId: mutation.exerciseId,
       exerciseStableKey: exerciseById.get(mutation.exerciseId)?.stableKey,
-      submoduleStableKey: selectedModule.submodules.find(s => s.id === exerciseById.get(mutation.exerciseId)?.submodule_id)?.stableKey,
+      submoduleStableKey: exerciseById.get(mutation.exerciseId)?.answerSubmoduleStableKey ?? selectedModule.submodules.find(s => s.id === exerciseById.get(mutation.exerciseId)?.submodule_id)?.stableKey,
       exercisePosition: exerciseById.get(mutation.exerciseId)!.position,
       submodulePosition: (() => {
         const submoduleId = exerciseById.get(mutation.exerciseId)!.submodule_id;

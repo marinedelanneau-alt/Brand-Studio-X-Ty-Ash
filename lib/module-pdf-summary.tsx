@@ -473,7 +473,7 @@ export function ModulePdfSummary({
             <SectionHeading
               index="01 · L'essentiel"
               title="Les décisions à retenir"
-              intro="Une lecture rapide des éléments qui structurent désormais votre marque."
+              intro="Une lecture rapide des éléments qui structurent désormais ta marque."
             />
             {summary.keyTakeaways.map((item) => (
               <View key={item.id} style={styles.takeaway} wrap={false}>
@@ -498,8 +498,8 @@ export function ModulePdfSummary({
           <View style={styles.section}>
             <SectionHeading
               index="02 · Le carnet"
-              title="Vos réponses, par étape"
-              intro="Le détail utile de votre cheminement, sans répéter les décisions déjà mises en avant."
+              title="Tes réponses, par étape"
+              intro="Le détail utile de ton cheminement, sans répéter les décisions déjà mises en avant."
             />
             {detailedRecaps.map((submodule) => (
               <View key={submodule.id} style={styles.chapter}>
@@ -525,7 +525,7 @@ export function ModulePdfSummary({
         <View style={styles.closing} minPresenceAhead={90}>
           <Text style={styles.closingTitle}>Et maintenant ?</Text>
           <Text style={styles.closingText}>
-            {sanitizePdfText(`${shareData.shareSentence} Gardez cette synthèse comme point de repère : elle vous aidera à rester cohérente dans vos prochaines décisions de marque.`)}
+            {sanitizePdfText(`${shareData.shareSentence} Garde cette synthèse comme point de repère pour tes prochaines décisions.`)}
           </Text>
         </View>
 

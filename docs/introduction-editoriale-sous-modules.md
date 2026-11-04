@@ -24,6 +24,8 @@ Ces valeurs servent uniquement à la prévisualisation locale ; elles ne sont pa
 
 ## Administration à prévoir
 
+Le contenu de « Votre personnalité » est associé localement à sa clé stable dans `content/tyash-v1/submodule-introductions.json`, via `getSubmoduleIntroduction`. Le composant et ses styles sont inchangés. Un objet `editorialIntroduction` fourni par les données du sous-module reste prioritaire sur ce catalogue local. Cette association ne modifie aucun snapshot distant et ne rend pas les quatre champs éditables dans l’Admin actuel.
+
 L’Admin existant sait modifier le contenu riche historique, mais pas encore les quatre éléments séparément. `editorialIntroduction` est pour l’instant un contrat de présentation, pas un champ distant sauvegardé.
 
 Pour activer l’édition structurée, prévoir les champs « Label éditorial », « Accroche », « Texte d’introduction » et « Transition » dans l’éditeur de sous-module ; transmettre ce même objet optionnel dans la conversion des données, la validation et la sauvegarde des snapshots. Le mécanisme de publication reste celui des brouillons existants. Les snapshots étant en JSON, une colonne Supabase supplémentaire n’est pas a priori nécessaire ; la compatibilité des validations SQL doit être vérifiée avant toute activation. Le repli sur `content_html` conserve les anciens contenus.

@@ -2,6 +2,8 @@ import { isTyAshContent, requireTyAshKey, resolveTyAshExerciseId } from "./tyash
 import { countsTowardsProgress, completionOverride } from "./exercise-completion";
 import "server-only";
 import { withFormalClientCopy } from "./client-copy";
+import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { getTyashPrefills, applyTyashPrefills } from "./tyash-questionnaire-prefill";
 import { getAdminReleaseWorkspace, saveAdminReleaseModules } from "@/lib/admin-content-release";
 import { validateReleaseModules } from "@/lib/release-content-validation";
 import { getRetainedPathwaySnapshots } from "@/lib/content-releases";
@@ -1431,7 +1433,7 @@ export async function getWorkspaceData(accountId: number) {
     : validateReleaseModules(snapshot.modules)) as unknown as DraftModule[];
   const modules = contentPreview.isPreviewMode
     ? validatedModules
-    : validatedModules.filter((item) => item.is_published);
+    : validatedModules.filter((item) => item.is_published).map(item => tyashRefonteEnabled(item) ? { ...item, tyashQuestionnairePreparedAt: contentPreview.release?.published_at ?? item.tyashQuestionnairePreparedAt } : item);
 
   if (!project) {
     return {
@@ -1645,9 +1647,11 @@ export async function getWorkspaceData(accountId: number) {
     };
   });
 
+  const prefills = !usesSeparatedPreviewAnswers && draftModules.some(tyashRefonteEnabled) ? await getTyashPrefills(project.id) : [];
+  const currentDraftModules = projectTyashQuestionnaire(applyTyashPrefills(draftModules, prefills));
   let unlockedUntilPosition = 1;
 
-  for (const currentModule of draftModules) {
+  for (const currentModule of currentDraftModules) {
     const progress = getModuleProgress(
       currentModule,
       currentModule.exercises,
@@ -1661,7 +1665,7 @@ export async function getWorkspaceData(accountId: number) {
     }
   }
 
-  const workspaceModules = draftModules.map((module) => ({
+  const workspaceModules = currentDraftModules.map((module) => ({
     ...module,
     progress: getModuleProgress(
       module,
@@ -1775,6 +1779,7 @@ export async function upsertStableModuleAnswers(input: {
   modulePosition: number;
   moduleStableKey?: string;
   answers: Array<{
+    answerModuleStableKey?: string;
     exerciseStableKey?: string;
     submoduleStableKey?: string;
     exerciseId: number;
@@ -1791,7 +1796,7 @@ export async function upsertStableModuleAnswers(input: {
   const rows = input.answers.map((answer) => ({
     user_id: input.userId,
     project_id: input.projectId,
-    module_key: isTyAshContent({ stableKey: input.moduleStableKey }) ? requireTyAshKey({ stableKey: input.moduleStableKey }) : `module_position_${input.modulePosition}`,
+    module_key: isTyAshContent({ stableKey: input.moduleStableKey }) ? requireTyAshKey({ stableKey: answer.answerModuleStableKey ?? input.moduleStableKey }) : `module_position_${input.modulePosition}`,
     submodule_key: isTyAshContent({ stableKey: input.moduleStableKey }) ? (answer.submoduleStableKey ?? "module_root") : "stable_position",
     exercise_key: (isTyAshContent({ stableKey: input.moduleStableKey }) ? (answer.exerciseStableKey === "__completed" ? "__completed" : requireTyAshKey({ stableKey: answer.exerciseStableKey })) : getStableExerciseAnswerKey({
       modulePosition: input.modulePosition,

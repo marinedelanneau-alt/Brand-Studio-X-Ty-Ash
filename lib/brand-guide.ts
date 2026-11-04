@@ -1,5 +1,6 @@
 import "server-only";
 import { toPlainText } from "@/lib/plain-text";
+import { parseStoredSpectrumAnswer } from "./spectrum";
 
 import { findFinalAnswerCandidate } from "@/lib/brand-guide-final-answers";
 import { getVocabularyDirection, isExcludedAnswerLabel } from "@/lib/brand-guide-answer-labels";
@@ -230,6 +231,11 @@ function summarizeTable(exercise: ModuleExercise, values: string[]) {
 
 function buildAnswerText(exercise: ModuleExercise, values: string[]) {
   if (values.length === 0) return "";
+
+  if (exercise.type === "spectrum") {
+    const answer = parseStoredSpectrumAnswer(values);
+    return answer ? `${answer.leftLabel} ↔ ${answer.rightLabel} : ${answer.score}/100` : "";
+  }
 
   if (exercise.type === "brand_persona") {
     const fields = getBrandPersonaFields(parseStoredBrandPersonaConfig(exercise.options));

@@ -18,6 +18,8 @@ import { getVocabularyDirection } from "@/lib/brand-guide-answer-labels";
 import { toPlainText } from "@/lib/plain-text";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { clientOptionAnswerLabel } from "./client-copy";
+import { parseStoredSpectrumAnswer } from "./spectrum";
+import { tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
 
 export type ModuleSummaryHighlight = {
   label: string;
@@ -97,7 +99,7 @@ export function buildModuleSummaryCard(input: {
     submoduleRecaps,
     keyTakeaways,
     footer:
-      "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand vous le souhaitez.",
+      tyashRefonteEnabled(input.module) ? "Un récapitulatif de tes réponses, à relire et à compléter quand tu le souhaites." : "Un récap rapide de ce qui a été formulé pendant le module, à relire et compléter quand vous le souhaitez.",
   } satisfies ModuleSummaryCard;
 }
 
@@ -129,6 +131,7 @@ function buildSubmoduleRecaps(module: WorkspaceModule): ModuleSubmoduleSummary[]
       summary: buildSubmoduleInsightSentence(
         submodule.title,
         highlights.filter((highlight) => !isPlaceholderSummaryValue(highlight.value)),
+        tyashRefonteEnabled(module),
       ),
       highlights,
     } satisfies ModuleSubmoduleSummary;
@@ -583,6 +586,11 @@ function summarizeExerciseAnswer(
   values = values.map((value) => isStoredConfiguration(value) ? "" : clientOptionAnswerLabel(exercise, value));
   if (values.length === 0) {
     return null;
+  }
+
+  if (exercise.type === "spectrum") {
+    const answer = parseStoredSpectrumAnswer(values);
+    return answer ? buildHighlight(exercise.question, `${answer.leftLabel} ↔ ${answer.rightLabel} : ${answer.score}/100 — ${answer.interpretation}`) : null;
   }
 
   if (exercise.type === "open" || exercise.type === "prompt_open") {
@@ -1071,13 +1079,14 @@ function buildInsightSentence(highlights: ModuleSummaryHighlight[]) {
 function buildSubmoduleInsightSentence(
   _submoduleTitle: string,
   highlights: ModuleSummaryHighlight[],
+  informal = false,
 ) {
   if (highlights.length === 0) {
     return "Aucune réponse n'a encore été formulée dans ce sous-module.";
   }
 
   const pointLabel = highlights.length > 1 ? "points clés" : "point clé";
-  return `Vous avez formulé ${highlights.length} ${pointLabel} dans ce sous-module. L'essentiel est résumé dans les cartes ci-dessous.`;
+  return `${informal ? "Tu as" : "Vous avez"} formulé ${highlights.length} ${pointLabel} dans ce sous-module. L'essentiel est résumé dans les cartes ci-dessous.`;
 }
 
 function joinSummaryParts(values: string[]) {

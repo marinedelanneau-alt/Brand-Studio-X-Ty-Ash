@@ -10,8 +10,11 @@ import { validateReleaseModules } from "./release-content-validation";
 import { getModulesWithExercises, getModuleProgress } from "@/lib/training";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
+import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { getTyashPrefills, applyTyashPrefills } from "./tyash-questionnaire-prefill";
 
 export type AdminAnswerView = {
+  origin?: "prefill" | "client";
   moduleId: number;
   moduleTitle: string;
   modulePosition: number;
@@ -68,6 +71,10 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
   const modules = isControlledProductionContentEnabled()
     ? validateReleaseModules((await getContentReleaseSnapshot((await getApplicationReleaseState()).published_release_id))?.modules) as unknown as Awaited<ReturnType<typeof getModulesWithExercises>>
     : await getModulesWithExercises();
+  if (modules.some(tyashRefonteEnabled)) {
+    const release = await (await import("./content-releases")).getContentRelease((await getApplicationReleaseState()).published_release_id);
+    for (const moduleItem of modules) if (tyashRefonteEnabled(moduleItem) && release?.published_at) moduleItem.tyashQuestionnairePreparedAt = release.published_at;
+  }
   const [accountsResult, projectsResult, stableResult, legacyResult, exportsResult] = await Promise.all([
     db.from("client_access_codes").select("id,email,client_name,company_name,created_at,is_admin,role").order("created_at", { ascending: false }),
     db.from("brand_projects").select("id,account_id,name,created_at,updated_at"),
@@ -83,14 +90,20 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
   const legacy = legacyResult.data ?? [];
   const guideProjects = new Set((exportsResult.data ?? []).map((item) => item.project_id));
 
-  return (accountsResult.data ?? [])
+  return Promise.all((accountsResult.data ?? [])
     .filter((account) => !account.is_admin && account.role !== "admin")
-    .map((account) => {
+    .map(async (account) => {
       const project = projects.find((item) => item.account_id === account.id) ?? null;
       const stableForUser = stable.filter((item) => item.user_id === account.id && item.project_id === project?.id);
       const legacyForProject = project ? legacy.filter((item) => item.project_id === project.id) : [];
+      const prefills = project && modules.some(tyashRefonteEnabled) ? await getTyashPrefills(project.id) : [];
+      const clientModules = projectTyashQuestionnaire(applyTyashPrefills(modules.map(m => ({
+        ...m,
+        answers: Object.fromEntries(m.exercises.map(e => [e.id, valuesOf(stableForUser.find(a => a.module_key === m.stableKey && a.question_key === e.stableKey)?.answer_value)])),
+        answerVersions: Object.fromEntries(m.exercises.flatMap(e => { const row = stableForUser.find(a => a.module_key === m.stableKey && a.question_key === e.stableKey); return row ? [[e.id, { updatedAt: Date.parse(row.client_updated_at || row.updated_at), revision: 0 }]] : []; })),
+      })), prefills));
       const answers: AdminAnswerView[] = [];
-      const moduleProgress = modules.map((moduleItem) => {
+      const moduleProgress = clientModules.map((moduleItem) => {
         const answerable = moduleItem.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type));
         const answerMap: Record<number, string[]> = {};
         for (const exercise of answerable) {
@@ -101,11 +114,11 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
             exercisePosition: exercise.position,
           });
           const stableAnswer = stableForUser
-            .filter((item) => isTyAshContent(moduleItem) ? item.module_key === requireTyAshKey(moduleItem) && item.question_key === requireTyAshKey(exercise) : (item.question_key === stableKey || item.question_key === `question_${exercise.id}`))
+            .filter((item) => isTyAshContent(moduleItem) ? item.module_key === (exercise.answerModuleStableKey ?? requireTyAshKey(moduleItem)) && item.question_key === requireTyAshKey(exercise) : (item.question_key === stableKey || item.question_key === `question_${exercise.id}`))
             .sort((a, b) => latestDate(a.client_updated_at, a.updated_at).localeCompare(latestDate(b.client_updated_at, b.updated_at)))
             .at(-1);
           const legacyAnswer = isTyAshContent(moduleItem) ? undefined : legacyForProject.find((item) => item.exercise_id === exercise.id);
-          const values = stableAnswer
+          const values = tyashRefonteEnabled(moduleItem) ? moduleItem.answers[exercise.id] ?? [] : stableAnswer
             ? valuesOf(stableAnswer.answer_value)
             : legacyAnswer?.answer_text
               ? [legacyAnswer.answer_text]
@@ -113,21 +126,22 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
           answerMap[exercise.id] = values;
           if (hasValue(values)) {
             answers.push({
+              origin: stableAnswer ? "client" : exercise.tyashQuestionnaire?.prefill ? "prefill" : "client",
               moduleId: moduleItem.id,
-              moduleTitle: clientLabel(moduleItem.title),
+              moduleTitle: tyashRefonteEnabled(moduleItem) ? moduleItem.title : clientLabel(moduleItem.title),
               modulePosition: moduleItem.position,
-              submoduleTitle: clientLabel(submodule?.title ?? "Repères essentiels"),
+              submoduleTitle: tyashRefonteEnabled(moduleItem) ? submodule?.title ?? "Repères essentiels" : clientLabel(submodule?.title ?? "Repères essentiels"),
               exerciseId: exercise.id,
-              exerciseTitle: clientLabel(exercise.question || `Exercice ${exercise.position}`),
+              exerciseTitle: tyashRefonteEnabled(moduleItem) ? exercise.question : clientLabel(exercise.question || `Exercice ${exercise.position}`),
               exerciseType: exercise.type,
-              values: reader.is_admin || reader.role === "admin" ? values : values.map(value => clientOptionAnswerLabel(exercise, value)),
+              values: tyashRefonteEnabled(moduleItem) || !(reader.is_admin || reader.role === "admin") ? values.map(value => clientOptionAnswerLabel(exercise, value)) : values,
               updatedAt: stableAnswer ? latestDate(stableAnswer.client_updated_at, stableAnswer.updated_at) : legacyAnswer?.updated_at ?? null,
             });
           }
         }
         return {
           id: moduleItem.id,
-          title: clientLabel(moduleItem.title),
+          title: tyashRefonteEnabled(moduleItem) ? moduleItem.title : clientLabel(moduleItem.title),
           progress: getModuleProgress(moduleItem, moduleItem.exercises, answerMap, 1, false).completionPercent,
         };
       });
@@ -154,7 +168,7 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
         moduleProgress,
         answers: answers.sort((a, b) => a.modulePosition - b.modulePosition),
       } satisfies AdminUserView;
-    });
+    }));
 });
 
 export async function getAdminUser(userId: number) {

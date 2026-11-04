@@ -4,7 +4,6 @@ import { unstable_rethrow } from "next/navigation";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { generateModuleAnswerAssistance, supportsModuleAnswerAi } from "@/lib/module-answer-ai";
 import { getWorkspaceData } from "@/lib/training";
-import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 
 type AssistanceMode = "suggest" | "improve";
 
@@ -46,7 +45,7 @@ export async function requestModuleAnswerAssistance(input: {
     if (!workspace.project) {
       return {
         status: "error",
-        message: "Créez d'abord votre projet de marque.",
+        message: "Commence par créer ton projet de marque.",
         coachingNote: "",
         values: [],
       };
@@ -108,7 +107,7 @@ export async function requestModuleAnswerAssistance(input: {
 
     return {
       status: "error",
-      message: getUserFacingDataErrorMessage(error),
+      message: "L’aide est momentanément indisponible. Tu peux continuer à répondre librement et réessayer plus tard.",
       coachingNote: "",
       values: [],
     };

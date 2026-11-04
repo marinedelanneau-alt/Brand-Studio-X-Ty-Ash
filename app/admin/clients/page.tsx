@@ -7,6 +7,7 @@ import InviteJulienForm from "./invite-julien-form";
 import { getAdminAccounts } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +86,7 @@ export default async function AdminClientsPage() {
                   </td>
                   <td className="px-5 py-4 text-sm leading-6 text-[var(--text-muted)]">
                     {account.project_name ?? "Aucun projet"}
+                    <Link href={`/admin/clients/prepare/${account.id}`} className="mt-2 block text-xs underline">Préparer le questionnaire</Link>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex flex-wrap gap-2">

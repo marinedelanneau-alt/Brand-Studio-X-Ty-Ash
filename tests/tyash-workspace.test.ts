@@ -73,4 +73,10 @@ describe("Actual workspace and saving paths", () => {
     expect(getModuleProgress(moduleItem, [required], {}, 1, true).completionPercent).toBe(0);
     expect(getModuleProgress(moduleItem, [required], { 2: ["filled"] }, 1, false).completionPercent).toBe(100);
   });
+  it("persists a displayed cross-module question in its original stable module slot", async () => {
+    await upsertStableModuleAnswers({ userId: 1, projectId: 1, moduleId: -65, modulePosition: 3, moduleStableKey: "tyash_v1_need", answers: [{ exerciseId: -125, exercisePosition: 40, submodulePosition: 3, exerciseStableKey: "tyash_v1_call_to_action", answerModuleStableKey: "tyash_v1_video", submoduleStableKey: "tyash_v1_formats", values: ["Prendre contact"], clientUpdatedAt: 100 }] });
+    expect(state.rpcRows[0].module_key).toBe("tyash_v1_video");
+    expect(state.rpcRows[0].question_key).toBe("tyash_v1_call_to_action");
+    expect(state.rpcRows[0].submodule_key).toBe("tyash_v1_formats");
+  });
 });

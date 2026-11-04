@@ -73,6 +73,7 @@ import VoiceNotePlayer from "./voice-note-player";
 import type { BrandSubmodule, ModuleExercise } from "@/lib/training-types";
 
 type EditorQuestion = {
+  tyashQuestionnaire?: ModuleExercise["tyashQuestionnaire"];
   completion?: import("@/lib/exercise-completion").CompletionRequirements;
   id: string;
   type: ExerciseType;
@@ -297,6 +298,7 @@ function toEditorQuestion(exercise: ModuleExercise, fallbackIndex: number): Edit
   return {
     id: exercise.editorKey ?? String(exercise.id ?? fallbackIndex + 1),
     completion: exercise.completion,
+    tyashQuestionnaire: exercise.tyashQuestionnaire,
     type: exercise.type,
     explanation: exercise.explanation ?? "",
     answerPlaceholder: exercise.answer_placeholder ?? "",
@@ -930,6 +932,7 @@ function QuestionCard({
             />
             <p className="mt-1 text-xs uppercase tracking-[0.12em] text-[var(--text-muted)]">
               {EXERCISE_TYPE_LABELS[question.type]}
+              {question.tyashQuestionnaire?.status === "archived" ? " · Archivée — masquée du parcours client" : question.tyashQuestionnaire?.status === "merged" ? " · Fusionnée — réponse historique conservée" : question.tyashQuestionnaire?.prefill ? " · Préremplissage TYASH" : ""}
             </p>
           </button>
           <div className="flex flex-wrap items-center justify-end gap-3">

@@ -1,5 +1,5 @@
 "use client";
-import { formalizeClientCopy } from "@/lib/client-copy";
+import { formalizeClientCopy, clientOptionAnswerLabel } from "@/lib/client-copy";
 import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
 
@@ -21,7 +21,7 @@ import { isMissingServerAction } from "@/lib/server-action-error";
 import { uploadExerciseImages } from "../upload-exercise-images";
 import BrandPersonaExercise from "./brand-persona-exercise";
 import { getBrandPersonaFields, parseStoredBrandPersonaConfig } from "@/lib/brand-persona";
-import { groupExercisesByGroupId } from "@/lib/exercise-groups";
+import { getClientExerciseGroups } from "@/lib/exercise-groups";
 import { normalizeVisibleContent } from "@/lib/pedagogical-content";
 import {
   parseStoredSpectrumAnswer,
@@ -521,7 +521,7 @@ function shouldShowExerciseExplanation(
 function getAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   displayedQuestion?: string,
-  fallback = "Votre réponse",
+  fallback = "Ta réponse",
 ) {
   const placeholder = exercise.answer_placeholder.trim();
 
@@ -590,7 +590,7 @@ function getFillBlankAnswerPlaceholder(
   exercise: WorkspaceModule["exercises"][number],
   sourceQuestion: string,
   blankIndex: number,
-  fallback = "Votre réponse",
+  fallback = "Ta réponse",
 ) {
   const placeholder = getAnswerPlaceholder(exercise, sourceQuestion, fallback);
   const blankCount = getFillBlankCount(sourceQuestion);
@@ -771,30 +771,7 @@ function getChecklistColumns(exercise: WorkspaceModule["exercises"][number]) {
 }
 
 function getRenderableExerciseGroups(exercises: ModuleExercise[]) {
-  return groupExercisesByGroupId(exercises).flatMap((group) => {
-    if (group.questions.length <= 1) {
-      return [group];
-    }
-
-    const supportsGroupedOpen = group.questions.every(
-      (question) => question.type === "open" || question.type === "group_open",
-    );
-    const supportsGroupedChecklist = group.questions.every(
-      (question) => question.type === "checklist",
-    );
-
-    if (supportsGroupedOpen || supportsGroupedChecklist) {
-      return [group];
-    }
-
-    // Fallback: unsupported mixed groups are rendered as one step per question
-    // so the user never gets a blank exercise screen.
-    return group.questions.map((question, questionIndex) => ({
-      id: `${group.id}-split-${question.id}-${questionIndex}`,
-      position: group.position + questionIndex,
-      questions: [question],
-    }));
-  });
+  return getClientExerciseGroups(exercises);
 }
 
 function buildSubmissionFormData(
@@ -1516,6 +1493,7 @@ export default function ModuleAnswerForm({
     : [];
   const currentQuestionPrompts = currentExercise ? getQuestionPrompts(currentExercise) : [];
   const isMultiQuestionExerciseGroup = currentExerciseQuestions.length > 1;
+  const isTyashPersonalityGroup = isMultiQuestionExerciseGroup && currentExerciseQuestions.every(q => q.tyashQuestionnaire?.keepTogether);
   const isChecklistExerciseGroup =
     isMultiQuestionExerciseGroup &&
     currentExerciseQuestions.every((question) => question.type === "checklist");
@@ -1686,7 +1664,7 @@ export default function ModuleAnswerForm({
           if (!navigator.onLine) {
             result = {
               status: "error",
-              message: "Hors ligne. Vos réponses sont conservées sur cet appareil.",
+              message: "Hors ligne. Tes réponses sont conservées sur cet appareil.",
             };
           } else {
             result = await saveModuleDraft(
@@ -1697,7 +1675,7 @@ export default function ModuleAnswerForm({
           result = {
             status: "error",
             message:
-              "Connexion interrompue. Votre réponse est conservée sur cet appareil et sera synchronisée automatiquement.",
+              "Connexion interrompue. Ta réponse est conservée sur cet appareil et sera synchronisée automatiquement.",
           };
         }
 
@@ -2093,7 +2071,7 @@ export default function ModuleAnswerForm({
                 : syncStatus === "synced"
                   ? "✓ Synchronisé"
                   : syncStatus === "offline"
-                    ? "⚠ Hors ligne — vos réponses sont enregistrées sur cet appareil."
+                    ? "⚠ Hors ligne — tes réponses sont enregistrées sur cet appareil."
                     : "⚠ Erreur de synchronisation"}
         </span>
         {syncStatus === "error" && !needsPageRefresh ? (
@@ -2137,7 +2115,7 @@ export default function ModuleAnswerForm({
               ? isPassiveContentType(currentExercise?.type)
                 ? currentExercise?.type === "popup_message"
                   ? "Inspiration"
-                  : "Pour vous éclairer"
+                  : "Pour t’éclairer"
                 : `Question ${currentAnswerableExerciseIndex + 1} sur ${answerableExerciseGroups.length}`
               : "Aucun exercice dans ce sous-module"}
           </p>
@@ -2160,7 +2138,8 @@ export default function ModuleAnswerForm({
       </div>
 
       <div className="space-y-4">
-        {currentExercise?.completion?.required === false ? <p className="text-sm text-[var(--text-muted)]">Facultatif : vous pouvez continuer sans remplir cet exercice.</p> : null}
+        {currentExerciseQuestions.some(q => module.prefilledQuestionKeys?.includes(q.stableKey ?? "")) ? <p className="rounded-xl border border-[var(--border)] bg-[var(--tyash-subtle)] p-4 text-sm leading-7">TYASH a déjà renseigné quelques informations à partir de tes échanges. Prends un instant pour les vérifier et les ajuster si nécessaire.</p> : null}
+        {currentExercise?.completion?.required === false ? <p className="text-sm text-[var(--text-muted)]">Facultatif : tu peux continuer sans remplir cet exercice.</p> : null}
         {currentSubmodule ? (
           <p className="text-[0.76rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">
             {currentSubmodule.title}
@@ -2231,6 +2210,8 @@ export default function ModuleAnswerForm({
                 }
               />
             ) : null}
+
+            {isTyashPersonalityGroup ? <div className="mt-5 space-y-7">{currentExerciseQuestions.map(question => <fieldset key={question.id} className="space-y-4"><legend className="mb-3 text-base font-semibold leading-7">{question.question}</legend>{question.type === "multiple" ? <div className="grid gap-3 sm:grid-cols-2">{question.options.filter(o => !o.startsWith("__")).map(option => <label key={option} className="flex items-start gap-3 text-sm leading-6"><input type="checkbox" className="mt-1" checked={(answers[question.id] ?? []).includes(option)} onChange={event => setAnswers(current => ({ ...current, [question.id]: event.target.checked ? [...(current[question.id] ?? []), option] : (current[question.id] ?? []).filter(v => v !== option) }))} />{clientOptionAnswerLabel(question, option)}</label>)}{(answers[question.id] ?? []).includes("Autre") ? <input type="text" aria-label="Précise ton autre choix" value={getOtherChoiceText(answers[question.id] ?? [])} onChange={event => setAnswers(current => ({ ...current, [question.id]: setOtherChoiceText(current[question.id] ?? [], "Autre", event.target.value) }))} className="rounded-xl border border-[var(--border)] bg-[var(--input)] p-3 sm:col-span-2" /> : null}</div> : <><textarea aria-label={question.question} rows={4} value={answers[question.id]?.[0] ?? ""} onChange={event => setAnswers(current => ({ ...current, [question.id]: [event.target.value] }))} className="w-full rounded-xl border border-[var(--border)] bg-[var(--input)] p-4" /><ExerciseAiActions exercise={question} state={aiAssistStates[question.id] ?? initialAiAssistState} onSuggest={() => void handleAiAssist(question, "suggest")} onImprove={() => void handleAiAssist(question, "improve")} /></>}</fieldset>)}</div> : null}
 
             {isChecklistExerciseGroup ? (
               <MultiQuestionChecklistExerciseGroup
@@ -2596,7 +2577,7 @@ export default function ModuleAnswerForm({
                                   }
                                   className="mt-1"
                                 />
-                                <span>{formalizeClientCopy(option)}</span>
+                                <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                               </label>
                               {isOtherOption && isChecked ? (
                                 <input
@@ -2625,7 +2606,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précisez votre réponse"
+                                  placeholder="Précise ta réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
@@ -2662,7 +2643,7 @@ export default function ModuleAnswerForm({
                             }
                             className="mt-1"
                           />
-                          <span>{formalizeClientCopy(option)}</span>
+                          <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                         </label>
                         {isOtherOption && isChecked ? (
                           <input
@@ -2678,7 +2659,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précisez votre réponse"
+                            placeholder="Précise ta réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
@@ -2736,7 +2717,7 @@ export default function ModuleAnswerForm({
                                 }))
                               }
                             />
-                            <span>{formalizeClientCopy(option)}</span>
+                            <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                           </label>
                         ))}
                       </div>
@@ -2762,14 +2743,14 @@ export default function ModuleAnswerForm({
                           }))
                         }
                       />
-                      <span>{formalizeClientCopy(option)}</span>
+                      <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                     </label>
                   ))}
                 </div>
               )
             ) : null}
 
-            {currentExercise.type === "multiple" ? (
+            {!isTyashPersonalityGroup && currentExercise.type === "multiple" ? (
               currentQuestionPrompts.length > 0 ? (
                 <div
                   className="mt-4 grid gap-4 md:[grid-template-columns:var(--question-columns)]"
@@ -2838,7 +2819,7 @@ export default function ModuleAnswerForm({
                                   }
                                   className="mt-1"
                                 />
-                                <span>{formalizeClientCopy(option)}</span>
+                                <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                               </label>
                               {isOtherOption && isChecked ? (
                                 <input
@@ -2867,7 +2848,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précisez votre réponse"
+                                  placeholder="Précise ta réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                                 />
                               ) : null}
@@ -2912,7 +2893,7 @@ export default function ModuleAnswerForm({
                             }
                             className="mt-1"
                           />
-                          <span>{formalizeClientCopy(option)}</span>
+                          <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                         </label>
                         {isOtherOption && isChecked ? (
                           <input
@@ -2930,7 +2911,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précisez votre réponse"
+                            placeholder="Précise ta réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
                           />
                         ) : null}
@@ -3573,7 +3554,7 @@ export default function ModuleAnswerForm({
               if (stored) {
                 window.location.reload();
               } else {
-                setRefreshError("Impossible de conserver le brouillon sur cet appareil. Copiez votre réponse avant d’actualiser la page.");
+                setRefreshError("Impossible de conserver le brouillon sur cet appareil. Copie ta réponse avant d’actualiser la page.");
               }
             }}
           >
@@ -3845,7 +3826,7 @@ function ExerciseAiActions({
         <div className="pointer-events-none absolute right-0 top-11 z-20 w-72 translate-y-1 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
           <div className="rounded-[1.1rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-4 shadow-[0_18px_42px_rgba(120,92,56,0.14)]">
             <p className="text-sm leading-6 text-[var(--text-primary)]">
-              L&apos;IA peut proposer une réponse ou retravailler votre texte.
+              L&apos;aide peut t’aider à formuler une réponse à partir des informations que tu as déjà partagées.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -4040,7 +4021,7 @@ function ChecklistExerciseBlocks({
 
             {entries.length === 0 ? (
               <div className="rounded-[1rem] border border-dashed border-[var(--border)] bg-[var(--card)] px-4 py-4 text-sm leading-6 text-[var(--text-muted)]">
-                Ajoutez vos mots ci-dessus pour construire votre checklist.
+                Ajoute tes mots ci-dessus pour construire ta checklist.
               </div>
             ) : null}
 
