@@ -1,7 +1,7 @@
 import "server-only";
 import { createSupabaseServerClient } from "./supabase/server";
 import type { WorkspaceModule } from "./training-types";
-import { tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { tyashRefonteEnabled } from "./tyash-questionnaire";
 
 export type TyashPrefill = { project_id: number; module_key: string; question_key: string; values: string[]; updated_at: string };
 
@@ -17,7 +17,7 @@ export function applyTyashPrefills<T extends Pick<WorkspaceModule, "tyashQuestio
     const answers = { ...module.answers };
     const prefilledQuestionKeys: string[] = [];
     for (const e of module.exercises) {
-      const prefill = prefills.find(p => p.module_key === module.stableKey && p.question_key === e.stableKey);
+      const prefill = prefills.find(p => p.module_key === (e.answerModuleStableKey ?? module.stableKey) && p.question_key === e.stableKey);
       if (!prefill || !e.tyashQuestionnaire?.prefill) continue;
       prefilledQuestionKeys.push(e.stableKey!);
       // A persisted client value, including an explicit empty answer, always wins.

@@ -1,6 +1,6 @@
 import mapping from "@/content/tyash-refonte/question-map.json";
 import { parseStoredSpectrumConfig, getSerializedSpectrumOptions } from "./spectrum";
-import type { ModuleExercise, WorkspaceModule } from "./training-types";
+import type { ModuleExercise } from "./training-types";
 import { informalTyashEditorialCopy } from "./client-copy";
 
 export const TYASH_QUESTIONNAIRE_REVISION = "julien-2026-11-04";
@@ -9,15 +9,8 @@ export const TYASH_REMOVED_IDS = [1003,1006,1007,1009,1020,1021,1023,1024,1026,1
 export const TYASH_MERGES: Record<number, number[]> = { 1083: [1065], 1086: [1087,1088,1089,1090], 1095: [1093], 1097: [1096] };
 const mergedIds = Object.values(TYASH_MERGES).flat();
 
-export type TyashQuestionnaireRule = {
-  status: "active" | "archived" | "merged";
-  prefill?: boolean;
-  displayModuleKey?: string;
-  displaySubmoduleKey?: string;
-  mergeSources?: string[];
-  keepTogether?: boolean;
-};
-
+export { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire";
+import type { TyashQuestionnaireRule } from "./tyash-questionnaire";
 const questions: Record<number, string> = {
   1000: "Que fait ton entreprise ?", 1001: "Quels produits ou services proposes-tu aujourd’hui ?", 1002: "Depuis quand existe-t-elle ?",
   1004: "Y a-t-il un moment qui raconte particulièrement bien ton histoire ?", 1005: "Au fond, pourquoi fais-tu ce que tu fais ?", 1008: "Qu’est-ce que tu fais à ta manière ?",
@@ -69,6 +62,7 @@ export function prepareTyashQuestionnaireRefonte<T extends { stableKey?: string;
         Object.assign(e, { tyashQuestionnaire: rule });
         if (rule.status !== "active") continue;
         if (questions[id]) e.question = questions[id];
+        if (id === 1082) e.options = e.options.filter(o => !["Voix off", "Interviews"].includes(o));
         e.explanation = "";
         e.audio_transcript = e.audio_transcript ? informalTyashEditorialCopy(e.audio_transcript) : null;
         if (e.feedback_config) {
@@ -87,60 +81,4 @@ export function prepareTyashQuestionnaireRefonte<T extends { stableKey?: string;
   return modules;
 }
 
-export function tyashRefonteEnabled(module: { tyashQuestionnaireRevision?: string }) {
-  return module.tyashQuestionnaireRevision === TYASH_QUESTIONNAIRE_REVISION;
-}
-
-type ProjectableModule = Omit<WorkspaceModule, "progress"> & { progress?: WorkspaceModule["progress"]; isManuallyCompleted?: boolean };
-
-// Presentation only: stored IDs, types, parents, positions and all answer rows stay unchanged.
-export function projectTyashQuestionnaire<T extends ProjectableModule>(input: T[]): T[] {
-  if (!input.some(tyashRefonteEnabled)) return input;
-  const originals = new Map(input.flatMap(m => m.exercises.map(e => [e.stableKey!, { m, e }] as const)));
-  return input.map(module => {
-    if (!tyashRefonteEnabled(module)) return module;
-    const answers: Record<number, string[]> = {};
-    const answerVersions: WorkspaceModule["answerVersions"] = {};
-    const submodules = module.submodules.map(submodule => {
-      const exercises = [...originals.values()].flatMap(({ m, e }) => {
-        const rule = e.tyashQuestionnaire ?? { status: "active" };
-        if (rule.status !== "active" || (rule.displayModuleKey ?? m.stableKey) !== module.stableKey || (rule.displaySubmoduleKey ?? m.submodules.find(s => s.id === e.submodule_id)?.stableKey) !== submodule.stableKey) return [];
-        let values = m.answers[e.id] ?? [];
-        const sources = [e.stableKey!, ...(rule.mergeSources ?? [])];
-        // A saved current response (even cleared) wins over archived source answers.
-        if (rule.mergeSources?.length && (!m.answerVersions[e.id] || m.answerVersions[e.id].updatedAt < Date.parse(m.tyashQuestionnairePreparedAt ?? ""))) {
-          values = sources.flatMap(key => {
-            const original = originals.get(key);
-            return original ? (original.m.answers[original.e.id] ?? []).filter(v => v.trim()).map(v => `${original.e.question}\n${v}`) : [];
-          });
-          if (values.length) values = [values.join("\n\n")];
-        }
-        answers[e.id] = values;
-        if (m.answerVersions[e.id]) answerVersions[e.id] = m.answerVersions[e.id];
-        const projected = { ...e, module_id: module.id, submodule_id: submodule.id, answerModuleStableKey: m.stableKey, answerSubmoduleStableKey: m.submodules.find(s => s.id === e.submodule_id)?.stableKey };
-        if (e.question === "Le son") projected.options = e.options.filter(o => !["Voix off", "Interviews"].includes(o));
-        return [projected];
-      });
-      return { ...submodule, exercises };
-    }).filter(s => s.exercises.length);
-    return { ...module, submodules, exercises: submodules.flatMap(s => s.exercises), answers, answerVersions };
-  });
-}
-
 export const tyashPrefillQuestions = mapping.entries.filter(e => TYASH_PREFILL_IDS.includes(e.templateId)).map(e => ({ ...e, label: questions[e.templateId] }));
-
-export function validateTyashQuestionnaireMetadata(modules: Array<{ stableKey?: string; tyashQuestionnaireRevision?: string; submodules: Array<{ stableKey?: string; exercises: Array<{ stableKey?: string; tyashQuestionnaire?: TyashQuestionnaireRule }> }> }>) {
-  if (!modules.some(tyashRefonteEnabled)) return;
-  if (modules.length !== 4 || !modules.every(tyashRefonteEnabled)) throw new Error("La refonte TYASH doit être préparée intégralement dans les quatre modules.");
-  const all = modules.flatMap(m => m.submodules.flatMap(s => s.exercises));
-  const keys = new Set(all.map(e => e.stableKey));
-  for (const e of all) {
-    const rule = e.tyashQuestionnaire;
-    if (!rule) continue; // Newly added Admin questions default to active.
-    if (!["active", "archived", "merged"].includes(rule.status) || rule.mergeSources?.some(k => k === e.stableKey || !keys.has(k))) throw new Error("Métadonnées de questionnaire TYASH invalides.");
-    if (rule.displayModuleKey || rule.displaySubmoduleKey) {
-      const target = modules.find(m => m.stableKey === rule.displayModuleKey);
-      if (!target?.submodules.some(s => s.stableKey === rule.displaySubmoduleKey)) throw new Error("Destination de question TYASH invalide.");
-    }
-  }
-}

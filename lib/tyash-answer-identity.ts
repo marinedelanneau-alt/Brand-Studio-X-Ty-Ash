@@ -12,17 +12,16 @@ export function tyAshBrowserKey(projectId: number, module: { stableKey?: string 
 }
 
 export function resolveTyAshExerciseId(
-  module: { stableKey?: string; exercises: { id: number; stableKey?: string }[] },
+  module: { stableKey?: string; exercises: { id: number; stableKey?: string; answerModuleStableKey?: string }[] },
   answer: { module_key: string; question_key: string },
 ) {
-  if (answer.module_key !== requireTyAshKey(module)) return undefined;
   return module.exercises.find((exercise) =>
-    requireTyAshKey(exercise) === answer.question_key,
+    requireTyAshKey(exercise) === answer.question_key && answer.module_key === (exercise.answerModuleStableKey ?? requireTyAshKey(module)),
   )?.id;
 }
 
 export function encodeTyAshBrowserDraft(
-  module: { stableKey?: string; exercises: { id: number; stableKey?: string }[] },
+  module: { stableKey?: string; exercises: { id: number; stableKey?: string; answerModuleStableKey?: string }[] },
   projectId: number, answers: Record<number, string[]>, pending: number[], updatedAt: number,
 ) {
   return JSON.stringify({
@@ -34,7 +33,7 @@ export function encodeTyAshBrowserDraft(
 
 export function decodeTyAshBrowserDraft(
   value: string | null,
-  module: { stableKey?: string; exercises: { id: number; stableKey?: string }[] }, projectId: number,
+  module: { stableKey?: string; exercises: { id: number; stableKey?: string; answerModuleStableKey?: string }[] }, projectId: number,
 ) {
   if (!value) return null;
   try {

@@ -10,7 +10,7 @@ import { validateReleaseModules } from "./release-content-validation";
 import { getModulesWithExercises, getModuleProgress } from "@/lib/training";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
-import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire";
 import { getTyashPrefills, applyTyashPrefills } from "./tyash-questionnaire-prefill";
 
 export type AdminAnswerView = {
@@ -99,8 +99,8 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
       const prefills = project && modules.some(tyashRefonteEnabled) ? await getTyashPrefills(project.id) : [];
       const clientModules = projectTyashQuestionnaire(applyTyashPrefills(modules.map(m => ({
         ...m,
-        answers: Object.fromEntries(m.exercises.map(e => [e.id, valuesOf(stableForUser.find(a => a.module_key === m.stableKey && a.question_key === e.stableKey)?.answer_value)])),
-        answerVersions: Object.fromEntries(m.exercises.flatMap(e => { const row = stableForUser.find(a => a.module_key === m.stableKey && a.question_key === e.stableKey); return row ? [[e.id, { updatedAt: Date.parse(row.client_updated_at || row.updated_at), revision: 0 }]] : []; })),
+        answers: Object.fromEntries(m.exercises.map(e => [e.id, valuesOf(stableForUser.find(a => a.module_key === (e.answerModuleStableKey ?? m.stableKey) && a.question_key === e.stableKey)?.answer_value)])),
+        answerVersions: Object.fromEntries(m.exercises.flatMap(e => { const row = stableForUser.find(a => a.module_key === (e.answerModuleStableKey ?? m.stableKey) && a.question_key === e.stableKey); return row ? [[e.id, { updatedAt: Date.parse(row.client_updated_at || row.updated_at), revision: 0 }]] : []; })),
       })), prefills));
       const answers: AdminAnswerView[] = [];
       const moduleProgress = clientModules.map((moduleItem) => {

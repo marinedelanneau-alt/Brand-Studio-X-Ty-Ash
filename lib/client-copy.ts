@@ -82,7 +82,7 @@ export function informalTyashEditorialCopy(value: string): string {
 // A selected predefined label can be presented formally without rewriting its
 // saved value. Free-text answers, including identical-looking prose, stay intact.
 export function clientOptionAnswerLabel(exercise: ModuleExercise, value: string): string {
-  if (exercise.tyashQuestionnaire?.status === "active" && exercise.options.includes(value)) return informalTyashEditorialCopy(value);
+  if (exercise.tyashQuestionnaire) return value;
   return exercise.stableKey?.startsWith("tyash_v1_")
     && ["single", "multiple", "boolean", "color"].includes(exercise.type)
     && exercise.options.includes(value)

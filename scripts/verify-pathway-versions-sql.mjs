@@ -160,5 +160,24 @@ try {
   await db.query("select public.mark_content_release_ready($1,'revision')",[revision]);
   await db.query("select public.publish_content_release($1,'revision')",[revision]);
   assert.deepEqual(await userInventory(),before);
-  console.log("PASS: independent draft, identities, admin save, unchanged official pointer/history/answers, simulated publication and clone inheritance; same-pathway unsafe changes rejected.");
+  await db.exec(readFileSync(new URL("../supabase/migrations/20261104180000_tyash_editable_questionnaire.sql", import.meta.url), "utf8"));
+  const editable = await scalar("select public.clone_content_release($1,'Editable revision',false)", [revision]);
+  const moved = structuredClone(edited);
+  moved[0].submodules.push({ id: -4, module_id: -1, stableKey: "tyash_v1_destination", title: "Destination", position: 2, content_html: "", exercises: [] });
+  const movedQuestion = moved[0].submodules[0].exercises.pop();
+  movedQuestion.submodule_id = -4;
+  movedQuestion.answerModuleStableKey = moved[0].stableKey;
+  movedQuestion.answerSubmoduleStableKey = moved[0].submodules[0].stableKey;
+  moved[0].submodules[1].exercises.push(movedQuestion);
+  const editableToken = await scalar("select updated_at::text from public.content_release_snapshots where release_id=$1", [editable]);
+  await db.query("select public.update_current_draft_snapshot_if_unchanged($1,$2,1,$3::jsonb)", [editable, editableToken, JSON.stringify(moved)]);
+  assert.deepEqual(await scalar("select modules from public.content_release_snapshots where release_id=$1", [editable]), moved);
+  const removed = structuredClone(moved); removed[0].submodules[1].exercises = [];
+  await assert.rejects(db.query("update public.content_release_snapshots set modules=$1::jsonb where release_id=$2", [JSON.stringify(removed), editable]), /incompatibles/);
+  const legacyMoved = structuredClone(initialModules); legacyMoved[0].submodules[0].exercises[0].position = 42;
+  await assert.rejects(db.query("select public.assert_pathway_answer_slots($1::jsonb,$2::jsonb)", [JSON.stringify(initialModules), JSON.stringify(legacyMoved)]), /incompatibles/);
+  await db.query("select public.mark_content_release_ready($1,'local simulation only')", [editable]);
+  await db.query("select public.publish_content_release($1,'local simulation only')", [editable]);
+  assert.deepEqual(await userInventory(), before);
+  console.log("PASS: TYASH physical moves saved and published in isolated PostgreSQL; historical identities required, legacy guards unchanged, user data unchanged.");
 } finally { await db.close(); }

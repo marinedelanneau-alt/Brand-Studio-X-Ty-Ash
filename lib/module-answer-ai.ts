@@ -1,6 +1,6 @@
 import "server-only";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
-import { tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { tyashRefonteEnabled } from "./tyash-questionnaire";
 import {
   getFillBlankCount,
   parseChecklistEntries,

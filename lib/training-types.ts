@@ -11,6 +11,7 @@ export type BrandProject = {
 };
 
 export type BrandModule = {
+  archived?: boolean;
   tyashQuestionnaireRevision?: string;
   tyashQuestionnairePreparedAt?: string;
   stableKey?: string;
@@ -37,6 +38,7 @@ export type SubmoduleEditorialIntroduction = {
 };
 
 export type BrandSubmodule = {
+  archived?: boolean;
   editorialIntroduction?: SubmoduleEditorialIntroduction;
   stableKey?: string;
   editorKey?: string;
@@ -53,7 +55,7 @@ export type BrandSubmodule = {
 };
 
 export type ModuleExercise = {
-  tyashQuestionnaire?: import("./tyash-questionnaire-refonte").TyashQuestionnaireRule;
+  tyashQuestionnaire?: import("./tyash-questionnaire").TyashQuestionnaireRule;
   answerModuleStableKey?: string;
   answerSubmoduleStableKey?: string;
   completion?: import("./exercise-completion").CompletionRequirements;

@@ -98,9 +98,9 @@ describe("TYASH questionnaire revision", () => {
     const modules = source(); modules[0].submodules[0].exercises[0].stableKey = "other_product";
     expect(() => prepareTyashQuestionnaireRefonte(modules)).toThrow();
   });
-  it("blocks a partially prepared release and an unknown move destination", () => {
+  it("allows additional modules without a fixed cardinality and rejects an unknown move destination", () => {
     const partial = draft(); delete partial[2].tyashQuestionnaireRevision;
-    expect(() => validateReleaseModules(partial)).toThrow("intégralement");
+    expect(() => validateReleaseModules(partial)).not.toThrow();
     const invalid = draft(); question(invalid, 1105).tyashQuestionnaire!.displaySubmoduleKey = "tyash_v1_missing_submodule";
     expect(() => validateReleaseModules(invalid)).toThrow("Destination");
   });

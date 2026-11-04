@@ -5,7 +5,6 @@ import { getAuthenticatedAdmin } from "@/lib/session";
 import { getAdminWorkingModules } from "@/lib/training";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
 import { unstable_rethrow } from "next/navigation";
-import { prepareTyashRefonteDraft } from "./prepare-tyash-refonte";
 
 export default async function AdminModulesPage({
   searchParams,
@@ -69,7 +68,7 @@ export default async function AdminModulesPage({
           Publie volontairement la version enregistrée pour la rendre visible aux utilisateurs.
         </p>
         <AdminDeploymentButton />
-        <form action={prepareTyashRefonteDraft} className="mt-5 rounded-xl border border-[var(--border)] p-4"><p className="mb-3 text-sm">Refonte TYASH : 54 questions actives, dont 6 préremplies. Les 52 questions retirées ou fusionnées restent archivées. Cette préparation ne publie rien.</p><button className="rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-bold">Préparer la refonte en brouillon</button></form>
+        <a href="/admin/modules/archives" className="mt-4 block underline">Archives du questionnaire et restauration</a>
         <a href="/admin/releases" className="mt-4 inline-block text-sm underline">
           Versions, aperçu et déploiements programmés
         </a>

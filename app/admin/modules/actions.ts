@@ -24,6 +24,7 @@ import { getAuthenticatedAdmin } from "@/lib/session";
 import { publishCurrentAdminRelease } from "@/lib/admin-content-release";
 
 type EditorExercise = {
+  tyashQuestionnaire?: import("@/lib/training-types").ModuleExercise["tyashQuestionnaire"];
   completion?: import("@/lib/exercise-completion").CompletionRequirements;
   clientId: string;
   type: ExerciseType;
@@ -86,7 +87,7 @@ export async function publishFinalVersionForAllUsers() {
 
 type ExistingExercises = Map<string, { type: ExerciseType; options: string[] }>;
 
-function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercises = new Map()) {
+function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercises = new Map()): EditorExercise {
   const item = rawQuestion as Partial<EditorExercise>;
     const clientId =
       typeof item.clientId === "string" && item.clientId.trim()
@@ -149,7 +150,7 @@ function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercise
     const existingExercise = existingExercises.get(clientId);
     const existingChoices = existingExercise ? resolveStoredExerciseOptions(existingExercise.type, existingExercise.options).map(value => value.trim()) : [];
     const preservesExistingSparseChoices = existingExercise?.type === type && existingChoices.length < 2 && JSON.stringify(existingChoices) === JSON.stringify(normalizedOptions);
-    if (type !== "open" && normalizedOptions.length < 2 && !preservesExistingSparseChoices) {
+    if (type !== "open" && !(type === "multiple" && normalizedOptions.length === 1) && normalizedOptions.length < 2 && !preservesExistingSparseChoices) {
       if (
         type !== "static_text" &&
         type !== "popup_message" &&
@@ -172,6 +173,7 @@ function parseQuestion(rawQuestion: unknown, existingExercises: ExistingExercise
 
     return {
       clientId,
+      ...(item.tyashQuestionnaire ? { tyashQuestionnaire: { status: "active" as const, prefill: item.tyashQuestionnaire.prefill === true, keepTogether: item.tyashQuestionnaire.keepTogether === true } } : {}),
       ...(item.completion !== undefined ? { completion: item.completion as import("@/lib/exercise-completion").CompletionRequirements } : {}),
       type,
       explanation,

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ reader: vi.fn(), project: vi.fn(), upsert: vi.fn(), revalidate: vi.fn(), createProject: vi.fn() }));
+vi.mock("@/lib/content-releases", () => ({ getApplicationReleaseState: async () => ({ current_draft_release_id: "draft" }), getContentReleaseSnapshot: async () => ({ modules: [{ stableKey: "tyash_v1_module", submodules: [{ exercises: tyashPrefillQuestions.map(q => ({ ...q, question: q.label, tyashQuestionnaire: { status: "active", prefill: true } })) }] }] }) }));
 vi.mock("@/lib/session", () => ({ getAuthenticatedClientReader: mocks.reader }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidate }));
 vi.mock("@/lib/training", () => ({ createProjectForAccount: mocks.createProject }));
@@ -13,7 +14,7 @@ beforeEach(() => {
   mocks.upsert.mockResolvedValue({ error: null });
 });
 afterEach(() => vi.unstubAllEnvs());
-const form = () => { const f = new FormData(); f.set("accountId", "20"); f.set("projectId", "999"); for (const q of tyashPrefillQuestions) f.set(q.stableKey, "Préparé par TYASH"); return f; };
+const form = () => { const f = new FormData(); f.set("accountId", "20"); f.set("projectId", "999"); for (const q of tyashPrefillQuestions) { f.set(`present:${q.stableKey}`, "1"); f.set(q.stableKey, "Préparé par TYASH"); } return f; };
 describe("TYASH prefill security", () => {
   it("limits the existing client reader to six baseline fields in the server-resolved project, never user_answers", async () => {
     const result = await saveTyashQuestionnairePrefill({ message: "" }, form());

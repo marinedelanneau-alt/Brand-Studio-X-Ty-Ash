@@ -1,8 +1,9 @@
+import { activeQuestionnaire, retainQuestionnaireHistory, sameAnswerLayout } from "./questionnaire-admin";
 import { isTyAshContent, requireTyAshKey, resolveTyAshExerciseId } from "./tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "./exercise-completion";
 import "server-only";
 import { withFormalClientCopy } from "./client-copy";
-import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire";
 import { getTyashPrefills, applyTyashPrefills } from "./tyash-questionnaire-prefill";
 import { getAdminReleaseWorkspace, saveAdminReleaseModules } from "@/lib/admin-content-release";
 import { validateReleaseModules } from "@/lib/release-content-validation";
@@ -1150,7 +1151,51 @@ async function getAdminDraftBase(_accountId: number) {
 }
 
 export async function getAdminWorkingModules(accountId: number) {
+  return activeQuestionnaire((await getAdminDraftBase(accountId)).modules);
+}
+
+export async function getAdminQuestionnaireArchives(accountId: number) {
   return (await getAdminDraftBase(accountId)).modules;
+}
+
+export async function updateAdminQuestionnaireStructure(accountId: number, input: {
+  moduleId: number; submoduleId?: number; questionId?: number; restore?: boolean;
+  targetSubmoduleId?: number; expectedRevision: string;
+}) {
+  const { modules, updatedAt } = await getAdminDraftBase(accountId);
+  const sourceModule = modules.find(m => m.id === input.moduleId);
+  if (!sourceModule || !isTyAshContent(sourceModule) || (sourceModule.editorRevision ?? sourceModule.updated_at ?? "initial") !== input.expectedRevision) throw new Error("Le brouillon a changé. Rechargez cette page.");
+  if (input.targetSubmoduleId !== undefined && input.questionId !== undefined) {
+    const source = sourceModule.submodules.find(s => s.exercises.some(e => e.id === input.questionId));
+    const targetModule = modules.find(m => m.submodules.some(s => s.id === input.targetSubmoduleId && !s.archived) && !m.archived);
+    const target = targetModule?.submodules.find(s => s.id === input.targetSubmoduleId);
+    if (!source || !target || !targetModule) throw new Error("Destination introuvable.");
+    const question = source.exercises.find(e => e.id === input.questionId)!;
+    source.exercises = source.exercises.filter(e => e.id !== question.id);
+    target.exercises.push({ ...question, module_id: targetModule.id, submodule_id: target.id, answerModuleStableKey: question.answerModuleStableKey ?? sourceModule.stableKey, answerSubmoduleStableKey: question.answerSubmoduleStableKey ?? source.stableKey });
+    targetModule.editorRevision = crypto.randomUUID();
+  } else if (input.questionId !== undefined) {
+    const submodule = sourceModule.submodules.find(s => s.exercises.some(e => e.id === input.questionId));
+    const question = submodule?.exercises.find(e => e.id === input.questionId);
+    if (!question || !submodule) throw new Error("Question introuvable.");
+    question.tyashQuestionnaire = { ...question.tyashQuestionnaire, status: "active" };
+    // Restoring a merged source removes it from the target to avoid duplicate synthesis.
+    for (const m of modules) for (const s of m.submodules) for (const e of s.exercises) if (e.tyashQuestionnaire?.mergeSources) e.tyashQuestionnaire.mergeSources = e.tyashQuestionnaire.mergeSources.filter(k => k !== question.stableKey);
+    sourceModule.archived = false;
+    submodule.archived = false;
+  } else if (input.submoduleId !== undefined) {
+    const submodule = sourceModule.submodules.find(s => s.id === input.submoduleId);
+    if (!submodule) throw new Error("Sous-sourceModule introuvable.");
+    submodule.archived = false;
+    sourceModule.archived = false;
+  } else sourceModule.archived = false;
+  sourceModule.editorRevision = crypto.randomUUID();
+  for (const m of modules) {
+    let position = 1;
+    m.submodules.forEach((s, i) => { s.position = i + 1; s.exercises = s.exercises.map(e => ({ ...e, position: position++ })); });
+    m.exercises = m.submodules.flatMap(s => s.exercises);
+  }
+  await saveAdminReleaseModules(modules, updatedAt);
 }
 
 function buildDraftModuleFromDefinition(
@@ -1172,6 +1217,7 @@ function buildDraftModuleFromDefinition(
         questions: Array<{
           clientId?: string;
           completion?: import("./exercise-completion").CompletionRequirements;
+          tyashQuestionnaire?: ModuleExercise["tyashQuestionnaire"];
           type: ExerciseType;
           explanation: string;
           answerPlaceholder: string;
@@ -1209,17 +1255,23 @@ function buildDraftModuleFromDefinition(
     const questions = submodule.exerciseGroups.flatMap((group) =>
       group.questions.map((question) => {
         const requestedExerciseId = Number(question.clientId);
-        const existingExercise =
+        const existingExercise = existingExercises.find(item =>
+          (!item.tyashQuestionnaire || item.tyashQuestionnaire.status === "active") &&
+          (item.id === requestedExerciseId || item.editorKey === question.clientId)) ??
           (Number.isFinite(requestedExerciseId)
             ? existingExercises.find((item) => item.id === requestedExerciseId)
             : undefined) ??
           existingExercises.find((item) => item.editorKey === question.clientId);
-        const exerciseId = existingExercise?.id ?? nextIdentityId--;
+        const compatibleExercise = existingExercise && sameAnswerLayout(existingExercise, question) ? existingExercise : undefined;
+        const exerciseId = compatibleExercise?.id ?? nextIdentityId--;
 
         return {
-          ...existingExercise,
-          stableKey: existingExercise?.stableKey ?? `tyash_v1_question_${crypto.randomUUID()}`,
-          editorKey: existingExercise?.editorKey ?? question.clientId,
+          ...compatibleExercise,
+          tyashQuestionnaire: question.tyashQuestionnaire ? { ...compatibleExercise?.tyashQuestionnaire, ...question.tyashQuestionnaire } : compatibleExercise?.tyashQuestionnaire,
+          answerModuleStableKey: compatibleExercise?.answerModuleStableKey ?? existingModule?.stableKey,
+          answerSubmoduleStableKey: compatibleExercise?.answerSubmoduleStableKey ?? existingModule?.submodules.find(s => s.id === compatibleExercise?.submodule_id)?.stableKey,
+          stableKey: compatibleExercise?.stableKey ?? `tyash_v1_question_${crypto.randomUUID()}`,
+          editorKey: question.clientId,
           id: exerciseId,
           module_id: moduleId,
           submodule_id: submoduleId,
@@ -1253,6 +1305,7 @@ function buildDraftModuleFromDefinition(
       audio_url: submodule.audioUrl || null,
       audio_transcript: submodule.audioTranscript || null,
       content_html: submodule.contentHtml,
+      editorialIntroduction: undefined,
       created_at: existingSubmodule?.created_at ?? now,
       updated_at: now,
       exercises: questions,
@@ -1301,8 +1354,8 @@ export async function saveAdminModuleDefinitionDraft(
       0,
     );
     if (
-      input.submodules.length < existingModule.submodules.length ||
-      submittedExerciseCount < existingModule.exercises.length
+      input.submodules.length < activeQuestionnaire([existingModule])[0].submodules.length ||
+      submittedExerciseCount < activeQuestionnaire([existingModule])[0].exercises.length
     ) {
       throw new Error(
         "Sauvegarde automatique interrompue : le contenu reçu est incomplet. Utilisez Enregistrer pour confirmer une suppression volontaire.",
@@ -1312,7 +1365,9 @@ export async function saveAdminModuleDefinitionDraft(
   if (input.moduleId && !existingModule) throw new Error("Module périmé : rechargez l'éditeur.");
   const history = existingModule && !isTyAshContent(existingModule) ? [] : await getRetainedPathwaySnapshots();
   const reserved = history.flatMap(h => h.modules.length ? validateReleaseModules(h.modules) : []) as unknown as DraftModule[];
-  const nextModule = buildDraftModuleFromDefinition(input, existingModule, [...modules, ...reserved]);
+  let nextModule = buildDraftModuleFromDefinition(input, existingModule, [...modules, ...reserved]);
+  if (existingModule && isTyAshContent(existingModule)) nextModule = retainQuestionnaireHistory(existingModule, nextModule);
+  if (!existingModule && modules.some(tyashRefonteEnabled)) nextModule.tyashQuestionnaireRevision = modules.find(tyashRefonteEnabled)!.tyashQuestionnaireRevision;
   const nextModules = existingModule
     ? reorderDraftModules(modules, nextModule)
     : reorderDraftModules([...modules, nextModule], nextModule);
@@ -1325,7 +1380,7 @@ export async function saveAdminModuleDefinitionDraft(
 export async function deleteAdminModuleDefinitionDraft(accountId: number, moduleId: number) {
   const { modules, updatedAt } = await getAdminDraftBase(accountId);
 
-  await saveAdminReleaseModules(modules.filter((module) => module.id !== moduleId), updatedAt);
+  await saveAdminReleaseModules(normalizeDraftModules(modules.map(module => module.id === moduleId && isTyAshContent(module) ? { ...module, archived: true } : module).filter(module => module.id !== moduleId || isTyAshContent(module)).sort((a,b) => Number(!!a.archived)-Number(!!b.archived))), updatedAt);
 }
 
 export async function saveAdminVoiceNoteToDraft(input: {
@@ -1547,7 +1602,7 @@ export async function getWorkspaceData(accountId: number) {
     const stableModuleAnswers = stableAnswers
       .filter(
         (item) =>
-          strictIdentity ? item.module_key === requireTyAshKey(module) : (item.module_key === `module_position_${module.position}` ||
+          strictIdentity ? resolveTyAshExerciseId(module, item) !== undefined : (item.module_key === `module_position_${module.position}` ||
           item.module_key === `module_${module.id}`),
       )
       .sort((left, right) =>
@@ -1916,6 +1971,7 @@ export async function saveModuleDefinition(input: {
       questions: Array<{
         clientId?: string;
         completion?: import("./exercise-completion").CompletionRequirements;
+          tyashQuestionnaire?: ModuleExercise["tyashQuestionnaire"];
         type: ExerciseType;
         explanation: string;
         answerPlaceholder: string;

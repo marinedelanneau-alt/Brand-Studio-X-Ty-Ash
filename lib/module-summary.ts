@@ -19,7 +19,7 @@ import { toPlainText } from "@/lib/plain-text";
 import type { WorkspaceModule } from "@/lib/training-types";
 import { clientOptionAnswerLabel } from "./client-copy";
 import { parseStoredSpectrumAnswer } from "./spectrum";
-import { tyashRefonteEnabled } from "./tyash-questionnaire-refonte";
+import { tyashRefonteEnabled } from "./tyash-questionnaire";
 
 export type ModuleSummaryHighlight = {
   label: string;

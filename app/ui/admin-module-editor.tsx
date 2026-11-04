@@ -513,6 +513,7 @@ function serializeQuestion(question: EditorQuestion) {
 
   return {
     clientId: question.id,
+    tyashQuestionnaire: question.tyashQuestionnaire,
     completion: question.completion,
     type: question.type,
     explanation: question.explanation.trim(),
@@ -936,6 +937,8 @@ function QuestionCard({
             </p>
           </button>
           <div className="flex flex-wrap items-center justify-end gap-3">
+            <label className="text-xs"><input type="checkbox" checked={question.tyashQuestionnaire?.prefill === true} onChange={event => onChange(current => ({ ...current, tyashQuestionnaire: { ...current.tyashQuestionnaire, status: "active", prefill: event.target.checked } }))} /> Preremplissage TYASH</label>
+            <label className="text-xs"><input type="checkbox" checked={question.tyashQuestionnaire?.keepTogether === true} onChange={event => onChange(current => ({ ...current, tyashQuestionnaire: { ...current.tyashQuestionnaire, status: "active", keepTogether: event.target.checked } }))} /> Conserver le groupe sur un ecran</label>
             <PositionControl
               label="Position"
               value={questionIndex}

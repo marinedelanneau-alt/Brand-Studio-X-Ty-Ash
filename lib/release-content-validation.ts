@@ -1,8 +1,9 @@
+import { sameAnswerLayout } from "./questionnaire-admin";
 import { validateCompletionRequirements, type CompletionRequirements } from "./exercise-completion";
 import { hydrateReleaseSnapshotModules } from "./content-release-diff";
 import { getFillBlankCount, parseStoredExerciseQuestionConfig, parseStoredTableConfig, type ExerciseType } from "./exercise-types";
 import contract from "./pathway-snapshot.schema.json";
-import { validateTyashQuestionnaireMetadata } from "./tyash-questionnaire-refonte";
+import { validateTyashQuestionnaireMetadata } from "./tyash-questionnaire";
 
 type Entity = { id: number; stableKey?: string; position: number };
 type Exercise = Entity & { completion?: CompletionRequirements; type: ExerciseType; question: string; options: string[]; module_id: number; submodule_id: number };
@@ -87,6 +88,16 @@ export function validateReleaseModules(value: unknown): Module[] {
 export function assertReleaseAnswerCompatibility(published: unknown[], draft: unknown[]) {
   const previous = validateReleaseModules(published);
   const next = validateReleaseModules(draft);
+  if (previous.every(m => m.stableKey?.startsWith("tyash_v1_")) && next.every(m => m.stableKey?.startsWith("tyash_v1_"))) {
+    const entities = next.flatMap(m => [m, ...m.submodules, ...m.exercises]);
+    for (const old of previous.flatMap(m => [m, ...m.submodules, ...m.exercises])) {
+      const candidate = entities.find(e => e.stableKey === old.stableKey);
+      if (!candidate || candidate.id !== old.id || ("type" in old && (!("type" in candidate) || !sameAnswerLayout(old as Exercise, candidate as Exercise)))) {
+        throw new Error("Conservez la définition historique archivée avant de changer son identité ou son format de réponse.");
+      }
+    }
+    return;
+  }
   const fail = () => {
     throw new Error("Modification bloquée pour conserver les réponses et la progression : ne supprimez, ne déplacez et ne changez pas le type d'une question existante. Ajoutez les nouveaux éléments en fin de liste, sans déplacer les éléments publiés.");
   };
