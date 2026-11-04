@@ -166,6 +166,7 @@ export default function ModuleSubmoduleViewer({
     ? isColorPaletteSubmodule(currentSubmodule)
     : false;
   const showBrandVideoIntroduction = currentSubmodule?.stableKey?.startsWith("tyash_v1_")
+    && currentSubmodule.editorialIntroduction?.layout !== "brand_video"
     && currentIndex === 0
     && normalizeForSearch(currentSubmodule.title).includes("histoire");
 
