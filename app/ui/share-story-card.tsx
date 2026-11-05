@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import { TYASH_PAPER_STYLE, usesTyashPaper } from "@/lib/tyash-paper";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
 
 function formatDate(value: string) {
@@ -18,6 +19,7 @@ type ShareStoryCardProps = {
 
 const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
   function ShareStoryCard({ data, showBrandName }, ref) {
+    const tyashPaper = usesTyashPaper();
     const title = showBrandName ? data.brandName : "Une marque en construction";
     const keywordLine = data.keywords.slice(0, 4).join(" / ");
     const titleClassName =
@@ -40,10 +42,11 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
         ref={ref}
         aria-label="Apercu story Brand Studio"
         className="bs-export-surface relative flex aspect-[9/16] w-full max-w-[22rem] flex-col overflow-hidden rounded-[1.35rem] border border-[var(--border)] p-6 text-[var(--heading-color)] shadow-[0_26px_60px_rgba(89,70,54,0.14)]"
-        style={{
+        style={tyashPaper ? TYASH_PAPER_STYLE : {
           background: `linear-gradient(180deg, ${data.themeColors.surface} 0%, var(--tyash-subtle) 58%, ${data.themeColors.background} 100%)`,
         }}
       >
+        {!tyashPaper ? <>
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-[0.32]"
@@ -61,6 +64,8 @@ const ShareStoryCard = forwardRef<HTMLElement, ShareStoryCardProps>(
           aria-hidden="true"
           className="absolute -left-16 bottom-24 h-40 w-40 rounded-full bg-[var(--tyash-primary)]/10 blur-3xl"
         />
+
+        </> : null}
 
         <div className="relative flex items-center justify-between gap-3">
           <span className="rounded-full border border-[var(--surface-highlight)]/80 bg-[var(--card)]/75 px-3.5 py-2 text-[0.54rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">

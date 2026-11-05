@@ -9,6 +9,7 @@ import type { GeneratedBrandGuide } from "@/lib/brand-guide";
 import { TYASH_NOTEBOOK_TAGLINE } from "@/lib/tyash-project-notebook";
 import type { NotebookAnswer } from "@/lib/tyash-module-notebook-data";
 import SummaryAnswerTable from "./summary-answer-table";
+import { TYASH_PAPER_STYLE } from "@/lib/tyash-paper";
 
 const display = localFont({ src: "../../public/fonts/tyash-archivo-display.ttf", weight: "900", display: "swap" });
 const editorial = localFont({ src: "../../public/fonts/tyash-instrument-serif-italic.ttf", weight: "400", style: "italic", display: "swap" });
@@ -54,7 +55,7 @@ export default function TyashProjectNotebookLayout({ guide, latestGeneratedAt, r
     } catch { setMessage("Le téléchargement a échoué. Veuillez réessayer."); }
     finally { setDownloading(false); }
   }
-  return <main className="min-h-screen bg-[#F4F0DF] px-4 py-8 text-[#111110] sm:px-6" style={{ backgroundImage: "linear-gradient(#E5DFC966 1px, transparent 1px), linear-gradient(90deg, #E5DFC966 1px, transparent 1px)", backgroundSize: "23px 23px" }}>
+  return <main className="min-h-screen px-4 py-8 text-[#111110] sm:px-6" style={TYASH_PAPER_STYLE}>
     <div className="mx-auto max-w-5xl">
       <nav className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="Actions du carnet">
         <Link href={backHref} className={button}>{backLabel}</Link>

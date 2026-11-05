@@ -6,12 +6,14 @@ import type { WorkspaceModule } from "./training-types";
 import { buildBrandStudioNotebookData } from "./brand-studio-notebook-data";
 import { notebookText, type NotebookAnswer } from "./tyash-module-notebook-data";
 import { TYASH_NOTEBOOK_TAGLINE } from "./tyash-project-notebook";
+import { TYASH_PAPER } from "./tyash-paper";
+import { TyashPaperGrid } from "./tyash-paper-pdf";
 
 // Brand Studio owns its configuration. TYASH's generator and configuration are
 // intentionally untouched; both documents reuse the exact existing font files.
 export const BRAND_STUDIO_NOTEBOOK = {
   name: "BRAND STUDIO", title: "TON CARNET DE PROJET",
-  paper: "#F4F0DF", grid: "#E5DFC9", ink: "#111110", accent: "#991D25",
+  paper: TYASH_PAPER.background, grid: "#E5DFC9", ink: "#111110", accent: "#991D25",
   body: "#34332D", muted: "#746F62", line: "#C9C2AF",
 };
 const C = BRAND_STUDIO_NOTEBOOK;
@@ -42,10 +44,7 @@ const textProps = { hyphenationCallback: hyphenation };
 function Furniture({ name, section, tyash = false }: { name: string; section: string; tyash?: boolean }) {
   const footerLabel = (value: string, limit: number) => value.length > limit ? `${value.slice(0, limit - 1)}…` : value;
   return <>
-    <Svg fixed width={596} height={842} style={{ position: "absolute", left: 0, top: 0 }}>
-      {Array.from({ length: 27 }, (_, i) => <Line key={`v${i}`} x1={i * 23} y1={0} x2={i * 23} y2={842} stroke={C.grid} strokeWidth={0.35} opacity={0.5} />)}
-      {Array.from({ length: 38 }, (_, i) => <Line key={`h${i}`} x1={0} y1={i * 23} x2={596} y2={i * 23} stroke={C.grid} strokeWidth={0.35} opacity={0.5} />)}
-    </Svg>
+    <TyashPaperGrid />
     <View fixed style={S.header}><Text style={S.micro}>{tyash ? "BRAND STUDIO × TYASH" : C.name}</Text><Text style={[S.micro, { color: C.accent }]}>CARNET DE PROJET</Text></View>
     <View fixed style={S.footer}>
       <Text {...textProps} style={{ maxWidth: 405 }}>{footerLabel(notebookText(name), 44)} / {footerLabel(notebookText(section), 66)}</Text>

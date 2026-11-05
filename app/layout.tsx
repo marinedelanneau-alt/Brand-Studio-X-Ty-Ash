@@ -10,6 +10,7 @@ import PreviewAccessDenied from "./ui/preview-access-denied";
 import ThemeToggle from "./ui/theme-toggle";
 import LegalFooter from "./ui/legal-footer";
 import { isLegalReleaseEnabled } from "@/lib/legal-release";
+import { TYASH_PAPER_VARIABLES, usesTyashPaper } from "@/lib/tyash-paper";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -60,7 +61,8 @@ export default async function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} ${satisfy.variable} ${moreSugar.variable} h-full antialiased`}
+      className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} ${satisfy.variable} ${moreSugar.variable} h-full antialiased ${usesTyashPaper() ? "tyash-grid-theme" : ""}`}
+      style={usesTyashPaper() ? TYASH_PAPER_VARIABLES : undefined}
     >
       <head>
         <script

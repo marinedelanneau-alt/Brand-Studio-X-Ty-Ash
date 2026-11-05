@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import { TYASH_PAPER_STYLE, usesTyashPaper } from "@/lib/tyash-paper";
 
 export type PersonaStorySummary = {
   firstName: string;
@@ -14,6 +15,7 @@ export type PersonaStorySummary = {
 
 const PersonaStoryCard = forwardRef<HTMLElement, { summary: PersonaStorySummary }>(
   function PersonaStoryCard({ summary }, ref) {
+    const tyashPaper = usesTyashPaper();
     const items = [
       ["Profil", summary.profile],
       ["Personnalité", [summary.traits, summary.tone].filter(Boolean).join(" • ")],
@@ -24,10 +26,13 @@ const PersonaStoryCard = forwardRef<HTMLElement, { summary: PersonaStorySummary 
       <article
         ref={ref}
         aria-label="Fiche persona au format story"
+        style={tyashPaper ? TYASH_PAPER_STYLE : undefined}
         className="bs-export-surface relative flex aspect-[9/16] w-full max-w-[22rem] flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[linear-gradient(160deg,var(--surface)_0%,var(--tyash-subtle)_58%,var(--tyash-soft)_100%)] p-4 text-[var(--heading-color)] shadow-[0_24px_60px_rgba(89,70,54,0.16)] sm:p-5"
       >
+        {!tyashPaper ? <>
         <div aria-hidden="true" className="absolute inset-0 opacity-30" style={{ backgroundImage: "linear-gradient(#eadfca 1px,transparent 1px),linear-gradient(90deg,#eadfca 1px,transparent 1px)", backgroundSize: "30px 30px" }} />
         <div aria-hidden="true" className="absolute -right-16 top-20 size-44 rounded-full bg-[var(--tyash-medium)]/35 blur-3xl" />
+        </> : null}
         <header className="relative flex items-center justify-between">
           <span className="rounded-full bg-[var(--card)]/80 px-3 py-2 text-[0.55rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-label-text)]">Brand Studio</span>
           <span className="text-[0.56rem] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">Persona de marque</span>

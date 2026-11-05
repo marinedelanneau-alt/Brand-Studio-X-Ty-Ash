@@ -1,5 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { PersonaCv } from "@/lib/persona-summary";
+import { TYASH_PAPER, usesTyashPaper } from "./tyash-paper";
+import { TyashPaperGrid } from "./tyash-paper-pdf";
 
 const styles = StyleSheet.create({
   page: { padding: 42, backgroundColor: "#fffaf2", color: "#403845", fontFamily: "Helvetica" },
@@ -22,7 +24,8 @@ const styles = StyleSheet.create({
 export function PersonaPdf({ persona, projectName }: { persona: PersonaCv; projectName: string }) {
   const highlights = [["Profil", persona.profile], ["Traits dominants", persona.traits], ["Ton de voix", persona.tone], ["Valeurs incarnées", persona.values], ["Manière d'interagir", persona.interactions]].filter(([, value]) => value);
   return <Document title={`Fiche persona - ${persona.firstName || projectName}`}>
-    <Page size="A4" style={styles.page} wrap>
+    <Page size="A4" style={[styles.page, usesTyashPaper() ? { backgroundColor: TYASH_PAPER.background } : {}]} wrap>
+      {usesTyashPaper() ? <TyashPaperGrid /> : null}
       <Text style={styles.eyebrow}>Brand Studio • Fiche persona complète</Text>
       <Text style={styles.title}>{persona.firstName || "Persona de marque"}</Text>
       <Text style={styles.subtitle}>{projectName} — Le CV de la personnalité de marque</Text>

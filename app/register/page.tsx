@@ -1,3 +1,4 @@
+import AccessPageBackground from "@/app/ui/access-page-background";
 import Image from "next/image";
 import Link from "next/link";
 import RegisterForm from "../ui/register-form";
@@ -29,8 +30,7 @@ export default async function RegisterPage({
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(184,171,152,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(184,171,152,0.18)_1px,transparent_1px)] [background-size:34px_34px]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgb(var(--tyash-glow-rgb)/0.24),transparent_20%),radial-gradient(circle_at_88%_18%,rgba(219,232,216,0.45),transparent_20%),radial-gradient(circle_at_78%_84%,rgb(var(--tyash-glow-rgb)/0.18),transparent_22%)]" />
+      <AccessPageBackground />
 
       <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-5">
         <div className="relative overflow-hidden rounded-[2.6rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] px-7 py-7 shadow-[0_26px_80px_rgba(210,189,152,0.18)] sm:px-10 sm:py-10">

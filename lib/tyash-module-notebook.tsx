@@ -5,13 +5,15 @@ import type { WorkspaceModule } from "./training-types";
 import type { ModuleShareData } from "./get-module-share-data";
 import type { ModuleSummaryCard } from "./module-summary";
 import { buildTyashNotebookData, notebookText, type NotebookAnswer } from "./tyash-module-notebook-data";
+import { TYASH_PAPER } from "./tyash-paper";
+import { TyashPaperGrid } from "./tyash-paper-pdf";
 
 const font = (name: string) => path.join(process.cwd(), "public", "fonts", name);
 Font.register({ family: "TyashDisplay", src: font("tyash-archivo-display.ttf") });
 Font.register({ family: "TyashEditorial", src: font("tyash-instrument-serif-italic.ttf"), fontStyle: "italic" });
 Font.register({ family: "TyashBody", fonts: [{ src: font("inter-400.woff"), fontWeight: 400 }, { src: font("inter-600.woff"), fontWeight: 600 }] });
 
-const C = { paper: "#F4F0DF", grid: "#E5DFC9", ink: "#111110", accent: "#991D25", body: "#34332D", muted: "#746F62", line: "#C9C2AF" };
+const C = { paper: TYASH_PAPER.background, grid: "#E5DFC9", ink: "#111110", accent: "#991D25", body: "#34332D", muted: "#746F62", line: "#C9C2AF" };
 function Text(props: ComponentProps<typeof PdfText>) {
   return <PdfText hyphenationCallback={word => word.length > 40 ? word.match(/.{1,20}/gu) ?? [word] : [word]} {...props} />;
 }
@@ -38,16 +40,9 @@ const S = StyleSheet.create({
   conclusionRow: { flexDirection: "row", justifyContent: "space-between", borderBottomWidth: 0.5, borderBottomColor: C.line, paddingVertical: 13 },
 });
 
-function PaperGrid() {
-  return <Svg fixed width={596} height={842} style={{ position: "absolute", top: 0, left: 0 }}>
-    {Array.from({ length: 27 }, (_, i) => <Line key={`v${i}`} x1={i * 23} y1={0} x2={i * 23} y2={842} stroke={C.grid} strokeWidth={0.35} opacity={0.5} />)}
-    {Array.from({ length: 38 }, (_, i) => <Line key={`h${i}`} x1={0} y1={i * 23} x2={596} y2={i * 23} stroke={C.grid} strokeWidth={0.35} opacity={0.5} />)}
-  </Svg>;
-}
-
 function Furniture({ shareData }: { shareData: ModuleShareData }) {
   return <>
-    <PaperGrid />
+    <TyashPaperGrid />
     <View fixed style={S.header}><Text style={S.micro}>BRAND STUDIO × TYASH</Text><Text style={[S.micro, { color: C.accent }]}>CARNET DE PROJET</Text></View>
     <View fixed style={S.footer}><Text style={{ maxWidth: 410 }}>{notebookText(shareData.brandName)}  /  {notebookText(shareData.moduleTitle)}</Text><Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} /></View>
   </>;
