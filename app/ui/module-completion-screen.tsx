@@ -1,6 +1,7 @@
 "use client";
 
 import { projectDocumentCopy } from "@/lib/project-document-copy";
+import { isTyAshContent } from "@/lib/tyash-answer-identity";
 
 import Link from "next/link";
 import SummaryAnswerTable from "@/app/ui/summary-answer-table";
@@ -469,6 +470,7 @@ export default function ModuleCompletionScreen({
   hideAnswerSummaries?: boolean;
 }) {
   const router = useRouter();
+  const useSubmoduleSummary = isTyAshContent(module);
   const storyRef = useRef<HTMLElement | null>(null);
   const [showBrandName, setShowBrandName] = useState(true);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -600,7 +602,12 @@ export default function ModuleCompletionScreen({
   return (
     <section id="resume-module" className="mt-10 space-y-7">
       <CompletionHero summary={summary} shareData={shareData} />
-      {!isActivationModule ? (
+      {useSubmoduleSummary ? (
+        <ModuleDetailAccordion
+          summary={summary}
+          onAdjustAnswer={setAdjustedExerciseId}
+        />
+      ) : !isActivationModule ? (
         <ModuleKeyTakeaways summary={summary} modulePosition={modulePosition} />
       ) : null}
       <StorySharePreview
@@ -611,10 +618,12 @@ export default function ModuleCompletionScreen({
         onShareStory={() => void shareStory()}
         onShowBrandNameChange={setShowBrandName}
       />
-      <ModuleDetailAccordion
-        summary={summary}
-        onAdjustAnswer={setAdjustedExerciseId}
-      />
+      {!useSubmoduleSummary ? (
+        <ModuleDetailAccordion
+          summary={summary}
+          onAdjustAnswer={setAdjustedExerciseId}
+        />
+      ) : null}
       <CompletionActions
         pdfHref={pdfHref}
         editHref={editHref}
