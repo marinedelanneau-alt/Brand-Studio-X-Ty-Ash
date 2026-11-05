@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
 import { createBrandGuideData, hasMeaningfulContent, validateBrandGuideConsistency } from "../lib/brand-guide-pdf-data";
 import { getCoverTitleFontSize, renderBrandGuidePdf } from "../lib/brand-guide-pdf";
@@ -207,4 +207,34 @@ describe("editorial brand guide PDF", () => {
     expect(selectApplicationMessage(data)).toBe(data.baseline);
     expect(fitTextToBox({ text: data.baseline, width: 240, height: 100, minFontSize: 20, maxFontSize: 38, lineHeight: 1.1 }).fits).toBe(true);
   });
+});
+
+
+it("renders the TYASH notebook title without changing a historical guide", async () => {
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://cplzwnlstcpqqzqeawgs.supabase.co");
+  vi.resetModules();
+  try {
+    const guide = makeGuide();
+    guide.cover.title = "Guide de Marque - " + guide.brandName;
+    const before = JSON.stringify(guide);
+    const { renderBrandGuidePdf: renderNotebook } = await import("../lib/brand-guide-pdf");
+    const buffer = await renderNotebook(guide);
+    const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const task = getDocument({ data: new Uint8Array(buffer), useSystemFonts: true });
+    const pdf = await task.promise;
+    const texts: string[] = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      texts.push(content.items.map((item) => "str" in item ? item.str : "").join(" "));
+    }
+    expect(texts[0].replace(/\s/g, "")).toContain("TONCARNETDEPROJET");
+    expect(texts[0]).toContain(guide.brandName);
+    expect(texts.join(" ")).not.toMatch(/Guide de marque/i);
+    expect(JSON.stringify(guide)).toBe(before);
+    await task.destroy();
+  } finally {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  }
 });

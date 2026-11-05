@@ -1,3 +1,4 @@
+import { projectDocumentCopy } from "@/lib/project-document-copy";
 import { NextResponse } from "next/server";
 import { unstable_rethrow } from "next/navigation";
 import {
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
       guide,
     }).catch(() => undefined);
 
-    const filename = `guide-de-marque-${slugify(guide.brandName)}.pdf`;
+    const filename = `${projectDocumentCopy("guide-de-marque", "carnet-de-projet")}-${slugify(guide.brandName)}.pdf`;
     const preview = new URL(request.url).searchParams.get("preview") === "1";
 
     return new NextResponse(new Uint8Array(pdfBuffer), {

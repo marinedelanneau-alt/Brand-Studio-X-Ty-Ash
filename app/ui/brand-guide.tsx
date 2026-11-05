@@ -1,5 +1,7 @@
 "use client";
 
+import { projectDocumentCopy, projectDocumentHeading, adminDocumentTitle } from "@/lib/project-document-copy";
+
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { CSSProperties } from "react";
@@ -51,7 +53,7 @@ export default function BrandGuideLayout({
 
   async function copyGuide() {
     await navigator.clipboard.writeText(guideText);
-    setMessage("Le contenu du guide est copié.");
+    setMessage(projectDocumentCopy("Le contenu du guide est copié.", "Le contenu du carnet est copié."));
   }
 
   async function exportPdf() {
@@ -70,12 +72,12 @@ export default function BrandGuideLayout({
       const downloadUrl = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = downloadUrl;
-      anchor.download = `guide-de-marque-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+      anchor.download = `${projectDocumentCopy("guide-de-marque", "carnet-de-projet")}-${guide.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(downloadUrl);
-      setMessage("Votre Guide de Marque a bien été téléchargé.");
+      setMessage(projectDocumentCopy("Votre Guide de Marque a bien été téléchargé.", "Votre carnet de projet a bien été téléchargé."));
     } catch {
       setMessage("Le PDF n’a pas pu être généré. Réessayez dans quelques instants.");
     } finally {
@@ -102,7 +104,7 @@ export default function BrandGuideLayout({
               onClick={() => setMode("complete")}
               className={tabClass(mode === "complete")}
             >
-              Guide complet
+              {projectDocumentCopy("Guide complet", readOnly ? "Brief complet" : "Carnet complet")}
             </button>
             <button
               type="button"
@@ -120,14 +122,14 @@ export default function BrandGuideLayout({
               Prévisualiser le PDF
             </Link>
             <button type="button" onClick={exportPdf} disabled={isExporting} className={`${primaryButtonClass} disabled:cursor-wait disabled:opacity-60`}>
-              {isExporting ? "Génération…" : "Exporter mon Guide de Marque"}
+              {isExporting ? "Génération…" : projectDocumentCopy("Exporter mon Guide de Marque", "Télécharger mon carnet")}
             </button>
           </div> : null}
         </header>
 
         {!readOnly ? <CompletionBanner
           items={guide.completion.items}
-          warning={guide.completion.warning}
+          warning={projectDocumentCopy(guide.completion.warning, guide.completion.warning.replace(/Guide de Marque|guide/g, "carnet de projet"))}
           latestGeneratedAt={latestGeneratedAt}
           isPending={isPending}
           onSave={saveSnapshot}
@@ -140,8 +142,8 @@ export default function BrandGuideLayout({
           <GuideSummary guide={guide} />
         ) : (
           <article id="brand-guide-document" className="space-y-8 print:space-y-6">
-            <GuideCover guide={guide} />
-            <GuideSection kicker="Introduction" title="Comment utiliser ce guide">
+            <GuideCover guide={guide} readOnly={readOnly} />
+            <GuideSection kicker="Introduction" title={projectDocumentCopy("Comment utiliser ce guide", readOnly ? "Comment utiliser ce brief" : "Comment utiliser ce carnet")}>
               <p className="max-w-3xl text-lg leading-9 text-[var(--text-primary)]">
                 {guide.introduction}
               </p>
@@ -233,7 +235,7 @@ function CompletionBanner({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[0.72rem] font-black uppercase tracking-[0.2em] text-[var(--guide-accent)]">
-            Etat du guide
+            {projectDocumentCopy("Etat du guide", "\u00c9tat du carnet")}
           </p>
           <p className="mt-2 text-lg font-semibold text-[var(--heading-color)]">{warning}</p>
           <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
@@ -243,7 +245,7 @@ function CompletionBanner({
           </p>
         </div>
         <button type="button" onClick={onSave} className={secondaryButtonClass} disabled={isPending}>
-          {isPending ? "Génération..." : "Générer mon Guide de Marque"}
+          {isPending ? "Génération..." : projectDocumentCopy("Générer mon Guide de Marque", latestGeneratedAt ? "ACTUALISER" : "CRÉER MON CARNET")}
         </button>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -268,7 +270,7 @@ function CompletionBanner({
   );
 }
 
-export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
+export function GuideCover({ guide, readOnly = false }: { guide: GeneratedBrandGuide; readOnly?: boolean }) {
   return (
     <section className="overflow-hidden rounded-[1.6rem] border border-[var(--guide-border)] bg-[var(--guide-surface)] shadow-[0_24px_60px_rgba(126,102,78,0.09)] print:rounded-none print:shadow-none">
       <div className="grid min-h-[32rem] gap-8 p-8 sm:p-12 lg:grid-cols-[1.1fr_0.9fr] lg:p-14">
@@ -278,10 +280,10 @@ export function GuideCover({ guide }: { guide: GeneratedBrandGuide }) {
               Brand Studio
             </p>
             <h1 className="mt-7 font-[family:var(--font-cormorant)] text-[3rem] leading-[0.92] text-[var(--guide-text)] sm:text-[4.5rem]">
-              {guide.cover.title}
+              {projectDocumentCopy(guide.cover.title, readOnly ? adminDocumentTitle.toUpperCase() : projectDocumentHeading)}
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-8 text-[var(--text-primary)]">
-              {guide.cover.subtitle}
+              {projectDocumentHeading === "TON CARNET DE PROJET" ? <>{guide.brandName}<br /></> : null}{guide.cover.subtitle}
             </p>
           </div>
           <div className="mt-10">
@@ -486,10 +488,10 @@ export function EmptyGuideState() {
   return (
     <section className="rounded-[1.4rem] border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-[0_18px_46px_rgba(210,189,152,0.08)]">
       <p className="font-[family:var(--font-cormorant)] text-[2.5rem] leading-tight text-[var(--heading-color)]">
-        Votre guide attend encore ses premières matières.
+        {projectDocumentCopy("Votre guide attend encore ses premi\u00e8res mati\u00e8res.", "Votre carnet attend encore ses premi\u00e8res r\u00e9ponses.")}
       </p>
       <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-[var(--text-primary)]">
-        Complétez au moins une réponse dans les modules Brand Studio pour générer un guide personnalisé.
+        {projectDocumentCopy("Compl\u00e9tez au moins une r\u00e9ponse dans les modules Brand Studio pour g\u00e9n\u00e9rer un guide personnalis\u00e9.", "Compl\u00e9tez au moins une r\u00e9ponse pour cr\u00e9er votre carnet de projet.")}
       </p>
       <Link href="/mon-espace" className={`${primaryButtonClass} mt-6`}>
         Modifier mes réponses
@@ -500,7 +502,7 @@ export function EmptyGuideState() {
 
 function buildCopyText(guide: GeneratedBrandGuide) {
   return [
-    guide.cover.title,
+    projectDocumentCopy(guide.cover.title, projectDocumentHeading),
     guide.baseline,
     "",
     "Introduction",

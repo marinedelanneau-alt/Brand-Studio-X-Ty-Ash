@@ -1,3 +1,4 @@
+import { projectDocumentCopy, projectDocumentTitle, projectDocumentHeading, projectDocumentDescription } from "@/lib/project-document-copy";
 import Image from "next/image";
 import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import Link from "next/link";
@@ -362,26 +363,27 @@ export default async function MonEspacePage() {
                   {workspace.project ? (
                     <div>
                       <p className="text-[0.76rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-primary-dark)]">
-                        Ton Guide de Marque
+                        {projectDocumentHeading}
                       </p>
+                      {projectDocumentTitle === "Carnet de projet" ? <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--text-muted)]">{projectDocumentDescription}</p> : null}
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Link
                           href="/brand-guide"
                           className="bs-button-primary inline-flex h-9 items-center justify-center rounded-[0.75rem] px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
-                          Generer
+                          {projectDocumentCopy("Generer", "CR\u00c9ER MON CARNET")}
                         </Link>
                         <Link
                           href="/brand-guide"
                           className="bs-button-secondary inline-flex h-9 items-center justify-center rounded-[0.75rem] border px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
-                          Voir
+                          {projectDocumentCopy("Voir", "CONSULTER")}
                         </Link>
                         <Link
                           href="/brand-guide"
                           className="bs-button-secondary inline-flex h-9 items-center justify-center rounded-[0.75rem] border px-3 text-[0.65rem] font-extrabold uppercase tracking-[0.1em]"
                         >
-                          Regenerer
+                          {projectDocumentCopy("Regenerer", "ACTUALISER")}
                         </Link>
                       </div>
                     </div>

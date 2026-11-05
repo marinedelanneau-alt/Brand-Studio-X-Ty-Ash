@@ -1,3 +1,4 @@
+import { projectDocumentCopy } from "./project-document-copy";
 import "server-only";
 import { toPlainText } from "@/lib/plain-text";
 import { parseStoredSpectrumAnswer } from "./spectrum";
@@ -649,11 +650,11 @@ export function generateBrandGuide(input: {
           ? "Aucune réponse n'est encore disponible pour générer le guide."
           : missingRequiredCount > 0
             ? "Votre guide peut être généré, mais certaines sections seront incomplètes."
-            : "Votre Guide de Marque est prêt.",
+            : projectDocumentCopy("Votre Guide de Marque est prêt.", "Votre carnet de projet est prêt."),
       items: completionItems,
     },
     cover: {
-      title: `Guide de Marque - ${brandName}`,
+      title: projectDocumentCopy(`Guide de Marque - ${brandName}`, "TON CARNET DE PROJET"),
       subtitle: baseline,
       introLine: toneWords.length > 0 ? `Une marque ${toneWords.join(", ").toLowerCase()} qui avance avec coherence.` : "Les fondations de votre marque.",
     },

@@ -1,3 +1,4 @@
+import { projectDocumentCopy, projectDocumentTitle } from "@/lib/project-document-copy";
 import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import path from "node:path";
 import type { GeneratedBrandGuide, GuideMoodboardItem } from "./brand-guide";
@@ -97,7 +98,7 @@ function PageFooter({ context, plan, light = false }: { context: RenderContext; 
   const color = light ? "#FFFFFF" : theme.colors.mutedText;
   return (
     <View fixed style={styles.footer}>
-      <Text style={[styles.tiny, { color }]}>Brand Studio · Guide de marque</Text>
+      <Text style={[styles.tiny, { color }]}>Brand Studio · {projectDocumentTitle}</Text>
       <Text style={[styles.tiny, { color }]}>{String(plan.pageNumber).padStart(2, "0")}</Text>
     </View>
   );
@@ -140,7 +141,7 @@ function CoverPage({ context, plan }: { context: RenderContext; plan: EditorialP
         </>
       ) : null}
       <View style={{ position: "absolute", top: 52, left: 48, right: 48, flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={[styles.tiny, { color: textColor }]}>Guide de marque</Text>
+        <Text style={[styles.tiny, { color: textColor }]}>{projectDocumentCopy("Guide de marque", "TON CARNET DE PROJET")}</Text>
         <Text style={[styles.tiny, { color: textColor }]}>Édition {formatDate(data.generatedAt)}</Text>
       </View>
       <View
@@ -150,13 +151,14 @@ function CoverPage({ context, plan }: { context: RenderContext; plan: EditorialP
           left: 0,
           top: plan.variant === "minimal-premium" ? 248 : 198,
           width: A4.width,
-          height: 300,
+          height: projectDocumentTitle === "Carnet de projet" ? 420 : 300,
           paddingHorizontal: 48,
           paddingVertical: 28,
           backgroundColor: "#FFFFFF",
           justifyContent: "center",
         }}
       >
+        {projectDocumentTitle === "Carnet de projet" ? <Text style={[styles.h1, { fontSize: 30, marginBottom: 20 }]}>TON CARNET DE PROJET</Text> : null}
         <BrandLockup
           context={context}
           size={plan.variant === "collage" || plan.variant === "chromatic" ? "medium" : "large"}
@@ -482,7 +484,7 @@ function renderPlannedPage(context: RenderContext, plan: EditorialPagePlan, occu
 function BrandGuideDocument({ context }: { context: RenderContext }) {
   const occurrences = new Map<string, number>();
   return (
-    <Document title={`Guide de marque — ${context.data.brandName}`} author="Brand Studio" subject={`Guide de marque de ${context.data.brandName}`} language="fr-FR">
+    <Document title={`${projectDocumentTitle} — ${context.data.brandName}`} author="Brand Studio" subject={`${projectDocumentTitle} de ${context.data.brandName}`} language="fr-FR">
       {context.composition.pages.map((plan) => {
         const occurrence = occurrences.get(plan.kind) || 0;
         occurrences.set(plan.kind, occurrence + 1);

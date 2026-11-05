@@ -1,3 +1,4 @@
+import { projectDocumentCopy } from "@/lib/project-document-copy";
 import Image from "next/image";
 import Link from "next/link";
 import AccessLoginForm from "./ui/access-login-form";
@@ -138,7 +139,7 @@ export default async function Home({
                       href="/brand-guide"
                       className="bs-access-guide-action flex h-14 w-full items-center justify-center rounded-[1.1rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)] transition duration-200 hover:-translate-y-0.5"
                     >
-                      Générer mon Guide de Marque
+                      {projectDocumentCopy("G\u00e9n\u00e9rer mon Guide de Marque", "CR\u00c9ER MON CARNET")}
                     </Link>
                   </div>
                 ) : (

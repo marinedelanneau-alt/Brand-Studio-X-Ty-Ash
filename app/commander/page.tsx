@@ -1,3 +1,4 @@
+import { projectDocumentCopy } from "@/lib/project-document-copy";
 import type { Metadata } from "next";
 import Link from "next/link";
 import EmbeddedPlatformCheckout from "@/app/ui/embedded-platform-checkout";
@@ -8,7 +9,7 @@ export const metadata: Metadata = { title: "Commander — Brand Studio X Ty-Ash"
 const deliverables = [
   ["04 modules · 60 exercices", "Un parcours guidé pour avancer à votre rythme."],
   ["Votre stratégie de marque", "Des fondations claires pour affirmer votre positionnement."],
-  ["Votre guide personnalisé", "Un document de référence pour donner vie à votre marque."],
+  [projectDocumentCopy("Votre guide personnalisé", "Votre carnet de projet"), projectDocumentCopy("Un document de référence pour donner vie à votre marque.", "Vos réponses et les éléments clés pour préparer votre vidéo.")],
   ...(communicationActionPlanEnabled() ? [["Votre plan d’actions", "Des prochaines étapes concrètes pour passer à l’action."]] : []),
   ["45 minutes avec Marine", "Un accompagnement individuel pour éclairer vos choix."],
 ];

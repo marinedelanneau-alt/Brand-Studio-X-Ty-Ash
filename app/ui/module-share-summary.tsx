@@ -1,5 +1,7 @@
 "use client";
 
+import { projectDocumentCopy } from "@/lib/project-document-copy";
+
 import Link from "next/link";
 import SummaryAnswerTable from "@/app/ui/summary-answer-table";
 import { useEffect, useState } from "react";
@@ -145,7 +147,7 @@ export default function ModuleShareSummary({
                 href="/brand-guide"
                 className="inline-flex h-11 items-center justify-center rounded-[0.9rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--tyash-label-text)]"
               >
-                Générer mon Guide de Marque
+                {projectDocumentCopy("G\u00e9n\u00e9rer mon Guide de Marque", "CR\u00c9ER MON CARNET")}
               </Link>
             ) : null}
           </div>

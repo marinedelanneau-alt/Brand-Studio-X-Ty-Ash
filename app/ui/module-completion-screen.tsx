@@ -1,5 +1,7 @@
 "use client";
 
+import { projectDocumentCopy } from "@/lib/project-document-copy";
+
 import Link from "next/link";
 import SummaryAnswerTable from "@/app/ui/summary-answer-table";
 import { useRouter } from "next/navigation";
@@ -409,7 +411,7 @@ function CompletionActions({
           </button>
         ) : (
           <Link href="/brand-guide" className={primaryClass}>
-            Générer mon Guide de Marque
+            {projectDocumentCopy("G\u00e9n\u00e9rer mon Guide de Marque", "CR\u00c9ER MON CARNET")}
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         )}

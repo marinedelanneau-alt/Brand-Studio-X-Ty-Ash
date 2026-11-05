@@ -1,3 +1,4 @@
+import { projectDocumentCopy } from "@/lib/project-document-copy";
 import { getCurrentAccount } from "@/lib/session";
 import { findAccountById } from "@/lib/access-codes";
 import { getWorkspaceData } from "@/lib/training";
@@ -35,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return new Response(new Uint8Array(pdf), { headers: {
       ...headers,
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="guide-de-marque-${slug}-${user.id}.pdf"`,
+      "Content-Disposition": `attachment; filename="${projectDocumentCopy("guide-de-marque", "carnet-de-projet")}-${slug}-${user.id}.pdf"`,
     } });
   } catch {
     return errorResponse("Le PDF n’a pas pu être généré. Réessayez dans quelques instants.", 500);

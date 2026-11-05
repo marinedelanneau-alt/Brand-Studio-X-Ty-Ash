@@ -1,5 +1,7 @@
 "use server";
 
+import { projectDocumentCopy } from "@/lib/project-document-copy";
+
 import { revalidatePath } from "next/cache";
 import type { GeneratedBrandGuide } from "@/lib/brand-guide";
 import { saveBrandGuideSnapshot } from "@/lib/brand-guide";
@@ -52,7 +54,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
 
     return {
       status: "success" as const,
-      message: "Votre Guide de Marque est prêt. Le snapshot a été sauvegardé.",
+      message: projectDocumentCopy("Votre Guide de Marque est prêt. Le snapshot a été sauvegardé.", "Votre carnet de projet est prêt. Il a été sauvegardé."),
     };
   } catch (error) {
     return {
