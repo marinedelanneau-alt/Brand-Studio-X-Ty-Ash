@@ -308,7 +308,7 @@ export default async function MonEspacePage() {
                 </span>
               </div>
               <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
-                <p className="font-more-sugar text-[3rem] leading-[0.96] tracking-[-0.01em] text-[var(--heading-color)] sm:text-[4rem]">
+                <p className={`${notebookDisplay.className} text-[clamp(2.25rem,6vw,4rem)] leading-[1.05] tracking-[-0.01em] text-[#111110] uppercase [overflow-wrap:anywhere]`}>
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
