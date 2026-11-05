@@ -12,6 +12,7 @@ import type {
   GuideMoodboardItem,
 } from "@/lib/brand-guide";
 import { saveBrandGuideExport } from "@/app/brand-guide/actions";
+import TyashProjectNotebookLayout from "./tyash-project-notebook";
 
 type BrandGuideProps = {
   guide: GeneratedBrandGuide;
@@ -21,7 +22,11 @@ type BrandGuideProps = {
   backLabel?: string;
 };
 
-export default function BrandGuideLayout({
+export default function BrandGuideLayout(props: BrandGuideProps) {
+  return props.guide.projectNotebook ? <TyashProjectNotebookLayout {...props} /> : <LegacyBrandGuideLayout {...props} />;
+}
+
+function LegacyBrandGuideLayout({
   guide,
   latestGeneratedAt,
   readOnly = false,

@@ -1,4 +1,6 @@
-import { projectDocumentCopy } from "./project-document-copy";
+import { projectDocumentCopy, projectDocumentTitle } from "./project-document-copy";
+import { createTyashProjectGuide, type TyashProjectNotebook } from "./tyash-project-notebook";
+import { isTyAshContent } from "./tyash-answer-identity";
 import "server-only";
 import { toPlainText } from "@/lib/plain-text";
 import { parseStoredSpectrumAnswer } from "./spectrum";
@@ -71,6 +73,7 @@ export type GuideCompletionItem = {
 };
 
 export type GeneratedBrandGuide = {
+  projectNotebook?: TyashProjectNotebook;
   brandName: string;
   brandAssets: {
     logoUrl?: string;
@@ -547,6 +550,7 @@ export function generateBrandGuide(input: {
   modules: WorkspaceModule[];
   brandName?: string | null;
 }): GeneratedBrandGuide {
+  if (projectDocumentTitle === "Carnet de projet" || input.modules.some(isTyAshContent)) return createTyashProjectGuide(input);
   const sources = collectSources(input.modules);
   const brandName = compactText(input.brandName) || compactText(input.project.name) || "Ma marque";
   const normalizedPalette = collectPaletteFromColorModule(input.modules);

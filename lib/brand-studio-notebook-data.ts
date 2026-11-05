@@ -11,6 +11,16 @@ export type ProjectNotebookSection = {
 
 // Presentation model only. Never modifies snapshots, exercise definitions or answers.
 export function buildBrandStudioNotebookData(guide: GeneratedBrandGuide, data: BrandGuideData, modules?: WorkspaceModule[]) {
+  if (guide.projectNotebook) {
+    const notebook = guide.projectNotebook;
+    return {
+      sections: notebook.modules.flatMap(module => module.sections.map(section => ({
+        id: `module-${module.id}-${section.id}`, scope: module.title, title: section.title, answers: section.answers,
+      }))),
+      progress: notebook.modules.map(module => ({ id: module.id, title: module.title, answered: module.answered, total: module.total, completionPercent: module.completionPercent })),
+      answered: notebook.answered, total: notebook.total, hasQuestionnaire: true,
+    };
+  }
   const sections: ProjectNotebookSection[] = [];
   let fieldId = 0;
   const add = (id: string, title: string, fields: Array<{ label: string; value: string }>) => {

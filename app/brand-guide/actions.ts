@@ -1,10 +1,11 @@
 "use server";
 
-import { projectDocumentCopy } from "@/lib/project-document-copy";
+import { projectDocumentCopy, projectDocumentTitle } from "@/lib/project-document-copy";
 
 import { revalidatePath } from "next/cache";
 import type { GeneratedBrandGuide } from "@/lib/brand-guide";
-import { saveBrandGuideSnapshot } from "@/lib/brand-guide";
+import { generateGuideFromAnswers, saveBrandGuideSnapshot } from "@/lib/brand-guide";
+import { isTyAshContent } from "@/lib/tyash-answer-identity";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
@@ -24,7 +25,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
     if (!(await hasActiveAccess(account.id))) {
       return {
         status: "error" as const,
-        message: "Débloquez Brand Studio pour sauvegarder votre guide.",
+        message: projectDocumentCopy("Débloquez Brand Studio pour sauvegarder votre guide.", "Débloquez Brand Studio pour sauvegarder votre carnet de projet."),
       };
     }
     const workspace = await getWorkspaceData(account.id);
@@ -32,7 +33,7 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
     if (!workspace.project) {
       return {
         status: "error" as const,
-        message: "Créez d'abord votre projet de marque.",
+        message: projectDocumentCopy("Créez d'abord votre projet de marque.", "Créez d’abord votre projet."),
       };
     }
 
@@ -46,7 +47,9 @@ export async function saveBrandGuideExport(guide: GeneratedBrandGuide) {
 
     await saveBrandGuideSnapshot({
       projectId: workspace.project.id,
-      guide,
+      guide: projectDocumentTitle === "Carnet de projet" || workspace.modules.some(isTyAshContent) ? generateGuideFromAnswers({
+        project: workspace.project, modules: workspace.modules, brandName: account.company_name?.trim() || workspace.project.name,
+      }) : guide,
     });
 
     revalidatePath("/brand-guide");

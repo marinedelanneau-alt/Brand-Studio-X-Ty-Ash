@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GeneratedBrandGuide } from "../lib/brand-guide";
 
 vi.mock("../app/brand-guide/actions", () => ({ saveBrandGuideExport: vi.fn() }));
+vi.mock("next/font/local", () => ({ default: () => ({ className: "notebook-font" }) }));
 
 afterEach(() => { vi.unstubAllEnvs(); vi.resetModules(); });
 

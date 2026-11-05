@@ -10,6 +10,7 @@ import { getAuthenticatedAccount } from "@/lib/session";
 import { hasActiveAccess } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
 import ContentPreviewFrame from "@/app/ui/content-preview-frame";
+import { projectDocumentCopy } from "@/lib/project-document-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,8 @@ export default async function BrandGuidePage() {
       <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <section className="mx-auto max-w-6xl">
           <DatabaseErrorState
-            title="Votre guide ne peut pas être chargé"
-            message={loadError || "Créez d'abord votre projet de marque."}
+            title={projectDocumentCopy("Votre guide ne peut pas être chargé", "Votre carnet ne peut pas être chargé")}
+            message={loadError || projectDocumentCopy("Créez d'abord votre projet de marque.", "Créez d’abord votre projet.")}
             backHref="/mon-espace"
             backLabel="Retour à mon espace"
           />
