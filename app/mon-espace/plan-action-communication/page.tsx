@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { redirect, unstable_rethrow } from "next/navigation";
+import { notFound, redirect, unstable_rethrow } from "next/navigation";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import CommunicationActionPlan from "@/app/ui/communication-action-plan";
 import DatabaseErrorState from "@/app/ui/database-error-state";
 import {
@@ -14,6 +15,7 @@ import { getWorkspaceData } from "@/lib/training";
 export const dynamic = "force-dynamic";
 
 export default async function CommunicationActionPlanPage() {
+  if (!communicationActionPlanEnabled()) notFound();
   let account: Awaited<ReturnType<typeof getAuthenticatedAccount>> | null = null;
   let workspace: Awaited<ReturnType<typeof getWorkspaceData>> | null = null;
   let loadError = "";

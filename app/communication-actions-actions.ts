@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import { isMissingDatabaseObject } from "@/lib/database-errors";
 import {
   deleteCommunicationAction,
@@ -35,6 +36,7 @@ function getActionPlanErrorMessage(error: unknown) {
 }
 
 async function getAuthorizedProject() {
+  if (!communicationActionPlanEnabled()) throw new Error("Cette fonctionnalité n’est plus disponible.");
   const account = await getAuthenticatedAccount();
   if (!(await hasActiveAccess(account.id))) {
     throw new Error("Débloquez Brand Studio pour enregistrer votre feuille de route.");

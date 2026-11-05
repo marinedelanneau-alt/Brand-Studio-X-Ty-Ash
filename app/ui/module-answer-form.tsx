@@ -1,4 +1,5 @@
 "use client";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import { formalizeClientCopy, clientOptionAnswerLabel } from "@/lib/client-copy";
 import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
@@ -3500,7 +3501,7 @@ export default function ModuleAnswerForm({
             >
               {isSavingDraft ? "Enregistrement..." : isTyAshContent(module) ? "Continuer" : nextStepLabel}
             </button>
-          ) : isEditorialCalendarModule ? (
+            ) : isEditorialCalendarModule && communicationActionPlanEnabled(module) ? (
             <button
               type="button"
               disabled={pending || isSavingDraft}

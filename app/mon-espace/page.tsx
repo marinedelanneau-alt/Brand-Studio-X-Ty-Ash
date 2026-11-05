@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import DatabaseErrorState from "@/app/ui/database-error-state";
@@ -338,12 +339,12 @@ export default async function MonEspacePage() {
                             {module.title}
                           </Link>
                         ))}
-                        <Link
+                        {communicationActionPlanEnabled(workspace.modules) ? <Link
                           href="/mon-espace/plan-action-communication"
                           className="w-full rounded-full border border-[var(--tyash-primary)] bg-[var(--tyash-soft)] px-3 py-1.5 text-center text-[0.68rem] font-black uppercase tracking-[0.1em] text-[var(--tyash-primary-dark)] transition hover:bg-[var(--tyash-primary)] hover:text-[var(--tyash-text-on-primary)]"
                         >
                           Plan d&apos;action communication
-                        </Link>
+                        </Link> : null}
                       </div>
                     </nav>
                   ) : null}

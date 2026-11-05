@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import EmbeddedPlatformCheckout from "@/app/ui/embedded-platform-checkout";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 
 export const metadata: Metadata = { title: "Commander — Brand Studio X Ty-Ash", description: "Construisez votre marque avec Brand Studio : votre accès à la plateforme pour 50 € TTC." };
 
@@ -8,7 +9,7 @@ const deliverables = [
   ["04 modules · 60 exercices", "Un parcours guidé pour avancer à votre rythme."],
   ["Votre stratégie de marque", "Des fondations claires pour affirmer votre positionnement."],
   ["Votre guide personnalisé", "Un document de référence pour donner vie à votre marque."],
-  ["Votre plan d’actions", "Des prochaines étapes concrètes pour passer à l’action."],
+  ...(communicationActionPlanEnabled() ? [["Votre plan d’actions", "Des prochaines étapes concrètes pour passer à l’action."]] : []),
   ["45 minutes avec Marine", "Un accompagnement individuel pour éclairer vos choix."],
 ];
 

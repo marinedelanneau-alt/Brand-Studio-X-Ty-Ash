@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import { unstable_rethrow } from "next/navigation";
 import { getCommunicationActions } from "@/lib/communication-actions";
 import { renderCommunicationActionPdf } from "@/lib/communication-action-pdf";
@@ -11,6 +12,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  if (!communicationActionPlanEnabled()) {
+    return new NextResponse(null, { status: 410, headers: { "Cache-Control": "no-store" } });
+  }
   try {
     const account = await getAuthenticatedAccount();
     if (!(await hasActiveAccess(account.id))) {
