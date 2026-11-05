@@ -1,5 +1,6 @@
 import { projectDocumentCopy, projectDocumentTitle, projectDocumentHeading, projectDocumentDescription } from "@/lib/project-document-copy";
 import Image from "next/image";
+import localFont from "next/font/local";
 import { communicationActionPlanEnabled } from "@/lib/platform-features";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
@@ -25,6 +26,21 @@ import {
 import ContentPreviewFrame from "@/app/ui/content-preview-frame";
 
 export const dynamic = "force-dynamic";
+
+// The same static font files used by the TYASH module notebook cover.
+const notebookDisplay = localFont({
+  src: "../../public/fonts/tyash-archivo-display.ttf",
+  weight: "900",
+  style: "normal",
+  display: "swap",
+});
+
+const notebookEditorial = localFont({
+  src: "../../public/fonts/tyash-instrument-serif-italic.ttf",
+  weight: "400",
+  style: "italic",
+  display: "swap",
+});
 
 function isExerciseAnswered(
   exercise: WorkspaceModule["exercises"][number],
@@ -501,8 +517,13 @@ export default async function MonEspacePage() {
           </div>
         </div>
         <div className="border-b border-[var(--border)] pb-8 pt-1 sm:pb-10">
-          <p className="font-more-sugar mx-auto max-w-4xl text-center text-[2.35rem] leading-[1.02] text-[var(--text-primary)] sm:text-[2.9rem] lg:text-[3.35rem]">
-            Ton histoire commence ici, écrivons-la ensemble !
+          <p className="mx-auto max-w-5xl text-center">
+            <span className={`${notebookDisplay.className} block text-[clamp(1.25rem,5.3vw,3.35rem)] leading-[1.05] text-[#111110]`}>
+              TON HISTOIRE COMMENCE ICI
+            </span>
+            <span className={`${notebookEditorial.className} mt-3 block text-[clamp(1.8rem,5vw,3.2rem)] leading-[1.15] text-[#991D25] sm:mt-4`}>
+              écrivons-la ensemble !
+            </span>
           </p>
         </div>
 
