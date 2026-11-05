@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { saveBrandGuideExport } from "@/app/brand-guide/actions";
 import type { GeneratedBrandGuide } from "@/lib/brand-guide";
-import { TYASH_NOTEBOOK_TAGLINE, tyashProjectNotebookText } from "@/lib/tyash-project-notebook";
+import { TYASH_NOTEBOOK_TAGLINE } from "@/lib/tyash-project-notebook";
 import type { NotebookAnswer } from "@/lib/tyash-module-notebook-data";
 import SummaryAnswerTable from "./summary-answer-table";
 
@@ -36,7 +36,6 @@ export default function TyashProjectNotebookLayout({ guide, latestGeneratedAt, r
 }) {
   const notebook = guide.projectNotebook!;
   const router = useRouter();
-  const [mode, setMode] = useState<"complete" | "express">("complete");
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
   const [downloading, setDownloading] = useState(false);
@@ -57,15 +56,14 @@ export default function TyashProjectNotebookLayout({ guide, latestGeneratedAt, r
   }
   return <main className="min-h-screen bg-[#F4F0DF] px-4 py-8 text-[#111110] sm:px-6" style={{ backgroundImage: "linear-gradient(#E5DFC966 1px, transparent 1px), linear-gradient(90deg, #E5DFC966 1px, transparent 1px)", backgroundSize: "23px 23px" }}>
     <div className="mx-auto max-w-5xl">
-      <nav className="mb-7 flex flex-wrap gap-3" aria-label="Actions du carnet">
+      <nav className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" aria-label="Actions du carnet">
         <Link href={backHref} className={button}>{backLabel}</Link>
-        <button className={button} aria-pressed={mode === "complete"} onClick={() => setMode("complete")}>Carnet complet</button>
-        <button className={button} aria-pressed={mode === "express"} onClick={() => setMode("express")}>Synthèse express</button>
-        {!readOnly ? <>
-          <button className={button} onClick={async () => { try { await navigator.clipboard.writeText(tyashProjectNotebookText(notebook)); setMessage("Le contenu du carnet a été copié."); } catch { setMessage("La copie a échoué. Veuillez réessayer."); } }}>Copier le contenu</button>
-          <Link href="/brand-guide/download?preview=1" target="_blank" className={button}>Prévisualiser le PDF</Link>
-          <button className={button} disabled={downloading} onClick={() => void download()}>{downloading ? "Préparation…" : "Télécharger mon carnet"}</button>
-        </> : null}
+        {!readOnly ? <button
+          className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#991D25] px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#7D1820] disabled:cursor-wait disabled:opacity-50"
+          disabled={downloading}
+          aria-busy={downloading}
+          onClick={() => void download()}
+        >{downloading ? "Préparation…" : "Télécharger mon carnet"}</button> : null}
       </nav>
       <section className="mb-8 rounded-2xl border border-[#C9C2AF] bg-[#fffdf5] p-5 sm:p-7" aria-label="État du carnet">
         <div className="flex flex-wrap items-start justify-between gap-5">
@@ -92,7 +90,7 @@ export default function TyashProjectNotebookLayout({ guide, latestGeneratedAt, r
           <p className={`${editorial.className} mt-7 max-w-3xl text-3xl leading-tight text-[#991D25] sm:text-4xl`}>{TYASH_NOTEBOOK_TAGLINE}</p>
           <p className="mt-7 text-xs uppercase tracking-widest text-[#746F62]">Généré le {date(notebook.generatedAt)}</p>
         </header>
-        {mode === "complete" ? notebook.modules.map(module => <section key={module.id} className="mt-12">
+        {notebook.modules.map(module => <section key={module.id} className="mt-12">
           <p className="text-xs font-extrabold uppercase tracking-widest text-[#991D25]">MODULE {String(module.position).padStart(2, "0")}</p>
           <h2 className={`${display.className} mt-3 text-4xl leading-tight uppercase sm:text-5xl`}>{module.title}</h2>
           {module.sections.map(section => <section key={section.id} className="mt-9 rounded-2xl border border-[#C9C2AF] bg-[#fffdf5]/90 p-5 sm:p-8">
@@ -100,7 +98,7 @@ export default function TyashProjectNotebookLayout({ guide, latestGeneratedAt, r
             <h3 className={`${display.className} mt-3 border-b border-[#C9C2AF] pb-5 text-3xl uppercase sm:text-4xl`}>{section.title}</h3>
             {section.answers.map(answer => <Answer key={answer.id} answer={answer} />)}
           </section>)}
-        </section>) : null}
+        </section>)}
         <section className="mt-12 border-t border-[#C9C2AF] py-10">
           <h2 className={`${display.className} text-3xl uppercase sm:text-4xl`}>LE BILAN DE TON PROJET</h2>
           <p className={`${editorial.className} mt-5 text-3xl text-[#991D25]`}>À relire, à compléter, à faire évoluer.</p>
