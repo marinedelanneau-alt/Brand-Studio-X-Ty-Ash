@@ -1,6 +1,7 @@
 import "server-only";
 import type { ModuleExercise, WorkspaceModule } from "@/lib/training-types";
 import { tyashRefonteEnabled } from "./tyash-questionnaire";
+import { answerAssistanceEnabled } from "./platform-features";
 import {
   getFillBlankCount,
   parseChecklistEntries,
@@ -134,6 +135,7 @@ function formatRagContext(items: Array<RagContextItem & { score: number }>) {
 }
 
 export function supportsModuleAnswerAi(exercise: ModuleExercise) {
+  if (!answerAssistanceEnabled(exercise)) return false;
   return (
     exercise.type === "open" ||
     exercise.type === "prompt_open" ||
@@ -427,6 +429,7 @@ export async function generateModuleAnswerAssistance(input: {
   clientName?: string | null;
   companyName?: string | null;
 }) {
+  if (!answerAssistanceEnabled([input.module, input.exercise])) throw new Error("Cette aide n’est plus proposée.");
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {

@@ -4,6 +4,7 @@ import { unstable_rethrow } from "next/navigation";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { generateModuleAnswerAssistance, supportsModuleAnswerAi } from "@/lib/module-answer-ai";
 import { getWorkspaceData } from "@/lib/training";
+import { answerAssistanceEnabled } from "@/lib/platform-features";
 
 type AssistanceMode = "suggest" | "improve";
 
@@ -37,6 +38,8 @@ export async function requestModuleAnswerAssistance(input: {
   mode: AssistanceMode;
   currentAnswers: Record<number, string[]>;
 }): Promise<AssistanceResult> {
+  const disabled: AssistanceResult = { status: "error", message: "Cette aide n’est plus proposée.", coachingNote: "", values: [] };
+  if (!answerAssistanceEnabled()) return disabled;
   try {
     const account = await getAuthenticatedAccount();
     const workspace = await getWorkspaceData(account.id);
@@ -52,6 +55,7 @@ export async function requestModuleAnswerAssistance(input: {
     }
 
     const selectedModule = workspace.modules.find((item) => item.id === input.moduleId);
+    if (selectedModule && !answerAssistanceEnabled(selectedModule)) return disabled;
 
     if (!selectedModule) {
       return {

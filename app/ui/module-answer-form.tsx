@@ -1,5 +1,5 @@
 "use client";
-import { communicationActionPlanEnabled } from "@/lib/platform-features";
+import { communicationActionPlanEnabled, answerAssistanceEnabled } from "@/lib/platform-features";
 import { formalizeClientCopy, clientOptionAnswerLabel } from "@/lib/client-copy";
 import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
@@ -152,6 +152,7 @@ function debugPersistence(event: string, details?: Record<string, unknown>) {
 }
 
 function supportsExerciseAi(exercise: WorkspaceModule["exercises"][number]) {
+  if (!answerAssistanceEnabled(exercise)) return false;
   return (
     exercise.type === "open" ||
     exercise.type === "prompt_open" ||
@@ -1970,6 +1971,7 @@ export default function ModuleAnswerForm({
     exercise: WorkspaceModule["exercises"][number],
     mode: AiAssistMode,
   ) {
+    if (!answerAssistanceEnabled([module, exercise])) return;
     setAiAssistStates((current) => ({
       ...current,
       [exercise.id]: {
