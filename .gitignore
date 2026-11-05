@@ -13,6 +13,7 @@
 # testing
 /coverage
 /artifacts/brand-guide-preview/*
+/artifacts/tyash-module-notebook/
 
 # next.js
 /.next/

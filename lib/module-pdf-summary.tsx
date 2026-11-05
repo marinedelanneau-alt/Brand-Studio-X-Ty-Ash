@@ -14,6 +14,8 @@ import type {
 } from "@/lib/module-summary";
 import type { ModuleShareData } from "@/lib/get-module-share-data";
 import { toPlainText } from "@/lib/plain-text";
+import type { WorkspaceModule } from "./training-types";
+import { TyashModuleNotebook } from "./tyash-module-notebook";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -426,10 +428,13 @@ function SectionHeading({
 export function ModulePdfSummary({
   summary,
   shareData,
+  module,
 }: {
   summary: ModuleSummaryCard;
   shareData: ModuleShareData;
+  module?: WorkspaceModule;
 }) {
+  if (module?.stableKey?.startsWith("tyash_v1_")) return <TyashModuleNotebook module={module} summary={summary} shareData={shareData} />;
   const detailedRecaps = removeRepeatedHighlights(summary.submoduleRecaps, summary);
 
   return (

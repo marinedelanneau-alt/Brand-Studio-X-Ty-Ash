@@ -44,7 +44,7 @@ export async function GET(
     const brandName = account.company_name?.trim() || workspace.project.name;
     const summary = buildModuleSummaryCard({ projectName: brandName, module: currentModule });
     const shareData = getModuleShareData({ brandName, module: currentModule, summary });
-    const pdfBuffer = await generateModulePdf({ summary, shareData });
+    const pdfBuffer = await generateModulePdf({ summary, shareData, module: currentModule });
     const filename = `brand-studio-${shareData.moduleKey}-${slugifyFilePart(brandName)}.pdf`;
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
