@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       modules: workspace.modules,
       brandName: account.company_name?.trim() || workspace.project.name,
     });
-    const pdfBuffer = await renderBrandGuidePdf(guide);
+    const pdfBuffer = await renderBrandGuidePdf(guide, { modules: workspace.modules });
 
     await saveBrandGuideSnapshot({
       projectId: workspace.project.id,

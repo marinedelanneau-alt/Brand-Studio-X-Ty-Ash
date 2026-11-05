@@ -31,7 +31,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       brandName: user.company_name?.trim() || workspace.project.name,
     });
     // Download only: do not save a snapshot or change participant data.
-    const pdf = await renderBrandGuidePdf(guide);
+    const pdf = await renderBrandGuidePdf(guide, { modules: workspace.modules });
     const slug = guide.brandName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "marque";
     return new Response(new Uint8Array(pdf), { headers: {
       ...headers,

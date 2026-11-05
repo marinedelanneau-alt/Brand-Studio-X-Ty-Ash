@@ -2,6 +2,8 @@ import { projectDocumentCopy, projectDocumentTitle } from "@/lib/project-documen
 import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import path from "node:path";
 import type { GeneratedBrandGuide, GuideMoodboardItem } from "./brand-guide";
+import type { WorkspaceModule } from "./training-types";
+import { BrandStudioNotebook } from "./brand-studio-notebook";
 import { createBrandGuideData, validateBrandGuideData, type BrandGuideData, type BrandValueData } from "./brand-guide-pdf-data";
 import { composeEditorialPages, type EditorialComposition, type EditorialPagePlan } from "./brand-guide-editorial-composer";
 import { fitTextToBox, getPositioningLayout, selectApplicationMessage, validateGeneratedGuide } from "./brand-guide-layout";
@@ -556,9 +558,16 @@ export async function prepareBrandGuideAssets(data: BrandGuideData) {
 
 export const prepareMoodboardAssets = prepareBrandGuideAssets;
 
-export async function renderBrandGuidePdf(guide: GeneratedBrandGuide) {
+export async function renderBrandGuidePdf(guide: GeneratedBrandGuide, options: {
+  modules?: WorkspaceModule[];
+  design?: "notebook" | "legacy";
+} = {}) {
   const initialData = createBrandGuideData(guide);
   const data = await prepareBrandGuideAssets(initialData);
+  const design = options.design ?? (projectDocumentTitle === "Carnet de projet" ? "notebook" : "legacy");
+  if (design === "notebook") {
+    return renderToBuffer(<BrandStudioNotebook guide={guide} data={data} modules={options.modules} />);
+  }
   const identity = buildBrandVisualIdentity({
     ...guide,
     brandAssets: { ...guide.brandAssets, logoUrl: data.logoUrl },
