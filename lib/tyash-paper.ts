@@ -15,10 +15,17 @@ export const TYASH_PAPER_STYLE = {
 } satisfies CSSProperties;
 
 export const TYASH_PAPER_VARIABLES = {
-  "--tyash-paper-color": TYASH_PAPER_STYLE.backgroundColor,
-  "--tyash-paper-image": TYASH_PAPER_STYLE.backgroundImage,
+  "--tyash-paper-light-color": TYASH_PAPER_STYLE.backgroundColor,
+  "--tyash-paper-light-image": TYASH_PAPER_STYLE.backgroundImage,
   "--tyash-paper-size": TYASH_PAPER_STYLE.backgroundSize,
 } as CSSProperties;
+
+// UI only. Export surfaces and PDF renderers retain the immutable reference above.
+export const TYASH_WEB_PAPER_STYLE = {
+  ...TYASH_PAPER_STYLE,
+  backgroundColor: "var(--tyash-paper-color)",
+  backgroundImage: "var(--tyash-paper-image)",
+} satisfies CSSProperties;
 
 export const TYASH_PAPER_PDF = {
   ...TYASH_PAPER,

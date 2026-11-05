@@ -2502,7 +2502,7 @@ function ModuleForm({
                   onClick={() => {
                     void saveLatestModule("manual");
                   }}
-                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[#4b4550] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:cursor-wait disabled:opacity-70"
+                  className="flex h-12 items-center justify-center rounded-[0.9rem] bg-[var(--neutral-button)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--neutral-button-ink)] disabled:cursor-wait disabled:opacity-70"
                 >
                   {isSavingModule ? "Enregistrement..." : "Enregistrer les modifications"}
                 </button>

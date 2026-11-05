@@ -8,7 +8,7 @@ export default function PrivacyRequestForm() {
     <label>Précisions<textarea name="message" maxLength={4000} rows={4} className="mt-2 block w-full rounded-lg border p-3" /></label>
     <p className="text-sm">N’envoyez pas de mot de passe, numéro de carte ou copie de pièce d’identité. Une demande d’effacement est examinée en tenant compte des obligations de conservation et de votre abonnement.</p>
     <label className="flex gap-2"><input type="checkbox" name="confirmed" required />Je confirme vouloir transmettre cette demande à l’équipe Brand Studio.</label>
-    <button disabled={pending} className="rounded-xl bg-[#4b4550] p-3 text-white disabled:opacity-50">{pending ? "Envoi…" : "Confirmer ma demande"}</button>
+    <button disabled={pending} className="rounded-xl bg-[var(--neutral-button)] p-3 text-[var(--neutral-button-ink)] disabled:opacity-50">{pending ? "Envoi…" : "Confirmer ma demande"}</button>
     <p role="status">{state.message}</p>
   </form>;
 }

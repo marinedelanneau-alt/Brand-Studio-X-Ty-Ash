@@ -308,7 +308,7 @@ export default async function MonEspacePage() {
                 </span>
               </div>
               <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
-                <p className={`${notebookDisplay.className} text-[clamp(2.25rem,6vw,4rem)] leading-[1.05] tracking-[-0.01em] text-[#111110] uppercase [overflow-wrap:anywhere]`}>
+                <p className={`${notebookDisplay.className} text-[clamp(2.25rem,6vw,4rem)] leading-[1.05] tracking-[-0.01em] text-[var(--tyash-display-ink)] uppercase [overflow-wrap:anywhere]`}>
                   {workspaceTitle}
                 </p>
                 <p className="mt-7 text-[0.8rem] font-black uppercase tracking-[0.24em] text-[var(--tyash-primary-dark)]">
@@ -518,10 +518,10 @@ export default async function MonEspacePage() {
         </div>
         <div className="border-b border-[var(--border)] pb-8 pt-1 sm:pb-10">
           <p className="mx-auto max-w-5xl text-center">
-            <span className={`${notebookDisplay.className} block text-[clamp(1.25rem,5.3vw,3.35rem)] leading-[1.05] text-[#111110]`}>
+            <span className={`${notebookDisplay.className} block text-[clamp(1.25rem,5.3vw,3.35rem)] leading-[1.05] text-[var(--tyash-display-ink)]`}>
               TON HISTOIRE COMMENCE ICI
             </span>
-            <span className={`${notebookEditorial.className} mt-3 block text-[clamp(1.8rem,5vw,3.2rem)] leading-[1.15] text-[#991D25] sm:mt-4`}>
+            <span className={`${notebookEditorial.className} mt-3 block text-[clamp(1.8rem,5vw,3.2rem)] leading-[1.15] text-[var(--tyash-editorial-ink)] sm:mt-4`}>
               écrivons-la ensemble !
             </span>
           </p>

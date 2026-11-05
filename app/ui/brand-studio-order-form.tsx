@@ -21,6 +21,6 @@ export default function BrandStudioOrderForm({ termsId }: { termsId: string }) {
     <label className="flex gap-3"><input type="checkbox" name="acceptedTerms" required /><span>J’accepte les <Link href="/conditions-generales-vente" target="_blank" className="underline">CGV</Link>.</span></label>
     <label className="flex items-start gap-3"><input type="checkbox" name="immediateAccess" required className="mt-1" /><span>{immediateServiceConsent}</span></label>
     <p><Link href="/politique-confidentialite" className="underline">Utilisation de vos données et exercice de vos droits</Link></p>
-    <button disabled={pending} className="w-full rounded-xl bg-[#4b4550] px-5 py-4 text-white disabled:opacity-50">{pending ? "Préparation…" : "Commander avec obligation de paiement — 289 €"}</button><p role="status">{message}</p>
+    <button disabled={pending} className="w-full rounded-xl bg-[var(--neutral-button)] px-5 py-4 text-[var(--neutral-button-ink)] disabled:opacity-50">{pending ? "Préparation…" : "Commander avec obligation de paiement — 289 €"}</button><p role="status">{message}</p>
   </form>;
 }

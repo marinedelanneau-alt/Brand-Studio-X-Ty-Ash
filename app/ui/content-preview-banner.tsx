@@ -34,7 +34,7 @@ export default function ContentPreviewBanner({
             Retour à l’administration
           </Link>
           <form action={exitContentPreview}>
-            <button className="rounded-xl bg-[#4b4550] px-4 py-2 text-sm font-bold text-white">
+            <button className="rounded-xl bg-[var(--neutral-button)] px-4 py-2 text-sm font-bold text-[var(--neutral-button-ink)]">
               Quitter l’aperçu
             </button>
           </form>

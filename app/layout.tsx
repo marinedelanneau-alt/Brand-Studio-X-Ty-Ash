@@ -11,6 +11,7 @@ import ThemeToggle from "./ui/theme-toggle";
 import LegalFooter from "./ui/legal-footer";
 import { isLegalReleaseEnabled } from "@/lib/legal-release";
 import { TYASH_PAPER_VARIABLES, usesTyashPaper } from "@/lib/tyash-paper";
+import { THEME_BOOTSTRAP } from "@/lib/theme";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -67,7 +68,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('brand-studio-theme');if(t!=='light'&&t!=='dark'){t='light'}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch(e){document.documentElement.dataset.theme='light'}})();`,
+            __html: THEME_BOOTSTRAP,
           }}
         />
       </head>

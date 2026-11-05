@@ -57,6 +57,7 @@
 html[data-theme="dark"],
 html[data-theme="dark"] .bs-access-dark-panel,
 html[data-theme="dark"] .bs-completion-progress,
+html.tyash-grid-theme[data-theme="dark"] :is(.bs-light-surface, .bs-access-shell, .bs-access-light-surface, .bs-completion-hero, .bs-status-light):not(.bs-export-surface, .bs-export-surface *),
 .bs-inverse-surface {
   --tyash-primary: #d998ab;
   --tyash-primary-hover: #e9b4c3;
@@ -576,4 +577,92 @@ select {
   --text-primary: #5d5559;
   --tyash-label-text: #7a2d46;
   color: var(--text-primary);
+}
+
+/* UI paper roles: exports deliberately keep TYASH_PAPER_STYLE / PDF constants. */
+:root {
+  --tyash-paper-color: var(--tyash-paper-light-color);
+  --tyash-paper-image: var(--tyash-paper-light-image);
+  --tyash-display-ink: #111110;
+  --tyash-editorial-ink: #991D25;
+  --notebook-body: #34332D;
+  --notebook-surface: #fffdf5;
+  --notebook-border: #C9C2AF;
+  --notebook-muted: #746F62;
+  --notebook-track: #E5DFC9;
+  --notebook-button: #991D25;
+  --notebook-button-hover: #7D1820;
+  --notebook-button-ink: #ffffff;
+  --order-ink: #382b20;
+  --order-panel: #ffe496;
+  --order-accent: #9a3e12;
+  --order-button: #a94713;
+  --order-button-hover: #88370e;
+  --order-button-ink: #ffffff;
+  --order-payment: #ffffff;
+  --order-border: var(--color-orange-100);
+  --order-border-strong: var(--color-orange-200);
+  --order-notice: var(--color-orange-50);
+  --order-error: var(--color-red-800);
+  --order-focus: var(--color-orange-600);
+  --order-outline: var(--color-orange-700);
+  --order-muted: #57534e;
+  --exercise-punctuation: #355f9d;
+  --exercise-focus: #d99f2b;
+  --moodboard-warning: #9d5f46;
+  --moodboard-toolbar: #ffffff;
+  --feedback-good: #5d6f61;
+  --neutral-button: #4b4550;
+  --neutral-button-hover: #3f3943;
+  --neutral-button-ink: #ffffff;
+}
+html.tyash-grid-theme[data-theme="dark"] {
+  --tyash-paper-color: #19171c;
+  --tyash-paper-image: linear-gradient(rgb(185 157 174 / 10%) 1px, transparent 1px), linear-gradient(90deg, rgb(185 157 174 / 10%) 1px, transparent 1px);
+  --tyash-display-ink: var(--heading-color);
+  --tyash-editorial-ink: var(--tyash-label-text);
+  --notebook-body: var(--text-primary);
+  --notebook-surface: var(--surface);
+  --notebook-border: var(--border);
+  --notebook-muted: var(--text-muted);
+  --notebook-track: var(--surface-highlight);
+  --notebook-button: var(--tyash-primary);
+  --notebook-button-hover: var(--tyash-primary-hover);
+  --notebook-button-ink: var(--tyash-text-on-primary);
+  --order-ink: var(--heading-color);
+  --order-panel: var(--surface-secondary);
+  --order-accent: var(--tyash-label-text);
+  --order-button: var(--tyash-primary);
+  --order-button-hover: var(--tyash-primary-hover);
+  --order-button-ink: var(--tyash-text-on-primary);
+  --order-payment: var(--surface);
+  --order-border: var(--border);
+  --order-border-strong: var(--border);
+  --order-notice: var(--tyash-subtle);
+  --order-error: var(--status-error-text);
+  --order-focus: var(--tyash-focus-ring);
+  --order-outline: var(--tyash-focus-ring);
+  --order-muted: var(--text-secondary);
+  --exercise-punctuation: var(--tyash-label-text);
+  --exercise-focus: var(--tyash-focus-ring);
+  --moodboard-warning: var(--status-error-text);
+  --moodboard-toolbar: var(--card);
+  --feedback-good: var(--status-success-text);
+  --neutral-button: var(--tyash-primary);
+  --neutral-button-hover: var(--tyash-primary-hover);
+  --neutral-button-ink: var(--tyash-text-on-primary);
+}
+html.tyash-grid-theme[data-theme="dark"] :is(.bs-light-surface, .bs-access-shell, .bs-access-light-surface, .bs-completion-hero):not(.bs-export-surface, .bs-export-surface *) {
+  color-scheme: dark;
+}
+html.tyash-grid-theme[data-theme="dark"] .bs-status-light:not(.bs-export-surface, .bs-export-surface *) {
+  background-color: var(--surface-secondary);
+  border-color: var(--border);
+}
+html.tyash-grid-theme[data-theme="dark"] :is(.tiptap-editor, .pedagogical-content) [data-info-box]:not(.bs-export-surface *) {
+  --heading-color: #f5efe6;
+  --text-primary: #d6cbd1;
+  --tyash-label-text: #edc4d1;
+  background: var(--surface-secondary);
+  border-color: var(--tyash-border);
 }

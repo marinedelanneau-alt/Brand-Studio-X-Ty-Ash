@@ -25,7 +25,7 @@ const LEVEL_STYLES = {
   good: {
     border: "border-[#dde7df]",
     bg: "bs-status-light bg-[#fbfdfb]",
-    text: "text-[#5d6f61]",
+    text: "text-[var(--feedback-good)]",
     badge: "bs-status-light bg-[#e9f1eb] text-[var(--status-success-text)]",
     label: "Bonne base",
   },

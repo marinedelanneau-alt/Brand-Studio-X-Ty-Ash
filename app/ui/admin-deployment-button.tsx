@@ -57,7 +57,7 @@ export default function AdminDeploymentButton() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[#4b4550] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_14px_32px_rgba(75,69,80,0.18)] transition hover:bg-[#3f3943] disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex h-12 items-center justify-center rounded-[0.95rem] bg-[var(--neutral-button)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--neutral-button-ink)] shadow-[0_14px_32px_rgba(75,69,80,0.18)] transition hover:bg-[var(--neutral-button-hover)] disabled:cursor-wait disabled:opacity-70"
         >
           {pending ? "Déploiement en cours…" : "Déployer à tous les utilisateurs"}
         </button>

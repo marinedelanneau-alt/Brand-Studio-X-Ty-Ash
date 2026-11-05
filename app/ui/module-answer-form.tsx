@@ -2490,7 +2490,7 @@ export default function ModuleAnswerForm({
                       <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[var(--heading-color)] sm:text-[2.35rem]">
                         {getPromptOpenLabel(cleanStoredExerciseQuestionText(currentExercise.question))}
                       </span>
-                      <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">
+                      <span className="text-[1.7rem] font-semibold leading-none text-[var(--exercise-punctuation)]">
                         :
                       </span>
                       <ExerciseAiActions
@@ -2610,7 +2610,7 @@ export default function ModuleAnswerForm({
                                     })
                                   }
                                   placeholder="Précise ta réponse"
-                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                                 />
                               ) : null}
                             </div>
@@ -2663,7 +2663,7 @@ export default function ModuleAnswerForm({
                               }))
                             }
                             placeholder="Précise ta réponse"
-                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                           />
                         ) : null}
                       </div>
@@ -2852,7 +2852,7 @@ export default function ModuleAnswerForm({
                                     })
                                   }
                                   placeholder="Précise ta réponse"
-                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
+                                  className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                                 />
                               ) : null}
                             </div>
@@ -2915,7 +2915,7 @@ export default function ModuleAnswerForm({
                               }))
                             }
                             placeholder="Précise ta réponse"
-                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[#d99f2b]"
+                            className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                           />
                         ) : null}
                       </div>

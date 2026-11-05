@@ -976,7 +976,7 @@ export default function MoodboardExercise({
               </p>
             </div>
 
-            <div className="rounded-[1.2rem] border border-[var(--border)] bg-white/80 px-4 py-4 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)]">
+            <div className="rounded-[1.2rem] border border-[var(--border)] bg-[var(--moodboard-toolbar)]/80 px-4 py-4 shadow-[inset_0_1px_0_rgb(var(--tyash-highlight-rgb)/0.82)]">
               <p className="text-[0.7rem] font-black uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 Ambiance
               </p>
@@ -1111,7 +1111,7 @@ export default function MoodboardExercise({
           {uploadState.message ? (
             <p
               className={`mt-4 text-sm leading-6 ${
-                uploadState.status === "error" ? "text-[#9d5f46]" : "text-[var(--text-muted)]"
+                uploadState.status === "error" ? "text-[var(--moodboard-warning)]" : "text-[var(--text-muted)]"
               }`}
             >
               {uploadState.message}
@@ -1477,7 +1477,7 @@ export default function MoodboardExercise({
                   <button
                     type="button"
                     onClick={() => removeBlock(selectedBlock.id)}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#f1d6c8] bg-[var(--tyash-subtle)] px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#9d5f46]"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#f1d6c8] bg-[var(--tyash-subtle)] px-4 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[var(--moodboard-warning)]"
                   >
                     <TrashIcon className="h-4 w-4" />
                     Retirer ce bloc

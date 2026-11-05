@@ -21,7 +21,7 @@ export default function WithdrawalForm() {
     <label className="block">Référence de commande<input required name="sessionId" maxLength={255} className="block w-full rounded border p-3" /></label>
     <label className="block">E-mail pour recevoir l’accusé de réception<input required type="email" name="receiptEmail" className="block w-full rounded border p-3" /></label>
     {review ? <p role="status">Vérifiez les informations ci-dessus. En confirmant, vous déclarez : « Je vous notifie ma rétractation du contrat Brand Studio correspondant à cette commande. »</p> : null}
-    <button disabled={pending} className="rounded bg-[#4b4550] px-5 py-3 text-white">{pending ? "Envoi…" : review ? "Confirmer la rétractation" : "Se rétracter du contrat"}</button>
+    <button disabled={pending} className="rounded bg-[var(--neutral-button)] px-5 py-3 text-[var(--neutral-button-ink)]">{pending ? "Envoi…" : review ? "Confirmer la rétractation" : "Se rétracter du contrat"}</button>
     <p role="status">{message}</p>
   </form>;
 }

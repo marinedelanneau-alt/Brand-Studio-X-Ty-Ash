@@ -2,18 +2,40 @@
 
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useSyncExternalStore } from "react";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 
 type Theme = "light" | "dark";
 
-const STORAGE_KEY = "brand-studio-theme";
+const STORAGE_KEY = THEME_STORAGE_KEY;
+
+function applyTheme(theme: Theme) {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  window.dispatchEvent(new Event("brand-studio-theme-change"));
+}
 
 function getCurrentTheme(): Theme {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
 function subscribeToTheme(onStoreChange: () => void) {
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const syncPreference = () => {
+    let saved: string | null = null;
+    try { saved = window.localStorage.getItem(STORAGE_KEY); } catch { /* Private browsing. */ }
+    applyTheme(saved === "light" || saved === "dark" ? saved : media.matches ? "dark" : "light");
+  };
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY || event.key === null) syncPreference();
+  };
+  media.addEventListener("change", syncPreference);
+  window.addEventListener("storage", onStorage);
   window.addEventListener("brand-studio-theme-change", onStoreChange);
-  return () => window.removeEventListener("brand-studio-theme-change", onStoreChange);
+  return () => {
+    media.removeEventListener("change", syncPreference);
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener("brand-studio-theme-change", onStoreChange);
+  };
 }
 
 export default function ThemeToggle() {
@@ -21,10 +43,8 @@ export default function ThemeToggle() {
 
   function toggleTheme() {
     const nextTheme: Theme = getCurrentTheme() === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = nextTheme;
-    document.documentElement.style.colorScheme = nextTheme;
-    window.localStorage.setItem(STORAGE_KEY, nextTheme);
-    window.dispatchEvent(new Event("brand-studio-theme-change"));
+    try { window.localStorage.setItem(STORAGE_KEY, nextTheme); } catch { /* Keep the toggle usable. */ }
+    applyTheme(nextTheme);
   }
 
   const isDark = theme === "dark";

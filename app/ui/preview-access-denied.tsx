@@ -12,7 +12,7 @@ export default function PreviewAccessDenied() {
           Cette version contient des fonctionnalités et des contenus en cours de
           validation. Elle n’est pas accessible aux bêta-testeurs.
         </p>
-        <LogoutButton className="mt-6 h-12 rounded-xl bg-[#4b4550] px-5 font-bold text-white" />
+        <LogoutButton className="mt-6 h-12 rounded-xl bg-[var(--neutral-button)] px-5 font-bold text-[var(--neutral-button-ink)]" />
       </section>
     </main>
   );

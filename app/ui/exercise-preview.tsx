@@ -881,7 +881,7 @@ export default function ExercisePreview({ exercise }: { exercise: PreviewExercis
               <span className="font-[family:var(--font-cormorant)] text-[2rem] font-semibold leading-none text-[var(--heading-color)] sm:text-[2.35rem]">
                 {getPromptOpenLabel(displayQuestion)}
               </span>
-              <span className="text-[1.7rem] font-semibold leading-none text-[#355f9d]">:</span>
+              <span className="text-[1.7rem] font-semibold leading-none text-[var(--exercise-punctuation)]">:</span>
               <div className="min-w-64 flex-1">
                 <PreviewTextInput placeholder={exercise.answer_placeholder || "Votre réponse"} />
               </div>
