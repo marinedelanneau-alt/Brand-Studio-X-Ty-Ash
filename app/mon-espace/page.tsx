@@ -11,7 +11,6 @@ import ProjectNameForm from "@/app/ui/project-name-form";
 import RevealOnScroll from "@/app/ui/reveal-on-scroll";
 import WorkspaceLogoForm from "@/app/ui/workspace-logo-form";
 import LogoutButton from "../ui/logout-button";
-import { canReadClients } from "@/lib/account-permissions";
 import { getAuthenticatedAccount } from "@/lib/session";
 import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
 import { getWorkspaceData } from "@/lib/training";
@@ -318,13 +317,13 @@ export default async function MonEspacePage() {
             </div>
 
             <div
-              className={`grid gap-5 sm:grid-cols-2 lg:w-[21rem] lg:grid-cols-1 ${
+              className={`flex min-w-0 flex-col gap-5 lg:w-[21rem] ${
                 workspace.project
                   ? "lg:col-start-2 lg:row-span-2 lg:row-start-1"
                   : ""
               }`}
             >
-              <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-[var(--surface-highlight)]/80 bg-[var(--surface)]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[var(--border)]/80 backdrop-blur-[2px] sm:col-span-2 lg:col-span-1">
+              <div className="relative flex flex-1 flex-col overflow-hidden rounded-[1.7rem] border border-[var(--surface-highlight)]/80 bg-[var(--surface)]/95 p-4 shadow-[0_16px_38px_rgba(21,33,59,0.055)] ring-1 ring-[var(--border)]/80 backdrop-blur-[2px]">
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top_right,rgb(var(--tyash-glow-rgb)/0.08),transparent_48%)]"
@@ -333,7 +332,7 @@ export default async function MonEspacePage() {
                   iconOnly
                   className="group absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--tyash-border)] bg-[var(--card)] text-[var(--text-muted)] shadow-[0_8px_20px_rgba(92,78,63,0.1)] transition hover:border-[var(--tyash-primary)] hover:bg-[var(--tyash-soft)] hover:text-[var(--tyash-primary-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tyash-focus-ring)]"
                 />
-                <div className="relative flex h-full flex-col gap-4">
+                <div className="relative flex flex-1 flex-col gap-4 lg:justify-between [&>*]:shrink-0">
                   {workspace.project && workspace.modules.length > 0 ? (
                     <nav className="border-b border-[var(--border)] pb-3">
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-[var(--tyash-primary-dark)]">
@@ -407,9 +406,8 @@ export default async function MonEspacePage() {
                 </div>
               </div>
 
-              {canReadClients(account) ? <Link href="/admin/clients" className="bs-button-secondary rounded-xl px-4 py-3">Suivi TYASH</Link> : null}
               {account.is_admin ? (
-                <div className="sm:col-span-2 lg:col-span-1">
+                <div className="shrink-0">
                   <Link
                     href="/admin/modules"
                     className="flex h-12 items-center justify-center rounded-[0.9rem] border border-[var(--border)] bg-[var(--card)] px-5 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--text-primary)]"
