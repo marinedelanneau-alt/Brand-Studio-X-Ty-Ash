@@ -1,3 +1,4 @@
+import BrandStudioTyAshLockup from "@/app/ui/brand-studio-tyash-lockup";
 import { projectDocumentCopy } from "@/lib/project-document-copy";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,20 +34,7 @@ export default async function Home({
             <div className="pointer-events-none absolute left-0 top-12 h-28 w-28 rounded-full bg-[var(--tyash-primary)]/8 blur-3xl" />
 
             <div className="relative flex h-full flex-col gap-7">
-              <div className="flex items-center gap-4">
-                <Image
-                  src="/logo.png"
-                  alt="Brand Studio"
-                  width={154}
-                  height={86}
-                  className="h-auto w-[8rem]"
-                  priority
-                />
-                <div className="hidden h-5 w-px bg-[var(--border)] lg:block" />
-                <p className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-5 py-3 text-[0.72rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
-                  Espace de travail
-                </p>
-              </div>
+              <BrandStudioTyAshLockup />
 
               <div className="grid gap-6 lg:grid-cols-[11rem_minmax(0,1fr)] lg:items-center">
                 <div className="relative mx-auto min-h-[18rem] w-full max-w-[12rem] sm:min-h-[21rem] sm:max-w-[13rem] lg:mx-0 lg:min-h-[22rem] lg:max-w-[11rem]">
