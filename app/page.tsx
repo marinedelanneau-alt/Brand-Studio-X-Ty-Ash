@@ -80,15 +80,15 @@ export default async function Home({
                   Nouveau client
                 </p>
                 <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[var(--text-muted)]">
-                  Le paiement déclenche l&apos;envoi d&apos;un lien personnel
-                  pour choisir votre mot de passe. Vous pourrez ensuite créer votre
-                  compte et choisir votre mot de passe.
+                  Créez votre compte avec votre e-mail et votre mot de passe,
+                  puis activez votre accès aux modules pour 365 jours avec un
+                  paiement unique de 55 € TTC.
                 </p>
                 <Link
-                  href="/pricing"
+                  href="/register"
                   className="bs-access-dark-action mt-4 flex h-12 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-5 text-[0.8rem] font-extrabold uppercase tracking-[0.12em] text-[var(--text-muted)] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Souscrire à la formation
+                  Créer mon compte
                 </Link>
               </div>
 

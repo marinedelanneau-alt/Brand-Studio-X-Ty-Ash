@@ -46,9 +46,11 @@ describe("beta registration preservation", () => {
   it("copies the paid expiry instead of recalculating from registration", async () => {
     const expiry = new Date(Date.now() + 86400000).toISOString();
     mocks.activation.mockResolvedValue({ id: 1, offer_version: BRAND_STUDIO_OFFER.version, stripe_checkout_session_id: "cs_new" });
-    mocks.order.mockResolvedValue({ data: { expires_at: expiry, offer_version: BRAND_STUDIO_OFFER.version }, error: null });
+    const paidAt = new Date(Date.now() - 3000).toISOString();
+    mocks.order.mockResolvedValue({ data: { paid_at: paidAt, expires_at: expiry, offer_version: BRAND_STUDIO_OFFER.version }, error: null });
     await expect(submit()).rejects.toThrow("REDIRECT_SUCCESS");
     expect(mocks.subscription.mock.calls[0][0]).toMatchObject({ plan: BRAND_STUDIO_OFFER.version, currentPeriodEnd: expiry });
+    expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ accessStartedAt: paidAt }));
   });
   it("does not attach a commercial order to a pre-existing beta account", async () => {
     mocks.account.mockReset().mockResolvedValue({ id: 42 });

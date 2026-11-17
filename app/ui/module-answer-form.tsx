@@ -3,6 +3,9 @@ import { communicationActionPlanEnabled, answerAssistanceEnabled } from "@/lib/p
 import { formalizeClientCopy, clientOptionAnswerLabel } from "@/lib/client-copy";
 import { isTyAshContent, tyAshBrowserKey, encodeTyAshBrowserDraft, decodeTyAshBrowserDraft } from "@/lib/tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "@/lib/exercise-completion";
+import { getPathwayProgress } from "@/lib/pathway-progress";
+import { withClientExerciseOptions } from "@/lib/client-exercise-options";
+import { NEW_OFFER_OPTION, hasNewOfferDetail, isNewOfferDetail, getNewOfferDetail, setNewOfferDetail, removeNewOffer } from "@/lib/priority-offer-detail";
 
 import { SparklesIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -392,6 +395,7 @@ function normalizeOtherChoiceValuesForState(
     (value) =>
       value.trim().length > 0 &&
       !optionLabels.has(value) &&
+      !(hasNewOfferDetail(exercise) && isNewOfferDetail(value)) &&
       !isSerializedOtherChoiceValue(value) &&
       parseIndexedAnswerItems([value]).length === 0,
   );
@@ -1404,12 +1408,12 @@ function PopupMessageCard({
 }
 
 export default function ModuleAnswerForm({
-  module,
+  module: sourceModule,
   persistenceScope,
   activeSubmoduleId,
   initialExerciseIndex = 0,
   currentSubmoduleIndex = 0,
-  totalSubmodules = module.submodules.length,
+  totalSubmodules = sourceModule.submodules.length,
   onPreviousSubmodule,
   onNextSubmodule,
   onComplete,
@@ -1424,6 +1428,16 @@ export default function ModuleAnswerForm({
   onNextSubmodule?: () => void;
   onComplete?: (answers: Record<number, string[]>) => void;
 }) {
+  const { module } = useMemo(() => ({
+    module: {
+      ...sourceModule,
+      exercises: sourceModule.exercises.map(withClientExerciseOptions),
+      submodules: sourceModule.submodules.map(submodule => ({
+        ...submodule,
+        exercises: submodule.exercises.map(withClientExerciseOptions),
+      })),
+    },
+  }), [sourceModule]);
   const [state, formAction, pending] = useActionState(
     saveModuleAnswers,
     initialState,
@@ -1517,8 +1531,16 @@ export default function ModuleAnswerForm({
     () => module.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type) && countsTowardsProgress(exercise)).length,
     [module.exercises],
   );
-  const localProgressPercent = totalAnswerableExercises > 0 ? Math.round(progressCount / totalAnswerableExercises * 100) : module.progress.completionPercent;
-  const globalProgressPercent = Math.max(0, Math.min(100, Math.round((module.globalProgressPercent ?? module.progress.completionPercent) + (localProgressPercent - module.progress.completionPercent) / (module.globalModuleCount ?? 4))));
+  const globalProgressPercent = getPathwayProgress([
+    ...(module.otherModulesProgress ?? []),
+    {
+      answeredCount: progressCount,
+      exerciseCount: totalAnswerableExercises,
+      isCompleted: totalAnswerableExercises > 0
+        ? progressCount === totalAnswerableExercises
+        : module.progress.isCompleted,
+    },
+  ]);
   const isFirstSubmodule = currentSubmoduleIndex === 0;
   const isLastSubmodule =
     totalSubmodules === 0 || currentSubmoduleIndex === totalSubmodules - 1;
@@ -2609,7 +2631,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précise ta réponse"
+                                  aria-label="Précisez votre réponse" placeholder="Précisez votre réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                                 />
                               ) : null}
@@ -2662,7 +2684,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précise ta réponse"
+                            aria-label="Précisez votre réponse" placeholder="Précisez votre réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                           />
                         ) : null}
@@ -2851,7 +2873,7 @@ export default function ModuleAnswerForm({
                                       };
                                     })
                                   }
-                                  placeholder="Précise ta réponse"
+                                  aria-label="Précisez votre réponse" placeholder="Précisez votre réponse"
                                   className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                                 />
                               ) : null}
@@ -2886,6 +2908,8 @@ export default function ModuleAnswerForm({
                                   ...current,
                                   [currentExercise.id]: event.target.checked
                                     ? [...currentValues, option]
+                                    : hasNewOfferDetail(currentExercise) && option === NEW_OFFER_OPTION
+                                      ? removeNewOffer(currentValues)
                                     : isOtherOption
                                       ? removeOtherChoiceValues(currentValues, option)
                                       : currentValues.filter(
@@ -2898,6 +2922,21 @@ export default function ModuleAnswerForm({
                           />
                           <span>{currentExercise.tyashQuestionnaire ? clientOptionAnswerLabel(currentExercise, option) : formalizeClientCopy(option)}</span>
                         </label>
+                        {hasNewOfferDetail(currentExercise) && option === NEW_OFFER_OPTION && isChecked ? (
+                          <label className="mt-3 block text-sm text-[var(--text-primary)]">
+                            Laquelle ?
+                            <input
+                              type="text"
+                              value={getNewOfferDetail(answers[currentExercise.id] ?? [])}
+                              onChange={event => setAnswers(current => ({
+                                ...current,
+                                [currentExercise.id]: setNewOfferDetail(current[currentExercise.id] ?? [], event.target.value),
+                              }))}
+                              placeholder="Précisez votre nouvelle offre"
+                              className="mt-2 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
+                            />
+                          </label>
+                        ) : null}
                         {isOtherOption && isChecked ? (
                           <input
                             type="text"
@@ -2914,7 +2953,7 @@ export default function ModuleAnswerForm({
                                 ),
                               }))
                             }
-                            placeholder="Précise ta réponse"
+                            aria-label="Précisez votre réponse" placeholder="Précisez votre réponse"
                             className="mt-3 w-full rounded-[0.75rem] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm text-[var(--heading-color)] outline-none transition focus:border-[var(--exercise-focus)]"
                           />
                         ) : null}

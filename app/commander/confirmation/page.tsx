@@ -2,12 +2,36 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getStripe } from "@/lib/stripe";
 import { PLATFORM_CHECKOUT_FLOW } from "@/lib/platform-checkout";
+import { getCurrentAccount } from "@/lib/session";
+import { getAnnualPayment } from "@/lib/annual-payments";
+import { annualPaymentGrantsAccess } from "@/lib/annual-offer";
+import PaymentConfirmationRefresh from "@/app/ui/payment-confirmation-refresh";
+import BrandStudioTyAshLockup from "@/app/ui/brand-studio-tyash-lockup";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Votre commande — Brand Studio", robots: { index: false, follow: false } };
 
 export default async function ConfirmationPage({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {
   const { session_id: id } = await searchParams;
+  const account = await getCurrentAccount();
+  if (account?.annual_access_required) {
+    let payment = null;
+    try { payment = await getAnnualPayment(account.id); } catch {
+      console.error("[annual-confirmation] Payment lookup unavailable");
+    }
+    const ownsPayment = !!payment && payment.session_id === id;
+    const active = ownsPayment && payment && account.is_active && annualPaymentGrantsAccess(payment);
+    const blocked = ownsPayment && payment && ["refunded", "disputed"].includes(payment.status);
+    const retryable = ownsPayment && payment && ["failed", "expired"].includes(payment.status);
+    return <main className="min-h-screen px-5 py-12"><section className="mx-auto max-w-2xl rounded-[2rem] border border-[var(--border)] bg-[var(--card)] p-8 sm:p-12">
+      <BrandStudioTyAshLockup compact />
+      <h1 className="mt-8 text-3xl font-semibold">{active ? "Bienvenue dans Brand Studio X TyASH !" : blocked ? "Votre accès nécessite une vérification." : retryable ? "Votre paiement n’a pas été finalisé." : "Votre accès est en cours de confirmation."}</h1>
+      <p className="mt-6 leading-8">{active ? "Votre accès est activé pour 1 an. Vous pouvez maintenant commencer à construire votre projet vidéo." : blocked ? "Un remboursement ou une contestation a suspendu vos droits. Vos données sont conservées. Contactez le support." : retryable ? "Aucun accès n’a été activé. Vous pouvez revenir à la page de paiement." : "Nous attendons la confirmation sécurisée du paiement. Si vous avez déjà payé, ne repassez pas commande."}</p>
+      {!active && !blocked && !retryable ? <PaymentConfirmationRefresh /> : null}
+      {active ? <Link href="/mon-espace" className="mt-8 inline-block rounded-xl bs-button-primary px-6 py-4 font-bold">Accéder à mon espace</Link> : retryable ? <Link href="/commander" className="mt-8 inline-block underline">Retour au paiement</Link> : null}
+      <a href="mailto:contact@marined-communication.fr" className="mt-6 block text-sm underline">Contacter le support</a>
+    </section></main>;
+  }
   let state: "paid" | "pending" | "open" | "unknown" = "unknown";
   try {
     const owner = (await cookies()).get("platform_checkout_owner")?.value;

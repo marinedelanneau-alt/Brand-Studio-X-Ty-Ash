@@ -1,6 +1,7 @@
 import { activeQuestionnaire, retainQuestionnaireHistory, sameAnswerLayout } from "./questionnaire-admin";
 import { isTyAshContent, requireTyAshKey, resolveTyAshExerciseId } from "./tyash-answer-identity";
 import { countsTowardsProgress, completionOverride } from "./exercise-completion";
+import { getPathwayProgress } from "./pathway-progress";
 import "server-only";
 import { withFormalClientCopy } from "./client-copy";
 import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire";
@@ -511,7 +512,7 @@ export function getModuleProgress(
     ? 100
     : exerciseCount === 0
       ? 0
-      : Math.round((answeredCount / exerciseCount) * 100);
+      : Math.min(99, Math.round((answeredCount / exerciseCount) * 100));
 
   return {
     answeredCount,
@@ -1736,19 +1737,11 @@ export async function getWorkspaceData(accountId: number) {
   const completedModulesCount = workspaceModules.filter(
     (module) => module.progress.isCompleted,
   ).length;
-  const progressPercent =
-    totalModulesCount === 0
-      ? 0
-      : Math.round(
-          workspaceModules.reduce(
-            (total, module) => total + module.progress.completionPercent,
-            0,
-          ) / totalModulesCount,
-        );
+  const progressPercent = getPathwayProgress(workspaceModules.map(module => module.progress));
 
   return {
     project,
-    modules: workspaceModules.map(m => withFormalClientCopy({ ...m, globalProgressPercent: progressPercent, globalModuleCount: totalModulesCount })),
+    modules: workspaceModules.map(m => withFormalClientCopy({ ...m, globalProgressPercent: progressPercent, globalModuleCount: totalModulesCount, otherModulesProgress: workspaceModules.filter(other => other.id !== m.id).map(other => other.progress) })),
     progressPercent,
     completedModulesCount,
     totalModulesCount,

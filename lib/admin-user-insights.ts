@@ -8,6 +8,7 @@ import { isTyAshContent, requireTyAshKey } from "./tyash-answer-identity";
 import { getApplicationReleaseState, getContentReleaseSnapshot, isControlledProductionContentEnabled } from "./content-releases";
 import { validateReleaseModules } from "./release-content-validation";
 import { getModulesWithExercises, getModuleProgress } from "@/lib/training";
+import { getPathwayProgress } from "./pathway-progress";
 import { isAnswerableExerciseType } from "@/lib/exercise-types";
 import { getStableExerciseAnswerKey } from "@/lib/stable-answer-keys";
 import { projectTyashQuestionnaire, tyashRefonteEnabled } from "./tyash-questionnaire";
@@ -103,6 +104,7 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
         answerVersions: Object.fromEntries(m.exercises.flatMap(e => { const row = stableForUser.find(a => a.module_key === (e.answerModuleStableKey ?? m.stableKey) && a.question_key === e.stableKey); return row ? [[e.id, { updatedAt: Date.parse(row.client_updated_at || row.updated_at), revision: 0 }]] : []; })),
       })), prefills));
       const answers: AdminAnswerView[] = [];
+      const progressStates: ReturnType<typeof getModuleProgress>[] = [];
       const moduleProgress = clientModules.map((moduleItem) => {
         const answerable = moduleItem.exercises.filter((exercise) => isAnswerableExerciseType(exercise.type));
         const answerMap: Record<number, string[]> = {};
@@ -139,15 +141,15 @@ export const getAdminUsers = cache(async function getAdminUsers(): Promise<Admin
             });
           }
         }
+        const moduleState = getModuleProgress(moduleItem, moduleItem.exercises, answerMap, 1, false);
+        progressStates.push(moduleState);
         return {
           id: moduleItem.id,
           title: tyashRefonteEnabled(moduleItem) ? moduleItem.title : clientLabel(moduleItem.title),
-          progress: getModuleProgress(moduleItem, moduleItem.exercises, answerMap, 1, false).completionPercent,
+          progress: moduleState.completionPercent,
         };
       });
-      const progress = moduleProgress.length === 0
-        ? 0
-        : Math.round(moduleProgress.reduce((sum, item) => sum + item.progress, 0) / moduleProgress.length);
+      const progress = getPathwayProgress(progressStates);
       const lastActivityAt = latestDate(
         account.created_at,
         project?.updated_at,

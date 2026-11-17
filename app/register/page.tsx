@@ -1,5 +1,5 @@
 import AccessPageBackground from "@/app/ui/access-page-background";
-import Image from "next/image";
+import BrandStudioTyAshLockup from "@/app/ui/brand-studio-tyash-lockup";
 import Link from "next/link";
 import RegisterForm from "../ui/register-form";
 import { findActivationCodeByToken, findUsableActivationCodeByToken } from "@/lib/activation-codes";
@@ -7,7 +7,7 @@ import { getPublishedLegalDocument } from "@/lib/legal";
 import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 
 const values = [
-  "Lien personnel reçu après paiement",
+  "Compte personnel avec e-mail et mot de passe",
   "Choix de votre mot de passe",
   "Connexion ensuite par e-mail et mot de passe",
 ];
@@ -38,17 +38,7 @@ export default async function RegisterPage({
           <div className="grid items-start gap-8 lg:grid-cols-[1.02fr_0.98fr]">
             <div className="flex flex-col gap-5">
               <div className="rounded-[2.4rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] p-7 shadow-[0_22px_54px_rgba(221,204,176,0.14)] sm:p-8">
-                <p className="inline-flex rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-5 py-3 text-[0.82rem] font-black uppercase tracking-[0.22em] text-[var(--tyash-label-text)]">
-                  Espace de travail
-                </p>
-                <Image
-                  src="/logo.png"
-                  alt="Brand Studio"
-                  width={154}
-                  height={86}
-                  className="mt-8 h-auto w-[8.8rem]"
-                  priority
-                />
+                <BrandStudioTyAshLockup compact />
                 <h1 className="mt-8 max-w-lg font-[family:var(--font-cormorant)] text-[3rem] leading-[0.96] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[4rem]">
                   Ouvrir votre
                   <br />
@@ -125,11 +115,11 @@ export default async function RegisterPage({
                   ? "Choisissez votre mot de passe pour créer votre compte. Votre adresse e-mail est déjà associée à votre paiement."
                   : accountAlreadyCreated
                     ? "Votre compte a déjà été créé avec ce lien. Vous pouvez maintenant vous connecter avec votre e-mail et votre mot de passe."
-                  : "Ce lien personnel est absent, invalide ou expiré. Reprenez le lien reçu par e-mail après votre paiement."}
+                  : activationToken ? "Ce lien personnel est invalide ou expiré. Reprenez le lien reçu par e-mail après votre paiement." : "Créez votre compte, puis réglez votre accès annuel à 55 € TTC. Les exercices seront accessibles après confirmation du paiement."}
               </p>
 
               <div className="mt-7">
-                {activation ? (
+                {!activationToken ? <RegisterForm registrationToken="" email="" legalEnabled /> : activation ? (
                   <RegisterForm registrationToken={activation.code} email={activation.email} legalEnabled={activation.offer_version === BRAND_STUDIO_OFFER.version} termsId={activation.offer_version === BRAND_STUDIO_OFFER.version ? (await getPublishedLegalDocument("terms_of_use"))?.id : undefined} />
                 ) : accountAlreadyCreated ? (
                   <Link href="/" className="flex h-16 w-full items-center justify-center rounded-[1.15rem] bs-button-primary px-6 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_30px_rgb(var(--tyash-glow-rgb)/0.24)]">

@@ -1,3 +1,4 @@
+vi.mock("@/lib/subscriptions", () => ({ getSubscriptionAccessStatus: async () => ({ accessGranted: true }) }));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ account: null as null | { id: number; role: string; is_admin: boolean; is_active: boolean; can_view_clients?: boolean; complimentary_access?: boolean } }));
 vi.mock("server-only", () => ({}));

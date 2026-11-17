@@ -248,23 +248,8 @@ export default async function MonEspacePage() {
                 workspace.project ? "lg:col-start-1 lg:row-start-1" : ""
               }`}
             >
-              <div className="flex w-full flex-wrap items-center justify-between gap-4">
-                <div className="min-w-0 shrink-0">
-                  {workspace.project?.logo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={workspace.project.logo_url}
-                      alt={`Logo de ${workspaceTitle}`}
-                      className="h-16 w-16 rounded-[1rem] border border-[var(--border)] bg-[var(--card)] object-contain p-2"
-                    />
-                  ) : (
-                    <BrandStudioTyAshLockup />
-                  )}
-                </div>
-
-                <span className="inline-flex shrink-0 rounded-full border border-[var(--tyash-border)] bg-[var(--tyash-soft)] px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.2em] text-[var(--tyash-label-text)]">
-                  Espace de travail
-                </span>
+              <div className="flex w-full items-center">
+                <BrandStudioTyAshLockup />
               </div>
               <div className="mt-10 max-w-3xl pl-6 sm:pl-8">
                 <p className={`${notebookDisplay.className} text-[clamp(2.25rem,6vw,4rem)] leading-[1.05] tracking-[-0.01em] text-[var(--tyash-display-ink)] uppercase [overflow-wrap:anywhere]`}>

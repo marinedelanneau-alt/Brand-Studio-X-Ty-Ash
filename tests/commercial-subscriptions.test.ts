@@ -12,6 +12,23 @@ beforeEach(() => {
   mocks.update.mockReturnValue({ eq: async () => ({ error: null }) });
 });
 describe("subscription storage boundaries", () => {
+  it("expires complimentary accounts under the universal account lifetime", async () => {
+    mocks.single.mockResolvedValueOnce({ data: { is_active: true, complimentary_access: true, access_expires_at: "2000-01-01" }, error: null });
+    expect((await getSubscriptionAccessStatus(42)).accessGranted).toBe(false);
+  });
+  it("gives an existing paid account the new full year rather than its old purchase deadline", async () => {
+    mocks.single.mockResolvedValueOnce({ data: { is_active: true, access_expires_at: "2099-01-01" }, error: null })
+      .mockResolvedValueOnce({ data: { plan: BRAND_STUDIO_OFFER.version, status: "paid", access_granted: true, current_period_end: "2000-01-01" }, error: null });
+    const access = await getSubscriptionAccessStatus(42);
+    expect(access.accessGranted).toBe(true);
+    expect(access.currentPeriodEnd).toBe("2099-01-01");
+  });
+  it.each([{ is_admin: true }, { role: "admin" }, { email: "jsene@ty-ash.com" }])("keeps staff access unlimited: %o", async staff => {
+    mocks.single.mockResolvedValueOnce({ data: { ...staff, is_active: true, access_expires_at: "2000-01-01" }, error: null });
+    const access = await getSubscriptionAccessStatus(42);
+    expect(access.accessGranted).toBe(true);
+    expect(access.currentPeriodEnd).toBeNull();
+  });
   it("historical access remains valid with an old period end and does not write", async () => {
     mocks.single.mockResolvedValue({ data: { plan: "brand_studio", status: "paid", access_granted: true, current_period_end: "2000-01-01" }, error: null });
     expect((await getSubscriptionAccessStatus(42)).accessGranted).toBe(true);

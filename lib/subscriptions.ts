@@ -2,6 +2,9 @@ import "server-only";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { allowsOfferAccess, BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
+import { isAccountExpired, isLifetimeExempt } from "./account-lifetime";
+import { getAnnualPayment } from "./annual-payments";
+import { ANNUAL_OFFER, annualPaymentGrantsAccess } from "./annual-offer";
 
 export type SubscriptionStatus =
   | "none"
@@ -28,12 +31,31 @@ export async function getSubscriptionAccessStatus(
   userId: number,
 ): Promise<SubscriptionAccessStatus> {
   const supabase = createSupabaseServerClient();
+  // Keep the existing access flow usable during rollout: optional lifetime
+  // columns are absent until the migration has been applied.
   const { data: freeAccount, error: freeError } = await supabase.from("client_access_codes")
-    .select("is_active,complimentary_access").eq("id", userId).maybeSingle();
+    .select("*").eq("id", userId).maybeSingle();
   if (freeError) throw new Error(freeError.message);
+  const lifetimeExpiry = freeAccount?.access_expires_at ?? null;
+  if (freeAccount && (freeAccount.is_active === false || isAccountExpired(freeAccount))) {
+    return { status: "none", accessGranted: false, plan: "expired",
+      stripeCustomerId: null, stripeSubscriptionId: null, currentPeriodEnd: lifetimeExpiry };
+  }
+  if (freeAccount && isLifetimeExempt(freeAccount)) {
+    return { status: "active", accessGranted: true, plan: "admin",
+      stripeCustomerId: null, stripeSubscriptionId: null, currentPeriodEnd: null };
+  }
+  if (freeAccount?.annual_access_required) {
+    const payment = await getAnnualPayment(userId);
+    return { plan: ANNUAL_OFFER.version,
+      status: payment?.status === "paid" ? "paid" : "none",
+      accessGranted: !!payment && annualPaymentGrantsAccess(payment),
+      stripeCustomerId: payment?.customer_id ?? null, stripeSubscriptionId: null,
+      currentPeriodEnd: payment?.expires_at ?? null };
+  }
   if (freeAccount?.is_active !== false && freeAccount?.complimentary_access === true) {
     return { status: "active", accessGranted: true, plan: "complimentary",
-      stripeCustomerId: null, stripeSubscriptionId: null, currentPeriodEnd: null };
+      stripeCustomerId: null, stripeSubscriptionId: null, currentPeriodEnd: lifetimeExpiry };
   }
   const { data, error } = await supabase
     .from("subscriptions")
@@ -55,17 +77,19 @@ export async function getSubscriptionAccessStatus(
       accessGranted: false,
       stripeCustomerId: null,
       stripeSubscriptionId: null,
-      currentPeriodEnd: null,
+      currentPeriodEnd: lifetimeExpiry,
     };
   }
 
   return {
     status: (data.status ?? "none") as SubscriptionStatus,
-    accessGranted: allowsOfferAccess(data.plan, data.access_granted === true, data.current_period_end),
+    accessGranted: lifetimeExpiry
+      ? data.access_granted === true
+      : allowsOfferAccess(data.plan, data.access_granted === true, data.current_period_end),
     plan: data.plan ?? null,
     stripeCustomerId: data.stripe_customer_id ?? null,
     stripeSubscriptionId: data.stripe_subscription_id ?? null,
-    currentPeriodEnd: data.current_period_end ?? null,
+    currentPeriodEnd: lifetimeExpiry ?? data.current_period_end ?? null,
   };
 }
 
@@ -73,17 +97,17 @@ export async function hasActiveAccess(userId: number) {
   const supabase = createSupabaseServerClient();
   const { data: account, error: accountError } = await supabase
     .from("client_access_codes")
-    .select("is_admin,is_active")
+    .select("*")
     .eq("id", userId)
-    .maybeSingle<{ is_admin: boolean; is_active: boolean }>();
+    .maybeSingle<{ is_admin: boolean; is_active: boolean; role?: string; email?: string; access_expires_at?: string | null; access_deletion_started_at?: string | null }>();
 
   if (accountError) {
     throw new Error(accountError.message);
   }
 
-  if (account?.is_active === false) return false;
+  if (!account || account.is_active === false || isAccountExpired(account)) return false;
 
-  if (account?.is_admin) {
+  if (isLifetimeExempt(account)) {
     return true;
   }
 

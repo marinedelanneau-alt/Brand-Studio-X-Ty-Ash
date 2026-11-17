@@ -136,7 +136,7 @@ export default function RegisterForm({
           Ce que vous obtenez
         </p>
         <p className="mt-4 text-sm leading-6 text-[var(--text-muted)]">
-          Après avoir choisi votre mot de passe, votre compte sera créé et vous accéderez directement à la formation.
+          {registrationToken ? "Après avoir choisi votre mot de passe, votre compte sera créé et vous accéderez directement à la formation." : "Votre compte sera créé avant le paiement. Votre accès aux modules sera activé après confirmation du paiement de 55 € TTC pour 365 jours."}
         </p>
       </div>
 

@@ -97,6 +97,7 @@ export type WorkspaceModule = BrandModule & {
   answerProjectId?: number;
   globalProgressPercent?: number;
   globalModuleCount?: number;
+  otherModulesProgress?: ModuleProgress[];
   submodules: Array<
     BrandSubmodule & {
       exercises: ModuleExercise[];

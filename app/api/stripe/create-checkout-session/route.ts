@@ -1,114 +1,68 @@
-import { NextResponse } from "next/server";
-import { getCurrentAccount } from "@/lib/session";
-import { findStripeCustomerId, getSubscriptionAccessStatus, upsertSubscription } from "@/lib/subscriptions";
-import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
-import { getStripe, getStripeCheckoutMode } from "@/lib/stripe";
-import { createStripeReturnUrl } from "@/lib/stripe-return-url";
+﻿import { getCurrentAccount } from "@/lib/session";
+import { getSubscriptionAccessStatus } from "@/lib/subscriptions";
+import { createSupabaseAuthServerClient, createSupabaseServerClient } from "@/lib/supabase/server";
+import { ANNUAL_OFFER } from "@/lib/annual-offer";
+import { annualLiveMode, getAnnualStripe } from "@/lib/annual-stripe";
+import { updateAnnualCheckoutState, type AnnualPayment } from "@/lib/annual-payments";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const origin = new URL(request.url).origin;
+  if (request.headers.get("origin") !== origin) return Response.json({ error: "Origine invalide." }, { status: 403 });
   try {
+    const auth = await createSupabaseAuthServerClient();
+    const { data: { user }, error: authError } = await auth.auth.getUser();
     const account = await getCurrentAccount();
-    if (account && (await getSubscriptionAccessStatus(account.id)).plan === BRAND_STUDIO_OFFER.version) {
-      return NextResponse.json({ error: "Contactez le support pour votre achat Brand Studio." }, { status: 409 });
+    if (authError || !user || !account || account.auth_user_id !== user.id) {
+      return Response.json({ error: "Connectez-vous avant de régler votre accès." }, { status: 401 });
     }
-    const body = (await request.json().catch(() => null)) as
-      | { email?: unknown }
-      | null;
-    const submittedEmail =
-      typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
-    const email = account?.email.trim().toLowerCase() || submittedEmail;
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json(
-        { error: "Une adresse e-mail valide est obligatoire pour souscrire." },
-        { status: 400 },
-      );
+    const access = await getSubscriptionAccessStatus(account.id);
+    if (access.accessGranted || !account.annual_access_required) {
+      return Response.json({ error: "Votre compte ne nécessite pas de nouvel achat. Contactez le support si nécessaire." }, { status: 409 });
     }
-
+    const stripe = getAnnualStripe();
+    const liveMode = annualLiveMode();
     const priceId = process.env.STRIPE_PRICE_ID;
-
-    if (!priceId) {
-      return NextResponse.json(
-        { error: "Stripe checkout is not configured" },
-        { status: 500 },
-      );
+    if (!priceId) throw new Error("Missing price");
+    const price = await stripe.prices.retrieve(priceId);
+    if (!price.active || price.type !== "one_time" || price.recurring || price.currency !== ANNUAL_OFFER.currency
+      || price.unit_amount !== ANNUAL_OFFER.amount || price.tax_behavior === "exclusive" || price.livemode !== liveMode) {
+      throw new Error("Invalid annual price");
     }
-
-    const stripe = getStripe();
-    const mode = getStripeCheckoutMode();
-    const successUrl = createStripeReturnUrl(request.url, "/?payment=success");
-    const cancelUrl = createStripeReturnUrl(
-      request.url,
-      "/pricing?payment=cancelled",
-    );
-    let customerId = account ? await findStripeCustomerId(account.id) : null;
-
-    if (account && !customerId) {
-      const customer = await stripe.customers.create({
-        email,
-        name: account.client_name ?? account.company_name ?? undefined,
-        metadata: {
-          user_id: String(account.id),
-          product: "brand_studio",
-        },
-      });
-      customerId = customer.id;
-
-      await upsertSubscription({
-        userId: account.id,
-        stripeCustomerId: customerId,
-        priceId,
-        status: "pending",
-        accessGranted: false,
-      });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode,
-      customer: customerId ?? undefined,
-      customer_email: customerId ? undefined : email,
-      customer_creation: !account && mode === "payment" ? "always" : undefined,
-      line_items: [{ price: priceId, quantity: 1 }],
-      allow_promotion_codes: true,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: {
-        user_id: account ? String(account.id) : "",
-        product: "brand_studio",
-      },
-      payment_intent_data:
-        mode === "payment"
-          ? {
-              metadata: {
-                user_id: account ? String(account.id) : "",
-                product: "brand_studio",
-              },
-            }
-          : undefined,
-      subscription_data:
-        mode === "subscription"
-          ? {
-              metadata: {
-                user_id: account ? String(account.id) : "",
-                product: "brand_studio",
-              },
-            }
-          : undefined,
+    const db = createSupabaseServerClient();
+    const reserve = () => db.rpc("reserve_annual_checkout", {
+      target_account_id: account.id, target_auth_user_id: user.id, target_price_id: priceId, target_live_mode: liveMode,
     });
-
-    if (!session.url) {
-      return NextResponse.json(
-        { error: "Stripe n'a pas retourné d'URL de paiement" },
-        { status: 502 },
-      );
+    let { data, error } = await reserve();
+    if (error || !data) return Response.json({ error: "Un paiement est déjà en cours ou votre accès nécessite une vérification. Consultez votre confirmation avant de recommencer." }, { status: 409 });
+    let order = data as AnnualPayment;
+    if (order.session_id) {
+      const existing = await stripe.checkout.sessions.retrieve(order.session_id);
+      if (existing.status === "open" && existing.url) return Response.json({ url: existing.url });
+      if (existing.status !== "expired") return Response.json({ error: "Votre paiement est en cours de confirmation. Ne repassez pas commande." }, { status: 409 });
+      await updateAnnualCheckoutState(existing, "expired");
+      ({ data, error } = await reserve());
+      if (error || !data) throw new Error("Checkout reservation failed");
+      order = data as AnnualPayment;
     }
-
-    return NextResponse.json({ url: session.url });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to create checkout session";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const metadata = { offer_version: ANNUAL_OFFER.version, order_id: order.id, auth_user_id: user.id, user_id: String(account.id) };
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment", locale: "fr", customer_email: account.email, customer_creation: "always",
+      client_reference_id: user.id, line_items: [{ price: order.price_id, quantity: 1 }],
+      expires_at: Math.floor(Date.parse(order.checkout_expires_at) / 1000),
+      success_url: `${origin}/commander/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/commander?payment=cancelled`,
+      metadata, payment_intent_data: { metadata },
+      custom_text: { submit: { message: "55 € TTC · paiement unique · accès 365 jours dès confirmation du paiement · aucun renouvellement automatique." } },
+    }, { idempotencyKey: `annual-${order.id}-${order.checkout_attempt}` });
+    if (!session.url) throw new Error("Missing checkout URL");
+    const { error: saveError } = await db.from("annual_payments").update({ session_id: session.id, customer_id: typeof session.customer === "string" ? session.customer : null, updated_at: new Date().toISOString() })
+      .eq("id", order.id).eq("checkout_attempt", order.checkout_attempt).is("session_id", null);
+    if (saveError) throw new Error("Checkout persistence failed");
+    return Response.json({ url: session.url }, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    console.error("[annual-checkout] Session preparation failed");
+    return Response.json({ error: "Le paiement est momentanément indisponible. Si vous avez déjà payé, contactez le support avant de recommencer." }, { status: 503 });
   }
 }

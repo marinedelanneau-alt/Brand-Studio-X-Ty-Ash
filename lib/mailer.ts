@@ -3,6 +3,7 @@ import "server-only";
 import { BrevoClient } from "@getbrevo/brevo";
 import { getPublicSiteUrlWithFallback } from "./public-site-url";
 import { BrevoDeliveryError, logJulienBrevoFailure } from "./brevo-diagnostics";
+import { buildAccountExpiryEmail } from "./account-expiry-email";
 
 type SendAccessCodeEmailInput = {
   email: string;
@@ -41,6 +42,22 @@ function getBrevoConfig() {
     replyToEmail,
     replyToName,
   };
+}
+
+export async function sendAccountExpiryEmail(input: {
+  email: string; clientName: string | null; expiresAt: string; stage: "month" | "fortnight";
+}) {
+  const config = getBrevoConfig();
+  const content = buildAccountExpiryEmail({ ...input, siteUrl: getPublicSiteUrlWithFallback() });
+  const brevo = new BrevoClient({ apiKey: config.apiKey, timeoutInSeconds: 15, maxRetries: 0 });
+  const receipt = await brevo.transactionalEmails.sendTransacEmail({
+    subject: content.subject, textContent: content.text,
+    sender: { email: config.senderEmail, name: config.senderName },
+    to: [{ email: input.email }],
+    replyTo: config.replyToEmail ? { email: config.replyToEmail } : undefined,
+  });
+  if (!receipt.messageId) throw new Error("Expiry reminder delivery not confirmed");
+  return receipt.messageId;
 }
 
 export function assertJulienEmailConfigured() {

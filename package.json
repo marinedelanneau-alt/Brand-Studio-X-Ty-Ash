@@ -33,6 +33,7 @@
     "@tiptap/react": "^3.22.3",
     "@tiptap/starter-kit": "^3.22.3",
     "dexie": "^4.4.4",
+    "fflate": "^0.8.3",
     "html-to-image": "^1.11.13",
     "next": "16.2.1",
     "react": "19.2.4",
@@ -41,6 +42,7 @@
     "stripe": "^22.1.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@napi-rs/canvas": "^1.0.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

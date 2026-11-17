@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { findAccountByCode } from "@/lib/access-codes";
 import { getUserFacingDataErrorMessage } from "@/lib/runtime-errors";
+import { isAccountExpired } from "@/lib/account-lifetime";
 
 type ActionState = {
   status: "idle" | "error" | "success";
@@ -34,6 +35,9 @@ export async function validateAccessCode(
         status: "error",
         message: "Code invalide ou désactivé. Réessayez avec votre accès.",
       };
+    }
+    if (isAccountExpired(data)) {
+      return { status: "error", message: "Votre année d’accès a expiré. Vos données sont conservées. Connectez-vous avec votre e-mail et votre mot de passe ou contactez le support." };
     }
 
     const cookieStore = await cookies();

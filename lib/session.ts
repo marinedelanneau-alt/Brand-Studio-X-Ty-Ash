@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { findAccountByAuthUserId, findAccountByCode } from "@/lib/access-codes";
 import { createSupabaseAuthServerClient } from "@/lib/supabase/server";
 import { canAdminister, canReadClients, isClientViewer } from "./account-permissions";
+import { isAccountExpired } from "./account-lifetime";
+import { getSubscriptionAccessStatus } from "./subscriptions";
 
 export const getCurrentAccount = cache(async function getCurrentAccount() {
   let userId: string | null = null;
@@ -52,6 +54,12 @@ export async function getAuthenticatedAccount() {
     redirect("/");
   }
 
+  if (!canAdminister(account)) {
+    if (isAccountExpired(account)) redirect("/acces-expire");
+    const access = await getSubscriptionAccessStatus(account.id);
+    if (!access.accessGranted) redirect(account.access_started_at ? "/acces-expire" : "/commander");
+  }
+
   return account;
 }
 
@@ -73,7 +81,7 @@ export async function getAuthenticatedClientReader() {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) redirect("/");
   const account = await findAccountByAuthUserId(user.id);
-  if (!account || account.is_active === false) redirect("/");
+  if (!account || account.is_active === false || isAccountExpired(account)) redirect("/");
   if (!canReadClients(account)) redirect("/mon-espace");
   return account;
 }

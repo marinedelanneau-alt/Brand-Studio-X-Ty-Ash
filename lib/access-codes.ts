@@ -14,7 +14,11 @@ type AccessCodeRecord = {
   role?: "user" | "admin";
   can_view_clients?: boolean;
   complimentary_access?: boolean;
+  annual_access_required?: boolean;
   created_at: string;
+  access_started_at?: string | null;
+  access_expires_at?: string | null;
+  access_deletion_started_at?: string | null;
 };
 
 function getTableConfig() {
@@ -163,6 +167,8 @@ export async function insertAccount(input: {
   email: string;
   clientName: string;
   companyName: string;
+  accessStartedAt?: string;
+  annualAccessRequired?: boolean;
 }) {
   const { tableName, codeColumn, activeColumn, labelColumn } = getTableConfig();
   const supabase = createSupabaseServerClient();
@@ -174,6 +180,8 @@ export async function insertAccount(input: {
     [labelColumn]: input.clientName,
     company_name: input.companyName,
     [activeColumn]: true,
+    ...(input.accessStartedAt ? { access_started_at: input.accessStartedAt } : {}),
+    ...(input.annualAccessRequired ? { annual_access_required: true } : {}),
   });
 
   if (error) {

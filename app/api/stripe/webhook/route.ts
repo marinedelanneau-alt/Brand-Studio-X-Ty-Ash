@@ -11,6 +11,9 @@ import { getStripe } from "@/lib/stripe";
 import { BRAND_STUDIO_OFFER } from "@/lib/brand-studio-offer";
 import { fulfillCommercialOrder } from "@/lib/commercial-order-fulfillment";
 import { PLATFORM_AMOUNT, PLATFORM_CHECKOUT_FLOW, PLATFORM_PRICE_ID } from "@/lib/platform-checkout";
+import { ANNUAL_OFFER } from "@/lib/annual-offer";
+import { fulfillAnnualPayment, updateAnnualCheckoutState, revokeAnnualPayment } from "@/lib/annual-payments";
+import { annualLiveMode } from "@/lib/annual-stripe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -190,21 +193,50 @@ export async function POST(request: Request) {
   try {
     const body = await request.text();
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Invalid webhook";
-    return NextResponse.json({ error: message }, { status: 400 });
+  } catch {
+    return NextResponse.json({ error: "Invalid Stripe signature" }, { status: 400 });
   }
 
   try {
+    if (process.env.STRIPE_MODE && event.livemode !== annualLiveMode()) {
+      return NextResponse.json({ error: "Payment environment mismatch" }, { status: 400 });
+    }
     switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
-        if (event.data.object.metadata?.offer_version === BRAND_STUDIO_OFFER.version) {
+        if (event.data.object.metadata?.offer_version === ANNUAL_OFFER.version) {
+          await fulfillAnnualPayment(event.data.object, event);
+          if (event.data.object.payment_status !== "paid") await updateAnnualCheckoutState(event.data.object, "processing");
+        } else if (event.data.object.metadata?.offer_version === BRAND_STUDIO_OFFER.version) {
           await fulfillCommercialOrder(event.data.object, event);
         } else {
           await handleCheckoutCompleted(event.data.object);
         }
         break;
+      case "checkout.session.async_payment_failed":
+      case "checkout.session.expired":
+        if (event.data.object.metadata?.offer_version === ANNUAL_OFFER.version) {
+          await updateAnnualCheckoutState(event.data.object, event.type === "checkout.session.expired" ? "expired" : "failed");
+        }
+        break;
+      case "charge.refunded": {
+        const charge = event.data.object;
+        const paymentIntentId = objectId(charge.payment_intent);
+        if (charge.refunded && charge.amount_refunded === charge.amount && paymentIntentId) {
+          await revokeAnnualPayment(paymentIntentId, event.livemode, "refunded");
+        }
+        break;
+      }
+      case "charge.dispute.created": {
+        const dispute = event.data.object;
+        let paymentIntentId = objectId(dispute.payment_intent);
+        if (!paymentIntentId) {
+          const charge = await stripe.charges.retrieve(objectId(dispute.charge)!);
+          paymentIntentId = objectId(charge.payment_intent);
+        }
+        if (paymentIntentId) await revokeAnnualPayment(paymentIntentId, event.livemode, "disputed");
+        break;
+      }
       case "customer.subscription.created":
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
@@ -221,9 +253,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to process webhook";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    console.error("[stripe-webhook] Processing failed", { eventId: event.id, type: event.type });
+    return NextResponse.json({ error: "Unable to process webhook" }, { status: 500 });
   }
 }

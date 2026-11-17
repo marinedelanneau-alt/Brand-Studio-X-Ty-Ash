@@ -1,3 +1,4 @@
+vi.mock("server-only", () => ({}));
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ event: vi.fn(), items: vi.fn(), existing: vi.fn(), activation: vi.fn(), deliver: vi.fn(), upsert: vi.fn(), commercial: vi.fn() }));
 vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ webhooks: { constructEvent: mocks.event }, checkout: { sessions: { listLineItems: mocks.items } } }) }));
