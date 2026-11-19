@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { beforeEach, afterEach, expect, it, vi } from "vitest";
-const m = vi.hoisted(() => ({ rpc: vi.fn(), single: vi.fn(), items: vi.fn(), update: vi.fn(), intent: vi.fn(), filters: [] as unknown[][] }));
+const m = vi.hoisted(() => ({ rpc: vi.fn(), single: vi.fn(), items: vi.fn(), update: vi.fn(), intent: vi.fn(), fulfillGuest: vi.fn(), filters: [] as unknown[][] }));
+vi.mock("@/lib/annual-activation", () => ({ fulfillGuestAnnualAccount: m.fulfillGuest }));
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/annual-stripe", () => ({ annualLiveMode: () => false, getAnnualStripe: () => stripeClient() }));
 vi.mock("@/lib/stripe", () => ({ getStripe: () => stripeClient() }));
@@ -19,7 +20,7 @@ const sdk = new Stripe("sk_test_fake");
 function stripeClient() { return { webhooks: sdk.webhooks, checkout: { sessions: { listLineItems: m.items } }, paymentIntents: { retrieve: m.intent } }; }
 import { POST } from "../app/api/stripe/webhook/route";
 import { ANNUAL_OFFER } from "../lib/annual-offer";
-const session = { id: "cs_test55", mode: "payment", livemode: false, currency: "eur", amount_total: 5500, payment_status: "paid", payment_intent: "pi55", customer: "cus55", client_reference_id: "auth55", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", auth_user_id: "auth55" } };
+const session = { id: "cs_test55", mode: "payment", livemode: false, currency: "eur", amount_total: 5200, payment_status: "paid", payment_intent: "pi55", customer: "cus55", client_reference_id: "auth55", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", auth_user_id: "auth55" } };
 function request(type = "checkout.session.completed", object: unknown = session, valid = true) {
   const payload = JSON.stringify({ id: "evt55", created: 1794900000, livemode: false, type, data: { object } });
   const signature = sdk.webhooks.generateTestHeaderString({ payload, secret: valid ? "whsec_fake" : "whsec_wrong" });
@@ -33,9 +34,19 @@ beforeEach(() => {
   m.intent.mockResolvedValue({ metadata: { order_id: "order55", offer_version: ANNUAL_OFFER.version } });
 });
 afterEach(() => vi.unstubAllEnvs());
-it("verifies a real Stripe signature and atomically activates only the evidenced 55 EUR purchase", async () => {
+it("verifies a real Stripe signature and atomically activates only the evidenced 52 EUR purchase", async () => {
   expect((await POST(request())).status).toBe(200);
   expect(m.rpc).toHaveBeenCalledWith("apply_annual_payment", expect.objectContaining({ target_session_id: "cs_test55", target_payment_intent_id: "pi55", target_live_mode: false, target_event_id: "evt55" }));
+});
+it("creates or associates a guest account only after validating the signed purchase and applying its payment", async () => {
+  m.single.mockResolvedValue({ data: { id: "order55", purchase_email: "guest@example.test", price_id: "price55", live_mode: false }, error: null });
+  const guest = { ...session, client_reference_id: "order55", customer_email: "guest@example.test", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", checkout_flow: "annual_guest_v1" } };
+  expect((await POST(request(undefined, guest))).status).toBe(200);
+  expect(m.fulfillGuest).toHaveBeenCalledWith("order55");
+  expect(m.rpc.mock.invocationCallOrder[0]).toBeLessThan(m.fulfillGuest.mock.invocationCallOrder[0]);
+  m.fulfillGuest.mockClear();
+  expect((await POST(request(undefined, { ...guest, customer_email: "someoneelse@example.test" }))).status).toBe(500);
+  expect(m.fulfillGuest).not.toHaveBeenCalled();
 });
 it("rejects a bad signature without reading or changing rights", async () => {
   expect((await POST(request(undefined, session, false))).status).toBe(400);
@@ -61,9 +72,9 @@ it("retries a transient database activation error instead of acknowledging it", 
   expect((await POST(request())).status).toBe(200);
 });
 it("revokes a full refund and any dispute, leaving partial refunds unchanged", async () => {
-  await POST(request("charge.refunded", { amount: 5500, amount_refunded: 1000, refunded: false, payment_intent: "pi55" }));
+  await POST(request("charge.refunded", { amount: 5200, amount_refunded: 1000, refunded: false, payment_intent: "pi55" }));
   expect(m.update).not.toHaveBeenCalled();
-  await POST(request("charge.refunded", { amount: 5500, amount_refunded: 5500, refunded: true, payment_intent: "pi55" }));
+  await POST(request("charge.refunded", { amount: 5200, amount_refunded: 5200, refunded: true, payment_intent: "pi55" }));
   expect(m.update).toHaveBeenCalledWith(expect.objectContaining({ status: "refunded" }));
   expect(m.filters).toContainEqual(["id", "order55"]);
   await POST(request("charge.dispute.created", { payment_intent: "pi55" }));

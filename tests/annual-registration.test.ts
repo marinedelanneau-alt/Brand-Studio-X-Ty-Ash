@@ -18,9 +18,9 @@ beforeEach(() => {
   m.create.mockResolvedValue({ data: { user: { id: "auth55" } }, error: null });
   m.login.mockResolvedValue({ error: null });
 });
-it("creates an unpaid account tied to the server-created Auth identity and redirects to payment", async () => {
-  await expect(submit()).rejects.toThrow("redirect:/commander");
-  expect(m.insert).toHaveBeenCalledWith({ email: "new@example.test", clientName: "Camille", companyName: "Studio", authUserId: "auth55", annualAccessRequired: true });
+it("closes the former account-before-payment action", async () => {
+  expect((await submit()).status).toBe("error");
+  expect(m.create).not.toHaveBeenCalled(); expect(m.insert).not.toHaveBeenCalled();
   expect(m.subscription).not.toHaveBeenCalled();
 });
 it("preserves existing accounts and their privileges", async () => {
@@ -28,10 +28,10 @@ it("preserves existing accounts and their privileges", async () => {
   expect((await submit()).status).toBe("error");
   expect(m.create).not.toHaveBeenCalled(); expect(m.insert).not.toHaveBeenCalled(); expect(m.remove).not.toHaveBeenCalled();
 });
-it("rolls back only the newly created unattached Auth user on profile creation failure", async () => {
+it("never creates or deletes Auth identities without a paid activation", async () => {
   m.insert.mockRejectedValue(new Error("DB failure"));
   expect((await submit()).status).toBe("error");
-  expect(m.remove).toHaveBeenCalledWith("auth55");
+  expect(m.remove).not.toHaveBeenCalled(); expect(m.create).not.toHaveBeenCalled();
   expect(m.subscription).not.toHaveBeenCalled(); expect(m.login).not.toHaveBeenCalled();
 });
 it("preserves the identity when profile insertion committed before a network error", async () => {

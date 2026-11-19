@@ -1,7 +1,7 @@
 export const ANNUAL_OFFER = {
   version: "tyash-beta-55-365-v1",
   name: "Brand Studio X TyASH — Accès 1 an",
-  amount: 5500,
+  amount: 5200,
   currency: "eur",
   days: 365,
 } as const;

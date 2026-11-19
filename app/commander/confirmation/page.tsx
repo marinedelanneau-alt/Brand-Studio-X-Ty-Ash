@@ -7,12 +7,38 @@ import { getAnnualPayment } from "@/lib/annual-payments";
 import { annualPaymentGrantsAccess } from "@/lib/annual-offer";
 import PaymentConfirmationRefresh from "@/app/ui/payment-confirmation-refresh";
 import BrandStudioTyAshLockup from "@/app/ui/brand-studio-tyash-lockup";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PURCHASE_COOKIE, fingerprint } from "@/lib/annual-guest-security";
+import type { GuestAnnualPayment } from "@/lib/annual-activation";
+import { annualLiveMode } from "@/lib/annual-stripe";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Votre commande — Brand Studio", robots: { index: false, follow: false } };
 
 export default async function ConfirmationPage({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {
   const { session_id: id } = await searchParams;
+  const purchaseOwner = (await cookies()).get(PURCHASE_COOKIE)?.value;
+  if (purchaseOwner && /^[a-f0-9]{64}$/.test(purchaseOwner) && typeof id === "string" && /^cs_[a-zA-Z0-9_]+$/.test(id)) {
+    let payment: GuestAnnualPayment | null = null;
+    try {
+      const result = await createSupabaseServerClient().from("annual_payments").select("*")
+        .eq("session_id", id).eq("owner_hash", fingerprint(purchaseOwner)).eq("live_mode", annualLiveMode()).maybeSingle<GuestAnnualPayment>();
+      if (!result.error) payment = result.data;
+    } catch { console.error("[annual-confirmation] Guest purchase lookup unavailable"); }
+    if (payment) {
+      const ready = annualPaymentGrantsAccess(payment) && payment.fulfillment_state === "ready" && !!payment.email_message_id;
+      const review = ["refunded", "disputed"].includes(payment.status) || !["pending", "ready"].includes(payment.fulfillment_state) || (payment.status === "paid" && !!payment.expires_at && Date.parse(payment.expires_at) <= Date.now());
+      const retry = ["failed", "expired"].includes(payment.status);
+      return <main className="min-h-screen px-4 py-12"><section className="mx-auto max-w-2xl rounded-[2rem] border border-[var(--border)] bg-[var(--card)] p-6 sm:p-10">
+        <BrandStudioTyAshLockup compact />
+        <h1 className="mt-8 font-[family:var(--font-cormorant)] text-4xl leading-tight">{ready ? "Votre projet vidéo peut commencer !" : review ? "Votre commande nécessite une vérification." : retry ? "Votre paiement n’a pas été finalisé." : "Votre accès est en cours de confirmation."}</h1>
+        {ready ? <><p className="mt-6 leading-8">Votre paiement a bien été confirmé.</p><p className="mt-4 leading-8">{payment.activation_required && !payment.password_initialized_at ? "Nous venons de vous envoyer un e-mail pour créer votre mot de passe et accéder à Brand Studio X TyASH." : "Votre accès est disponible. Connectez-vous avec votre mot de passe habituel."}</p><p className="mt-4 text-sm leading-7">Pensez à vérifier vos courriers indésirables.</p><Link href={payment.activation_required && !payment.password_initialized_at ? "/activer" : "/"} className="mt-7 inline-block underline">{payment.activation_required && !payment.password_initialized_at ? "Renvoyer mon lien d’activation" : "Se connecter"}</Link></> : <p className="mt-6 leading-8">{review ? "Vos données et vos droits existants sont conservés. Contactez le support pour vérifier cette commande avant tout nouvel achat." : retry ? "Vous pouvez revenir au paiement pour réessayer." : "Nous attendons la confirmation sécurisée du paiement et la préparation de votre accès. Si vous avez déjà payé, ne repassez pas commande. L’e-mail vous sera envoyé dès que votre accès sera prêt."}</p>}
+        {!ready && !review && !retry ? <PaymentConfirmationRefresh /> : null}
+        {retry ? <Link href="/register" className="mt-7 inline-block underline">Réessayer le paiement</Link> : null}
+        <a href="mailto:contact@marined-communication.fr" className="mt-7 block text-sm underline">Contacter le support</a>
+      </section></main>;
+    }
+  }
   const account = await getCurrentAccount();
   if (account?.annual_access_required) {
     let payment = null;

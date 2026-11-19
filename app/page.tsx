@@ -7,9 +7,9 @@ import { getCurrentAccount } from "@/lib/session";
 import PaymentSuccessPopup from "./ui/payment-success-popup";
 
 const studioNotes = [
-  "Accès immédiat à votre espace de formation",
-  "Code personnel simple à réutiliser",
-  "Interface éditoriale inspirée de Brand Studio",
+  "Un parcours guidé pour structurer votre projet vidéo",
+  "Des exercices pour définir vos objectifs et vos messages",
+  "Un carnet de projet personnalisé à télécharger",
 ];
 
 export default async function Home({
@@ -21,7 +21,6 @@ export default async function Home({
   const paymentSucceeded = query.payment === "success";
   const account = await getCurrentAccount();
   const hasAccess = Boolean(account);
-  const homeTitle = account?.company_name?.trim() || "Brand Studio";
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
@@ -36,38 +35,48 @@ export default async function Home({
             <div className="relative flex h-full flex-col gap-7">
               <BrandStudioTyAshLockup />
 
-              <div className="grid gap-6 lg:grid-cols-[11rem_minmax(0,1fr)] lg:items-center">
-                <div className="relative mx-auto min-h-[18rem] w-full max-w-[12rem] sm:min-h-[21rem] sm:max-w-[13rem] lg:mx-0 lg:min-h-[22rem] lg:max-w-[11rem]">
-                  <Image
-                    src="/Icone Accueil - Brand Studio.png"
-                    alt="Illustration Brand Studio"
-                    fill
-                    sizes="(min-width: 1024px) 11rem, (min-width: 640px) 13rem, 12rem"
-                    className="object-contain object-center drop-shadow-[0_12px_18px_rgba(198,168,120,0.08)]"
-                    priority
-                  />
+              <div className="grid gap-7 lg:grid-cols-[8.5rem_minmax(0,1fr)] lg:items-center">
+                <div aria-hidden="true" className="relative mx-auto flex aspect-video w-full max-w-[16rem] flex-col items-center justify-center gap-5 overflow-hidden rounded-[1.5rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] p-5 lg:mx-0 lg:aspect-[3/4] lg:max-w-[8.5rem] lg:px-3">
+                  <div className="relative aspect-[1878/523] w-full max-w-[11rem] overflow-hidden">
+                    <Image
+                      src="/tyash-logo-transparent.png"
+                      alt=""
+                      width={2122}
+                      height={741}
+                      sizes="(min-width: 1024px) 110px, 176px"
+                      className="tyash-partner-logo absolute left-[-6.02%] top-[-24.67%] h-[141.683%] w-auto max-w-none"
+                    />
+                  </div>
+                  <svg className="h-10 w-10 text-[var(--tyash-primary)]" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18.5" stroke="currentColor" />
+                    <path d="m17 13 10 7-10 7V13Z" fill="currentColor" />
+                  </svg>
                 </div>
 
                 <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
-                  <h1 className="bs-text-on-light-primary max-w-full break-words font-[family:var(--font-cormorant)] text-[2.7rem] leading-[0.95] tracking-[-0.04em] text-[var(--heading-color)] sm:text-[3.45rem] xl:text-[3.95rem]">
-                    {homeTitle}
+                  <h1 className="bs-text-on-light-primary max-w-full text-balance font-[family:var(--font-cormorant)] text-[2.6rem] leading-[1.04] tracking-[-0.035em] text-[var(--heading-color)] sm:text-[3.2rem] xl:text-[3.45rem]">
+                    Brand Studio <span className="whitespace-nowrap">X TyASH</span>
                   </h1>
-                  <p className="bs-text-on-light-secondary mt-4 max-w-[24rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
-                    Un espace éditorial pour structurer votre parcours, accéder
-                    à vos ressources et avancer avec plus de clarté.
+                  <p className="bs-text-on-light-primary mt-5 max-w-[25rem] text-balance text-[1.15rem] font-semibold leading-[1.45] text-[var(--heading-color)] sm:text-[1.3rem]">
+                    Donnez vie à votre projet vidéo, étape par étape.
+                  </p>
+                  <p className="bs-text-on-light-secondary mt-4 max-w-[27rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
+                    Un espace pour poser vos idées, clarifier vos intentions et
+                    construire un projet vidéo qui vous ressemble, avant de
+                    passer à la création.
                   </p>
 
-                  <div className="mt-6 grid gap-3 border-l border-[var(--border)] pl-5">
+                  <ul className="mt-7 grid gap-4 border-l border-[var(--border)] pl-5">
                     {studioNotes.map((item) => (
-                      <div
+                      <li
                         key={item}
                         className="bs-text-on-light-secondary flex items-start gap-3 text-[0.9rem] leading-6 text-[var(--text-muted)]"
                       >
-                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--tyash-medium)]" />
+                        <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--tyash-medium)]" />
                         <span>{item}</span>
-                      </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -80,15 +89,15 @@ export default async function Home({
                   Nouveau client
                 </p>
                 <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[var(--text-muted)]">
-                  Créez votre compte avec votre e-mail et votre mot de passe,
-                  puis activez votre accès aux modules pour 365 jours avec un
-                  paiement unique de 55 € TTC.
+                  Renseignez votre e-mail, puis réglez votre accès de 365 jours
+                  avec un paiement unique de 55 € TTC. Vous choisirez votre mot
+                  de passe après le paiement.
                 </p>
                 <Link
                   href="/register"
                   className="bs-access-dark-action mt-4 flex h-12 w-full items-center justify-center rounded-[1rem] border border-[var(--border)] bg-[var(--card)] px-5 text-[0.8rem] font-extrabold uppercase tracking-[0.12em] text-[var(--text-muted)] transition duration-200 hover:-translate-y-0.5"
                 >
-                  Créer mon compte
+                  Entrer dans l’outil
                 </Link>
               </div>
 
@@ -98,7 +107,7 @@ export default async function Home({
                 </p>
                 <p className="bs-text-on-light-secondary mt-1 max-w-[25rem] text-[0.9rem] leading-[1.65] text-[var(--text-muted)]">
                   Connectez-vous avec votre e-mail et votre mot de passe pour
-                  retrouver votre espace de travail.
+                  retrouver votre projet vidéo.
                 </p>
               </div>
 

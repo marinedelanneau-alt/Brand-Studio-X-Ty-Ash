@@ -29,3 +29,4 @@ it("never confirms activation for refunded, disputed or unavailable payments", a
   m.payment.mockRejectedValue(new Error("offline"));
   expect(await render()).not.toContain("Votre accès est activé");
 });
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));

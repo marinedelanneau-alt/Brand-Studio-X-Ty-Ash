@@ -1,5 +1,11 @@
 # Stripe — Brand Studio X TyASH, 55 € TTC pour 365 jours
 
+> Le parcours d’inscription décrit dans ce document correspond à la première
+> intégration annuelle. Il est remplacé par le parcours invité documenté dans
+> [tyash-guest-checkout.md](tyash-guest-checkout.md) : e-mail avant paiement,
+> compte et mot de passe après paiement. Consulter ce nouveau guide pour les
+> migrations, variables, cas de comptes existants et la recette à jour.
+
 ## État du livrable
 
 Implémentation locale. Aucune migration distante, aucun paiement, aucun envoi

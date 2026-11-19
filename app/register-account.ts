@@ -48,7 +48,7 @@ export async function registerAccount(
       : "";
 
   if (!registrationToken) {
-    return registerUnpaidAccount({ email, password, clientName, companyName });
+    return { status: "error", message: "Commencez par votre adresse e-mail et le paiement sur la page d’inscription." };
   }
 
   if (!registrationToken || !email || !password || !clientName || !companyName) {
@@ -207,38 +207,4 @@ export async function registerAccount(
   }
 
   redirect("/register/success");
-}
-
-async function registerUnpaidAccount(input: { email: string; password: string; clientName: string; companyName: string }): Promise<RegisterState> {
-  const { email, password, clientName, companyName } = input;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8 || !clientName || !companyName) {
-    return { status: "error", message: "Renseignez votre e-mail, votre nom, votre entreprise et un mot de passe d’au moins 8 caractères." };
-  }
-  try {
-    if (await findAccountByEmail(email)) return { status: "error", message: "Un compte existe déjà. Connectez-vous ou réinitialisez votre mot de passe." };
-    const db = createSupabaseServerClient();
-    // Follow the existing account creation convention. No payment or privilege
-    // is granted by registration; the Auth identity is attached server-side.
-    const { data, error } = await db.auth.admin.createUser({ email, password, email_confirm: true,
-      user_metadata: { client_name: clientName, company_name: companyName } });
-    if (error || !data.user) return { status: "error", message: "Impossible de créer ce compte. Connectez-vous si vous êtes déjà inscrit." };
-    try {
-      await insertAccount({ email, clientName, companyName, authUserId: data.user.id, annualAccessRequired: true });
-    } catch (error) {
-      // A timeout can happen after INSERT committed. Confirm that no profile
-      // was attached before rolling back this newly created Auth identity.
-      try {
-        const attached = await findAccountByEmail(email);
-        if (!attached || attached.auth_user_id !== data.user.id) await db.auth.admin.deleteUser(data.user.id);
-      } catch { /* Ambiguous persistence: retain the identity for support review. */ }
-      throw error;
-    }
-    const auth = await createSupabaseAuthServerClient();
-    const { error: loginError } = await auth.auth.signInWithPassword({ email, password });
-    if (loginError) return { status: "error", message: "Votre compte est créé. Connectez-vous pour régler votre accès." };
-  } catch {
-    console.error("[annual-registration] Account creation failed");
-    return { status: "error", message: "La création du compte n’a pas abouti. Contactez le support si vous ne parvenez pas à vous connecter." };
-  }
-  redirect("/commander");
 }

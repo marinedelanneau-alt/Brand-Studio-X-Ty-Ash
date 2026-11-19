@@ -44,6 +44,32 @@ function getBrevoConfig() {
   };
 }
 
+export function assertAnnualWelcomeEmailConfigured() { getBrevoConfig(); }
+
+export async function sendAnnualWelcomeEmail(input: { email: string; activationUrl?: string; idempotencyKey: string }) {
+  const config = getBrevoConfig();
+  const url = input.activationUrl ?? new URL("/", getPublicSiteUrlWithFallback()).toString();
+  const escapedUrl = url.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+  const text = ["Bonjour,", "", "Bienvenue dans Brand Studio X TyASH !", "",
+    "Votre paiement a bien été confirmé et votre accès est maintenant disponible pour 365 jours.", "",
+    input.activationUrl ? "Il ne vous reste qu'une étape avant de commencer votre projet vidéo : créer votre mot de passe." : "Vous pouvez vous connecter avec votre mot de passe habituel. Vos projets et vos réponses sont conservés.", "",
+    input.activationUrl ? "CRÉER MON MOT DE PASSE" : "ACCÉDER À MON ESPACE", url, "",
+    "Une fois votre mot de passe défini, vous pourrez accéder à votre espace personnel et commencer votre parcours.", "",
+    input.activationUrl ? "Ce lien personnel est à usage unique et expire dans une heure. Vous pourrez demander un nouveau lien depuis la page d’activation." : "", "",
+    "À très bientôt,", "L'équipe Brand Studio X TyASH"].filter((line) => line !== undefined).join("\n");
+  const brevo = new BrevoClient({ apiKey: config.apiKey, timeoutInSeconds: 15, maxRetries: 0 });
+  const receipt = await brevo.transactionalEmails.sendTransacEmail({
+    subject: "Bienvenue dans Brand Studio X TyASH — Activez votre accès",
+    sender: { email: config.senderEmail, name: config.senderName }, to: [{ email: input.email }],
+    replyTo: config.replyToEmail ? { email: config.replyToEmail } : undefined,
+    headers: { idempotencyKey: input.idempotencyKey },
+    textContent: text,
+    htmlContent: `<div style="font-family:Arial,sans-serif;max-width:600px;padding:32px;background:#fffaf2;color:#4b4550"><h1>Brand Studio X TyASH</h1><p>Bonjour,</p><p>Bienvenue dans Brand Studio X TyASH !</p><p>Votre paiement a bien été confirmé et votre accès est maintenant disponible pour 365 jours.</p><p>${input.activationUrl ? "Il ne vous reste qu'une étape avant de commencer votre projet vidéo : créer votre mot de passe." : "Connectez-vous avec votre mot de passe habituel. Vos projets et vos réponses sont conservés."}</p><p><a style="display:inline-block;padding:16px 24px;background:#7a2d46;color:white;border-radius:12px;text-decoration:none" href="${escapedUrl}">${input.activationUrl ? "CRÉER MON MOT DE PASSE" : "ACCÉDER À MON ESPACE"}</a></p><p>Une fois votre mot de passe défini, vous pourrez accéder à votre espace personnel et commencer votre parcours.</p>${input.activationUrl ? "<p>Ce lien personnel est à usage unique et expire dans une heure.</p>" : ""}<p>À très bientôt,<br>L'équipe Brand Studio X TyASH</p></div>`,
+  });
+  if (!receipt.messageId) throw new Error("Annual welcome delivery unconfirmed");
+  return receipt.messageId;
+}
+
 export async function sendAccountExpiryEmail(input: {
   email: string; clientName: string | null; expiresAt: string; stage: "month" | "fortnight";
 }) {

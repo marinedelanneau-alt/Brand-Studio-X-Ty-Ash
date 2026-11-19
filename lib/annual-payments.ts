@@ -3,9 +3,11 @@ import type Stripe from "stripe";
 import { createSupabaseServerClient } from "./supabase/server";
 import { ANNUAL_OFFER } from "./annual-offer";
 import { annualLiveMode, getAnnualStripe } from "./annual-stripe";
+import { fulfillGuestAnnualAccount } from "./annual-activation";
 
 export type AnnualPayment = {
-  id: string; account_id: number; auth_user_id: string; live_mode: boolean;
+  id: string; account_id: number | null; auth_user_id: string | null; live_mode: boolean;
+  purchase_email?: string | null; owner_hash?: string | null;
   price_id: string; session_id: string | null; customer_id: string | null;
   payment_intent_id: string | null; status: string; paid_at: string | null;
   expires_at: string | null; checkout_attempt: number; checkout_expires_at: string;
@@ -34,8 +36,9 @@ export async function fulfillAnnualPayment(session: Stripe.Checkout.Session, eve
   if (session.mode !== "payment" || session.amount_total !== ANNUAL_OFFER.amount
     || session.currency !== ANNUAL_OFFER.currency || order.live_mode !== session.livemode
     || session.metadata?.offer_version !== ANNUAL_OFFER.version
-    || session.metadata?.order_id !== order.id || session.metadata?.auth_user_id !== order.auth_user_id
-    || session.client_reference_id !== order.auth_user_id
+    || session.metadata?.order_id !== order.id
+    || (order.purchase_email ? session.metadata?.checkout_flow !== "annual_guest_v1" || session.client_reference_id !== order.id || session.customer_email?.trim().toLowerCase() !== order.purchase_email
+      : session.metadata?.auth_user_id !== order.auth_user_id || session.client_reference_id !== order.auth_user_id)
     || items.has_more || items.data.length !== 1 || items.data[0].price?.id !== order.price_id
     || items.data[0].quantity !== 1) throw new Error("Invalid annual checkout");
   const { error: applyError } = await db.rpc("apply_annual_payment", {
@@ -44,6 +47,7 @@ export async function fulfillAnnualPayment(session: Stripe.Checkout.Session, eve
     target_paid_at: new Date(event.created * 1000).toISOString(), target_live_mode: session.livemode,
   });
   if (applyError) throw new Error("Annual payment activation failed");
+  if (order.purchase_email) await fulfillGuestAnnualAccount(order.id);
 }
 
 export async function updateAnnualCheckoutState(session: Stripe.Checkout.Session, status: "processing" | "failed" | "expired") {

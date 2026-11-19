@@ -1,0 +1,56 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "overflow": false,
+    "headline": 117,
+    "card": 481.140625,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "overflow": false,
+    "headline": 58.5,
+    "card": 305.515625,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "overflow": false,
+    "headline": 81.1875,
+    "card": 328.203125,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "overflow": false,
+    "headline": 117,
+    "card": 481.140625,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "overflow": false,
+    "headline": 58.5,
+    "card": 305.515625,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "overflow": false,
+    "headline": 81.1875,
+    "card": 328.203125,
+    "bodyFont": "Manrope",
+    "headlineFont": "\"Cormorant Garamond\", serif"
+  }
+]
