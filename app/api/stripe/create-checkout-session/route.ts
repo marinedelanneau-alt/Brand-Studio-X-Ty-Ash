@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       success_url: `${origin}/commander/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/register?payment=cancelled`,
       metadata, payment_intent_data: { metadata },
-      custom_text: { submit: { message: "55 € TTC · paiement unique · accès 365 jours dès confirmation du paiement · aucun renouvellement automatique." } },
+      custom_text: { submit: { message: "52 € · paiement unique · accès 365 jours dès confirmation du paiement · aucun renouvellement automatique." } },
     }, { idempotencyKey: `annual-${order.id}-${order.checkout_attempt}` });
     if (!session.url) throw new Error("Missing checkout URL");
     const { error: saveError } = await db.from("annual_payments").update({ session_id: session.id, customer_id: typeof session.customer === "string" ? session.customer : null, updated_at: new Date().toISOString() })

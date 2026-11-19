@@ -14,5 +14,5 @@ export default function CheckoutButton() {
       window.location.assign(url.toString());
     } catch (err) { setError(err instanceof Error ? err.message : "Impossible d’ouvrir le paiement."); setPending(false); }
   }
-  return <div><button type="button" onClick={pay} disabled={pending} className="flex min-h-14 w-full items-center justify-center rounded-xl bs-button-primary px-5 py-4 font-bold disabled:opacity-60">{pending ? "Ouverture du paiement…" : "Accéder à Brand Studio — 55 €"}</button>{error ? <p role="alert" className="mt-4 text-sm text-[var(--status-error-text)]">{error}</p> : null}</div>;
+  return <div><button type="button" onClick={pay} disabled={pending} className="flex min-h-14 w-full items-center justify-center rounded-xl bs-button-primary px-5 py-4 font-bold disabled:opacity-60">{pending ? "Ouverture du paiement…" : "Accéder à Brand Studio — 52 €"}</button>{error ? <p role="alert" className="mt-4 text-sm text-[var(--status-error-text)]">{error}</p> : null}</div>;
 }

@@ -23,7 +23,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
       <div className="mt-9 grid items-start gap-9 lg:grid-cols-2 lg:gap-12">
         <div><h1 className="font-[family:var(--font-cormorant)] text-[2.7rem] leading-[1.02] tracking-[-0.035em] text-[var(--heading-color)] sm:text-5xl">Votre projet vidéo commence ici.</h1>
           <p className="mt-5 text-lg leading-8 text-[var(--text-muted)]">Un parcours guidé pour clarifier vos idées, définir vos objectifs et construire un projet vidéo qui vous ressemble.</p>
-          <div className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--tyash-subtle)] p-5"><p className="text-xl font-bold text-[var(--heading-color)]">55 € TTC — Accès pendant 365 jours</p>
+          <div className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--tyash-subtle)] p-5"><p className="text-xl font-bold text-[var(--heading-color)]">52 € — Accès pendant 365 jours</p>
             <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">Paiement unique, sans renouvellement automatique.</p></div>
         </div>
         <div className="min-w-0">

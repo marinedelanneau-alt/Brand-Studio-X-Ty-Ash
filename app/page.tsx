@@ -90,7 +90,7 @@ export default async function Home({
                 </p>
                 <p className="bs-text-on-dark-secondary mt-3 text-[0.86rem] leading-6 text-[var(--text-muted)]">
                   Renseignez votre e-mail, puis réglez votre accès de 365 jours
-                  avec un paiement unique de 55 € TTC. Vous choisirez votre mot
+                  avec un paiement unique de 52 €. Vous choisirez votre mot
                   de passe après le paiement.
                 </p>
                 <Link

@@ -115,7 +115,7 @@ export default async function RegisterPage({
                   ? "Choisissez votre mot de passe pour créer votre compte. Votre adresse e-mail est déjà associée à votre paiement."
                   : accountAlreadyCreated
                     ? "Votre compte a déjà été créé avec ce lien. Vous pouvez maintenant vous connecter avec votre e-mail et votre mot de passe."
-                  : activationToken ? "Ce lien personnel est invalide ou expiré. Reprenez le lien reçu par e-mail après votre paiement." : "Créez votre compte, puis réglez votre accès annuel à 55 € TTC. Les exercices seront accessibles après confirmation du paiement."}
+                  : activationToken ? "Ce lien personnel est invalide ou expiré. Reprenez le lien reçu par e-mail après votre paiement." : "Créez votre compte, puis réglez votre accès annuel à 52 €. Les exercices seront accessibles après confirmation du paiement."}
               </p>
 
               <div className="mt-7">
