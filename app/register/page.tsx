@@ -25,6 +25,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           <p className="mt-5 text-lg leading-8 text-[var(--text-muted)]">Un parcours guidé pour clarifier vos idées, définir vos objectifs et construire un projet vidéo qui vous ressemble.</p>
           <div className="mt-7 rounded-2xl border border-[var(--border)] bg-[var(--tyash-subtle)] p-5"><p className="text-xl font-bold text-[var(--heading-color)]">52 € — Accès pendant 365 jours</p>
             <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">Paiement unique, sans renouvellement automatique.</p></div>
+          <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">Offre réservée aux professionnels. TVA non applicable, article 293 B du CGI.</p>
         </div>
         <div className="min-w-0">
           {query.payment === "cancelled" ? <p role="status" className="mb-5 text-sm leading-7">Votre paiement n’a pas été finalisé. Vous pouvez reprendre votre paiement. Si vous avez déjà payé, attendez votre confirmation avant de recommencer.</p> : null}
