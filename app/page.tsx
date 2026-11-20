@@ -28,44 +28,26 @@ export default async function Home({
       <section className="bs-access-shell relative mx-auto w-full max-w-[84rem] overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[image:var(--tyash-surface-gradient)] shadow-[0_16px_44px_rgba(210,189,152,0.09)]">
         <div className="absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,rgb(var(--tyash-glow-rgb)/0),rgb(var(--tyash-glow-rgb)/0.72),rgb(var(--tyash-glow-rgb)/0.42),rgb(var(--tyash-glow-rgb)/0))]" />
 
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid lg:grid-cols-[minmax(0,1.3fr)_minmax(19rem,0.8fr)]">
           <div className="bs-access-light-surface relative overflow-hidden px-7 py-8 sm:px-9 sm:py-9 lg:px-10 lg:py-10">
             <div className="pointer-events-none absolute left-0 top-12 h-28 w-28 rounded-full bg-[var(--tyash-primary)]/8 blur-3xl" />
 
-            <div className="relative flex h-full flex-col gap-7">
+            <div className="relative flex h-full flex-col gap-8 sm:gap-10">
               <BrandStudioTyAshLockup />
 
-              <div className="grid gap-7 lg:grid-cols-[8.5rem_minmax(0,1fr)] lg:items-center">
-                <div aria-hidden="true" className="relative mx-auto flex aspect-video w-full max-w-[16rem] flex-col items-center justify-center gap-5 overflow-hidden rounded-[1.5rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] p-5 lg:mx-0 lg:aspect-[3/4] lg:max-w-[8.5rem] lg:px-3">
-                  <div className="relative aspect-[1878/523] w-full max-w-[11rem] overflow-hidden">
-                    <Image
-                      src="/tyash-logo-transparent.png"
-                      alt=""
-                      width={2122}
-                      height={741}
-                      sizes="(min-width: 1024px) 110px, 176px"
-                      className="tyash-partner-logo absolute left-[-6.02%] top-[-24.67%] h-[141.683%] w-auto max-w-none"
-                    />
-                  </div>
-                  <svg className="h-10 w-10 text-[var(--tyash-primary)]" viewBox="0 0 40 40" fill="none">
-                    <circle cx="20" cy="20" r="18.5" stroke="currentColor" />
-                    <path d="m17 13 10 7-10 7V13Z" fill="currentColor" />
-                  </svg>
-                </div>
+              <div className="min-w-0">
+                <h1 className="bs-text-on-light-primary font-[family:var(--font-cormorant)] text-[clamp(1.75rem,9vw,2.25rem)] font-normal leading-[1.12] tracking-[-0.035em] text-[var(--heading-color)] sm:text-[clamp(2.65rem,4vw,3.35rem)] lg:text-[clamp(2rem,3.1vw,3.1rem)]">
+                  Une belle vidéo commence<span className="hidden sm:inline"><br /></span><span className="sm:hidden"> </span>par une idée claire.
+                </h1>
+                <p className="bs-text-on-light-primary mt-5 max-w-[38rem] text-[1.08rem] font-semibold leading-[1.5] text-[var(--heading-color)] sm:text-[1.2rem]">
+                  Avant de passer derrière la caméra, passons derrière vos idées.
+                </p>
+                <p className="bs-text-on-light-secondary mt-3 max-w-[38rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
+                  Explorez vos intentions, affinez vos messages et construisez un projet vidéo qui vous ressemble.
+                </p>
 
-                <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
-                  <h1 className="bs-text-on-light-primary max-w-full text-balance font-[family:var(--font-cormorant)] text-[2.25rem] leading-[1.08] tracking-[-0.035em] text-[var(--heading-color)] sm:text-[2.8rem] xl:text-[3rem]">
-                    Une belle vidéo commence par une idée claire.
-                  </h1>
-                  <p className="bs-text-on-light-primary mt-5 max-w-[25rem] text-balance text-[1.15rem] font-semibold leading-[1.45] text-[var(--heading-color)] sm:text-[1.3rem]">
-                    Avant de passer derrière la caméra, passons derrière vos idées.
-                  </p>
-                  <p className="bs-text-on-light-secondary mt-4 max-w-[27rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
-                    Explorez vos intentions, affinez vos messages et construisez
-                    un projet vidéo qui vous ressemble.
-                  </p>
-
-                  <ul className="mt-7 grid gap-4 border-l border-[var(--border)] pl-5">
+                <div className="mt-7 grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(11rem,0.8fr)] sm:gap-7">
+                  <ul className="grid gap-4 border-l border-[var(--border)] pl-5">
                     {studioNotes.map((item) => (
                       <li
                         key={item}
@@ -76,6 +58,22 @@ export default async function Home({
                       </li>
                     ))}
                   </ul>
+                  <div aria-hidden="true" className="relative flex aspect-video w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-[1.5rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] p-5">
+                    <div className="relative aspect-[1878/523] w-full max-w-[11rem] overflow-hidden">
+                      <Image
+                        src="/tyash-logo-transparent.png"
+                        alt=""
+                        width={2122}
+                        height={741}
+                        sizes="176px"
+                        className="tyash-partner-logo absolute left-[-6.02%] top-[-24.67%] h-[141.683%] w-auto max-w-none"
+                      />
+                    </div>
+                    <svg className="h-10 w-10 text-[var(--tyash-primary)]" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="20" r="18.5" stroke="currentColor" />
+                      <path d="m17 13 10 7-10 7V13Z" fill="currentColor" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
