@@ -1,16 +1,16 @@
 import { beforeEach, afterEach, expect, it, vi } from "vitest";
-const m = vi.hoisted(() => ({ account: vi.fn(), user: vi.fn(), access: vi.fn(), price: vi.fn(), create: vi.fn(), retrieve: vi.fn(), reserve: vi.fn(), update: vi.fn() }));
+const m = vi.hoisted(() => ({ account: vi.fn(), user: vi.fn(), access: vi.fn(), price: vi.fn(), create: vi.fn(), retrieve: vi.fn(), expire: vi.fn(), reserve: vi.fn(), update: vi.fn() }));
 vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "a".repeat(64) }), set: vi.fn() }) }));
 vi.mock("@/lib/mailer", () => ({ assertAnnualWelcomeEmailConfigured: vi.fn() }));
 vi.mock("@/lib/legal", () => ({ getPublishedLegalDocument: async (type: string) => ({ id: type, version: "1", content: [] }) }));
 vi.mock("@/lib/session", () => ({ getCurrentAccount: m.account }));
 vi.mock("@/lib/subscriptions", () => ({ getSubscriptionAccessStatus: m.access }));
-vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ prices: { retrieve: m.price }, checkout: { sessions: { create: m.create, retrieve: m.retrieve } } }) }));
+vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ prices: { retrieve: m.price }, checkout: { sessions: { create: m.create, retrieve: m.retrieve, expire: m.expire } } }) }));
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseAuthServerClient: async () => ({ auth: { getUser: m.user } }),
   createSupabaseServerClient: () => {
-    const q = { update: m.update, eq: () => q, is: async () => ({ error: null }) };
+    const q = { update: m.update, eq: () => q, in: () => q, is: async () => ({ error: null }) };
     m.update.mockReturnValue(q);
     return { rpc: m.reserve, from: () => q };
   },
@@ -55,9 +55,30 @@ it("blocks an active account and a processing payment", async () => {
 });
 it("reuses an open session when the user retries an abandoned checkout", async () => {
   m.reserve.mockResolvedValue({ data: { session_id: "cs_existing" }, error: null });
-  m.retrieve.mockResolvedValue({ status: "open", url: "https://checkout.stripe.com/c/pay/existing" });
+  m.retrieve.mockResolvedValue({ status: "open", payment_status: "unpaid", allow_promotion_codes: true, url: "https://checkout.stripe.com/c/pay/existing" });
   expect(await (await POST(request())).json()).toEqual({ url: "https://checkout.stripe.com/c/pay/existing" });
   expect(m.create).not.toHaveBeenCalled();
+});
+it("expires an old unpaid session without promotion codes before reserving a new attempt", async () => {
+  m.reserve.mockResolvedValueOnce({ data: { session_id: "cs_existing" }, error: null })
+    .mockResolvedValueOnce({ data: { id: "order1", checkout_attempt: 2, price_id: "price_test55", checkout_expires_at: "2026-11-17T12:00:00Z" }, error: null });
+  m.retrieve.mockResolvedValue({ id: "cs_existing", status: "open", payment_status: "unpaid", allow_promotion_codes: null, livemode: false });
+  m.expire.mockResolvedValue({ id: "cs_existing", status: "expired", payment_status: "unpaid", livemode: false });
+  expect((await POST(request())).status).toBe(200);
+  expect(m.expire).toHaveBeenCalledWith("cs_existing");
+  expect(m.expire.mock.invocationCallOrder[0]).toBeLessThan(m.reserve.mock.invocationCallOrder[1]);
+  expect(m.create).toHaveBeenCalledWith(expect.objectContaining({ allow_promotion_codes: true }), { idempotencyKey: "annual-order1-2" });
+});
+it("never replaces a completed session or a session that cannot be expired safely", async () => {
+  m.reserve.mockResolvedValue({ data: { session_id: "cs_existing" }, error: null });
+  m.retrieve.mockResolvedValueOnce({ id: "cs_existing", status: "complete", payment_status: "paid", allow_promotion_codes: false });
+  expect((await POST(request())).status).toBe(409);
+  expect(m.expire).not.toHaveBeenCalled();
+  m.retrieve.mockResolvedValueOnce({ id: "cs_existing", status: "open", payment_status: "unpaid", allow_promotion_codes: false });
+  m.expire.mockRejectedValueOnce(new Error("already completed"));
+  expect((await POST(request())).status).toBe(503);
+  expect(m.create).not.toHaveBeenCalled();
+  expect(m.reserve).toHaveBeenCalledTimes(2);
 });
 it.each([{ unit_amount: 5000 }, { unit_amount: 28900 }, { currency: "usd" }, { tax_behavior: "exclusive" }, { livemode: true }, { type: "recurring" }])("rejects incompatible price %o", async invalid => {
   m.price.mockResolvedValue({ active: true, type: "one_time", currency: "eur", unit_amount: 5200, livemode: false, ...invalid });

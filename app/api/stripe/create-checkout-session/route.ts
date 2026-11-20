@@ -58,9 +58,16 @@ export async function POST(request: Request) {
     if (error || !data) return Response.json({ error: "Un paiement est déjà en cours ou votre accès nécessite une vérification. Consultez votre confirmation avant de recommencer." }, { status: 409 });
     let order = data as AnnualPayment;
     if (order.session_id) {
-      const existing = await stripe.checkout.sessions.retrieve(order.session_id);
-      if (existing.status === "open" && existing.url) return Response.json({ url: existing.url });
-      if (existing.status !== "expired") return Response.json({ error: "Votre paiement est en cours de confirmation. Ne repassez pas commande." }, { status: 409 });
+      let existing = await stripe.checkout.sessions.retrieve(order.session_id);
+      if (existing.status === "open" && existing.allow_promotion_codes === true && existing.url) {
+        return Response.json({ url: existing.url }, { headers: { "Cache-Control": "no-store" } });
+      }
+      if (existing.status === "open" && existing.allow_promotion_codes !== true && existing.payment_status === "unpaid") {
+        // Expire at Stripe first: a completed or concurrently paid session must never be replaced.
+        existing = await stripe.checkout.sessions.expire(existing.id);
+        if (existing.status !== "expired" || existing.payment_status !== "unpaid") throw new Error("Checkout expiration was not confirmed");
+      }
+      if (existing.status !== "expired" || existing.payment_status !== "unpaid") return Response.json({ error: "Votre paiement est en cours de confirmation. Ne repassez pas commande." }, { status: 409 });
       await updateAnnualCheckoutState(existing, "expired");
       ({ data, error } = await reserve());
       if (error || !data) throw new Error("Checkout reservation failed");
