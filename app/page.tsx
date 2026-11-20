@@ -1,6 +1,5 @@
 import BrandStudioTyAshLockup from "@/app/ui/brand-studio-tyash-lockup";
 import { projectDocumentCopy } from "@/lib/project-document-copy";
-import Image from "next/image";
 import Link from "next/link";
 import AccessLoginForm from "./ui/access-login-form";
 import { getCurrentAccount } from "@/lib/session";
@@ -46,35 +45,17 @@ export default async function Home({
                   Explorez vos intentions, affinez vos messages et construisez un projet vidéo qui vous ressemble.
                 </p>
 
-                <div className="mt-7 grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(11rem,0.8fr)] sm:gap-7">
-                  <ul className="grid gap-4 border-l border-[var(--border)] pl-5">
-                    {studioNotes.map((item) => (
-                      <li
-                        key={item}
-                        className="bs-text-on-light-secondary flex items-start gap-3 text-[0.9rem] leading-6 text-[var(--text-muted)]"
-                      >
-                        <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--tyash-medium)]" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div aria-hidden="true" className="relative flex aspect-video w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-[1.5rem] border border-[var(--tyash-border)] bg-[var(--tyash-soft)] p-5">
-                    <div className="relative aspect-[1878/523] w-full max-w-[11rem] overflow-hidden">
-                      <Image
-                        src="/tyash-logo-transparent.png"
-                        alt=""
-                        width={2122}
-                        height={741}
-                        sizes="176px"
-                        className="tyash-partner-logo absolute left-[-6.02%] top-[-24.67%] h-[141.683%] w-auto max-w-none"
-                      />
-                    </div>
-                    <svg className="h-10 w-10 text-[var(--tyash-primary)]" viewBox="0 0 40 40" fill="none">
-                      <circle cx="20" cy="20" r="18.5" stroke="currentColor" />
-                      <path d="m17 13 10 7-10 7V13Z" fill="currentColor" />
-                    </svg>
-                  </div>
-                </div>
+                <ul className="mt-7 grid gap-4 border-l border-[var(--border)] pl-5">
+                  {studioNotes.map((item) => (
+                    <li
+                      key={item}
+                      className="bs-text-on-light-secondary flex items-start gap-3 text-[0.9rem] leading-6 text-[var(--text-muted)]"
+                    >
+                      <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--tyash-medium)]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
