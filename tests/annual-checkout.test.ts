@@ -35,7 +35,7 @@ afterEach(() => vi.unstubAllEnvs());
 it("normalizes guest email and uses the existing 52 EUR ledger without creating an account", async () => {
   expect((await POST(request())).status).toBe(200);
   expect(m.reserve).toHaveBeenCalledWith("reserve_guest_annual_checkout", expect.objectContaining({ target_email: "verified@example.test", target_owner_hash: expect.stringMatching(/^[a-f0-9]{64}$/), target_live_mode: false }));
-  expect(m.create).toHaveBeenCalledWith(expect.objectContaining({ mode: "payment", client_reference_id: "order1", customer_email: "verified@example.test", line_items: [{ price: "price_test55", quantity: 1 }], metadata: expect.objectContaining({ order_id: "order1", checkout_flow: "annual_guest_v1" }) }), { idempotencyKey: "annual-order1-1" });
+  expect(m.create).toHaveBeenCalledWith(expect.objectContaining({ mode: "payment", allow_promotion_codes: true, client_reference_id: "order1", customer_email: "verified@example.test", line_items: [{ price: "price_test55", quantity: 1 }], metadata: expect.objectContaining({ order_id: "order1", checkout_flow: "annual_guest_v1" }) }), { idempotencyKey: "annual-order1-1" });
   expect(m.update.mock.calls.every(([payload]) => !('access_granted' in payload) && !('paid_at' in payload))).toBe(true);
 });
 it("requires same origin, a valid email and current legal acceptance before touching Stripe", async () => {

@@ -20,7 +20,7 @@ const sdk = new Stripe("sk_test_fake");
 function stripeClient() { return { webhooks: sdk.webhooks, checkout: { sessions: { listLineItems: m.items } }, paymentIntents: { retrieve: m.intent } }; }
 import { POST } from "../app/api/stripe/webhook/route";
 import { ANNUAL_OFFER } from "../lib/annual-offer";
-const session = { id: "cs_test55", mode: "payment", livemode: false, currency: "eur", amount_total: 5200, payment_status: "paid", payment_intent: "pi55", customer: "cus55", client_reference_id: "auth55", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", auth_user_id: "auth55" } };
+const session = { id: "cs_test55", mode: "payment", status: "complete", livemode: false, currency: "eur", amount_subtotal: 5200, amount_total: 5200, total_details: { amount_discount: 0, amount_tax: 0, amount_shipping: 0 }, payment_status: "paid", payment_intent: "pi55", customer: "cus55", client_reference_id: "auth55", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", auth_user_id: "auth55" } };
 function request(type = "checkout.session.completed", object: unknown = session, valid = true) {
   const payload = JSON.stringify({ id: "evt55", created: 1794900000, livemode: false, type, data: { object } });
   const signature = sdk.webhooks.generateTestHeaderString({ payload, secret: valid ? "whsec_fake" : "whsec_wrong" });
@@ -62,9 +62,22 @@ it("waits for asynchronous confirmation and records failed or expired checkouts"
   await POST(request("checkout.session.expired", { ...session, payment_status: "unpaid" }));
   expect(m.update).toHaveBeenCalledWith(expect.objectContaining({ status: "expired" }));
 });
-it.each([{ amount_total: 5000 }, { currency: "usd" }, { client_reference_id: "another_user" }])("does not activate an incompatible purchase %o", async invalid => {
+it.each([{ amount_total: 5000 }, { amount_subtotal: 5000 }, { total_details: { amount_discount: 6000, amount_tax: 0, amount_shipping: 0 } }, { payment_status: "no_payment_required" }, { status: "open" }, { currency: "usd" }, { client_reference_id: "another_user" }])("does not activate an incompatible purchase %o", async invalid => {
   expect((await POST(request(undefined, { ...session, ...invalid }))).status).toBe(500);
   expect(m.rpc).not.toHaveBeenCalled();
+});
+it.each([2600, 5199])("activates a Stripe-confirmed discounted checkout for %i cents", async (amount) => {
+  const discounted = { ...session, amount_total: amount, total_details: { ...session.total_details, amount_discount: 5200 - amount } };
+  expect((await POST(request(undefined, discounted))).status).toBe(200);
+  expect(m.rpc).toHaveBeenCalledWith("apply_annual_payment", expect.objectContaining({ target_payment_intent_id: "pi55" }));
+});
+it("activates a fully discounted checkout without a PaymentIntent", async () => {
+  m.single.mockResolvedValue({ data: { id: "order55", purchase_email: "guest@example.test", price_id: "price55", live_mode: false }, error: null });
+  const free = { ...session, amount_total: 0, total_details: { ...session.total_details, amount_discount: 5200 }, payment_status: "no_payment_required", payment_intent: null, client_reference_id: "order55", customer_email: "guest@example.test", metadata: { offer_version: ANNUAL_OFFER.version, order_id: "order55", checkout_flow: "annual_guest_v1" } };
+  expect((await POST(request(undefined, free))).status).toBe(200);
+  expect(m.rpc).toHaveBeenCalledWith("apply_annual_payment", expect.objectContaining({ target_payment_intent_id: null }));
+  expect(m.fulfillGuest).toHaveBeenCalledWith("order55");
+  expect(m.update).not.toHaveBeenCalled();
 });
 it("retries a transient database activation error instead of acknowledging it", async () => {
   m.rpc.mockResolvedValueOnce({ error: new Error("unavailable") });

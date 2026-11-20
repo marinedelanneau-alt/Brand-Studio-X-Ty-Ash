@@ -206,7 +206,7 @@ export async function POST(request: Request) {
       case "checkout.session.async_payment_succeeded":
         if (event.data.object.metadata?.offer_version === ANNUAL_OFFER.version) {
           await fulfillAnnualPayment(event.data.object, event);
-          if (event.data.object.payment_status !== "paid") await updateAnnualCheckoutState(event.data.object, "processing");
+          if (!["paid", "no_payment_required"].includes(event.data.object.payment_status)) await updateAnnualCheckoutState(event.data.object, "processing");
         } else if (event.data.object.metadata?.offer_version === BRAND_STUDIO_OFFER.version) {
           await fulfillCommercialOrder(event.data.object, event);
         } else {

@@ -25,12 +25,19 @@ it("binds only paid guest purchases, preserves identities/Admins/data and reject
       insert into auth.users values('${admin}','marine@example.test','original-password-hash');
       insert into client_access_codes(email,role,is_admin,auth_user_id) values('marine@example.test','admin',true,'${admin}');
     `);
-    for (const migration of ["20261113180000_account_lifetime.sql", "20261117120000_tyash_annual_payments.sql", "20261117160000_tyash_guest_checkout.sql", "20261119170000_annual_price_52.sql"]) {
+    for (const migration of ["20261113180000_account_lifetime.sql", "20261117120000_tyash_annual_payments.sql", "20261117160000_tyash_guest_checkout.sql", "20261119170000_annual_price_52.sql", "20261120120000_annual_free_checkout.sql"]) {
       await db.exec(readFileSync(new URL(`../supabase/migrations/${migration}`, import.meta.url), "utf8"));
     }
     const reserve = async (email: string, owner = "a".repeat(64)) => (await db.query<{ id: string }>("select * from reserve_guest_annual_checkout($1,$2,'price55',false,'{}')",[email,owner])).rows[0];
     const order = await reserve("guest@example.test");
     expect((await db.query("select amount from annual_payments where id=$1", [order.id])).rows[0]).toEqual({ amount: 5200 });
+    const freeOrder = await reserve("free@example.test");
+    await db.query("update annual_payments set session_id='cs_free' where id=$1", [freeOrder.id]);
+    await db.query("select apply_annual_payment('cs_free',null,null,'evt_free',now()-interval '1 second',false)");
+    const free = (await db.query<{ paid_at: Date; expires_at: Date }>("select paid_at,expires_at from annual_payments where id=$1", [freeOrder.id])).rows[0];
+    expect(free.expires_at.getTime() - free.paid_at.getTime()).toBe(365 * 86400000);
+    await db.query("select apply_annual_payment('cs_free',null,null,'evt_free_replay',now(),false)");
+    expect((await db.query("select paid_at,expires_at from annual_payments where id=$1", [freeOrder.id])).rows[0]).toEqual(free);
     expect((await reserve("guest@example.test")).id).toBe(order.id);
     // A different browser cannot infer that this email already has a purchase.
     const secondBrowserOrder = await reserve("guest@example.test","b".repeat(64));

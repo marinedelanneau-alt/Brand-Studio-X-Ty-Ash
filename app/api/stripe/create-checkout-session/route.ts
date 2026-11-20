@@ -68,13 +68,13 @@ export async function POST(request: Request) {
     }
     const metadata = { offer_version: ANNUAL_OFFER.version, order_id: order.id, checkout_flow: "annual_guest_v1" };
     const session = await stripe.checkout.sessions.create({
-      mode: "payment", locale: "fr", customer_email: email, customer_creation: "always",
+      mode: "payment", locale: "fr", customer_email: email, customer_creation: "always", allow_promotion_codes: true,
       client_reference_id: order.id, line_items: [{ price: order.price_id, quantity: 1 }],
       expires_at: Math.floor(Date.parse(order.checkout_expires_at) / 1000),
       success_url: `${origin}/commander/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/register?payment=cancelled`,
       metadata, payment_intent_data: { metadata },
-      custom_text: { submit: { message: "52 € · paiement unique · accès 365 jours dès confirmation du paiement · aucun renouvellement automatique." } },
+      custom_text: { submit: { message: "Paiement unique · accès 365 jours dès confirmation de la commande · aucun renouvellement automatique." } },
     }, { idempotencyKey: `annual-${order.id}-${order.checkout_attempt}` });
     if (!session.url) throw new Error("Missing checkout URL");
     const { error: saveError } = await db.from("annual_payments").update({ session_id: session.id, customer_id: typeof session.customer === "string" ? session.customer : null, updated_at: new Date().toISOString() })

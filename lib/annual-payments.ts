@@ -27,13 +27,20 @@ function idOf(value: string | { id: string } | null) {
 
 export async function fulfillAnnualPayment(session: Stripe.Checkout.Session, event: { id: string; created: number; livemode: boolean }) {
   if (event.livemode !== annualLiveMode() || session.livemode !== event.livemode) throw new Error("Payment environment mismatch");
-  if (session.payment_status !== "paid") return;
+  if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") return;
   const stripe = getAnnualStripe();
   const db = createSupabaseServerClient();
   const { data: order, error } = await db.from("annual_payments").select("*").eq("session_id", session.id).single<AnnualPayment>();
   if (error || !order) throw new Error("Checkout evidence missing");
   const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
-  if (session.mode !== "payment" || session.amount_total !== ANNUAL_OFFER.amount
+  const discount = session.total_details?.amount_discount;
+  const total = session.amount_total;
+  const paymentIntentId = idOf(session.payment_intent);
+  if (session.mode !== "payment" || session.status !== "complete" || session.amount_subtotal !== ANNUAL_OFFER.amount
+    || !Number.isInteger(discount) || discount! < 0 || discount! > ANNUAL_OFFER.amount
+    || session.total_details?.amount_tax !== 0 || session.total_details?.amount_shipping !== 0
+    || total !== ANNUAL_OFFER.amount - discount!
+    || (session.payment_status === "paid" ? !paymentIntentId || total === 0 : total !== 0 || paymentIntentId !== null)
     || session.currency !== ANNUAL_OFFER.currency || order.live_mode !== session.livemode
     || session.metadata?.offer_version !== ANNUAL_OFFER.version
     || session.metadata?.order_id !== order.id
@@ -42,7 +49,7 @@ export async function fulfillAnnualPayment(session: Stripe.Checkout.Session, eve
     || items.has_more || items.data.length !== 1 || items.data[0].price?.id !== order.price_id
     || items.data[0].quantity !== 1) throw new Error("Invalid annual checkout");
   const { error: applyError } = await db.rpc("apply_annual_payment", {
-    target_session_id: session.id, target_payment_intent_id: idOf(session.payment_intent),
+    target_session_id: session.id, target_payment_intent_id: paymentIntentId,
     target_customer_id: idOf(session.customer), target_event_id: event.id,
     target_paid_at: new Date(event.created * 1000).toISOString(), target_live_mode: session.livemode,
   });
