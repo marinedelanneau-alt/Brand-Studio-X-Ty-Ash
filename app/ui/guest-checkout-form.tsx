@@ -31,6 +31,5 @@ export default function GuestCheckoutForm({ termsId, salesId, email = "" }: { te
     <p className="text-sm leading-6 text-[var(--text-muted)]">Après votre paiement, vous recevrez un e-mail pour activer votre accès.</p>
     {!termsId || !salesId ? <p role="status" className="text-sm leading-6">L’inscription est momentanément indisponible. Merci de réessayer ultérieurement.</p> : null}
     {error ? <p role="alert" className="text-sm leading-6 text-[var(--status-error-text)]">{error}</p> : null}
-    <p className="text-sm leading-6 text-[var(--text-muted)]">Vous disposez déjà d’un accès ? <Link href="/" className="underline">Connectez-vous avant tout nouvel achat.</Link></p>
   </form>;
 }

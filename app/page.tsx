@@ -7,9 +7,9 @@ import { getCurrentAccount } from "@/lib/session";
 import PaymentSuccessPopup from "./ui/payment-success-popup";
 
 const studioNotes = [
-  "Un parcours guidé pour structurer votre projet vidéo",
-  "Des exercices pour définir vos objectifs et vos messages",
-  "Un carnet de projet personnalisé à télécharger",
+  "Clarifiez vos objectifs et les messages à transmettre.",
+  "Explorez votre univers et donnez une direction à vos idées.",
+  "Construisez votre carnet de projet à votre rythme.",
 ];
 
 export default async function Home({
@@ -54,16 +54,15 @@ export default async function Home({
                 </div>
 
                 <div className="mx-auto flex w-full max-w-[30rem] flex-col items-start justify-center text-left lg:mx-0 lg:max-w-none">
-                  <h1 className="bs-text-on-light-primary max-w-full text-balance font-[family:var(--font-cormorant)] text-[2.6rem] leading-[1.04] tracking-[-0.035em] text-[var(--heading-color)] sm:text-[3.2rem] xl:text-[3.45rem]">
-                    Brand Studio <span className="whitespace-nowrap">X TyASH</span>
+                  <h1 className="bs-text-on-light-primary max-w-full text-balance font-[family:var(--font-cormorant)] text-[2.25rem] leading-[1.08] tracking-[-0.035em] text-[var(--heading-color)] sm:text-[2.8rem] xl:text-[3rem]">
+                    Une belle vidéo commence par une idée claire.
                   </h1>
                   <p className="bs-text-on-light-primary mt-5 max-w-[25rem] text-balance text-[1.15rem] font-semibold leading-[1.45] text-[var(--heading-color)] sm:text-[1.3rem]">
-                    Donnez vie à votre projet vidéo, étape par étape.
+                    Avant de passer derrière la caméra, passons derrière vos idées.
                   </p>
                   <p className="bs-text-on-light-secondary mt-4 max-w-[27rem] text-[0.97rem] leading-[1.8] text-[var(--text-muted)]">
-                    Un espace pour poser vos idées, clarifier vos intentions et
-                    construire un projet vidéo qui vous ressemble, avant de
-                    passer à la création.
+                    Explorez vos intentions, affinez vos messages et construisez
+                    un projet vidéo qui vous ressemble.
                   </p>
 
                   <ul className="mt-7 grid gap-4 border-l border-[var(--border)] pl-5">
